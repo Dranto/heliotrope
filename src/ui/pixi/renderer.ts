@@ -1104,7 +1104,6 @@ export class MapRenderer {
       mote.sprite.position.set((mote.x + wobble) * width, (mote.y + wobble * 0.6) * height);
       mote.sprite.alpha = 0.35 + Math.sin(t * 1.4 + mote.phase) * 0.3;
     }
-
   }
 
   private drawShadows(): void {
