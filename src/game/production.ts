@@ -1,5 +1,7 @@
 // Production, click and cost formulas (docs/game-design.md §4, §5, §8). Pure functions shared
 // by the game, the UI and the balancing simulator.
+import { achievementBonus } from './achievements';
+import { effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import { seedBonus } from './seasons';
 import type { GameState } from './state';
@@ -37,9 +39,14 @@ export function biodiversityBonus(state: GameState): number {
   return steps * BIODIVERSITY_STEP;
 }
 
-/** §8: multiplier applied to every generator: Seeds × biodiversity (Milestones come later). */
+/** §8: multiplier applied to every generator: Seeds × Milestones × biodiversity × Floraison. */
 export function globalMultiplier(state: GameState): number {
-  return (1 + seedBonus(state.seeds)) * (1 + biodiversityBonus(state));
+  return (
+    (1 + seedBonus(state.seeds)) *
+    (1 + achievementBonus(state)) *
+    (1 + biodiversityBonus(state)) *
+    effectFactor(state.effects, 'bloom')
+  );
 }
 
 /** Light per second produced by all units of one generator, multipliers included. */
@@ -58,7 +65,10 @@ export function lightPerSecond(state: GameState): number {
   return total;
 }
 
-/** §5.2: click = 1 × click multipliers + share of the production per second. */
+/**
+ * §5.2: click = 1 × click multipliers + share of the production per second, all ×100 during a
+ * Pollinisation (§9.2).
+ */
 export function clickValue(state: GameState): number {
   let multiplier = 1;
   let fraction = 0;
@@ -66,7 +76,8 @@ export function clickValue(state: GameState): number {
     if (effect.kind === 'clickMultiplier') multiplier *= effect.factor;
     if (effect.kind === 'clickFromProduction') fraction += effect.fraction;
   }
-  return multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
+  const base = multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
+  return base * effectFactor(state.effects, 'pollination');
 }
 
 /**

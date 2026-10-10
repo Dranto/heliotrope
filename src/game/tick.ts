@@ -5,30 +5,53 @@ import {
   lightPerSecond,
   clickValue,
 } from './production';
+import { unlockAchievements } from './achievements';
+import { advanceButterfly } from './butterfly';
 import type { GeneratorId } from './generators';
+import { unlockJournal } from './journal';
+import { earnLight } from './light';
 import type { GameState } from './state';
 import { UPGRADES, type UpgradeId } from './upgrades';
 
-/** Add Light to the reserve, to the Season total and to the all-time total. */
-export function earnLight(state: GameState, amount: number): GameState {
-  return {
-    ...state,
-    resources: { ...state.resources, light: state.resources.light + amount },
-    totalLight: state.totalLight + amount,
-    allTimeLight: state.allTimeLight + amount,
-  };
+export { earnLight };
+
+/**
+ * Production over dtSeconds, split where a Golden Butterfly effect ends so a long tick (a
+ * throttled tab) earns exactly what many short ones would.
+ */
+function produce(state: GameState, dtSeconds: number): GameState {
+  let next = state;
+  let remaining = dtSeconds;
+  while (remaining > 0) {
+    const step = Math.min(remaining, ...next.effects.map((e) => e.remaining));
+    next = earnLight(next, lightPerSecond(next) * step);
+    next = {
+      ...next,
+      effects: next.effects
+        .map((e) => ({ ...e, remaining: e.remaining - step }))
+        .filter((e) => e.remaining > 1e-9),
+    };
+    remaining -= step;
+  }
+  return next;
 }
 
-/** Advance the simulation by dtSeconds. Pure: returns a new state. */
+/** Unlock the Milestones and journal entries the state now qualifies for. */
+export function unlockProgress(state: GameState): GameState {
+  return unlockJournal(unlockAchievements(state));
+}
+
+/** Advance the simulation by dtSeconds of online play. Pure: returns a new state. */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const next = earnLight(state, lightPerSecond(state) * dtSeconds);
-  return {
+  const next = advanceButterfly(produce(state, dtSeconds), dtSeconds);
+  return unlockProgress({
     ...next,
     playSeconds: state.playSeconds + dtSeconds,
     seasonSeconds: state.seasonSeconds + dtSeconds,
+    idleSeconds: state.idleSeconds + dtSeconds,
     lastUpdate: state.lastUpdate + dtSeconds * 1000,
-  };
+  });
 }
 
 /** Player action: click the heliotrope. */
@@ -52,6 +75,7 @@ export function buyGenerator(state: GameState, id: GeneratorId, count = 1): Game
     // Clamp so floating-point error never leaves a tiny negative reserve.
     resources: { ...state.resources, light: Math.max(0, state.resources.light - cost) },
     generators: { ...state.generators, [id]: state.generators[id] + count },
+    idleSeconds: 0,
   };
 }
 
@@ -70,5 +94,6 @@ export function buyUpgrade(state: GameState, id: UpgradeId): GameState {
     ...state,
     resources: { ...state.resources, light: state.resources.light - UPGRADES[id].cost },
     upgrades: [...state.upgrades, id],
+    idleSeconds: 0,
   };
 }

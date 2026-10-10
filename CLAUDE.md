@@ -25,6 +25,11 @@ a design decision changes, update that document in the same PR.
   - `production.ts`: pure formulas: production, multipliers, biodiversity, click value, costs,
     upgrade availability
   - `seasons.ts`: prestige (design doc §7): Seeds formula, bonus, `startNewSeason`
+  - `achievements.ts`: Milestones ("Jalons", §9.3) data table, +1% bonus, unlock checks
+  - `butterfly.ts`, `effects.ts`: the Golden Butterfly (§9.2), its schedule and timed effects
+  - `journal.ts`: neighbourhood journal entries and their unlock conditions (§6)
+  - `phases.ts`: progression phases and visual seasons of the scene (§6)
+  - `random.ts`: seeded random numbers; the seed lives in `GameState` so random events stay pure
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
   - `tick.ts`: `tick(state, dtSeconds)` and player actions; pure functions returning new state
   - `offline.ts`: offline progress on load, capped by `MAX_OFFLINE_SECONDS`, simulated in chunks
@@ -33,8 +38,8 @@ a design decision changes, update that document in the same PR.
     targets within ±30%
   - `store.ts`: `GameStore`, which owns live state, the tick interval and autosave
   - `format.ts`: number formatting for display (French notation, design doc §8)
-- `src/i18n/fr.ts`: every player-facing text (UI strings, generator and upgrade names and
-  flavour lines).
+- `src/i18n/fr.ts`: every player-facing text (UI strings, generator, upgrade and Milestone names,
+  flavour lines, journal entries).
 - `src/ui/`: React components. Read state with `useGameState()`, change it with
   `store.dispatch((s) => action(s))`.
 

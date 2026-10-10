@@ -19,11 +19,23 @@ function threeDigits(value: number): string {
   return value.toFixed(value < 10 ? 2 : value < 100 ? 1 : 0).replace('.', ',');
 }
 
-function formatAbs(abs: number): string {
+export type Notation = 'short' | 'scientific';
+
+/**
+ * Display notation chosen in the Options (§8). Kept here so every number on screen follows it;
+ * the UI sets it from the saved settings before rendering.
+ */
+let currentNotation: Notation = 'short';
+
+export function setNotation(notation: Notation): void {
+  currentNotation = notation;
+}
+
+function formatAbs(abs: number, notation: Notation): string {
   if (abs < 1e6) {
     // Small fractional values (rates such as 0,1/s) keep one decimal; the rest is whole.
     const text = abs < 100 && !Number.isInteger(abs) ? abs.toFixed(1) : Math.round(abs).toFixed(0);
-    if (text === '1000000') return formatAbs(1e6);
+    if (text === '1000000') return formatAbs(1e6, notation);
     const [integer = '', decimals] = text.split('.');
     const grouped = groupThousands(integer);
     return decimals === undefined || decimals === '0' ? grouped : `${grouped},${decimals}`;
@@ -36,17 +48,20 @@ function formatAbs(abs: number): string {
     mantissa /= 10;
   }
   const tier = Math.floor((exponent - FIRST_SUFFIX_EXPONENT) / 3);
-  const suffix = SUFFIXES[tier];
+  const suffix = notation === 'short' ? SUFFIXES[tier] : undefined;
   if (suffix === undefined) return `${threeDigits(mantissa)}e${exponent}`;
   const scaled = mantissa * 10 ** ((exponent - FIRST_SUFFIX_EXPONENT) % 3);
   return `${threeDigits(scaled)}${SPACE}${suffix}`;
 }
 
-/** Human-readable number for display: 12345 -> "12 345", 1.234e6 -> "1,23 M". */
-export function formatNumber(value: number): string {
+/**
+ * Human-readable number for display: 12345 -> "12 345", 1.234e6 -> "1,23 M", or "1,23e6" in
+ * scientific notation.
+ */
+export function formatNumber(value: number, notation: Notation = currentNotation): string {
   if (!Number.isFinite(value)) return String(value);
   const sign = value < 0 ? '-' : '';
-  return sign + formatAbs(Math.abs(value));
+  return sign + formatAbs(Math.abs(value), notation);
 }
 
 /** A ratio as a French percentage number, without the sign: 0.05 -> "5", 0.025 -> "2,5". */

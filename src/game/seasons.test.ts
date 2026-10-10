@@ -99,6 +99,9 @@ describe('new Season', () => {
       clicks: 500,
       playSeconds: 7200,
       seasonSeconds: 0,
+      achievements: ['light.3', 'light.6', 'light.9', 'clicks.100', 'seasons.1'],
+      journal: ['firstSeason'],
+      butterfly: { nextIn: state.butterfly.nextIn, visible: 0 },
     });
     expect(isSeasonsScreenUnlocked(next)).toBe(true);
   });

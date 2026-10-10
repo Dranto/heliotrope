@@ -1,7 +1,11 @@
+import { isAchievementId, type AchievementId } from './achievements';
+import { EFFECTS, type ActiveEffect } from './effects';
 import { GENERATOR_IDS } from './generators';
+import { isJournalId, type JournalId } from './journal';
 import { RESOURCE_IDS } from './resources';
 import { isUpgradeId, type UpgradeId } from './upgrades';
-import { createInitialState, STATE_VERSION, type GameState } from './state';
+import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameState } from './state';
+import { BUTTERFLY_VISIBLE_SECONDS } from './butterfly';
 
 export const SAVE_KEY = 'heliotrope.save';
 
@@ -24,6 +28,10 @@ const migrations: Record<number, Migration> = {
     seasonSeconds: 0,
     version: 4,
   }),
+  // v5 adds Milestones, the journal, the Golden Butterfly and options (milestone 4). Their
+  // defaults come from the fresh state in deserialize; Milestones already earned unlock on the
+  // first tick.
+  4: (raw) => ({ ...raw, version: 5 }),
 };
 
 function isFiniteNumber(value: unknown): value is number {
@@ -32,6 +40,17 @@ function isFiniteNumber(value: unknown): value is number {
 
 function isCount(value: unknown): value is number {
   return isFiniteNumber(value) && Number.isInteger(value) && value >= 0;
+}
+
+function isEffect(value: unknown): value is ActiveEffect {
+  if (typeof value !== 'object' || value === null) return false;
+  const { kind, remaining } = value as Record<string, unknown>;
+  return (
+    (kind === 'bloom' || kind === 'pollination') &&
+    isFiniteNumber(remaining) &&
+    remaining > 0 &&
+    remaining <= EFFECTS[kind].seconds
+  );
 }
 
 export function serialize(state: GameState): string {
@@ -87,6 +106,42 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (isFiniteNumber(data.seasonSeconds) && data.seasonSeconds >= 0) {
     state.seasonSeconds = Math.min(data.seasonSeconds, state.playSeconds);
+  }
+  if (isFiniteNumber(data.idleSeconds) && data.idleSeconds >= 0) {
+    state.idleSeconds = Math.min(data.idleSeconds, state.seasonSeconds);
+  }
+  if (Array.isArray(data.achievements)) {
+    state.achievements = [...new Set<AchievementId>(data.achievements.filter(isAchievementId))];
+  }
+  if (Array.isArray(data.journal)) {
+    state.journal = [...new Set<JournalId>(data.journal.filter(isJournalId))];
+  }
+  if (isCount(data.butterflies)) state.butterflies = data.butterflies;
+  const butterfly = data.butterfly as Record<string, unknown> | undefined;
+  if (
+    isFiniteNumber(butterfly?.nextIn) &&
+    isFiniteNumber(butterfly.visible) &&
+    butterfly.nextIn >= 0 &&
+    butterfly.visible >= 0
+  ) {
+    state.butterfly = {
+      nextIn: Math.min(butterfly.nextIn, BUTTERFLY_MAX_INTERVAL),
+      visible: Math.min(butterfly.visible, BUTTERFLY_VISIBLE_SECONDS),
+    };
+  }
+  if (Array.isArray(data.effects)) {
+    // At most one running effect of each kind.
+    state.effects = data.effects
+      .filter(isEffect)
+      .filter((effect, i, list) => list.findIndex((e) => e.kind === effect.kind) === i);
+  }
+  if (isCount(data.rngSeed) && data.rngSeed <= 0xffffffff) state.rngSeed = data.rngSeed;
+  const settings = data.settings as Record<string, unknown> | undefined;
+  if (settings?.notation === 'short' || settings?.notation === 'scientific') {
+    state.settings = { ...state.settings, notation: settings.notation };
+  }
+  if (typeof settings?.reducedMotion === 'boolean') {
+    state.settings = { ...state.settings, reducedMotion: settings.reducedMotion };
   }
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
   return state;
