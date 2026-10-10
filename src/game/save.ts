@@ -14,6 +14,16 @@ const migrations: Record<number, Migration> = {
   1: ({ resources: _placeholder, ...rest }) => ({ ...rest, version: 2 }),
   // v3 adds bought upgrades; v2 players had none.
   2: (raw) => ({ ...raw, upgrades: [], version: 3 }),
+  // v4 adds the Seasons (§7) and statistics. Before it, all Light was earned in the first Season.
+  3: (raw) => ({
+    ...raw,
+    allTimeLight: raw.totalLight,
+    seeds: 0,
+    seasons: 0,
+    playSeconds: 0,
+    seasonSeconds: 0,
+    version: 4,
+  }),
 };
 
 function isFiniteNumber(value: unknown): value is number {
@@ -63,7 +73,21 @@ export function deserialize(json: string, now: number): GameState | null {
     state.upgrades = [...new Set<UpgradeId>(data.upgrades.filter(isUpgradeId))];
   }
   if (isFiniteNumber(data.totalLight) && data.totalLight >= 0) state.totalLight = data.totalLight;
+  // The all-time total includes the current Season, so it can never be below it.
+  if (isFiniteNumber(data.allTimeLight) && data.allTimeLight >= state.totalLight) {
+    state.allTimeLight = data.allTimeLight;
+  } else {
+    state.allTimeLight = state.totalLight;
+  }
+  if (isCount(data.seeds)) state.seeds = data.seeds;
+  if (isCount(data.seasons)) state.seasons = data.seasons;
   if (isCount(data.clicks)) state.clicks = data.clicks;
+  if (isFiniteNumber(data.playSeconds) && data.playSeconds >= 0) {
+    state.playSeconds = data.playSeconds;
+  }
+  if (isFiniteNumber(data.seasonSeconds) && data.seasonSeconds >= 0) {
+    state.seasonSeconds = Math.min(data.seasonSeconds, state.playSeconds);
+  }
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
   return state;
 }

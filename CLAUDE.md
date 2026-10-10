@@ -24,6 +24,7 @@ a design decision changes, update that document in the same PR.
   - `upgrades.ts`: upgrade data table (×2 per generator, click upgrades, synergies)
   - `production.ts`: pure formulas: production, multipliers, biodiversity, click value, costs,
     upgrade availability
+  - `seasons.ts`: prestige (design doc §7): Seeds formula, bonus, `startNewSeason`
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
   - `tick.ts`: `tick(state, dtSeconds)` and player actions; pure functions returning new state
   - `offline.ts`: offline progress on load, capped by `MAX_OFFLINE_SECONDS`, simulated in chunks

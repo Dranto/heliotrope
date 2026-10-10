@@ -2,17 +2,22 @@
 // the game's own formulas and data, and reports when each pacing event of §8 happens.
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { availableUpgrades, clickValue, generatorCost, lightPerSecond } from './production';
+import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { buyGenerator, buyUpgrade, earnLight, tick } from './tick';
 import type { UpgradeId } from './upgrades';
 
-/** Light earned in total that makes the first Season advisable: 10 Seeds (§7), 100 × 5e7. */
-export const ADVISED_SEASON_LIGHT = 5e9;
+/** Light earned in a Season that makes the first Season advisable: 10 Seeds (§7), 5e9. */
+export const ADVISED_SEASON_LIGHT = lightForSeeds(ADVISED_FIRST_SEASON_SEEDS);
 
 /** Click rate of the reference active player used for the §8 pacing table. */
 export const REFERENCE_CLICKS_PER_SECOND = 2.5;
 
 export interface SimulationOptions {
+  /** State to start from; a fresh game by default. */
+  state?: GameState;
+  /** Stop as soon as the Season total reaches ADVISED_SEASON_LIGHT. */
+  stopWhenAdvised?: boolean;
   /** Clicks per second of the simulated active player. */
   clicksPerSecond?: number;
   /** Stop after this many seconds of play. */
@@ -24,7 +29,7 @@ export interface SimulationOptions {
 export interface SimulationResult {
   /** Seconds of play when the first unit of each generator was bought. */
   firstGenerator: Partial<Record<GeneratorId, number>>;
-  /** Seconds of play when the Season total reached ADVISED_SEASON_LIGHT. */
+  /** Seconds of play when the Season total reached ADVISED_SEASON_LIGHT (5e9 Light). */
   advisedSeason?: number;
   /** State at the end of the simulation. */
   state: GameState;
@@ -82,16 +87,18 @@ function bestOption(state: GameState, clicksPerSecond: number): Option {
 }
 
 export function simulate({
+  state: start = createInitialState(0),
+  stopWhenAdvised = false,
   clicksPerSecond = REFERENCE_CLICKS_PER_SECOND,
   maxSeconds = 5 * 3600,
   maxStepSeconds = 10,
 }: SimulationOptions = {}): SimulationResult {
-  let state = createInitialState(0);
+  let state = start;
   let seconds = 0;
   const firstGenerator: SimulationResult['firstGenerator'] = {};
   let advisedSeason: number | undefined;
 
-  while (seconds < maxSeconds) {
+  while (seconds < maxSeconds && !(stopWhenAdvised && advisedSeason !== undefined)) {
     const option = bestOption(state, clicksPerSecond);
     const price = cost(state, option);
     const rate = income(state, clicksPerSecond);
@@ -120,6 +127,23 @@ export function simulate({
     }
   }
   return { firstGenerator, advisedSeason, state, seconds };
+}
+
+/**
+ * Milestone 3 exit criterion (§12): play the first Season until it is advisable, start a new
+ * Season, then play the second one for as long. Each pacing event should come sooner.
+ */
+export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {}): {
+  first: SimulationResult;
+  second: SimulationResult;
+} {
+  const first = simulate({ ...options, stopWhenAdvised: true });
+  const second = simulate({
+    ...options,
+    state: startNewSeason(first.state),
+    stopWhenAdvised: true,
+  });
+  return { first, second };
 }
 
 /** §8 pacing targets for a first active playthrough, in seconds. */

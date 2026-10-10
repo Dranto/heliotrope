@@ -18,7 +18,12 @@ function playedState(): GameState {
     generators: { ...base.generators, pot: 3, balconyPanel: 1 },
     upgrades: ['pot.1', 'gloves'],
     totalLight: 300,
+    allTimeLight: 9e9,
+    seeds: 12,
+    seasons: 2,
     clicks: 120,
+    playSeconds: 30_000,
+    seasonSeconds: 600,
   };
 }
 
@@ -88,6 +93,35 @@ describe('save', () => {
     expect(state.generators.arcology).toBe(0);
     expect(state.totalLight).toBe(20_000);
     expect(state.lastUpdate).toBe(5000);
+  });
+
+  it('migrates a v3 save into its first Season, counting its Light as all-time Light', () => {
+    const v3 = JSON.stringify({
+      version: 3,
+      resources: { light: 10 },
+      generators: { pot: 2 },
+      upgrades: ['pot.1'],
+      totalLight: 6e8,
+      clicks: 40,
+      lastUpdate: 7000,
+    });
+    const state = deserialize(v3, 0)!;
+    expect(state).toMatchObject({
+      version: STATE_VERSION,
+      upgrades: ['pot.1'],
+      totalLight: 6e8,
+      allTimeLight: 6e8,
+      seeds: 0,
+      seasons: 0,
+      clicks: 40,
+      playSeconds: 0,
+      seasonSeconds: 0,
+    });
+  });
+
+  it('never lets the all-time Light fall below the Season total', () => {
+    const json = JSON.stringify({ version: STATE_VERSION, totalLight: 500, allTimeLight: 100 });
+    expect(deserialize(json, 0)?.allTimeLight).toBe(500);
   });
 });
 
