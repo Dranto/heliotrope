@@ -20,7 +20,7 @@ describe('balancing simulator', () => {
     },
   );
 
-  it('makes the first Season advisable within ±30% of 2 h 15', () => {
+  it('makes the first Season advisable within ±30% of 1 h 40', () => {
     const ratio = result.advisedSeason! / PACING_TARGETS.advisedSeason;
     expect(ratio).toBeGreaterThanOrEqual(0.7);
     expect(ratio).toBeLessThanOrEqual(1.3);

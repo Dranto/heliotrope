@@ -230,12 +230,12 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
 /** §8 pacing targets for a first active playthrough, in seconds. */
 export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   pot: 15,
-  balconyPanel: 45,
-  rooftopGarden: 2.5 * 60,
-  greenhouse: 7 * 60,
-  verticalFarm: 15 * 60,
-  mirrorPlant: 35 * 60,
-  urbanCanopy: 65 * 60,
-  arcology: 105 * 60,
-  advisedSeason: 135 * 60,
+  balconyPanel: 35,
+  rooftopGarden: 1.5 * 60,
+  greenhouse: 5.5 * 60,
+  verticalFarm: 12 * 60,
+  mirrorPlant: 26 * 60,
+  urbanCanopy: 50 * 60,
+  arcology: 80 * 60,
+  advisedSeason: 100 * 60,
 };
