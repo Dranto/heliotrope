@@ -437,6 +437,7 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 - Jusqu'à 999 999 : chiffres complets avec séparateur de milliers (« 12 345 »).
 - Au-delà : suffixes courts de l'échelle longue avec 3 chiffres significatifs (« 1,23 M », « 45,6 Md », « 7,89 Bn »…) : M (million, 1e6), Md (milliard), Bn (billion), Bd (billiard), Tn (trillion), Td (trilliard), Qn (quadrillion), Qd (quadrilliard, 1e27), puis notation scientifique (« 1,23e30 ») au-delà du dernier suffixe.
 - Option pour forcer la notation scientifique partout.
+- En anglais (M8, §14 Q1) : mêmes règles avec le point décimal, la virgule comme séparateur de milliers et les suffixes de l'échelle courte (« 12,345 », « 1.23 M », « 45.6 B », « 7.89 T » ; puis Qa, Qi, Sx, Sp, Oc).
 
 ---
 
@@ -532,7 +533,7 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi (§7.1) | 1ʳᵉ Graine |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
-| **Options** | Notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
+| **Options** | Langue (français ou anglais), notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
 | **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
 
 Les Options proposent aussi de réduire les animations, en plus du réglage `prefers-reduced-motion` de l'appareil (§10.4), et, depuis M6, de régler le volume des sons ou de les couper (§6.3).
@@ -677,7 +678,7 @@ Décisions qui appartiennent à Antoine. En attendant sa réponse, le document a
 
 | # | Question | Choix recommandé (appliqué par défaut) |
 |---|---|---|
-| Q1 | Langue de l'interface du jeu ? | Français d'abord, textes externalisés pour ajouter l'anglais ensuite |
+| Q1 | Langue de l'interface du jeu ? | Français d'abord. *Livré en M8 :* version anglaise complète, choisie dans les Options (le français reste la langue par défaut). Tous les textes sont dans `src/i18n/` (`fr.ts` fait référence, `en.ts` a la même forme). |
 | Q2 | Plateforme visée ? | Navigateur, bureau d'abord, mais jouable sur mobile (responsive) |
 | Q3 | Production hors ligne : 100 % plafonnée à 8 h ? | Oui |
 | Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP : livrée en M6 (parcelles, §6.1) |

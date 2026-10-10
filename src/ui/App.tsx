@@ -13,7 +13,7 @@ import {
 import type { GameState } from '../game/state';
 import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
 import { achievementName } from '../i18n/achievements';
-import { t } from '../i18n/fr';
+import { setLanguage, t } from '../i18n';
 import { Achievements } from './Achievements';
 import { Cooperatives } from './Cooperatives';
 import { Flower } from './Flower';
@@ -97,8 +97,14 @@ export function App() {
     store.offlineSeconds >= 60 && store.offlineLight >= 1,
   );
   useSounds(state);
-  // Every number on screen follows the notation chosen in the Options (§8).
+  // Every number on screen follows the notation chosen in the Options (§8), every text the
+  // language (§14 Q1).
   setNotation(state.settings.notation);
+  setLanguage(state.settings.language);
+  const { language } = state.settings;
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const closeScreen = useCallback(() => setScreen(null), []);
   const notify = useCallback((text: string) => {
@@ -279,7 +285,8 @@ export function App() {
         </div>
       )}
 
-      <main className="layout">
+      {/* Memoised drawings keep their texts until their props change: redraw on a new language. */}
+      <main className="layout" key={language}>
         <Flower />
         <Scene onCatch={onCatch} />
         <div className="column">
