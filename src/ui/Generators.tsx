@@ -12,7 +12,7 @@ import {
 } from '../game/production';
 import type { GameState } from '../game/state';
 import { buyGenerator, canBuyGenerator } from '../game/tick';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { useGameState, useGameStore } from './useGame';
 
 type BuyAmount = 1 | 10 | 100 | 'max';

@@ -11,7 +11,7 @@ import {
 import type { GeneratorId } from '../game/generators';
 import type { Phase } from '../game/phases';
 import type { UpgradeId } from '../game/upgrades';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import {
   ARCOLOGY_SITE,
   BLOCKS,

@@ -1,6 +1,7 @@
-// French texts (docs/game-design.md §14 Q1: French first, texts kept out of the code so an
-// English translation can be added later).
+// French texts, the reference language (docs/game-design.md §14 Q1). Every other language
+// (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
 import type { AchievementId } from '../game/achievements';
+import type { Language } from '../game/format';
 import type { GeneratorId } from '../game/generators';
 import type { ParcelId } from '../game/parcels';
 import type { VisualSeason } from '../game/phases';
@@ -394,6 +395,8 @@ export const fr = {
     cooperativePurchases: 'Achats des coopératives',
     percent: (percent: string) => `+${percent}\u00a0%`,
   },
+  /** Each language is named in itself, so a player lost in the other one finds theirs. */
+  languageNames: { fr: 'Français', en: 'English' } satisfies Record<Language, string>,
   options: {
     open: 'Options',
     title: 'Options',
@@ -403,6 +406,7 @@ export const fr = {
     notationShort: 'Suffixes courts (1,23\u00a0M)',
     notationScientific: 'Scientifique (1,23e6)',
     reducedMotion: 'Réduire les animations',
+    language: 'Langue',
     soundTitle: 'Son',
     volume: 'Volume',
     muted: 'Couper le son',
@@ -572,4 +576,4 @@ export const fr = {
   } satisfies Record<ClickSynergyId, UpgradeText>,
 };
 
-export const t = fr;
+export type Texts = typeof fr;

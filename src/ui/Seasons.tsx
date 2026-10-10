@@ -10,7 +10,7 @@ import {
   startNewSeason,
 } from '../game/seasons';
 import { canLearnTalent, TALENT_LIST } from '../game/talents';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { Dialog } from './Dialog';
 import { useGameState, useGameStore } from './useGame';
 

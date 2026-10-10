@@ -1,22 +1,51 @@
-// Number display rules from docs/game-design.md §8, in French notation:
-// full digits with a thin-space separator up to 999 999, then short long-scale suffixes
-// with 3 significant digits ("1,23 M", "45,6 Md"), then scientific notation.
+// Number display rules from docs/game-design.md §8. In French notation: full digits with a
+// thin-space separator up to 999 999, then short long-scale suffixes with 3 significant digits
+// ("1,23 M", "45,6 Md"), then scientific notation. The English version (§14 Q1) follows the
+// same rules with a decimal point, comma separators and short-scale suffixes ("1.23 M", "45.6 B").
 
-/** Narrow no-break space: the French thousands separator, and the space before a suffix. */
-const SPACE = ' ';
+/** Narrow no-break space: the space before a suffix, and the French thousands separator. */
+const SPACE = '\u202f';
 
-/** Long-scale French suffixes, one per power of 1000 starting at 1e6. */
-const SUFFIXES = ['M', 'Md', 'Bn', 'Bd', 'Tn', 'Td', 'Qn', 'Qd'];
+/** Languages of the interface (§14 Q1): French first, English second. */
+export type Language = 'fr' | 'en';
+
+export const LANGUAGES: readonly Language[] = ['fr', 'en'];
+
+interface NumberStyle {
+  decimal: string;
+  thousands: string;
+  /** One suffix per power of 1000, starting at 1e6. */
+  suffixes: readonly string[];
+}
+
+const STYLES: Record<Language, NumberStyle> = {
+  // Long scale: million, milliard, billion, billiard…
+  fr: { decimal: ',', thousands: SPACE, suffixes: ['M', 'Md', 'Bn', 'Bd', 'Tn', 'Td', 'Qn', 'Qd'] },
+  // Short scale: million, billion, trillion, quadrillion…
+  en: { decimal: '.', thousands: ',', suffixes: ['M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc'] },
+};
 
 const FIRST_SUFFIX_EXPONENT = 6;
 
-function groupThousands(integer: string): string {
-  return integer.replace(/\B(?=(\d{3})+(?!\d))/g, SPACE);
+/** Language of the numbers on screen; the UI sets it from the saved settings, like the notation. */
+let style: NumberStyle = STYLES.fr;
+
+export function setNumberLanguage(language: Language): void {
+  style = STYLES[language];
 }
 
-/** 3 significant digits for a value in [1, 1000), French decimal comma. */
+function groupThousands(integer: string): string {
+  return integer.replace(/\B(?=(\d{3})+(?!\d))/g, style.thousands);
+}
+
+/** A plain decimal number with the separator of the language: 1.5 -> "1,5" in French. */
+export function formatDecimal(value: number): string {
+  return String(value).replace('.', style.decimal);
+}
+
+/** 3 significant digits for a value in [1, 1000). */
 function threeDigits(value: number): string {
-  return value.toFixed(value < 10 ? 2 : value < 100 ? 1 : 0).replace('.', ',');
+  return value.toFixed(value < 10 ? 2 : value < 100 ? 1 : 0).replace('.', style.decimal);
 }
 
 export type Notation = 'short' | 'scientific';
@@ -38,7 +67,9 @@ function formatAbs(abs: number, notation: Notation): string {
     if (text === '1000000') return formatAbs(1e6, notation);
     const [integer = '', decimals] = text.split('.');
     const grouped = groupThousands(integer);
-    return decimals === undefined || decimals === '0' ? grouped : `${grouped},${decimals}`;
+    return decimals === undefined || decimals === '0'
+      ? grouped
+      : `${grouped}${style.decimal}${decimals}`;
   }
   let exponent = Math.floor(Math.log10(abs));
   let mantissa = abs / 10 ** exponent;
@@ -48,7 +79,7 @@ function formatAbs(abs: number, notation: Notation): string {
     mantissa /= 10;
   }
   const tier = Math.floor((exponent - FIRST_SUFFIX_EXPONENT) / 3);
-  const suffix = notation === 'short' ? SUFFIXES[tier] : undefined;
+  const suffix = notation === 'short' ? style.suffixes[tier] : undefined;
   if (suffix === undefined) return `${threeDigits(mantissa)}e${exponent}`;
   const scaled = mantissa * 10 ** ((exponent - FIRST_SUFFIX_EXPONENT) % 3);
   return `${threeDigits(scaled)}${SPACE}${suffix}`;
@@ -64,7 +95,7 @@ export function formatNumber(value: number, notation: Notation = currentNotation
   return sign + formatAbs(Math.abs(value), notation);
 }
 
-/** A ratio as a French percentage number, without the sign: 0.05 -> "5", 0.025 -> "2,5". */
+/** A ratio as a percentage number, without the sign: 0.05 -> "5", 0.025 -> "2,5". */
 export function formatPercent(ratio: number): string {
   return formatNumber(Math.round(ratio * 1000) / 10);
 }

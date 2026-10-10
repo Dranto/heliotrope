@@ -297,6 +297,24 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('radio', { name: /suffixes courts/i }));
   });
 
+  it('switches the whole interface to English from the options (§14 Q1)', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, resources: { light: 12_345 }, totalLight: 12_345 });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    expect(screen.getByTestId('light')).toHaveTextContent('12 345');
+    fireEvent.click(screen.getByRole('button', { name: 'Options' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'English' }));
+    expect(store.getState().settings.language).toBe('en');
+    expect(document.documentElement.lang).toBe('en');
+    expect(screen.getByRole('dialog', { name: 'Options' })).toHaveTextContent('Language');
+    expect(screen.getByRole('button', { name: /harvest the heliotrope/i })).toBeInTheDocument();
+    expect(screen.getByTestId('light')).toHaveTextContent('12,345');
+    expect(screen.getByText('Potted heliotrope')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'Français' }));
+    expect(screen.getByText('Héliotrope en pot')).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe('fr');
+  });
+
   it('sets the volume and mutes the sounds from the options', () => {
     const store = renderApp();
     fireEvent.click(screen.getByRole('button', { name: 'Options' }));
