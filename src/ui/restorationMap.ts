@@ -23,6 +23,18 @@ export const PARCEL_PLACES: Record<ParcelId, Box> = {
   squares: [WEST, NORTH, EAST - WEST + W, SOUTH - NORTH + W],
 };
 
+/** Drawing order of the parcels: roofs, then streets, then the squares over their crossroads. */
+export const GROUND_ORDER: ParcelId[] = [
+  'livingRoofs',
+  'gardenStreet',
+  'rainGardens',
+  'pollinatorStrip',
+  'river',
+  'squares',
+  'park',
+  'orchard',
+];
+
 /** Roofs greened by the living roofs parcel. Gardens and farms later grow on top of them. */
 export const LIVING_ROOFS: Box[] = BUILDINGS.map(({ box }) => box);
 

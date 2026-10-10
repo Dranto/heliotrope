@@ -16,6 +16,7 @@ import { Appear } from './Neighbourhood';
 import { STREETS, WORLD, type Box } from './neighbourhood';
 import {
   CROSSROADS,
+  GROUND_ORDER,
   LIVING_ROOFS,
   OUTER_AVENUES,
   PARCEL_PINS,
@@ -302,17 +303,21 @@ const PARCEL_ART: Record<ParcelId, () => ReactNode> = {
   orchard: Orchard,
 };
 
-/** Drawing order: roofs, then streets, then the squares over their crossroads. */
-const GROUND_ORDER: ParcelId[] = [
-  'livingRoofs',
-  'gardenStreet',
-  'rainGardens',
-  'pollinatorStrip',
-  'river',
-  'squares',
-  'park',
-  'orchard',
-];
+/** Patterns the parcels are painted with. */
+export function ParcelPatterns() {
+  return (
+    <pattern id="sedum-texture" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.7" className="sedum-dot" />
+      <circle cx="3" cy="3" r="0.5" className="sedum-dot" />
+    </pattern>
+  );
+}
+
+/** One restored parcel, without its entrance: the enriched map turns it into a texture. */
+export function ParcelArt({ id }: { id: ParcelId }) {
+  const Art = PARCEL_ART[id];
+  return <Art />;
+}
 
 /** Restored parcels, drawn over the grey city and under the generators. */
 export const ParcelGround = memo(function ParcelGround({
@@ -328,10 +333,7 @@ export const ParcelGround = memo(function ParcelGround({
     <LiveContext.Provider value={live}>
       <g className="parcels">
         <defs>
-          <pattern id="sedum-texture" width="4" height="4" patternUnits="userSpaceOnUse">
-            <circle cx="1" cy="1" r="0.7" className="sedum-dot" />
-            <circle cx="3" cy="3" r="0.5" className="sedum-dot" />
-          </pattern>
+          <ParcelPatterns />
         </defs>
         {GROUND_ORDER.filter((id) => parcels.includes(id)).map((id) => {
           const Art = PARCEL_ART[id];

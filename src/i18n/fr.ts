@@ -701,9 +701,9 @@ export const fr = {
       'Des sons discrets accompagnent la récolte, les achats et la restauration du quartier.',
     reducedMotionHint:
       'Arrête le pollen, la respiration du soleil et le vol du papillon. Suit aussi le réglage de votre appareil.',
-    enhancedMap: 'Rendu enrichi (expérimental)',
+    enhancedMap: 'Rendu enrichi',
     enhancedMapHint:
-      'Dessine la carte avec la carte graphique : ombres douces qui suivent le soleil, eau vivante, reflets sur le verre. Retour au rendu habituel si l’appareil ne le permet pas.',
+      'Dessine la carte avec la carte graphique : ombres douces qui suivent le soleil, eau vivante, reflets sur le verre. Choisi d’office quand l’appareil le permet ; décochez pour un rendu plus simple et plus léger.',
     saveTitle: 'Sauvegarde',
     saveHint: 'La partie est sauvegardée automatiquement toutes les 30 secondes.',
     saveNow: 'Sauvegarder maintenant',

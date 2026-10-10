@@ -34,13 +34,12 @@ import {
   VIEWS,
   type View,
 } from './neighbourhood';
-import { PIXI_PARCELS } from './pixi/model';
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
-/** The enriched WebGL map (§10.4), downloaded only when chosen in the Options. */
+/** The enriched WebGL map (§10.4), downloaded only where it is drawn. */
 const PixiMap = lazy(() => import('./pixi/PixiMap'));
 
 /** The Golden Butterfly (§9.2), drawn with fine lines like the rest of the botanical motifs. */
@@ -165,10 +164,10 @@ export function Scene({
     [bioregion, sites, collectors, raining, reduced],
   );
   const { roofTanks, swales } = collectors;
-  const overlay = useMemo(
+  // What moves on its own or answers the pointer: over both maps, drawn in SVG.
+  const marks = useMemo(
     () => (
       <>
-        <CityWater roofTanks={roofTanks} swales={swales} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
@@ -180,7 +179,16 @@ export function Scene({
         />
       </>
     ),
-    [roofTanks, swales, projects, species, bikes, reduced, offered, affordable, highlight, restore],
+    [projects, species, bikes, reduced, offered, affordable, highlight, restore],
+  );
+  const overlay = useMemo(
+    () => (
+      <>
+        <CityWater roofTanks={roofTanks} swales={swales} />
+        {marks}
+      </>
+    ),
+    [roofTanks, swales, marks],
   );
   const phase = phaseOf(state);
   const furthest = furthestView(phase, state.generators, bioregion);
@@ -206,14 +214,9 @@ export function Scene({
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
   // map only redraws when the colour visibly changes.
   const greenness = Math.round(Math.min(1, Math.log10(1 + lightPerSecond(state)) / 5) * 20) / 20;
-  const renderer = useMapRenderer();
+  const { renderer, chosen: rendererChosen } = useMapRenderer();
   const [webglFailed, setWebglFailed] = useState(false);
   const enhanced = renderer === 'pixi' && !webglFailed;
-  // The WebGL map draws some parcels itself; the SVG layer over it keeps the others.
-  const enhancedGround = useMemo(
-    () => <ParcelGround parcels={parcels.filter((id) => !PIXI_PARCELS.includes(id))} />,
-    [parcels],
-  );
   const svgMap = (
     <Neighbourhood
       generators={state.generators}
@@ -251,8 +254,12 @@ export function Scene({
               camera={camera}
               width={width}
               height={height}
-              ground={enhancedGround}
-              overlay={overlay}
+              sites={sites}
+              collectors={collectors}
+              raining={raining}
+              bioregion={bioregion}
+              strict={!rendererChosen}
+              overlay={marks}
               onFail={() => setWebglFailed(true)}
             />
           </Suspense>

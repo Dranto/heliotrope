@@ -16,10 +16,11 @@ const sceneLabel = 'Le quartier, qui reverdit à mesure que vous construisez';
 describe('Enhanced map (§10.4)', () => {
   beforeEach(() => localStorage.clear());
 
-  it('is off by default and switched on from the options, in this browser only', () => {
+  it('stays off where the device cannot draw it, and is chosen from the options per browser', () => {
     renderApp();
     fireEvent.click(screen.getByRole('button', { name: 'Options' }));
-    const toggle = screen.getByRole('checkbox', { name: 'Rendu enrichi (expérimental)' });
+    // jsdom has no WebGL: the automatic choice is the SVG map.
+    const toggle = screen.getByRole('checkbox', { name: 'Rendu enrichi' });
     expect(toggle).not.toBeChecked();
     fireEvent.click(toggle);
     expect(toggle).toBeChecked();

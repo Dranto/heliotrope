@@ -13,7 +13,9 @@ import {
   Sprite,
   Texture,
   TilingSprite,
+  isWebGLSupported,
 } from 'pixi.js';
+import type { CollectorId, SiteId } from '../../game/bioregion';
 import type { GeneratorId } from '../../game/generators';
 import type { ParcelId } from '../../game/parcels';
 import type { Phase, VisualSeason } from '../../game/phases';
@@ -40,6 +42,7 @@ import {
   type Box,
   type Camera,
 } from '../neighbourhood';
+import { CANALS, LAND, RAIN, RIVER, RIVER_NORTH, RIVER_SOUTH, landShown } from '../bioregionMap';
 import { PARCEL_PLACES } from '../restorationMap';
 import {
   arcologyRingArt,
@@ -76,6 +79,8 @@ import {
   type Palette,
   type Sun,
 } from './model';
+import { Snapshots } from './snapshot';
+import { mapSources, type SourceGroup } from './sources';
 
 /** Everything the map shows, as the SVG scene receives it. */
 export interface MapProps {
@@ -89,6 +94,14 @@ export interface MapProps {
   camera: Camera;
   width: number;
   height: number;
+  sites: Record<SiteId, number>;
+  collectors: Record<CollectorId, number>;
+  /** Water is being gathered (§7.4): a shower crosses the land. */
+  raining: boolean;
+  /** The Bioregion is open: the land around the city is drawn. */
+  bioregion: boolean;
+  /** Gives up on devices that would draw it slowly, so the SVG map stays: the automatic choice. */
+  strict?: boolean;
 }
 
 /** Shadows a little longer than the SVG scene's: real depth, now that their edges are soft. */
@@ -117,13 +130,13 @@ const OUTSKIRTS_TILE = {
 };
 const OUTSKIRTS_REACH = 1400;
 
-type Group = 'buildings' | GeneratorId | 'planter' | 'river' | 'bridges';
+type Group = 'buildings' | GeneratorId | 'planter' | 'river' | 'bridges' | SourceGroup;
 
 /** One drawn element of the map: a texture placed in the world, and the shadow it casts. */
 interface Item {
   key: string;
   group: Group;
-  art: () => Art;
+  art: () => Art | null;
   /** Where the drawing's origin goes, for drawings made around (0, 0). */
   at?: [number, number];
   rotation?: number;
@@ -131,6 +144,14 @@ interface Item {
   shadow?: Shadow;
   /** Size of the golden ring of its entrance. */
   ring?: number;
+  /** Where that ring is drawn, when not at the drawing's centre. */
+  ringAt?: [number, number];
+  /** Unveiled by a circle widening from a point, instead of growing. */
+  unveil?: { x: number; y: number; reach: number };
+  /** Drawn in place, without an entrance. */
+  still?: boolean;
+  /** Most pixels per world unit of its texture. */
+  maxRes?: number;
 }
 
 type Shadow =
@@ -143,6 +164,8 @@ interface Placed {
   textureKey: string | null;
   base: { x: number; y: number };
   born: number | null;
+  /** The circle unveiling it, during its entrance. */
+  mask?: Graphics;
 }
 
 interface Mote {
@@ -299,6 +322,38 @@ function vignetteTexture(): Texture {
   return Texture.from(canvas);
 }
 
+/**
+ * Haze over the far countryside, as in the SVG scene: clear around the city, fading into the
+ * cream of the page towards the edges of the land.
+ */
+function hazeTexture(): Texture {
+  const [x, y, w, h] = LAND;
+  const canvas = document.createElement('canvas');
+  canvas.width = 400;
+  canvas.height = Math.round((400 * h) / w);
+  const k = canvas.width / w;
+  const context = canvas.getContext('2d')!;
+  context.translate((WORLD.width / 2 - x) * k, (WORLD.height / 2 - y) * k);
+  context.scale(1, 0.8);
+  const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1400 * k);
+  gradient.addColorStop(0.72, 'rgba(251,246,236,0)');
+  gradient.addColorStop(1, 'rgba(251,246,236,0.75)');
+  context.fillStyle = gradient;
+  context.fillRect(-canvas.width * 2, -canvas.height * 3, canvas.width * 4, canvas.height * 6);
+  return Texture.from(canvas);
+}
+
+/** A stroked path as SVG, for the water courses drawn with Pixi's Graphics. */
+function stroke(d: string, width: number, colour: string, cap = 'round'): string {
+  return `<path d="${d}" fill="none" stroke="${colour}" stroke-width="${Math.max(1, width)}" stroke-linecap="${cap}"/>`;
+}
+
+/** Seconds a restored parcel takes to be unveiled, as in the SVG scene. */
+const UNVEIL = 2.4;
+
+/** One crossing of the land by the shower, as in the SVG scene. */
+const SHOWER_PERIOD = 70;
+
 /** Point on a cubic Bézier curve. */
 function bezier(c: readonly number[], t: number): [number, number] {
   const u = 1 - t;
@@ -348,6 +403,16 @@ export class MapRenderer {
   private vignette!: Sprite;
   private pollen = new Container();
   private motes: Mote[] = [];
+  /** The Bioregion around the city, under it: the plain and its sites, its water, haze, showers. */
+  private land = new Container();
+  private landWater = new Container();
+  private landDisplacement!: Sprite;
+  private landRipples!: TilingSprite;
+  private landSparkles: { sprite: Sprite; offset: number }[] = [];
+  private haze!: Sprite;
+  private shower = new Container();
+  private rain = new Graphics();
+  private snapshots: Snapshots | null;
 
   private textures = new Map<
     string,
@@ -380,9 +445,18 @@ export class MapRenderer {
   private shadowsDirty = true;
   private pending = 0;
 
-  /** Starts WebGL in `host`. False when the device cannot, so the SVG map stays. */
-  async init(host: HTMLElement): Promise<boolean> {
+  /** `sources`: the hidden SVG holding the drawings taken from the SVG scene (see sources.tsx). */
+  constructor(sources: SVGSVGElement | null = null) {
+    this.snapshots = sources ? new Snapshots(sources) : null;
+  }
+
+  /**
+   * Starts WebGL in `host`. False when the device cannot, or, when `strict`, when it would only
+   * draw it slowly (no graphics card): the SVG map stays.
+   */
+  async init(host: HTMLElement, strict = false): Promise<boolean> {
     try {
+      if (!isWebGLSupported(strict)) return false;
       await this.app.init({
         width: this.props?.width ?? 300,
         height: this.props?.height ?? 150,
@@ -427,6 +501,7 @@ export class MapRenderer {
     this.treeShadowLayer.filters = [new BlurFilter({ strength: 2, quality: 2 })];
     for (const group of [
       'river',
+      'parcels',
       'buildings',
       'rooftopGarden',
       'balconyPanel',
@@ -437,6 +512,7 @@ export class MapRenderer {
       'arcology',
       'bridges',
       'planter',
+      'cityWater',
       'urbanCanopy',
     ] as Group[]) {
       const container = new Container();
@@ -484,8 +560,54 @@ export class MapRenderer {
     this.vignette = new Sprite(vignetteTexture());
     this.screen.addChild(this.daylight, this.bloom, this.pollen, this.vignette);
 
-    this.world.addChild(this.outskirts, this.ground, this.items, this.effects, this.clouds);
+    this.buildLand();
+    this.world.addChild(
+      this.outskirts,
+      this.land,
+      this.ground,
+      this.items,
+      this.effects,
+      this.clouds,
+    );
     this.app.stage.addChild(this.world, this.screen);
+  }
+
+  /** Layers of the Bioregion, in the SVG scene's order. */
+  private buildLand(): void {
+    for (const group of ['landGround', 'landSites', 'landWater', 'landTop'] as const) {
+      if (group === 'landWater') {
+        this.land.addChild(this.landWater);
+        continue;
+      }
+      const container = new Container();
+      this.groups.set(group, container);
+      this.land.addChild(container);
+    }
+    this.landDisplacement = new Sprite(this.displacement.texture);
+    // Broader swells than in the city: the countryside is seen from afar.
+    this.landDisplacement.scale.set(2);
+    const [x, y, w, h] = LAND;
+    this.landRipples = new TilingSprite({ texture: this.ripples.texture, width: w, height: h });
+    this.landRipples.position.set(x, y);
+    this.landRipples.blendMode = 'add';
+    this.landRipples.alpha = 0.55;
+    this.haze = new Sprite(hazeTexture());
+    this.haze.position.set(x, y);
+    this.haze.width = w;
+    this.haze.height = h;
+    // The shower: its soft shadow on the land, and streaks of rain falling through it.
+    const cloud = new Sprite(this.glow);
+    cloud.anchor.set(0.5);
+    cloud.tint = 0x3c5a6e;
+    cloud.alpha = 0.3;
+    cloud.width = 620;
+    cloud.height = 360;
+    this.rain.svg(
+      `<svg><path d="${RAIN}" fill="none" stroke="#6ea0b9" stroke-opacity="0.7" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+    );
+    this.shower.addChild(cloud, this.rain);
+    this.land.addChild(this.haze, this.shower);
+    this.land.visible = false;
   }
 
   /** Shows the scene for `props`. Cheap when nothing visible changed. */
@@ -511,6 +633,10 @@ export class MapRenderer {
       props.season,
       props.greenness,
       props.reduced,
+      props.sites,
+      props.collectors,
+      props.raining,
+      props.bioregion,
       res,
     ]);
     if (signature !== this.signature) {
@@ -659,6 +785,26 @@ export class MapRenderer {
         });
       }
     }
+    // Parcels, the Bioregion and the collectors: drawings taken from the SVG scene.
+    const snapshots = this.snapshots;
+    if (snapshots) {
+      for (const source of mapSources(props)) {
+        const { entrance } = source;
+        items.push({
+          key: `s:${source.key}`,
+          group: source.group,
+          art: () => snapshots.art(source.key),
+          maxRes: source.maxRes,
+          still: !entrance,
+          ring:
+            entrance && (entrance.unveil ? Math.min(entrance.unveil, 120) / 1.4 : entrance.size),
+          ringAt: entrance?.at,
+          unveil: entrance?.unveil
+            ? { x: entrance.at[0], y: entrance.at[1], reach: entrance.unveil }
+            : undefined,
+        });
+      }
+    }
     return items;
   }
 
@@ -683,7 +829,7 @@ export class MapRenderer {
     if (groundKey !== this.groundKey) {
       const previous = this.groundKey;
       this.groundKey = groundKey;
-      this.acquire(groundKey, ground).then((texture) => {
+      this.acquire(groundKey, ground, this.res).then((texture) => {
         if (this.destroyed || this.groundKey !== groundKey) return;
         this.ground.texture = texture;
         this.ground.position.set(0, 0);
@@ -707,17 +853,20 @@ export class MapRenderer {
         sprite.visible = false;
         if (item.rotation) sprite.rotation = item.rotation;
         this.groups.get(item.group)!.addChild(sprite);
-        placed = { item, sprite, textureKey: null, base: { x: 1, y: 1 }, born: live ? -1 : null };
+        const born = live && !item.still ? -1 : null;
+        placed = { item, sprite, textureKey: null, base: { x: 1, y: 1 }, born };
         this.placed.set(item.key, placed);
       }
       placed.item = item;
       const art = item.art();
-      const textureKey = `${this.res}|${art.svg}`;
+      if (!art) continue;
+      const res = Math.min(this.res, item.maxRes ?? Infinity);
+      const textureKey = `${res}|${art.svg}`;
       if (textureKey === placed.textureKey) continue;
       const old = placed.textureKey;
       placed.textureKey = textureKey;
       const target = placed;
-      this.acquire(textureKey, art).then((texture) => {
+      this.acquire(textureKey, art, res).then((texture) => {
         if (this.destroyed || target.textureKey !== textureKey) return;
         const [bx, by, bw, bh] = art.box;
         const [ox, oy] = item.at ?? [0, 0];
@@ -736,7 +885,13 @@ export class MapRenderer {
         target.sprite.visible = true;
         if (target.born === -1) {
           target.born = this.time;
-          if (item.ring) this.addRing(target.sprite.x, target.sprite.y, item.ring);
+          const [rx, ry] = item.ringAt ?? [target.sprite.x, target.sprite.y];
+          if (item.ring) this.addRing(rx, ry, item.ring);
+          if (item.unveil) {
+            target.mask = new Graphics();
+            target.sprite.parent?.addChild(target.mask);
+            target.sprite.mask = target.mask;
+          }
         }
         if (old) this.release(old);
         this.shadowsDirty = true;
@@ -745,6 +900,7 @@ export class MapRenderer {
     }
     for (const [key, placed] of this.placed) {
       if (keep.has(key)) continue;
+      placed.mask?.destroy();
       placed.sprite.destroy();
       if (placed.textureKey) this.release(placed.textureKey);
       this.placed.delete(key);
@@ -758,8 +914,10 @@ export class MapRenderer {
       this.levels.set(id, level);
     }
 
+    this.snapshots?.keep(new Set(mapSources(props).map((source) => source.key)));
     this.syncGlints();
     this.syncWater(props);
+    this.syncLand(props);
     this.syncFlows(props);
     this.syncPollen(props);
     this.daylight.tint = this.palette.light;
@@ -888,7 +1046,61 @@ export class MapRenderer {
         this.sparkles.push({ sprite, offset: (i * 1.7) % 6 });
       });
     }
-    this.water.filters = [new DisplacementFilter({ sprite: this.displacement, scale: 5 })];
+    this.water.filters = [this.waterFilter(this.displacement)];
+  }
+
+  /** The Bioregion's river, canals and streams: the same living water as in the city. */
+  private syncLand(props: MapProps): void {
+    this.land.visible = props.bioregion;
+    this.landRipples.mask = null;
+    this.landWater.removeChildren().forEach((child) => {
+      if (child !== this.landRipples && child !== this.landDisplacement) child.destroy();
+    });
+    for (const { sprite } of this.landSparkles) sprite.destroy();
+    this.landSparkles = [];
+    if (!props.bioregion) {
+      this.landWater.filters = [];
+      return;
+    }
+    const { streams } = landShown(props.sites, props.collectors);
+    const canals = CANALS.map(([[x0, y0], [, y1]]) => `M${x0} ${y0}V${y1}`);
+    const shapes = (grow: number) =>
+      `<svg>${[
+        ...streams.map((d) => stroke(d, 7 + grow, '#ffffff')),
+        ...RIVER.map((d) => stroke(d, 28 + grow, '#ffffff')),
+        ...canals.map((d) => stroke(d, 18 + grow, '#ffffff', 'butt')),
+      ].join('')}</svg>`;
+    // Grassy banks of the streams and the sandy bed of the river, then the water over them.
+    const banks = new Graphics().svg(
+      `<svg>${streams.map((d) => stroke(d, 14, '#b9cf9f')).join('')}${RIVER.map((d) => stroke(d, 40, '#d9cdb0')).join('')}</svg>`,
+    );
+    const water = new Graphics().svg(shapes(0));
+    water.tint = Number.parseInt(this.palette.water.slice(1), 16);
+    const sky = new Graphics().svg(shapes(-10));
+    sky.tint = Number.parseInt(this.palette.sky.slice(1), 16);
+    sky.alpha = 0.3;
+    const mask = new Graphics().svg(shapes(0));
+    this.landRipples.mask = mask;
+    this.landWater.addChild(banks, water, sky, this.landRipples, mask, this.landDisplacement);
+    [...RIVER_NORTH, ...RIVER_SOUTH].forEach(([x, y], i) => {
+      const sprite = new Sprite(this.glow);
+      sprite.anchor.set(0.5);
+      sprite.blendMode = 'add';
+      sprite.position.set(x, y);
+      this.landWater.addChild(sprite);
+      this.landSparkles.push({ sprite, offset: (i * 1.3) % 6 });
+    });
+    this.landWater.filters = [this.waterFilter(this.landDisplacement)];
+  }
+
+  /** The ripple filter of a water layer, as sharp and smooth-edged as the rest of the map. */
+  private waterFilter(sprite: Sprite): DisplacementFilter {
+    return new DisplacementFilter({
+      sprite,
+      scale: 5,
+      resolution: this.app.renderer.resolution,
+      antialias: 'inherit',
+    });
   }
 
   private syncFlows(props: MapProps): void {
@@ -1007,9 +1219,22 @@ export class MapRenderer {
       this.drawShadows();
     }
 
-    // Entrances of newly built elements.
+    // Entrances of newly built elements: restored parcels are unveiled, the others grow.
     for (const placed of this.placed.values()) {
       if (placed.born === null || placed.born < 0) continue;
+      const unveil = placed.item.unveil;
+      if (unveil && placed.mask) {
+        const p = Math.min(1, (t - placed.born) / UNVEIL);
+        const r = Math.max(0.1, unveil.reach * (1 - (1 - p) ** 4));
+        placed.mask.clear().circle(unveil.x, unveil.y, r).fill(0xffffff);
+        if (p >= 1) {
+          placed.sprite.mask = null;
+          placed.mask.destroy();
+          placed.mask = undefined;
+          placed.born = null;
+        }
+        continue;
+      }
       const s = appearScale(t - placed.born);
       placed.sprite.scale.set(placed.base.x * s, placed.base.y * s);
       placed.sprite.alpha = Math.min(1, (t - placed.born) * 4);
@@ -1067,7 +1292,12 @@ export class MapRenderer {
       cloud.y = 90 + i * 140 + Math.sin(t * 0.05 + i) * 20;
     });
 
-    // Water: the current carries the ripples, the surface wobbles, the sun sparkles on it.
+    // Water: the current carries the ripples, the surface wobbles, the sun sparkles on it. The
+    // wobble is measured in screen pixels: smaller from afar, so thin streams keep their shape.
+    const wobble = Math.min(5, Math.max(1, (this.camera?.scale ?? 1) * 3));
+    for (const filter of [...(this.water.filters ?? []), ...(this.landWater.filters ?? [])]) {
+      (filter as DisplacementFilter).scale.set(wobble);
+    }
     this.ripples.tilePosition.y = t * 6;
     this.displacement.x = t * 8;
     this.displacement.y = t * 5;
@@ -1075,6 +1305,25 @@ export class MapRenderer {
       const p = ((t + offset) % 3.2) / 3.2;
       sprite.alpha = Math.max(0, Math.sin(p * Math.PI)) ** 6;
       sprite.width = sprite.height = 3 + sprite.alpha * 4;
+    }
+    if (props.bioregion) {
+      this.landRipples.tilePosition.set(t * 3, t * 6);
+      this.landDisplacement.x = t * 8;
+      this.landDisplacement.y = t * 5;
+      for (const { sprite, offset } of this.landSparkles) {
+        const p = ((t + offset) % 3.6) / 3.6;
+        sprite.alpha = Math.max(0, Math.sin(p * Math.PI)) ** 6;
+        sprite.width = sprite.height = 6 + sprite.alpha * 8;
+      }
+    }
+    // A shower crosses the land while water is gathered.
+    this.shower.visible = props.bioregion && props.raining && !still;
+    if (this.shower.visible) {
+      const p = (t % SHOWER_PERIOD) / SHOWER_PERIOD;
+      this.shower.position.set(-1500 + 3600 * p, -500 + 1400 * p);
+      const q = (t % 0.9) / 0.9;
+      this.rain.position.set(3 - 6 * q, -8 + 16 * q);
+      this.rain.alpha = 0.4 + 0.6 * q;
     }
 
     // Glints sweep across the glass now and then.
@@ -1185,10 +1434,10 @@ export class MapRenderer {
     });
   }
 
-  private acquire(key: string, art: Art): Promise<Texture> {
+  private acquire(key: string, art: Art, res: number): Promise<Texture> {
     let entry = this.textures.get(key);
     if (!entry) {
-      const promise = rasterize(art, this.res);
+      const promise = rasterize(art, res);
       const created = { promise, refs: 0 } as {
         promise: Promise<Texture>;
         texture?: Texture;
