@@ -1,9 +1,10 @@
 // Layout of the Bioregion around the city (docs/game-design.md §7.4, §10.4): the land beyond the
 // outskirts, its river, hills and fields, and where the water collectors and regional sites
 // appear. Pure data in world coordinates, next to the city plan in neighbourhood.ts.
-import { BUILDINGS, PLANTER, STREETS, WORLD, type Box } from './neighbourhood';
+import type { CollectorId, SiteId } from '../game/bioregion';
+import { BUILDINGS, PLANTER, STREETS, WORLD, visibleElements, type Box } from './neighbourhood';
 
-type Point = readonly [number, number];
+export type Point = readonly [number, number];
 
 /** The grey suburbs kept around the city: the land begins beyond them. */
 export const SUBURBS: Box = [-130, -110, WORLD.width + 260, WORLD.height + 220];
@@ -308,4 +309,51 @@ export const SWALES: Box[] = (() => {
 
 function round(value: number): number {
   return Math.round(value * 10) / 10;
+}
+
+/** The regional river, north and south of the city, as SVG paths. */
+export const RIVER = [smoothPath(RIVER_NORTH), smoothPath(RIVER_SOUTH)];
+
+/** Streaks of the shower's rain, around its centre. */
+export const RAIN = Array.from({ length: 70 }, (_, i) => {
+  const x = -230 + ((i * 47) % 460);
+  const y = -120 + ((i * 83) % 240);
+  return `M${x} ${y}l-6 16`;
+}).join('');
+
+/** What the land shows for the regional sites raised and the collectors built. */
+export interface LandShown {
+  /** Fields still farmed: those not yet turned into meadows or food forests. */
+  fields: Field[];
+  meadows: Field[];
+  gardens: Field[];
+  marshes: Marsh[];
+  crowns: Crown[];
+  ponds: Crown[];
+  streams: string[];
+  tanks: Point[];
+  swales: Box[];
+}
+
+export function landShown(
+  sites: Record<SiteId, number>,
+  collectors: Record<CollectorId, number>,
+): LandShown {
+  const meadows = MEADOW_FIELDS.slice(0, visibleElements(sites.meadows, MEADOW_FIELDS.length, 2));
+  const gardens = FOREST_GARDEN_FIELDS.slice(
+    0,
+    visibleElements(sites.foodForests, FOREST_GARDEN_FIELDS.length, 2),
+  );
+  const taken = new Set([...meadows, ...gardens]);
+  return {
+    fields: FIELDS.filter((field) => !taken.has(field)),
+    meadows,
+    gardens,
+    marshes: MARSHES.slice(0, visibleElements(sites.wetlands, MARSHES.length, 2)),
+    crowns: OLD_FOREST.slice(0, visibleElements(sites.oldForest, OLD_FOREST.length, 14)),
+    ponds: PONDS.slice(0, visibleElements(collectors.ponds, PONDS.length)),
+    streams: STREAMS.slice(0, visibleElements(collectors.streams, STREAMS.length)),
+    tanks: ROOF_TANKS.slice(0, visibleElements(collectors.roofTanks, ROOF_TANKS.length)),
+    swales: SWALES.slice(0, visibleElements(collectors.swales, SWALES.length)),
+  };
 }

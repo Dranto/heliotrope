@@ -16,7 +16,7 @@ type ResetStep = 'idle' | 'confirm' | 'final';
 export function Options({ onClose }: { onClose: () => void }) {
   const store = useGameStore();
   const { settings } = useGameState();
-  const renderer = useMapRenderer();
+  const { renderer } = useMapRenderer();
   const [exported] = useState(() => exportSave(store.getState()));
   const [importText, setImportText] = useState('');
   const [message, setMessage] = useState('');

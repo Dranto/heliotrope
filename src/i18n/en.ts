@@ -640,9 +640,9 @@ export const en: Texts = {
       'Discreet sounds accompany harvesting, purchases and the neighbourhood’s restoration.',
     reducedMotionHint:
       'Stops the pollen, the breathing sun and the butterfly’s flight. Also follows your device’s setting.',
-    enhancedMap: 'Enhanced rendering (experimental)',
+    enhancedMap: 'Enhanced rendering',
     enhancedMapHint:
-      'Draws the map on the graphics card: soft shadows following the sun, living water, glints on glass. Falls back to the usual rendering when the device cannot.',
+      'Draws the map on the graphics card: soft shadows following the sun, living water, glints on glass. On by default when the device allows it; untick for a simpler, lighter rendering.',
     saveTitle: 'Save',
     saveHint: 'The game is saved automatically every 30 seconds.',
     saveNow: 'Save now',

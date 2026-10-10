@@ -5,7 +5,7 @@ import type { ParcelId } from '../../game/parcels';
 import type { Phase, VisualSeason } from '../../game/phases';
 import type { Box, Camera } from '../neighbourhood';
 
-/** Parcels (§6.1) the WebGL map draws itself; the others stay in the SVG layer over it. */
+/** Parcels (§6.1) the WebGL map draws itself; it takes the others from the SVG scene (sources.tsx). */
 export const PIXI_PARCELS: readonly ParcelId[] = ['river', 'livingRoofs'];
 
 /** Shadow offset for one storey, in world units: points away from the sun. */

@@ -3036,3 +3036,26 @@ button {
   width: 100%;
   height: 100%;
 }
+
+/* Drawings the WebGL map takes from the SVG scene: styled by the page, never painted, and at
+   rest so each one is taken as it stands. */
+.pixi-map > .pixi-sources {
+  position: absolute;
+  inset: auto;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pixi-sources,
+.pixi-sources * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Ponds take the colour of the WebGL map's living water. */
+.pixi-sources .bioregion-land .pond,
+.pixi-sources .bioregion-land .marsh-pool {
+  fill: #6aa6aa;
+}

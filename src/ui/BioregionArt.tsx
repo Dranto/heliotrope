@@ -7,30 +7,22 @@ import type { CollectorId, SiteId } from '../game/bioregion';
 import { t } from '../i18n';
 import {
   CANALS,
-  FIELDS,
-  FOREST_GARDEN_FIELDS,
   HILLS,
   LAND,
-  MARSHES,
-  MEADOW_FIELDS,
-  OLD_FOREST,
-  PONDS,
-  RIVER_NORTH,
-  RIVER_SOUTH,
-  ROOF_TANKS,
-  STREAMS,
+  RAIN,
+  RIVER,
   SUBURBS,
   SUBURBS_RADIUS,
-  SWALES,
   landHash,
-  smoothPath,
+  landShown,
+  type Crown,
   type Field,
+  type Marsh,
+  type Point,
 } from './bioregionMap';
 import { Appear } from './Neighbourhood';
-import { centre, visibleElements, type Box } from './neighbourhood';
+import { centre, type Box } from './neighbourhood';
 import './bioregion.css';
-
-const RIVER = [smoothPath(RIVER_NORTH), smoothPath(RIVER_SOUTH)];
 
 function roundedRect([x, y, w, h]: Box, r: number): string {
   return (
@@ -53,7 +45,7 @@ const [LX, LY, LW, LH] = LAND;
 /** The land, with the suburbs left open in its middle. */
 const LAND_PATH = `M${LX} ${LY}H${LX + LW}V${LY + LH}H${LX}Z ${roundedRect(SUBURBS, SUBURBS_RADIUS)}`;
 
-function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
+export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
   const [x, y, w, h] = box;
   const hedge = landHash(x, y) % 2 === 0;
   return (
@@ -84,7 +76,7 @@ function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
 }
 
 /** Agrivoltaic meadow: a flowering meadow under rows of raised solar panels. */
-function Meadow({ box: [x, y, w, h] }: { box: Box }) {
+export function Meadow({ box: [x, y, w, h] }: { box: Box }) {
   const rows = [0.22, 0.5, 0.78].map((f) => y + h * f);
   return (
     <g className="agri-meadow">
@@ -104,7 +96,7 @@ function Meadow({ box: [x, y, w, h] }: { box: Box }) {
 }
 
 /** Food forest: several layers of fruit trees, shrubs and fruit, in irregular clumps. */
-function FoodForest({ box: [x, y, w, h] }: { box: Box }) {
+export function FoodForest({ box: [x, y, w, h] }: { box: Box }) {
   const crowns: [number, number, number, number][] = [];
   for (let i = 0; i < 9; i++) {
     const hash = landHash(x + i * 13, y + i * 7);
@@ -130,19 +122,7 @@ function FoodForest({ box: [x, y, w, h] }: { box: Box }) {
   );
 }
 
-function MarshArt({
-  x,
-  y,
-  rx,
-  ry,
-  angle,
-}: {
-  x: number;
-  y: number;
-  rx: number;
-  ry: number;
-  angle: number;
-}) {
+export function MarshArt({ x, y, rx, ry, angle }: Marsh) {
   return (
     <g transform={`rotate(${angle} ${x} ${y})`} className="marsh">
       <ellipse cx={x} cy={y} rx={rx} ry={ry} className="marsh-ground" />
@@ -160,7 +140,7 @@ function MarshArt({
   );
 }
 
-function Hills() {
+export function Hills() {
   return (
     <g className="hills">
       {HILLS.map((hill) => (
@@ -182,6 +162,78 @@ function Hills() {
   );
 }
 
+export function Pond({ x, y, r }: Crown) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r={r + 5} className="pond-bank" />
+      <circle cx={x} cy={y} r={r} className="pond" />
+      <path
+        d={`M${x - r * 0.5} ${y - r * 0.2}q${r * 0.25} -3 ${r * 0.5} 0`}
+        className="pond-glint"
+      />
+    </g>
+  );
+}
+
+export function OldCrown({ x, y, r }: Crown) {
+  return (
+    <g>
+      <circle cx={x + 3} cy={y + 4} r={r} className="crown-shadow" />
+      <circle cx={x} cy={y} r={r} className="old-crown" />
+      <circle cx={x - r * 0.3} cy={y - r * 0.32} r={r * 0.45} className="crown-light" />
+    </g>
+  );
+}
+
+export function Tank({ at: [x, y] }: { at: Point }) {
+  return (
+    <g>
+      <circle cx={x + 0.6} cy={y + 0.9} r="3.2" className="tank-shadow" />
+      <circle cx={x} cy={y} r="3.2" className="tank" />
+      <circle cx={x - 0.9} cy={y - 0.9} r="1.1" className="tank-light" />
+    </g>
+  );
+}
+
+export function Swale({ box: [x, y, w, h] }: { box: Box }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx="1.5" className="swale" />
+      <path d={`M${x + 2} ${y + h / 2}H${x + w - 2}`} className="swale-water" />
+    </g>
+  );
+}
+
+/** Patterns the land's fields and meadows are painted with. */
+export function LandPatterns() {
+  return (
+    <>
+      <pattern id="land-furrows" width="8" height="8" patternUnits="userSpaceOnUse">
+        <path d="M0 4H8" className="furrow" />
+      </pattern>
+      <pattern id="land-flowers" width="18" height="16" patternUnits="userSpaceOnUse">
+        <circle cx="4" cy="5" r="1.1" className="flower-a" />
+        <circle cx="13" cy="11" r="1" className="flower-b" />
+        <path d="M9 4l-1 -3M9 4l1 -3" className="grass-blade" />
+      </pattern>
+    </>
+  );
+}
+
+/** The plain itself: its colour, the hedge around the suburbs, the hills and the farmed fields. */
+export function LandGround({ sites, fields }: { sites: Record<SiteId, number>; fields: Field[] }) {
+  return (
+    <>
+      <path d={LAND_PATH} fillRule="evenodd" className="land" fill={landColour(sites)} />
+      <path d={roundedRect(SUBURBS, SUBURBS_RADIUS)} className="hedge-line" />
+      <Hills />
+      {fields.map((field) => (
+        <FieldArt key={field.box.join()} field={field} />
+      ))}
+    </>
+  );
+}
+
 export interface BioregionLandProps {
   sites: Record<SiteId, number>;
   collectors: Record<CollectorId, number>;
@@ -200,23 +252,12 @@ export const BioregionLand = memo(function BioregionLand({
   raining,
   reduced,
 }: BioregionLandProps) {
-  const meadows = visibleElements(sites.meadows, MEADOW_FIELDS.length, 2);
-  const gardens = visibleElements(sites.foodForests, FOREST_GARDEN_FIELDS.length, 2);
-  const taken = new Set([
-    ...MEADOW_FIELDS.slice(0, meadows),
-    ...FOREST_GARDEN_FIELDS.slice(0, gardens),
-  ]);
-  const marshes = visibleElements(sites.wetlands, MARSHES.length, 2);
-  const crowns = visibleElements(sites.oldForest, OLD_FOREST.length, 14);
-  const ponds = visibleElements(collectors.ponds, PONDS.length);
-  const streams = visibleElements(collectors.streams, STREAMS.length);
+  const shown = landShown(sites, collectors);
 
   return (
     <g className="bioregion-land" aria-hidden="true">
       <defs>
-        <pattern id="land-furrows" width="8" height="8" patternUnits="userSpaceOnUse">
-          <path d="M0 4H8" className="furrow" />
-        </pattern>
+        <LandPatterns />
         <radialGradient
           id="land-haze"
           gradientUnits="userSpaceOnUse"
@@ -228,21 +269,11 @@ export const BioregionLand = memo(function BioregionLand({
           <stop offset="72%" stopColor="#fbf6ec" stopOpacity="0" />
           <stop offset="100%" stopColor="#fbf6ec" stopOpacity="0.75" />
         </radialGradient>
-        <pattern id="land-flowers" width="18" height="16" patternUnits="userSpaceOnUse">
-          <circle cx="4" cy="5" r="1.1" className="flower-a" />
-          <circle cx="13" cy="11" r="1" className="flower-b" />
-          <path d="M9 4l-1 -3M9 4l1 -3" className="grass-blade" />
-        </pattern>
       </defs>
-      <path d={LAND_PATH} fillRule="evenodd" className="land" fill={landColour(sites)} />
-      <path d={roundedRect(SUBURBS, SUBURBS_RADIUS)} className="hedge-line" />
-      <Hills />
-      {FIELDS.filter((field) => !taken.has(field)).map((field) => (
-        <FieldArt key={field.box.join()} field={field} />
-      ))}
+      <LandGround sites={sites} fields={shown.fields} />
       <g data-site="meadows">
         {sites.meadows > 0 && <title>{t.bioregion.sites.meadows.name}</title>}
-        {MEADOW_FIELDS.slice(0, meadows).map(({ box }) => (
+        {shown.meadows.map(({ box }) => (
           <Appear key={box.join()} at={centre(box)} size={box[2] / 2}>
             <Meadow box={box} />
           </Appear>
@@ -250,14 +281,14 @@ export const BioregionLand = memo(function BioregionLand({
       </g>
       <g data-site="foodForests">
         {sites.foodForests > 0 && <title>{t.bioregion.sites.foodForests.name}</title>}
-        {FOREST_GARDEN_FIELDS.slice(0, gardens).map(({ box }) => (
+        {shown.gardens.map(({ box }) => (
           <Appear key={box.join()} at={centre(box)} size={box[2] / 2}>
             <FoodForest box={box} />
           </Appear>
         ))}
       </g>
       <g data-collector="streams">
-        {STREAMS.slice(0, streams).map((d) => (
+        {shown.streams.map((d) => (
           <g key={d}>
             <path d={d} className="stream-bank" />
             <path d={d} className="stream" />
@@ -279,31 +310,24 @@ export const BioregionLand = memo(function BioregionLand({
       </g>
       <g data-site="wetlands">
         {sites.wetlands > 0 && <title>{t.bioregion.sites.wetlands.name}</title>}
-        {MARSHES.slice(0, marshes).map((marsh) => (
+        {shown.marshes.map((marsh) => (
           <Appear key={`${marsh.x},${marsh.y}`} at={[marsh.x, marsh.y]} size={marsh.rx}>
             <MarshArt {...marsh} />
           </Appear>
         ))}
       </g>
       <g data-collector="ponds">
-        {PONDS.slice(0, ponds).map(({ x, y, r }) => (
-          <Appear key={`${x},${y}`} at={[x, y]} size={r + 6}>
-            <circle cx={x} cy={y} r={r + 5} className="pond-bank" />
-            <circle cx={x} cy={y} r={r} className="pond" />
-            <path
-              d={`M${x - r * 0.5} ${y - r * 0.2}q${r * 0.25} -3 ${r * 0.5} 0`}
-              className="pond-glint"
-            />
+        {shown.ponds.map((pond) => (
+          <Appear key={`${pond.x},${pond.y}`} at={[pond.x, pond.y]} size={pond.r + 6}>
+            <Pond {...pond} />
           </Appear>
         ))}
       </g>
       <g data-site="oldForest">
         {sites.oldForest > 0 && <title>{t.bioregion.sites.oldForest.name}</title>}
-        {OLD_FOREST.slice(0, crowns).map(({ x, y, r }) => (
-          <Appear key={`${x},${y}`} at={[x, y]} size={r + 2}>
-            <circle cx={x + 3} cy={y + 4} r={r} className="crown-shadow" />
-            <circle cx={x} cy={y} r={r} className="old-crown" />
-            <circle cx={x - r * 0.3} cy={y - r * 0.32} r={r * 0.45} className="crown-light" />
+        {shown.crowns.map((crown) => (
+          <Appear key={`${crown.x},${crown.y}`} at={[crown.x, crown.y]} size={crown.r + 2}>
+            <OldCrown {...crown} />
           </Appear>
         ))}
       </g>
@@ -311,14 +335,7 @@ export const BioregionLand = memo(function BioregionLand({
       {raining && !reduced && (
         <g className="shower">
           <ellipse cx="0" cy="0" rx="260" ry="150" className="shower-shadow" />
-          <path
-            className="rain"
-            d={Array.from({ length: 70 }, (_, i) => {
-              const x = -230 + ((i * 47) % 460);
-              const y = -120 + ((i * 83) % 240);
-              return `M${x} ${y}l-6 16`;
-            }).join('')}
-          />
+          <path className="rain" d={RAIN} />
         </g>
       )}
     </g>
@@ -332,27 +349,23 @@ export interface CityWaterProps {
 
 /** Collectors in the city itself: tanks on the roofs and planted swales along the kerbs. */
 export const CityWater = memo(function CityWater({ roofTanks, swales }: CityWaterProps) {
-  const tanks = visibleElements(roofTanks, ROOF_TANKS.length);
-  const ditches = visibleElements(swales, SWALES.length);
+  const { tanks, swales: ditches } = landShown(
+    { wetlands: 0, meadows: 0, foodForests: 0, oldForest: 0 },
+    { roofTanks, swales, ponds: 0, streams: 0 },
+  );
   return (
     <g className="city-water" aria-hidden="true">
       <g data-collector="swales">
-        {SWALES.slice(0, ditches).map((box) => (
+        {ditches.map((box) => (
           <Appear key={box.join()} at={centre(box)} size={box[2] / 3}>
-            <rect x={box[0]} y={box[1]} width={box[2]} height={box[3]} rx="1.5" className="swale" />
-            <path
-              d={`M${box[0] + 2} ${box[1] + box[3] / 2}H${box[0] + box[2] - 2}`}
-              className="swale-water"
-            />
+            <Swale box={box} />
           </Appear>
         ))}
       </g>
       <g data-collector="roofTanks">
-        {ROOF_TANKS.slice(0, tanks).map(([x, y]) => (
-          <Appear key={`${x},${y}`} at={[x, y]} size={5}>
-            <circle cx={x + 0.6} cy={y + 0.9} r="3.2" className="tank-shadow" />
-            <circle cx={x} cy={y} r="3.2" className="tank" />
-            <circle cx={x - 0.9} cy={y - 0.9} r="1.1" className="tank-light" />
+        {tanks.map((point) => (
+          <Appear key={point.join()} at={[point[0], point[1]]} size={5}>
+            <Tank at={point} />
           </Appear>
         ))}
       </g>

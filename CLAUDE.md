@@ -69,6 +69,9 @@ a design decision changes, update that document in the same PR.
   and `speciesMap.ts` the species on the map.
   `SeasonTree.tsx` and `seasonTree.ts` draw the Tree of Seasons screen; `Cooperatives.tsx` is their
   panel, `CooperativeArt.tsx` and `cooperativeMap.ts` their cargo bikes on the map.
+  `pixi/` is the WebGL map drawn by default (§10.4), SVG staying as fallback: `renderer.ts` draws
+  the generators from `art.ts`; `sources.tsx` takes parcels, the Bioregion and the collectors from
+  their SVG components, so their art is changed in those SVG files only.
   `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes.
   Read state with `useGameState()`, change it with `store.dispatch((s) => action(s))`.
 
