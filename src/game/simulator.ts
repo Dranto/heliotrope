@@ -177,9 +177,9 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   balconyPanel: 45,
   rooftopGarden: 2.5 * 60,
   greenhouse: 7 * 60,
-  verticalFarm: 17 * 60,
+  verticalFarm: 15 * 60,
   mirrorPlant: 35 * 60,
-  urbanCanopy: 70 * 60,
-  arcology: 125 * 60,
-  advisedSeason: 160 * 60,
+  urbanCanopy: 65 * 60,
+  arcology: 105 * 60,
+  advisedSeason: 135 * 60,
 };

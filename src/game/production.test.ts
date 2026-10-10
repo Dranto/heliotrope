@@ -9,6 +9,7 @@ import {
   isUpgradeUnlocked,
   lightPerSecond,
   maxAffordable,
+  upgradeSynergyBonus,
 } from './production';
 import { createInitialState, type GameState } from './state';
 import { UPGRADE_LIST, UPGRADES, type UpgradeId } from './upgrades';
@@ -23,8 +24,8 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 });
 
 describe('upgrade data', () => {
-  it('has 7 ×2 upgrades per generator, 5 click upgrades and 3 synergies (§5)', () => {
-    expect(UPGRADE_LIST).toHaveLength(8 * 7 + 5 + 3);
+  it('has 7 ×2 upgrades per generator, 5 click upgrades and 21 synergies (§5)', () => {
+    expect(UPGRADE_LIST).toHaveLength(8 * 7 + 5 + 18 + 3);
     expect(new Set(UPGRADE_LIST.map((u) => u.id)).size).toBe(UPGRADE_LIST.length);
   });
 
@@ -35,10 +36,23 @@ describe('upgrade data', () => {
     expect(UPGRADES['greenhouse.3'].condition).toEqual({ owned: { greenhouse: 25 } });
   });
 
-  it('prices synergies at 10 000 × the dearer base cost (§5.3)', () => {
-    expect(UPGRADES.sharedCompost.cost).toBe(60_000_000);
-    expect(UPGRADES.usefulShade.cost).toBe(280_000_000_000);
-    expect(UPGRADES.recoveredHeat.cost).toBe(30_000_000_000);
+  it('prices synergies at 2 000 × the dearer base cost, 100 × for the last buildings (§5.3)', () => {
+    expect(UPGRADES.sharedCompost.cost).toBe(12_000_000);
+    expect(UPGRADES.usefulShade.cost).toBe(2_800_000_000);
+    expect(UPGRADES.recoveredHeat.cost).toBe(300_000_000);
+  });
+
+  it('links every pair of neighbouring buildings both ways (§5.3)', () => {
+    const pairs = new Set(
+      UPGRADE_LIST.flatMap(({ effect }) =>
+        effect.kind === 'synergy' ? [`${effect.source}>${effect.generator}`] : [],
+      ),
+    );
+    GENERATOR_IDS.slice(1).forEach((dearer, i) => {
+      const cheaper = GENERATOR_IDS[i]!;
+      expect(pairs).toContain(`${dearer}>${cheaper}`);
+      expect(pairs).toContain(`${cheaper}>${dearer}`);
+    });
   });
 });
 
@@ -67,6 +81,40 @@ describe('generator production', () => {
       upgrades: ['greenhouse.1', 'recoveredHeat'],
     });
     expect(generatorMultiplier(state, 'greenhouse')).toBeCloseTo(2 * 1.3);
+  });
+});
+
+describe('upgrade synergies', () => {
+  it('adds a global bonus per upgrade bought', () => {
+    const generators = owned({ pot: 10 });
+    const without = withState({ generators, upgrades: ['gloves', 'copperCan'] });
+    const withIt = withState({ generators, upgrades: ['gloves', 'copperCan', 'sharedKnowledge'] });
+    expect(upgradeSynergyBonus(without)).toBe(0);
+    expect(upgradeSynergyBonus(withIt)).toBeCloseTo(0.005 * 3);
+    expect(lightPerSecond(withIt) / lightPerSecond(without)).toBeCloseTo(1.015);
+  });
+
+  it('counts only building synergies for Les communs', () => {
+    const state = withState({ upgrades: ['gloves', 'sunnyPots', 'wiredRoofs', 'commons'] });
+    expect(upgradeSynergyBonus(state)).toBeCloseTo(0.03 * 2);
+  });
+
+  it('unlocks on the number of upgrades or synergies bought', () => {
+    const pots = Array.from({ length: 7 }, (_, i) => `pot.${i + 1}`) as UpgradeId[];
+    const nine: UpgradeId[] = [...pots, 'balconyPanel.1', 'balconyPanel.2'];
+    expect(isUpgradeUnlocked(withState({ upgrades: nine }), 'sharedKnowledge')).toBe(false);
+    const ten: UpgradeId[] = [...nine, 'gloves'];
+    expect(isUpgradeUnlocked(withState({ upgrades: ten }), 'sharedKnowledge')).toBe(true);
+    const five: UpgradeId[] = [
+      'sunnyPots',
+      'wiredRoofs',
+      'sharedCompost',
+      'potCuttings',
+      'gardenersCorner',
+    ];
+    expect(isUpgradeUnlocked(withState({ upgrades: five }), 'commons')).toBe(false);
+    const six: UpgradeId[] = [...five, 'rooftopSockets'];
+    expect(isUpgradeUnlocked(withState({ upgrades: six }), 'commons')).toBe(true);
   });
 });
 
@@ -144,13 +192,20 @@ describe('upgrade availability', () => {
     expect(isUpgradeUnlocked(withState({ totalLight: 1_000 }), 'gloves')).toBe(true);
   });
 
-  it('unlocks synergies when both generators reach 15', () => {
+  it('unlocks synergies when both generators reach 10', () => {
     const id: UpgradeId = 'sharedCompost';
-    const some = owned({ rooftopGarden: 15, greenhouse: 14 });
+    const some = owned({ rooftopGarden: 10, greenhouse: 9 });
     expect(isUpgradeUnlocked(withState({ generators: some }), id)).toBe(false);
-    expect(isUpgradeUnlocked(withState({ generators: { ...some, greenhouse: 15 } }), id)).toBe(
+    expect(isUpgradeUnlocked(withState({ generators: { ...some, greenhouse: 10 } }), id)).toBe(
       true,
     );
+  });
+
+  it('unlocks synergies of the last three buildings at 5', () => {
+    const id: UpgradeId = 'livingRoots';
+    const some = owned({ urbanCanopy: 5, arcology: 4 });
+    expect(isUpgradeUnlocked(withState({ generators: some }), id)).toBe(false);
+    expect(isUpgradeUnlocked(withState({ generators: { ...some, arcology: 5 } }), id)).toBe(true);
   });
 
   it('lists unlocked upgrades not bought yet, cheapest first', () => {

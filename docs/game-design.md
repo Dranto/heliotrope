@@ -136,13 +136,47 @@ Le clic vaut donc `(1 × multiplicateursDeClic) + (% de la production/s)`. Cela 
 
 ### 5.3 Synergies
 
-Petites améliorations qui lient deux générateurs, pour récompenser une ville variée plutôt qu'un seul bâtiment empilé. Exemples :
+Petites améliorations qui lient deux générateurs, pour récompenser une ville variée plutôt qu'un seul bâtiment empilé. Le générateur indiqué gagne un bonus (additif) par exemplaire possédé de la source.
 
-- **Compost partagé** : le Potager sur le toit gagne +5 % par Serre communautaire possédée.
-- **Ombre utile** : la Canopée urbaine gagne +1 % par Panneau de balcon possédé.
-- **Chaleur récupérée** : la Serre communautaire gagne +2 % par Centrale à miroirs possédée.
+**Entre bâtiments voisins.** Chaque paire de bâtiments voisins est liée dans les deux sens : le plus cher aide généreusement le moins cher, et le moins cher, possédé en nombre, aide un peu le plus cher.
 
-Condition : 15 exemplaires de chacun des deux générateurs. Coût : ~10 000 × le coût de base du plus cher des deux *(à valider)*.
+| Nom | Gagne | Par exemplaire de | Bonus |
+|---|---|---|---|
+| Pots au soleil | Héliotrope en pot | Panneau de balcon | +5 % |
+| Toits branchés | Panneau de balcon | Potager sur le toit | +5 % |
+| Compost partagé | Potager sur le toit | Serre communautaire | +5 % |
+| Tours à semis | Serre communautaire | Ferme verticale | +4 % |
+| Lumière réfléchie | Ferme verticale | Centrale à miroirs | +3 % |
+| Miroirs au frais | Centrale à miroirs | Canopée urbaine | +3 % |
+| Racines vivantes | Canopée urbaine | Arcologie vivante | +3 % |
+| Boutures de pot | Panneau de balcon | Héliotrope en pot | +1 % |
+| Prises sur le toit | Potager sur le toit | Panneau de balcon | +1 % |
+| Coin des jardiniers | Serre communautaire | Potager sur le toit | +1 % |
+| Étages pépinière | Ferme verticale | Serre communautaire | +1 % |
+| Fleurs de ferme | Centrale à miroirs | Ferme verticale | +1 % |
+| Clairières ensoleillées | Canopée urbaine | Centrale à miroirs | +1 % |
+| Corridors de canopée | Arcologie vivante | Canopée urbaine | +1 % |
+
+**Entre bâtiments éloignés.**
+
+| Nom | Gagne | Par exemplaire de | Bonus |
+|---|---|---|---|
+| Ombre utile | Canopée urbaine | Panneau de balcon | +1 % |
+| Chaleur récupérée | Serre communautaire | Centrale à miroirs | +2 % |
+| Mille pots | Arcologie vivante | Héliotrope en pot | +0,5 % |
+| Réseau citoyen | Centrale à miroirs | Panneau de balcon | +0,5 % |
+
+Condition : 10 exemplaires de chacun des deux générateurs, ou 5 quand l'un des deux fait partie des trois derniers (Centrale, Canopée, Arcologie), plus rares. Coût : 2 000 × le coût de base du plus cher des deux, ou 100 × pour les synergies des trois derniers, pour qu'elles restent à portée. Celles des derniers bâtiments arrivent surtout à partir de la 2ᵉ Saison, ce qui laisse quelque chose à découvrir après le premier prestige.
+
+**Entre améliorations.** Trois améliorations grandissent avec les autres améliorations achetées. Leur bonus s'ajoute à toute la production (multiplicateur global, §8) :
+
+| Nom | Condition | Coût | Effet |
+|---|---|---|---|
+| Savoirs partagés | 10 améliorations achetées | 50 000 | +0,5 % par amélioration achetée |
+| Grainothèque | 30 améliorations achetées | 50 M | +0,5 % par amélioration achetée |
+| Les communs | 6 synergies entre bâtiments achetées | 500 M | +3 % par synergie entre bâtiments achetée |
+
+> Synergies (après le MVP, 2026-10-10) : Antoine voulait adoucir encore l'équilibrage en ajoutant beaucoup de synergies plutôt qu'en touchant aux valeurs des générateurs. On passe de 3 synergies à 18 entre bâtiments et 3 entre améliorations. Les synergies se débloquent plus tôt (10 exemplaires au lieu de 15) et coûtent moins cher (2 000 × au lieu de 10 000 × le coût de base). Les coûts et productions des générateurs ne changent pas. La 1ʳᵉ Saison conseillée arrive vers 2 h 15 au lieu de 2 h 50 (§8).
 
 ### 5.4 Bonus de biodiversité
 
@@ -158,7 +192,7 @@ Chaque phase change la scène centrale (le décor reverdit) et débloque des él
 |---|---|---|---|---|
 | 1 | **Le Balcon** | 0 – 6 min | Clic, générateurs 1 à 3, premières améliorations | Un balcon gris, une fleur, puis des pots et un panneau |
 | 2 | **Le Quartier** | 6 min – 30 min | Générateurs 4 et 5, synergies, Jalons, Papillon doré | Les toits verdissent, une serre apparaît |
-| 3 | **La Ville** | 30 min – 2 h 40 | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
+| 3 | **La Ville** | 30 min – 2 h 15 | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
 | 4 | **Les Saisons** | après la 1ʳᵉ Saison | Écran des Saisons, statistiques de prestige | La scène change de teinte selon la saison (printemps, été, automne, hiver) |
 
 Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en cours** (seuils indicatifs : Phase 2 à 10 000, Phase 3 à 10 M).
@@ -214,7 +248,7 @@ Points de repère *(à valider)* :
 
 - Le bouton Nouvelle Saison est disponible dès qu'on gagnerait au moins **1** Graine, mais l'interface conseille d'attendre d'en gagner au moins 10 pour la première (« La terre n'est pas encore prête »). On ne bloque pas, on conseille.
 - L'écran de confirmation montre clairement : ce qui sera perdu, les Graines gagnées, le bonus avant/après.
-- Cible : 1ʳᵉ Saison rentable vers **2 h 30 – 3 h** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
+- Cible : 1ʳᵉ Saison rentable vers **2 h – 2 h 30** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
 
 **Implémentation (jalon 3).** `src/game/seasons.ts`. Précisions retenues :
 
@@ -239,6 +273,7 @@ productionGlobale/s = Σ_types( prodBase × possédés × multTypes )
                       × (1 + 0,05 × graines)
                       × (1 + 0,01 × jalons)
                       × (1 + bonusBiodiversité)
+                      × (1 + bonusSynergiesAméliorations)   // §5.3, entre améliorations
                       × multÉvénement            // Floraison du Papillon doré : ×3
 coût(n)             = coûtBase × 1,15^n
 valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
@@ -259,13 +294,13 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 | 1ᵉʳ Panneau de balcon | ~45 s |
 | 1ᵉʳ Potager sur le toit | ~2 min 30 |
 | 1ʳᵉ Serre communautaire | ~7 min |
-| 1ʳᵉ Ferme verticale | ~17 min |
+| 1ʳᵉ Ferme verticale | ~15 min |
 | 1ʳᵉ Centrale à miroirs | ~35 min |
-| 1ʳᵉ Canopée urbaine | ~1 h 10 |
-| 1ʳᵉ Arcologie vivante | ~2 h 05 |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~2 h 40 |
+| 1ʳᵉ Canopée urbaine | ~1 h 05 |
+| 1ʳᵉ Arcologie vivante | ~1 h 45 |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~2 h 15 |
 
-Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments.
+Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie.
 
 ### Outil de simulation
 
@@ -273,7 +308,7 @@ L'équilibrage doit être vérifié par un **simulateur sans interface** qui rej
 
 **Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat dépend un peu de la graine, surtout en milieu de partie où un Papillon tombe plus ou moins tôt (chiffres sous le tableau ci-dessous).
 
-Sortie actuelle (équilibrage adouci) :
+Sortie actuelle (avec les synergies) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
@@ -281,13 +316,13 @@ Sortie actuelle (équilibrage adouci) :
 | 1ᵉʳ Panneau de balcon | ~45 s | 44,6 s | −1 % | 43,3 s |
 | 1ᵉʳ Potager sur le toit | ~2 min 30 | 2,7 min | +8 % | 2,2 min |
 | 1ʳᵉ Serre communautaire | ~7 min | 7,5 min | +7 % | 5,2 min |
-| 1ʳᵉ Ferme verticale | ~17 min | 14,7 min | −14 % | 10,8 min |
-| 1ʳᵉ Centrale à miroirs | ~35 min | 35,8 min | +2 % | 25,3 min |
-| 1ʳᵉ Canopée urbaine | ~1 h 10 | 1 h 03 | −10 % | 41 min |
-| 1ʳᵉ Arcologie vivante | ~2 h 05 | 2 h 16 | +9 % | 1 h 22 |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~2 h 40 | 2 h 51 | +7 % | 1 h 47 |
+| 1ʳᵉ Ferme verticale | ~15 min | 14,7 min | −2 % | 10,5 min |
+| 1ʳᵉ Centrale à miroirs | ~35 min | 35,8 min | +2 % | 23,7 min |
+| 1ʳᵉ Canopée urbaine | ~1 h 05 | 1 h 05 | +1 % | 42 min |
+| 1ʳᵉ Arcologie vivante | ~1 h 45 | 1 h 45 | 0 % | 1 h 07 |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~2 h 15 | 2 h 12 | −2 % | 1 h 22 |
 
-Le joueur simulé atteint 18 Jalons et attrape 29 Papillons pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −16 % et +26 % de sa cible. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+Le joueur simulé atteint 20 Jalons, attrape 22 Papillons et achète 31 améliorations (dont 6 synergies entre bâtiments et 2 entre améliorations) pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −4 % et +21 % de sa cible. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 ### Affichage des nombres
 

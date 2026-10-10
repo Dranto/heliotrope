@@ -25,10 +25,36 @@ export const CLICK_UPGRADE_IDS = [
 ] as const;
 export type ClickUpgradeId = (typeof CLICK_UPGRADE_IDS)[number];
 
-export const SYNERGY_IDS = ['sharedCompost', 'usefulShade', 'recoveredHeat'] as const;
+export const SYNERGY_IDS = [
+  // A dearer neighbour helps the cheaper one (§5.3).
+  'sunnyPots',
+  'wiredRoofs',
+  'sharedCompost',
+  'seedlingTowers',
+  'reflectedLight',
+  'coolMirrors',
+  'livingRoots',
+  // A cheaper neighbour, owned in numbers, helps the dearer one.
+  'potCuttings',
+  'rooftopSockets',
+  'gardenersCorner',
+  'nurseryFloors',
+  'farmFlowers',
+  'sunlitGlades',
+  'usefulShade',
+  'canopyCorridors',
+  // Distant pairs.
+  'recoveredHeat',
+  'thousandPots',
+  'citizenGrid',
+] as const;
 export type SynergyId = (typeof SYNERGY_IDS)[number];
 
-export type UpgradeId = GeneratorUpgradeId | ClickUpgradeId | SynergyId;
+/** §5.3: upgrades that grow with the other upgrades bought. */
+export const UPGRADE_SYNERGY_IDS = ['sharedKnowledge', 'seedLibrary', 'commons'] as const;
+export type UpgradeSynergyId = (typeof UPGRADE_SYNERGY_IDS)[number];
+
+export type UpgradeId = GeneratorUpgradeId | ClickUpgradeId | SynergyId | UpgradeSynergyId;
 
 export type UpgradeEffect =
   /** Multiplies one generator's production. */
@@ -38,13 +64,19 @@ export type UpgradeEffect =
   /** Adds a fraction of the Light per second to each click. */
   | { kind: 'clickFromProduction'; fraction: number }
   /** `generator` gains `bonusPerUnit` (additive) per unit of `source` owned. */
-  | { kind: 'synergy'; generator: GeneratorId; source: GeneratorId; bonusPerUnit: number };
+  | { kind: 'synergy'; generator: GeneratorId; source: GeneratorId; bonusPerUnit: number }
+  /** Global production gains `bonusPerUpgrade` (additive) per upgrade of `counts` bought. */
+  | { kind: 'upgradeSynergy'; counts: 'all' | 'synergies'; bonusPerUpgrade: number };
 
 export interface UpgradeCondition {
   /** Minimum units owned of each listed generator. */
   owned?: Partial<Record<GeneratorId, number>>;
   /** Minimum Light earned during the current Season. */
   totalLight?: number;
+  /** Minimum number of upgrades bought this Season. */
+  upgrades?: number;
+  /** Minimum number of building synergies bought this Season. */
+  synergies?: number;
 }
 
 export interface UpgradeDef {
@@ -55,9 +87,14 @@ export interface UpgradeDef {
 }
 
 /** Synergies unlock when both generators reach this many units (§5.3). */
-export const SYNERGY_OWNED = 15;
+export const SYNERGY_OWNED = 10;
+/** ...or this many when one of them is among the last three, scarcer buildings. */
+export const SYNERGY_OWNED_LATE = 5;
+const LATE_GENERATORS: readonly GeneratorId[] = GENERATOR_IDS.slice(-3);
 /** Synergy cost, in base costs of the more expensive of the two generators (§5.3). */
-export const SYNERGY_COST_FACTOR = 10_000;
+export const SYNERGY_COST_FACTOR = 2_000;
+/** ...or this many for the synergies of the last three buildings, so they arrive in reach. */
+export const SYNERGY_COST_FACTOR_LATE = 100;
 
 function generatorUpgrades(): UpgradeDef[] {
   return GENERATOR_IDS.flatMap((generator) =>
@@ -109,25 +146,60 @@ function synergy(
   source: GeneratorId,
   bonusPerUnit: number,
 ): UpgradeDef {
+  const late = LATE_GENERATORS.includes(generator) || LATE_GENERATORS.includes(source);
+  const owned = late ? SYNERGY_OWNED_LATE : SYNERGY_OWNED;
   return {
     id,
     cost:
-      SYNERGY_COST_FACTOR * Math.max(GENERATORS[generator].baseCost, GENERATORS[source].baseCost),
-    condition: { owned: { [generator]: SYNERGY_OWNED, [source]: SYNERGY_OWNED } },
+      (late ? SYNERGY_COST_FACTOR_LATE : SYNERGY_COST_FACTOR) *
+      Math.max(GENERATORS[generator].baseCost, GENERATORS[source].baseCost),
+    condition: { owned: { [generator]: owned, [source]: owned } },
     effect: { kind: 'synergy', generator, source, bonusPerUnit },
   };
 }
 
 const SYNERGIES: UpgradeDef[] = [
+  synergy('sunnyPots', 'pot', 'balconyPanel', 0.05),
+  synergy('wiredRoofs', 'balconyPanel', 'rooftopGarden', 0.05),
   synergy('sharedCompost', 'rooftopGarden', 'greenhouse', 0.05),
+  synergy('seedlingTowers', 'greenhouse', 'verticalFarm', 0.04),
+  synergy('reflectedLight', 'verticalFarm', 'mirrorPlant', 0.03),
+  synergy('coolMirrors', 'mirrorPlant', 'urbanCanopy', 0.03),
+  synergy('livingRoots', 'urbanCanopy', 'arcology', 0.03),
+  synergy('potCuttings', 'balconyPanel', 'pot', 0.01),
+  synergy('rooftopSockets', 'rooftopGarden', 'balconyPanel', 0.01),
+  synergy('gardenersCorner', 'greenhouse', 'rooftopGarden', 0.01),
+  synergy('nurseryFloors', 'verticalFarm', 'greenhouse', 0.01),
+  synergy('farmFlowers', 'mirrorPlant', 'verticalFarm', 0.01),
+  synergy('sunlitGlades', 'urbanCanopy', 'mirrorPlant', 0.01),
   synergy('usefulShade', 'urbanCanopy', 'balconyPanel', 0.01),
+  synergy('canopyCorridors', 'arcology', 'urbanCanopy', 0.01),
   synergy('recoveredHeat', 'greenhouse', 'mirrorPlant', 0.02),
+  synergy('thousandPots', 'arcology', 'pot', 0.005),
+  synergy('citizenGrid', 'mirrorPlant', 'balconyPanel', 0.005),
+];
+
+function upgradeSynergy(
+  id: UpgradeSynergyId,
+  cost: number,
+  condition: UpgradeCondition,
+  counts: 'all' | 'synergies',
+  bonusPerUpgrade: number,
+): UpgradeDef {
+  return { id, cost, condition, effect: { kind: 'upgradeSynergy', counts, bonusPerUpgrade } };
+}
+
+const UPGRADE_SYNERGIES: UpgradeDef[] = [
+  upgradeSynergy('sharedKnowledge', 50_000, { upgrades: 10 }, 'all', 0.005),
+  upgradeSynergy('seedLibrary', 50_000_000, { upgrades: 30 }, 'all', 0.005),
+  upgradeSynergy('commons', 500_000_000, { synergies: 6 }, 'synergies', 0.03),
 ];
 
 export const UPGRADE_LIST: readonly UpgradeDef[] = [
   ...generatorUpgrades(),
   ...CLICK_UPGRADES,
   ...SYNERGIES,
+  ...UPGRADE_SYNERGIES,
 ];
 
 export const UPGRADES = Object.fromEntries(UPGRADE_LIST.map((u) => [u.id, u])) as Record<
