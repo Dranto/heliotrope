@@ -215,7 +215,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 
 **Le récit passe par le gameplay (2026-10-10).** Le Journal du quartier livré au jalon 4 a été retiré : il n'y a plus de messages narratifs. Ses temps forts sont repris ainsi :
 
-- **Déjà portés par la scène.** Premier pot, premier panneau, premier potager, serre, ferme verticale, miroirs, canopée, arcologie : chaque bâtiment apparaît sur la carte avec son animation. « Le quartier se réveille » et « d'autres quartiers verdissent » : la caméra qui recule de phase en phase et le quartier qui reverdit avec la production. Premier Papillon doré : le papillon lui-même. Dix Jalons : l'annonce et l'écran des Jalons (§9.3). Les Saisons accomplies : la teinte de saison de la scène.
+- **Déjà portés par la scène.** Premier pot, premier panneau, premier potager, serre, ferme verticale, miroirs, canopée, arcologie : chaque bâtiment apparaît sur la carte avec son animation. « Le quartier se réveille » et « d'autres quartiers verdissent » : les vues de la carte qui s'ouvrent de phase en phase et le quartier qui reverdit avec la production. Premier Papillon doré : le papillon lui-même. Dix Jalons : l'annonce et l'écran des Jalons (§9.3). Les Saisons accomplies : la teinte de saison de la scène.
 - **Pistes d'événements en jeu, plus tard.** Les voisins qui apportent des boutures et le vote du jardin partagé de la rue des Tilleuls peuvent devenir des Projets du quartier visibles sur la carte (roadmap, M6). « La terre se souvient » d'une Saison à l'autre prend corps avec les parcelles qui restent restaurées et l'Arbre des Saisons (roadmap, M6 et M7). Rien de tout cela n'est construit pour l'instant.
 
 **Implémentation (jalon 4).** `src/game/phases.ts`.
@@ -229,7 +229,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 - **Chaque générateur a ses places.** Pots autour de la cour, panneaux sur les toits voisins, potagers qui remplacent les toits gris (du plus proche au plus lointain), serres sur les friches, fermes verticales à la place de trois tours, champ de miroirs sur le parking du sud-est, arbres le long des rues (la canopée part de la cour et gagne la ville), arcologie en rosace de terrasses sur la grande friche du nord-ouest.
 - **Chaque achat se voit.** Chacun des premiers exemplaires ajoute un élément ; ensuite les éléments arrivent à des paliers de plus en plus espacés (12, 14, 16, 18, 20, 23… jusqu'à 500), pour qu'un achat tardif change encore l'image. Les arbres arrivent par bosquets de quatre et les miroirs par deux. Un nouvel élément pousse en place en 1,2 s, accompagné d'un anneau doré qui s'élargit ; ce qui existait déjà au chargement s'affiche sans animation.
 - **Les améliorations aussi.** Chaque amélioration ×2 (§5.1) fait scintiller une fois tous les éléments du générateur et les enrichit : plus de pétales dans les pots, cadre doré des panneaux, tomates puis fleurs dans les potagers, serres plus nervurées puis chauffées, terrasses supplémentaires sur les fermes, miroirs dorés puis rayons vers la tour, arbres en fleurs, arcologie fleurie. Les améliorations de clic font fleurir l'héliotrope de la cour, et chaque synergie (§5.3) trace un fil doré entre les deux générateurs qu'elle relie.
-- **La caméra recule par paliers.** Phase 1 : la cour et l'immeuble du joueur. Phase 2 : le quartier. Phase 3 : la ville entière. La caméra recule plus tôt si le joueur achète un générateur dont la place est hors champ, pour qu'aucun achat ne soit construit hors de vue. Le recul dure 2,8 s.
+- **Trois vues, au choix du joueur (2026-10-10).** Demande d'Antoine : la carte ne se dézoome plus d'elle-même, le joueur passe d'une vue à l'autre avec un sélecteur en haut à gauche de la carte. « Le Balcon » cadre la cour et l'immeuble du joueur, « Le Quartier » les îlots autour, « La Ville » la ville entière. Chaque vue s'ouvre avec sa phase, ou plus tôt si le joueur achète un générateur dont la place est hors de la dernière vue ouverte. Quand une vue s'ouvre en jeu, la carte y glisse une fois (1,1 s) pour qu'on voie le nouveau bâtiment pousser ; le joueur peut ensuite revenir plus près. Le choix est gardé dans le navigateur, hors sauvegarde. Chaque vue garde son cadre entier et aussi grand que l'écran le permet, quelle que soit sa forme, sans empiéter sur la fleur ; le reste de l'écran montre la périphérie grise, des îlots jamais restaurés sur la même grille de rues, voilés de lumière pour que la partie du joueur ressorte.
 - **La lumière suit la phase.** Les ombres des bâtiments tournent et changent de longueur (aube : longues vers l'ouest ; midi : courtes ; fin d'après-midi : longues vers l'est), un voile de lumière teinte la scène, des ombres de nuages la traversent lentement. Le quartier reverdit avec la production, et les teintes de saison (phase 4) s'appliquent au feuillage et à la lumière.
 - **Animations réduites.** Avec le réglage des Options ou `prefers-reduced-motion`, rien ne bouge : les éléments apparaissent directement, la caméra change de cadre sans transition, pas de scintillement.
 
@@ -248,7 +248,7 @@ Le quartier garde des places grises qu'aucun bâtiment n'occupe : une avenue, de
 | Toits vivants | Tous les toits gris se couvrent d'orpin et de fleurs | 3 | 3 Md | Bonus de biodiversité ×2 |
 | Places plantées | Les quatre carrefours autour de l'immeuble deviennent des places rondes autour d'un arbre | 3 | 30 Md | Chaque Jalon donne +2 % au lieu de +1 % |
 
-- **Quand une parcelle est proposée.** Quand sa place est dans le cadre de la caméra (sa phase) et que la Saison en cours a récolté la moitié de son prix, comme pour les générateurs (§4). Une première Saison en restaure environ six ; les deux dernières sont des objectifs lointains pour les Saisons suivantes.
+- **Quand une parcelle est proposée.** Quand sa place est dans une vue ouverte (sa phase) et que la Saison en cours a récolté la moitié de son prix, comme pour les générateurs (§4). Une première Saison en restaure environ six ; les deux dernières sont des objectifs lointains pour les Saisons suivantes.
 - **Sur la carte.** Une parcelle proposée est cernée d'un pointillé doré qui respire, avec une épingle en forme de pousse là où elle commencera à reverdir ; l'épingle est dorée quand on peut se l'offrir, et un clic dessus la restaure. Passer sur la parcelle dans le panneau sous la carte éclaire sa place.
 - **L'animation.** La parcelle restaurée se dévoile depuis son épingle : un cercle qui s'élargit découvre le nouveau sol pendant que des pétales jaillissent, avec un anneau doré. Une parcelle déjà restaurée au chargement s'affiche sans animation.
 - **Le panneau « Le quartier ».** Sous la carte, une rangée de huit pastilles montre les parcelles restaurées pour toujours, puis les quatre offres les moins chères (parcelles et projets mêlés) avec leur effet et leur prix.
@@ -504,25 +504,27 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 
 ### 10.1 Écran principal (bureau)
 
+Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fleur est dans la carte, le menu latéral s'élargit et se replie.
+
 ```
-┌───────────────────────────────────────────────────────────────────┐
-│  HELIOTROPE           ☀ 1,23 M Lumière   (+4 560 /s)     [≡ Menu] │
-├───────────────┬─────────────────────────────┬─────────────────────┤
-│               │                             │ Améliorations       │
-│   (fleur      │      Scène du quartier      │ [▣][▣][▣][▢][▢]     │
-│   cliquable,  │   (reverdit selon la phase) │─────────────────────│
-│   tourne vers │                             │ Acheter ×1 ×10 ×100 │
-│   le soleil)  │                             │ Héliotrope en pot 42│
-│               │                             │ Panneau de balcon 18│
-│   +12 / clic  │                             │ Potager sur le toit │
-│               │                             │ ░░ ??? ░░  1,4 M    │
-└───────────────┴─────────────────────────────┴─────────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│ HELIOTROPE        ☀ 1,23 M Lumière  +4 560 /s       [Jalons] [Options]│
+├────────────────────────────────────────────────────┬─┬────────────────┤
+│ [Balcon|Quartier|Ville]                            │›│ Améliorer ⌄    │
+│                                                    │ │ [▣][▣][▣][▢]   │
+│              Scène du quartier                     │ │ Bâtir ⌄ ×1 ×10 │
+│        (toute la hauteur de la fenêtre)            │ │ Héliotrope  42 │
+│  ╭──╮                                              │ │ Panneau     18 │
+│  │✿ │ fleur cliquable                              │ │ Le quartier ⌄  │
+│  ╰──╯                                              │ │ Coopératives ⌄ │
+└────────────────────────────────────────────────────┴─┴────────────────┘
 ```
 
-- **Gauche :** l'héliotrope cliquable (petite animation et nombre flottant à chaque clic), valeur du clic.
-- **Centre :** la scène du quartier vue du dessus (§6), plus large que les deux colonnes latérales depuis 2026-10-10 : c'est la pièce maîtresse de l'écran. Le Papillon doré la traverse.
-- **Droite :** améliorations disponibles (icônes avec infobulle) puis liste des générateurs (nom, quantité, prix, production, infobulle avec le détail des multiplicateurs).
-- **Haut :** compteur de Lumière, production/s, menu.
+- **Haut :** une barre fine : titre, compteur de Lumière et production/s, menu. Aucun texte sous le titre.
+- **Carte :** la scène du quartier vue du dessus (§6) occupe toute la hauteur restante et toute la largeur que laisse le menu. Le sélecteur de vue est en haut à gauche, avec la teinte de saison. Le Papillon doré la traverse.
+- **Fleur :** l'héliotrope cliquable se dresse dans son arche en bas à gauche de la carte, au premier plan, comme une jardinière devant la ville. Sa taille suit celle de la carte. Aucun texte sous la fleur : chaque clic fait flotter sa valeur.
+- **Menu latéral :** Améliorer, Bâtir, Le quartier (parcelles et projets, §6.1, §6.2) et les Coopératives (§7.2), dans cet ordre ; il défile seul et la page ne défile pas. Large d'environ un tiers de l'écran, il passe à deux colonnes sur les très grands écrans (dès 1760 px) pour tout montrer d'un coup. Le titre de chaque panneau le replie ou le déplie, et la poignée entre la carte et le menu replie tout le menu pour donner toute la largeur à la carte. Ces choix sont gardés dans le navigateur.
+- **Tablette :** la carte en haut (environ 60 % de la hauteur), les panneaux en deux colonnes dessous.
 
 ### 10.2 Autres écrans (onglets ou panneaux)
 
@@ -539,7 +541,7 @@ Les Options proposent aussi de réduire les animations, en plus du réglage `pre
 
 ### 10.3 Mobile
 
-Même contenu, une colonne : compteur en haut, fleur + scène au centre, barre d'onglets en bas (Récolte / Bâtir / Améliorer / Plus). Les cibles tactiles font au moins 44 px. *Livré au jalon 4 : « Plus » rassemble les Jalons, les Saisons, les Statistiques et les Options.*
+Même contenu, une colonne : compteur en haut, carte avec la fleur dedans, barre d'onglets en bas (Récolte / Bâtir / Améliorer / Plus). La carte reste visible sur les onglets Récolte (grande, avec Le quartier dessous), Bâtir et Améliorer (plus basse, pour voir chaque achat pousser) ; « Plus » la remplace par le menu. Les cibles tactiles font au moins 44 px. *Livré au jalon 4 : « Plus » rassemble les Jalons, les Saisons, les Statistiques et les Options.*
 
 ### 10.4 Direction artistique
 

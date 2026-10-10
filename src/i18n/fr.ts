@@ -36,12 +36,9 @@ const u = (name: string, flavour: string): UpgradeText => ({ name, flavour: q(fl
 
 export const fr = {
   title: 'Heliotrope',
-  tagline: 'Faire reverdir la ville, un rayon à la fois',
   light: 'Lumière',
   perSecond: '/ s',
-  perClick: 'par clic',
   clickFlower: 'Récolter la lumière de l’héliotrope',
-  clickHint: 'Touchez la fleur pour récolter sa lumière',
   generatorsTitle: 'Bâtir',
   owned: 'possédés',
   produces: 'produit',
@@ -81,6 +78,12 @@ export const fr = {
     autumn: 'Automne',
     winter: 'Hiver',
   } satisfies Record<VisualSeason, string>,
+  layout: {
+    views: 'Vue de la carte',
+    panels: 'Menus',
+    hidePanels: 'Replier les menus pour agrandir la carte',
+    showPanels: 'Déplier les menus',
+  },
   tabs: {
     label: 'Sections du jeu',
     harvest: 'Récolte',

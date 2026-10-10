@@ -46,7 +46,9 @@ a design decision changes, update that document in the same PR.
   flavour lines).
 - `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
   rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
-  the restored parcels and project marks, `Restoration.tsx` is the panel under the map.
+  the restored parcels and project marks, `Restoration.tsx` is their panel in the side menu.
+  `Scene.tsx` frames the map with the view switch (`fitCamera`) and holds the clickable `Flower.tsx`;
+  `PanelTitle.tsx` and `layoutPrefs.ts` fold the panels and remember layout choices per browser.
   `SeasonTree.tsx` and `seasonTree.ts` draw the Tree of Seasons screen; `Cooperatives.tsx` is their
   panel, `CooperativeArt.tsx` and `cooperativeMap.ts` their cargo bikes on the map.
   `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes. Read state with `useGameState()`, change it with

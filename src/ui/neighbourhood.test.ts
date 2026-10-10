@@ -4,7 +4,6 @@ import type { UpgradeId } from '../game/upgrades';
 import {
   APPEAR_THRESHOLDS,
   BUILDINGS,
-  CAMERAS,
   FARM_SITES,
   GARDEN_ROOFS,
   MIRRORS,
@@ -12,7 +11,9 @@ import {
   POT_SPOTS,
   TREES,
   WORLD,
-  cameraLevel,
+  VIEW_FRAMES,
+  fitCamera,
+  furthestView,
   cameraTransform,
   clickLevel,
   upgradeLevel,
@@ -68,28 +69,66 @@ describe('upgrade levels', () => {
   });
 });
 
-describe('camera', () => {
-  it('follows the phase', () => {
-    expect(cameraLevel(1, owning({ pot: 5 }))).toBe(1);
-    expect(cameraLevel(2, owning({ pot: 5 }))).toBe(2);
-    expect(cameraLevel(3, owning({}))).toBe(3);
+describe('views', () => {
+  it('opens views with the phase', () => {
+    expect(furthestView(1, owning({ pot: 5 }))).toBe(1);
+    expect(furthestView(2, owning({ pot: 5 }))).toBe(2);
+    expect(furthestView(3, owning({}))).toBe(3);
   });
 
-  it('pulls back early so a generator further out is never built out of sight', () => {
-    expect(cameraLevel(1, owning({ greenhouse: 1 }))).toBe(2);
-    expect(cameraLevel(2, owning({ mirrorPlant: 1 }))).toBe(3);
-    expect(cameraLevel(3, owning({ greenhouse: 1 }))).toBe(3);
+  it('opens a further view early so a generator further out is never built out of reach', () => {
+    expect(furthestView(1, owning({ greenhouse: 1 }))).toBe(2);
+    expect(furthestView(2, owning({ mirrorPlant: 1 }))).toBe(3);
+    expect(furthestView(3, owning({ greenhouse: 1 }))).toBe(3);
   });
 
-  it('frames the whole world at the city level', () => {
-    expect(cameraTransform(CAMERAS[3])).toBe('translate(0px, 0px) scale(1)');
+  it('frames the whole world in the city view of a world-sized screen', () => {
+    expect(cameraTransform(fitCamera(3, WORLD.width, WORLD.height))).toBe(
+      'translate(0px, 0px) scale(1)',
+    );
   });
 
-  it('centres the home courtyard when zoomed in', () => {
-    const { x, y, scale } = CAMERAS[1];
-    const match = /translate\((-?[\d.]+)px, (-?[\d.]+)px\)/.exec(cameraTransform(CAMERAS[1]))!;
-    expect(Number(match[1]) + x * scale).toBeCloseTo(WORLD.width / 2, 1);
-    expect(Number(match[2]) + y * scale).toBeCloseTo(WORLD.height / 2, 1);
+  /** Screen rectangle the frame of `view` takes with the camera fitted to that screen. */
+  function onScreen(view: 1 | 2 | 3, width: number, height: number, left = 0, bottom = 0, top = 0) {
+    const camera = fitCamera(view, width, height, { top, left, bottom });
+    const [fx, fy, fw, fh] = VIEW_FRAMES[view];
+    const x = width / 2 + (fx - camera.x) * camera.scale;
+    const y = height / 2 + (fy - camera.y) * camera.scale;
+    return { x, y, right: x + fw * camera.scale, bottom: y + fh * camera.scale };
+  }
+
+  it('keeps every view whole on wide and tall screens alike', () => {
+    for (const view of [1, 2, 3] as const) {
+      for (const [width, height] of [
+        [1200, 700],
+        [390, 480],
+        [800, 800],
+      ] as const) {
+        const box = onScreen(view, width, height);
+        expect(box.x).toBeGreaterThanOrEqual(-0.5);
+        expect(box.y).toBeGreaterThanOrEqual(-0.5);
+        expect(box.right).toBeLessThanOrEqual(width + 0.5);
+        expect(box.bottom).toBeLessThanOrEqual(height + 0.5);
+        // As large as it fits: it touches two opposite sides.
+        const fillsWidth = box.right - box.x >= width - 1;
+        const fillsHeight = box.bottom - box.y >= height - 1;
+        expect(fillsWidth || fillsHeight).toBe(true);
+      }
+    }
+  });
+
+  it('keeps the flower clear of the part of the city in view', () => {
+    const box = onScreen(2, 1200, 700, 260, 0);
+    expect(box.x).toBeGreaterThanOrEqual(259.5);
+    expect(box.right).toBeLessThanOrEqual(1200.5);
+    const tall = onScreen(3, 390, 520, 0, 150, 48);
+    expect(tall.bottom).toBeLessThanOrEqual(370.5);
+    expect(tall.y).toBeGreaterThanOrEqual(47.5);
+  });
+
+  it('zooms closer on the courtyard than on the city', () => {
+    expect(fitCamera(1, 1000, 700).scale).toBeGreaterThan(fitCamera(2, 1000, 700).scale);
+    expect(fitCamera(2, 1000, 700).scale).toBeGreaterThan(fitCamera(3, 1000, 700).scale);
   });
 });
 

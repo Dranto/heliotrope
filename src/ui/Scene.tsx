@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import type { ParcelId } from '../game/parcels';
 import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restoration';
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
@@ -12,7 +12,9 @@ import {
 } from '../game/cooperatives';
 import { CooperativeBikes } from './CooperativeArt';
 import { Neighbourhood } from './Neighbourhood';
-import { Restoration } from './Restoration';
+import { Flower } from './Flower';
+import { useLayoutPref } from './layoutPrefs';
+import { WORLD, fitCamera, furthestView, VIEWS, type Insets, type View } from './neighbourhood';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
@@ -61,16 +63,52 @@ function Butterfly({ onCatch }: { onCatch: (result: CatchResult) => void }) {
   );
 }
 
+interface Size {
+  width: number;
+  height: number;
+}
+
+/** Size of an element in whole pixels, followed as the window or the layout changes. */
+function useSize<T extends HTMLElement>(fallback: Size): [RefObject<T | null>, Size] {
+  const ref = useRef<T>(null);
+  const [size, setSize] = useState(fallback);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || typeof ResizeObserver !== 'function') return;
+    const observer = new ResizeObserver(([entry]) => {
+      const box = entry?.contentRect;
+      if (!box || box.width < 1 || box.height < 1) return;
+      const next = { width: Math.round(box.width), height: Math.round(box.height) };
+      setSize((old) => (old.width === next.width && old.height === next.height ? old : next));
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, size];
+}
+
+/** Gap kept between the flower and the part of the city in view. */
+const FLOWER_GAP = 12;
+/** Room kept free under the view switch at the top of the map. */
+const CAPTION_ROOM = 52;
+
 /**
  * The neighbourhood scene (docs/game-design.md §6, §10.4): the city seen from above, where each
- * purchase builds something with a soft entrance. The light and the shadows follow the phase
- * (dawn, noon, late afternoon) and, after the first Season, the season's tint. The Golden
- * Butterfly flies across it.
+ * purchase builds something with a soft entrance, with the clickable heliotrope standing in front
+ * of it. The player switches between the views opened so far: the courtyard, the neighbourhood,
+ * the city; each one keeps its part of the city whole and as large as the screen allows. The
+ * light and the shadows follow the phase (dawn, noon, late afternoon) and, after the first
+ * Season, the season's tint. The Golden Butterfly flies across it.
  */
-export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
+export function Scene({
+  onCatch,
+  highlight,
+}: {
+  onCatch: (result: CatchResult) => void;
+  highlight: ParcelId | null;
+}) {
   const store = useGameStore();
   const state = useGameState();
-  const [highlight, setHighlight] = useState<ParcelId | null>(null);
   const restore = useCallback(
     (id: ParcelId) => store.dispatch((s) => restoreParcel(s, id)),
     [store],
@@ -108,6 +146,27 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
     [projects, bikes, reduced, offered, affordable, highlight, restore],
   );
   const phase = phaseOf(state);
+  const furthest = furthestView(phase, state.generators);
+  const [chosen, choose] = useLayoutPref<View | null>('view', null);
+  // When a further view opens during play, the map moves to it once, so the new places are seen
+  // being built; the player can go back closer at any time.
+  const opened = useRef(furthest);
+  useEffect(() => {
+    if (furthest > opened.current) choose(furthest);
+    opened.current = furthest;
+  }, [furthest, choose]);
+  const view = Math.min(chosen ?? furthest, furthest) as View;
+  const [mapRef, size] = useSize<HTMLDivElement>(WORLD);
+  const [flowerRef, flower] = useSize<HTMLDivElement>({ width: 0, height: 0 });
+  const { width, height } = size;
+  // Kept as one object while nothing moves, so the map does not redraw at every tick.
+  const camera = useMemo(() => {
+    const insets: Insets =
+      width >= height
+        ? { top: 0, left: flower.width + FLOWER_GAP, bottom: 0 }
+        : { top: CAPTION_ROOM, left: 0, bottom: flower.height + FLOWER_GAP };
+    return fitCamera(view, width, height, insets);
+  }, [view, width, height, flower.width, flower.height]);
   const season = visualSeason(state);
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
   // map only redraws when the colour visibly changes.
@@ -115,15 +174,12 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
 
   return (
     <figure className="panel scene" data-phase={phase} data-season={season ?? 'none'}>
-      <figcaption className="scene-caption">
-        <span key={phase} className="scene-phase">
-          {t.phases[phase]}
-        </span>
-        {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
-      </figcaption>
-      <div className="scene-map">
+      <div className="scene-map" ref={mapRef}>
         <Neighbourhood
           generators={state.generators}
+          camera={camera}
+          width={width}
+          height={height}
           upgrades={state.upgrades}
           phase={phase}
           greenness={greenness}
@@ -132,8 +188,29 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
           overlay={overlay}
         />
         <Butterfly onCatch={onCatch} />
+        <div className="map-flower" ref={flowerRef}>
+          <Flower />
+        </div>
       </div>
-      <Restoration onHighlight={setHighlight} />
+      <figcaption className="scene-caption">
+        {furthest > 1 && (
+          <div className="segmented views" role="radiogroup" aria-label={t.layout.views}>
+            {VIEWS.filter((v) => v <= furthest).map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="radio"
+                aria-checked={view === v}
+                onClick={() => choose(v)}
+              >
+                {t.phases[v]}
+              </button>
+            ))}
+          </div>
+        )}
+        {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
+        {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
+      </figcaption>
     </figure>
   );
 }

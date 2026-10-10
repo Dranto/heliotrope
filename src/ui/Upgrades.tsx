@@ -5,6 +5,8 @@ import { buyUpgrade, canBuyUpgrade } from '../game/tick';
 import type { UpgradeId } from '../game/upgrades';
 import { t } from '../i18n/fr';
 import { upgradeEffectText, upgradeText } from '../i18n/upgrades';
+import { usePanelOpen } from './layoutPrefs';
+import { PanelTitle } from './PanelTitle';
 import { UpgradeIcon } from './UpgradeIcon';
 import { useGameState, useGameStore } from './useGame';
 
@@ -19,13 +21,16 @@ export function Upgrades() {
   const state = useGameState();
   const available = availableUpgrades(state);
   const [selectedId, setSelectedId] = useState<UpgradeId | null>(null);
+  const [open, toggle] = usePanelOpen('upgrades');
   const selected = available.find((u) => u.id === selectedId) ?? available[0];
   // Nothing to show before the first upgrade unlocks.
   if (selected === undefined && state.upgrades.length === 0) return null;
 
   return (
-    <section className="panel upgrades" aria-labelledby="upgrades-title">
-      <h2 id="upgrades-title">{t.upgradesTitle}</h2>
+    <section className="panel upgrades" aria-labelledby="upgrades-title" data-open={open}>
+      <PanelTitle id="upgrades-title" open={open} onToggle={toggle}>
+        {t.upgradesTitle}
+      </PanelTitle>
       {selected === undefined ? (
         <p className="empty">{t.noUpgrades}</p>
       ) : (

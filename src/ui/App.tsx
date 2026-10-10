@@ -10,15 +10,17 @@ import {
   seedBonus,
   seedsToGain,
 } from '../game/seasons';
+import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
 import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
 import { achievementName } from '../i18n/achievements';
 import { t } from '../i18n/fr';
 import { Achievements } from './Achievements';
 import { Cooperatives } from './Cooperatives';
-import { Flower } from './Flower';
 import { Generators } from './Generators';
+import { useLayoutPref } from './layoutPrefs';
 import { Options } from './Options';
+import { Restoration } from './Restoration';
 import { Scene } from './Scene';
 import { Seasons } from './Seasons';
 import { SeasonTree } from './SeasonTree';
@@ -93,6 +95,8 @@ export function App() {
   const [screen, setScreen] = useState<Screen | null>(null);
   const [tab, setTab] = useState<Tab>('harvest');
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [highlight, setHighlight] = useState<ParcelId | null>(null);
+  const [sideOpen, setSideOpen] = useLayoutPref('side', true);
   const [showWelcome, setShowWelcome] = useState(
     store.offlineSeconds >= 60 && store.offlineLight >= 1,
   );
@@ -215,6 +219,7 @@ export function App() {
     <div
       className="app"
       data-tab={tab}
+      data-side={sideOpen ? 'open' : 'closed'}
       data-motion={state.settings.reducedMotion ? 'reduced' : undefined}
     >
       <header className="topbar">
@@ -260,8 +265,6 @@ export function App() {
         </div>
         {menu}
       </header>
-      <p className="tagline">{t.tagline}</p>
-
       {showWelcome && (
         <div className="notice" role="status">
           <div>
@@ -280,13 +283,32 @@ export function App() {
       )}
 
       <main className="layout">
-        <Flower />
-        <Scene onCatch={onCatch} />
-        <div className="column">
-          <Upgrades />
-          <Generators />
-          <Cooperatives />
-        </div>
+        <Scene onCatch={onCatch} highlight={highlight} />
+        <aside className="side" aria-label={t.layout.panels}>
+          <button
+            type="button"
+            className="ghost icon side-toggle"
+            aria-expanded={sideOpen}
+            aria-controls="side-panels"
+            aria-label={sideOpen ? t.layout.hidePanels : t.layout.showPanels}
+            title={sideOpen ? t.layout.hidePanels : t.layout.showPanels}
+            onClick={() => setSideOpen(!sideOpen)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d={sideOpen ? 'M10 7l5 5-5 5' : 'M14 7l-5 5 5 5'} />
+            </svg>
+          </button>
+          <div className="side-panels" id="side-panels">
+            <div className="side-column">
+              <Upgrades />
+              <Restoration onHighlight={setHighlight} />
+            </div>
+            <div className="side-column">
+              <Generators />
+              <Cooperatives />
+            </div>
+          </div>
+        </aside>
       </main>
 
       <nav className="tabbar" aria-label={t.tabs.label}>

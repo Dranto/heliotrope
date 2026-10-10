@@ -11,6 +11,8 @@ import {
 } from '../game/restoration';
 import { t } from '../i18n/fr';
 import { bonusesText } from '../i18n/restoration';
+import { usePanelOpen } from './layoutPrefs';
+import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
 
 function ParcelIcon() {
@@ -90,12 +92,13 @@ function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: 
 
 /**
  * Parcels to restore and neighbourhood projects on offer (docs/game-design.md §6.1, §6.2), under
- * the map. Pointing at a parcel highlights its place on the map. A row of dots shows how much of
+ * the map, in the side menu. Pointing at a parcel highlights its place on the map. A row of dots shows how much of
  * the neighbourhood is restored for good.
  */
 export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null) => void }) {
   const store = useGameStore();
   const state = useGameState();
+  const [open, toggle] = usePanelOpen('restoration');
   // The cheapest few, so the list stays short under the map; the next ones follow.
   const offers: Offer[] = [
     ...offeredParcels(state).map((def) => ({ kind: 'parcel', def }) as const),
@@ -106,9 +109,11 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
   if (offers.length === 0 && state.parcels.length === 0) return null;
 
   return (
-    <section className="restoration" aria-labelledby="restoration-title">
+    <section className="panel restoration" aria-labelledby="restoration-title" data-open={open}>
       <header className="restoration-head">
-        <h2 id="restoration-title">{t.restoration.title}</h2>
+        <PanelTitle id="restoration-title" open={open} onToggle={toggle}>
+          {t.restoration.title}
+        </PanelTitle>
         <ol className="restored-dots" aria-label={t.restoration.parcels}>
           {PARCEL_IDS.map((id) => {
             const done = state.parcels.includes(id);

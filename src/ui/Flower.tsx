@@ -316,7 +316,7 @@ export function Flower() {
 
   return (
     <section
-      className="panel flower-panel"
+      className="flower-panel"
       aria-label={t.light}
       data-season={season ?? 'none'}
       data-stage={stage}
@@ -409,10 +409,6 @@ export function Flower() {
           </span>
         ))}
       </button>
-      <p className="click-value">
-        <strong>+{formatNumber(value)}</strong> {t.perClick}
-      </p>
-      <p className="hint">{t.clickHint}</p>
     </section>
   );
 }
