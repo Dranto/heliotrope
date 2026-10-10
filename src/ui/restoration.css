@@ -547,7 +547,8 @@
 }
 
 /* Light, clouds and pollen float over the city without catching the pointer, so the pins of
-   parcels on offer stay clickable. */
-.scene-map svg > :not(.camera) {
+   parcels on offer stay clickable. Only the map's own drawing: the flower's drawing, also an svg
+   inside the map, must keep catching clicks. */
+.scene-map > svg > :not(.camera) {
   pointer-events: none;
 }
