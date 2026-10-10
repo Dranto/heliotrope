@@ -41,6 +41,7 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
     bonuses: [
       { kind: 'generatorMultiplier', generator: 'pot', factor: 2 },
       { kind: 'generatorMultiplier', generator: 'balconyPanel', factor: 1.5 },
+      { kind: 'water', factor: 1.25 },
     ],
   },
   {
@@ -53,7 +54,10 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
     id: 'river',
     cost: 2e6,
     phase: 2,
-    bonuses: [{ kind: 'offlineCap', seconds: 2 * 3600 }],
+    bonuses: [
+      { kind: 'offlineCap', seconds: 2 * 3600 },
+      { kind: 'water', factor: 1.5 },
+    ],
   },
   { id: 'park', cost: 3e7, phase: 3, bonuses: [{ kind: 'global', bonus: 0.1 }] },
   {

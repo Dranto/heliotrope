@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { activeChallenge } from '../game/challenges';
+import {
+  canStartNewCycle,
+  isCycleScreenUnlocked,
+  sourceBonus,
+  sourcesToGain,
+} from '../game/cycles';
 import type { CatchResult } from '../game/butterfly';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { phaseOf } from '../game/phases';
@@ -16,7 +23,9 @@ import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
 import { challengeRulesText, challengeTitle, speciesName } from '../i18n/herbier';
 import { setLanguage, t } from '../i18n';
 import { Achievements } from './Achievements';
+import { Bioregion, WaterIcon } from './Bioregion';
 import { Cooperatives } from './Cooperatives';
+import { Cycles } from './Cycles';
 import { Generators } from './Generators';
 import { Herbier } from './Herbier';
 import { useLayoutPref } from './layoutPrefs';
@@ -32,7 +41,7 @@ import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
 import { useSounds } from './useSounds';
 
-type Screen = 'achievements' | 'herbier' | 'seasons' | 'tree' | 'stats' | 'options';
+type Screen = 'achievements' | 'herbier' | 'seasons' | 'tree' | 'cycles' | 'stats' | 'options';
 /** §10.3: mobile tab bar sections. */
 type Tab = 'harvest' | 'build' | 'improve' | 'more';
 const TABS: Tab[] = ['harvest', 'build', 'improve', 'more'];
@@ -76,6 +85,16 @@ function TreeIcon() {
       <circle cx="12" cy="7" r="3.2" />
       <circle cx="6.8" cy="10.6" r="2.2" />
       <circle cx="17.2" cy="9.6" r="2.2" />
+    </svg>
+  );
+}
+
+/** A spring and its rings, the mark of the Water Cycle (§7.4). */
+function SpringIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3c-2.4 3.4-4.4 5.8-4.4 8.2a4.4 4.4 0 0 0 8.8 0C16.4 8.8 14.4 6.4 12 3Z" />
+      <path d="M4 19.5c2.6 1.4 5.2 1.4 8 0s5.4-1.4 8 0" />
     </svg>
   );
 }
@@ -165,6 +184,7 @@ export function App() {
   const gain = seedsToGain(state);
   const seedsToSow = availableSeeds(state);
   const canSow = TALENT_LIST.some((talent) => canLearnTalent(state, talent.id));
+  const sourceGain = sourcesToGain(state);
 
   const menu = (
     <nav className="menu" aria-label={t.menu}>
@@ -236,6 +256,24 @@ export function App() {
           )}
         </button>
       )}
+      {isCycleScreenUnlocked(state) && (
+        <button
+          type="button"
+          className="ghost menu-button seasons-button cycles-button"
+          aria-haspopup="dialog"
+          aria-label={sourceGain > 0 ? t.cycles.openWithGain(formatNumber(sourceGain)) : undefined}
+          data-ready={canStartNewCycle(state)}
+          onClick={() => setScreen('cycles')}
+        >
+          <SpringIcon />
+          {t.cycles.open}
+          {sourceGain > 0 && (
+            <span className="menu-badge" aria-hidden="true">
+              +{formatNumber(sourceGain)}
+            </span>
+          )}
+        </button>
+      )}
       <button
         type="button"
         className="ghost menu-button"
@@ -289,13 +327,59 @@ export function App() {
             <span
               className="counter-seeds"
               data-testid="seeds-chip"
-              title={t.seeds.chip(formatNumber(state.seeds), formatPercent(seedBonus(state.seeds)))}
+              title={t.seeds.chip(
+                formatNumber(state.seeds),
+                formatPercent(seedBonus(state.seeds, state.sources)),
+              )}
             >
               <SeedIcon />
               {formatNumber(state.seeds)}
               <span className="visually-hidden">
                 {' '}
-                {t.seeds.chip(formatNumber(state.seeds), formatPercent(seedBonus(state.seeds)))}
+                {t.seeds.chip(
+                  formatNumber(state.seeds),
+                  formatPercent(seedBonus(state.seeds, state.sources)),
+                )}
+              </span>
+            </span>
+          )}
+          {isBioregionOpen(state) && (
+            <span
+              className="counter-water"
+              data-testid="water-chip"
+              title={t.bioregion.chip(
+                formatNumber(Math.floor(state.resources.water)),
+                formatNumber(waterPerSecond(state)),
+              )}
+            >
+              <WaterIcon />
+              {formatNumber(Math.floor(state.resources.water))}
+              <span className="visually-hidden">
+                {' '}
+                {t.bioregion.chip(
+                  formatNumber(Math.floor(state.resources.water)),
+                  formatNumber(waterPerSecond(state)),
+                )}
+              </span>
+            </span>
+          )}
+          {state.sources > 0 && (
+            <span
+              className="counter-seeds counter-sources"
+              data-testid="sources-chip"
+              title={t.cycles.chip(
+                formatNumber(state.sources),
+                formatPercent(sourceBonus(state.sources)),
+              )}
+            >
+              <SpringIcon />
+              {formatNumber(state.sources)}
+              <span className="visually-hidden">
+                {' '}
+                {t.cycles.chip(
+                  formatNumber(state.sources),
+                  formatPercent(sourceBonus(state.sources)),
+                )}
               </span>
             </span>
           )}
@@ -371,6 +455,7 @@ export function App() {
             </div>
             <div className="side-column">
               <Generators />
+              <Bioregion />
               <Cooperatives />
             </div>
           </div>
@@ -410,6 +495,7 @@ export function App() {
         <Seasons onClose={closeScreen} onOpenTree={() => setScreen('tree')} />
       )}
       {screen === 'tree' && <SeasonTree onClose={closeScreen} />}
+      {screen === 'cycles' && <Cycles onClose={closeScreen} />}
       {screen === 'stats' && <Stats onClose={closeScreen} />}
       {screen === 'options' && <Options onClose={closeScreen} />}
     </div>

@@ -7,6 +7,7 @@ import type { ParcelId } from '../game/parcels';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
 import type { ChallengeId } from '../game/challenges';
+import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
 import type { TalentBranch, TalentId } from '../game/talents';
@@ -74,7 +75,10 @@ export const fr = {
   },
   buyUpgradeLabel: (name: string, cost: string) => `Acheter ${name} pour ${cost} Lumière`,
   sceneLabel: 'Le quartier, qui reverdit à mesure que vous construisez',
-  phases: { 1: 'Le Balcon', 2: 'Le Quartier', 3: 'La Ville' } as Record<1 | 2 | 3, string>,
+  phases: { 1: 'Le Balcon', 2: 'Le Quartier', 3: 'La Ville', 4: 'La Biorégion' } as Record<
+    1 | 2 | 3 | 4,
+    string
+  >,
   visualSeasons: {
     spring: 'Printemps',
     summer: 'Été',
@@ -219,6 +223,18 @@ export const fr = {
       lateHarvest: 'Moisson tardive',
       slowPhotosynthesis: 'Photosynthèse lente',
       earlySowing: 'Semis précoce',
+      'water.3': 'Premières gouttes',
+      'water.6': 'Nappe retrouvée',
+      'water.9': 'Fleuve vivant',
+      'collectors.10': 'Ville éponge',
+      'collectors.50': 'Mille gouttières',
+      'sites.1': 'Premier marais',
+      'sites.10': 'Paysage rendu',
+      'sites.25': 'Terre de sources',
+      watershed: 'Bassin versant',
+      'cycles.1': 'Retour à la mer',
+      'cycles.3': 'Grand cycle',
+      floodTide: 'Grandes eaux',
     } satisfies Record<AchievementId, string>,
     families: {
       light: 'Lumière',
@@ -228,6 +244,7 @@ export const fr = {
       butterflies: 'Papillon doré',
       neighbourhood: 'Le quartier',
       seasons: 'Saisons',
+      bioregion: 'La Biorégion',
     } satisfies Record<AchievementFamily, string>,
     describe: {
       allTimeLight: (amount: string) => `Récolter ${amount} Lumière au total`,
@@ -275,6 +292,16 @@ export const fr = {
       justInTime: 'Attraper un Papillon doré à la toute dernière seconde',
       idle: 'Ne rien acheter pendant 10 minutes',
       earlySowing: 'Commencer une Saison avant que la terre soit prête',
+      allTimeWater: (amount: string) => `Recueillir ${amount} Eau au total`,
+      collectors: (count: number) => `Posséder ${count} collecteurs d’eau`,
+      siteLevels: (count: number) =>
+        count === 1
+          ? 'Étendre un premier site de la biorégion'
+          : `Atteindre ${count} niveaux de sites de la biorégion`,
+      everySite: 'Étendre chacun des quatre sites de la biorégion',
+      cycles: (count: number) =>
+        count === 1 ? 'Accomplir un Cycle de l’eau' : `Accomplir ${count} Cycles de l’eau`,
+      floodTide: (sources: number) => `Faire jaillir ${sources} Sources d’un coup`,
     },
   },
   restoration: {
@@ -343,6 +370,7 @@ export const fr = {
       perSeason: (percent: string) => `Toute la production +${percent}\u00a0% par Saison accomplie`,
       globalPerType: (percent: string) =>
         `Toute la production +${percent}\u00a0% par type de bâtiment possédé`,
+      water: (factor: string) => `Eau récoltée ×${factor} (Biorégion)`,
     },
     effectNames: { bloom: 'La Floraison', pollination: 'La Pollinisation' },
   },
@@ -524,6 +552,88 @@ export const fr = {
     noSeed: 'Les Graines se récoltent en commençant une nouvelle Saison.',
     fromSeasons: 'Semer mes Graines dans l’Arbre',
   },
+  water: 'Eau',
+  bioregion: {
+    title: 'La Biorégion',
+    collectorsTitle: 'Recueillir l’eau',
+    sitesTitle: 'Sites de la biorégion',
+    collectors: {
+      roofTanks: { name: 'Citernes de toit', flavour: q('Chaque averse remplit les réserves.') },
+      swales: { name: 'Noues', flavour: q('Les rues boivent la pluie.') },
+      ponds: { name: 'Mares', flavour: q('Les grenouilles ont trouvé l’adresse.') },
+      streams: {
+        name: 'Ruisseaux rouverts',
+        flavour: q('Sous le bitume, l’eau courait toujours.'),
+      },
+    } satisfies Record<CollectorId, GeneratorText>,
+    sites: {
+      wetlands: {
+        name: 'Zones humides',
+        flavour: q('Les roseaux filtrent, les hérons attendent.'),
+      },
+      meadows: {
+        name: 'Prairies agrivoltaïques',
+        flavour: q('Les moutons broutent à l’ombre des panneaux.'),
+      },
+      foodForests: {
+        name: 'Forêts-jardins',
+        flavour: q('Sept étages de fruits, de noix et de feuilles.'),
+      },
+      oldForest: { name: 'Forêt ancienne', flavour: q('On la laisse pousser. Elle sait faire.') },
+    } satisfies Record<SiteId, GeneratorText>,
+    gathers: (water: string) => `recueille ${water} Eau / s`,
+    unitWater: (water: string) => `+${water} Eau / s`,
+    linked: (percent: string, building: string) => `+${percent}\u00a0% par ${building}`,
+    siteEffect: (first: string, second: string, percent: string) =>
+      `${first} et ${second}\u00a0: +${percent}\u00a0% par niveau`,
+    siteNow: (factor: string) => `production ×${factor}`,
+    level: 'niveau',
+    build: 'Bâtir',
+    raise: 'Étendre',
+    buildLabel: (name: string, cost: string) => `Bâtir ${name} pour ${cost} Lumière`,
+    raiseLabel: (name: string, cost: string) => `Étendre ${name} pour ${cost} Eau`,
+    unknown: 'Encore à découvrir',
+    chip: (water: string, rate: string) => `${water} Eau, +${rate} par seconde`,
+  },
+  cycles: {
+    open: 'Cycle de l’eau',
+    openWithGain: (sources: string) => `Cycle de l’eau, ${sources} Sources à gagner`,
+    title: 'Le Cycle de l’eau',
+    close: 'Fermer le Cycle de l’eau',
+    intro: 'La pluie rejoint la mer, puis revient. Les sources, elles, restent.',
+    chip: (sources: string, percent: string) => `${sources} Sources, production +${percent}\u00a0%`,
+    owned: 'Sources',
+    ownedHint: (percent: string) => `+${percent}\u00a0% de production et d’Eau`,
+    toGain: 'À faire jaillir',
+    toGainHint: 'en lançant un nouveau Cycle',
+    bonus: 'Bonus de production',
+    bonusAfter: 'après le nouveau Cycle',
+    nextSource: (water: string) => `Prochaine Source dans ${water} Eau.`,
+    formula:
+      'Chaque Source ajoute 10\u00a0% à toute la production et à l’Eau récoltée, et chaque Graine rapporte 1\u00a0% de plus. Les Sources viennent de l’Eau recueillie au fil de tous les Cycles.',
+    notReadyTitle: 'La rivière n’est pas encore prête',
+    notReady: (advised: string) =>
+      `Rien ne vous en empêche, mais pour un premier Cycle, mieux vaut attendre d’avoir au moins ${advised} Sources à faire jaillir.`,
+    noSourceYet: 'Il faut au moins une Source à faire jaillir pour commencer un nouveau Cycle.',
+    lost: [
+      'Tout ce qu’une nouvelle Saison remet à zéro',
+      'Les Graines d’Héliotrope',
+      'L’Eau, les collecteurs et les sites de la biorégion',
+    ],
+    kept: [
+      'Les Sources',
+      'Les talents de l’Arbre des Saisons, sans les repayer',
+      'Les parcelles restaurées',
+      'L’Herbier, les défis réussis et les jalons',
+      'Les statistiques et les options',
+    ],
+    start: 'Commencer un nouveau Cycle',
+    confirm: (sources: string) =>
+      `Laisser l’eau repartir et faire jaillir ${sources} Sources\u00a0?`,
+    confirmYes: 'Oui, recommencer le Cycle',
+    cancel: 'Pas encore',
+    started: 'Un nouveau Cycle commence. Les sources coulent plus fort.',
+  },
   cooperatives: {
     title: 'Coopératives',
     hint: 'Vos voisins achètent pour vous, dans chaque Saison.',
@@ -567,6 +677,9 @@ export const fr = {
     achievementBonus: 'Bonus des jalons',
     talents: 'Talents de l’Arbre',
     cooperativePurchases: 'Achats des coopératives',
+    water: 'Eau recueillie',
+    sources: 'Sources',
+    cycles: 'Cycles de l’eau accomplis',
     percent: (percent: string) => `+${percent}\u00a0%`,
   },
   /** Each language is named in itself, so a player lost in the other one finds theirs. */

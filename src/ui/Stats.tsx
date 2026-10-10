@@ -57,7 +57,7 @@ export function Stats({ onClose }: { onClose: () => void }) {
           <Row label={t.stats.seeds} value={formatNumber(state.seeds)} />
           <Row
             label={t.stats.seedBonus}
-            value={t.stats.percent(formatPercent(seedBonus(state.seeds)))}
+            value={t.stats.percent(formatPercent(seedBonus(state.seeds, state.sources)))}
           />
           <Row
             label={t.stats.butterflies}
@@ -74,6 +74,19 @@ export function Stats({ onClose }: { onClose: () => void }) {
               label={t.stats.talents}
               value={`${state.talents.length} / ${TALENT_LIST.length}`}
             />
+          )}
+          {state.allTimeWater > 0 && (
+            <Row
+              label={t.stats.water}
+              value={formatNumber(Math.floor(state.allTimeWater))}
+              testId="stat-water"
+            />
+          )}
+          {(state.sources > 0 || state.cycles > 0) && (
+            <>
+              <Row label={t.stats.sources} value={formatNumber(state.sources)} />
+              <Row label={t.stats.cycles} value={formatNumber(state.cycles)} />
+            </>
           )}
           {state.talents.length > 0 && (
             <Row

@@ -17,7 +17,7 @@ function lateGame(allTimeLight: number, extra: Partial<GameState> = {}): GameSta
   const base = createInitialState(1000);
   return {
     ...base,
-    resources: { light: 1234 },
+    resources: { water: 0, light: 1234 },
     generators: { ...base.generators, pot: 40, balconyPanel: 12, arcology: 2 },
     upgrades: ['pot.1', 'gloves'],
     totalLight: allTimeLight,

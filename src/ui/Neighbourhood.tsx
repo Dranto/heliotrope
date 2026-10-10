@@ -622,6 +622,8 @@ export interface NeighbourhoodProps {
   reduced: boolean;
   /** Drawn over the grey city, under the generators: restored parcels (§6.1). */
   ground?: ReactNode;
+  /** Drawn around the city, over its grey outskirts: the Bioregion (§7.4). */
+  land?: ReactNode;
   /** Drawn over everything in the city: projects and parcels on offer (§6.1, §6.2). */
   overlay?: ReactNode;
 }
@@ -630,8 +632,8 @@ export interface NeighbourhoodProps {
  * The neighbourhood seen from above (docs/game-design.md §6, §10.4): a grey city block grid in
  * which every generator has its places. Each purchase builds the next element with a soft
  * entrance, ×2 upgrades refine a generator's elements. The camera frames the home courtyard, the
- * neighbourhood or the whole city, and the grey outskirts around the world fill the rest of the
- * screen.
+ * neighbourhood, the whole city or the Bioregion around it, and the grey outskirts (then the
+ * land of the Bioregion) fill the rest of the screen.
  */
 export const Neighbourhood = memo(function Neighbourhood({
   generators,
@@ -643,6 +645,7 @@ export const Neighbourhood = memo(function Neighbourhood({
   greenness,
   reduced,
   ground,
+  land,
   overlay,
 }: NeighbourhoodProps) {
   const live = useRef(false);
@@ -733,6 +736,7 @@ export const Neighbourhood = memo(function Neighbourhood({
 
         <g className="camera" style={{ transform: cameraTransform(camera, width, height) }}>
           <Outskirts />
+          {land}
           <rect width={WORLD.width} height={WORLD.height} className="asphalt" />
           <rect width={WORLD.width} height={WORLD.height} fill="url(#asphalt-grain)" />
           {STREETS.horizontal.map((y) => (

@@ -63,7 +63,7 @@ describe('App', () => {
 
   it('builds each purchase on the neighbourhood map, with an entrance', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 400 }, totalLight: 400 });
+    saveGame({ ...base, resources: { water: 0, light: 400 }, totalLight: 400 });
     const { container } = render(
       <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
         <App />
@@ -100,7 +100,7 @@ describe('App', () => {
 
   it('buys generators in bulk with the ×10 and Max amounts', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 400 }, totalLight: 400 });
+    saveGame({ ...base, resources: { water: 0, light: 400 }, totalLight: 400 });
     const store = renderApp(new GameStore(localStorage, () => 0));
     fireEvent.click(screen.getByRole('radio', { name: '×10' }));
     // 10 pots from 0: 15 × (1.15^10 − 1) / 0.15 ≈ 304,6
@@ -116,7 +116,7 @@ describe('App', () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
-      resources: { light: 1_000 },
+      resources: { water: 0, light: 1_000 },
       totalLight: 2_000,
       generators: { ...base.generators, pot: 1 },
     });
@@ -143,7 +143,12 @@ describe('App', () => {
     const dialog = screen.getByRole('dialog', { name: 'Options' });
     expect(dialog).toBeInTheDocument();
     const base = createInitialState(0);
-    const save = exportSave({ ...base, clicks: 3, resources: { light: 42 }, totalLight: 42 });
+    const save = exportSave({
+      ...base,
+      clicks: 3,
+      resources: { water: 0, light: 42 },
+      totalLight: 42,
+    });
     fireEvent.change(screen.getByLabelText('Sauvegarde à importer'), { target: { value: 'oops' } });
     fireEvent.click(screen.getByRole('button', { name: 'Charger cette sauvegarde' }));
     expect(screen.getByText('Ce texte n’est pas une sauvegarde valide.')).toBeInTheDocument();
@@ -179,7 +184,7 @@ describe('App', () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
-      resources: { light: 1e9 },
+      resources: { water: 0, light: 1e9 },
       generators: { ...base.generators, arcology: 3 },
       upgrades: ['gloves'],
       totalLight: 8e7,
@@ -206,7 +211,7 @@ describe('App', () => {
       clicks: 77,
       upgrades: [],
       totalLight: 0,
-      resources: { light: 0 },
+      resources: { water: 0, light: 0 },
     });
     expect(store.getState().generators.arcology).toBe(0);
     expect(screen.getByText('La 2ᵉ Saison commence. La terre se souvient.')).toBeInTheDocument();
@@ -279,7 +284,7 @@ describe('App', () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
-      resources: { light: 20_000 },
+      resources: { water: 0, light: 20_000 },
       totalLight: 20_000,
       allTimeLight: 20_000,
       generators: { ...base.generators, balconyPanel: 10 },
@@ -320,7 +325,7 @@ describe('App', () => {
 
   it('switches to scientific notation from the options and keeps the choice', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 2e6 }, totalLight: 2e6 });
+    saveGame({ ...base, resources: { water: 0, light: 2e6 }, totalLight: 2e6 });
     const store = renderApp(new GameStore(localStorage, () => 0));
     expect(screen.getByTestId('light')).toHaveTextContent('2,00 M');
     fireEvent.click(screen.getByRole('button', { name: 'Options' }));
@@ -337,7 +342,7 @@ describe('App', () => {
 
   it('switches the whole interface to English from the options (§14 Q1)', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 12_345 }, totalLight: 12_345 });
+    saveGame({ ...base, resources: { water: 0, light: 12_345 }, totalLight: 12_345 });
     const store = renderApp(new GameStore(localStorage, () => 0));
     expect(screen.getByTestId('light')).toHaveTextContent('12 345');
     fireEvent.click(screen.getByRole('button', { name: 'Options' }));
@@ -366,7 +371,7 @@ describe('App', () => {
 
   it('restores a parcel from the panel under the map, and keeps it on the map', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 2_000 }, totalLight: 2_000 });
+    saveGame({ ...base, resources: { water: 0, light: 2_000 }, totalLight: 2_000 });
     const store = renderApp(new GameStore(localStorage, () => 0));
     expect(screen.getByRole('heading', { name: 'Le quartier' })).toBeInTheDocument();
     fireEvent.click(
@@ -381,7 +386,7 @@ describe('App', () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
-      resources: { light: 300 },
+      resources: { water: 0, light: 300 },
       totalLight: 300,
       generators: { ...base.generators, pot: 5 },
     });
@@ -395,7 +400,7 @@ describe('App', () => {
 
   it('outlines an offered parcel on the map and restores it from its pin', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 2_000 }, totalLight: 2_000 });
+    saveGame({ ...base, resources: { water: 0, light: 2_000 }, totalLight: 2_000 });
     const store = renderApp(new GameStore(localStorage, () => 0));
     const offer = document.querySelector('[data-offer="gardenStreet"]')!;
     expect(offer).toHaveAttribute('data-ready', 'true');
@@ -448,7 +453,7 @@ describe('App', () => {
 
   it('folds a panel away and the side menu with it (§10.1)', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, resources: { light: 50 }, totalLight: 50 });
+    saveGame({ ...base, resources: { water: 0, light: 50 }, totalLight: 50 });
     renderApp(new GameStore(localStorage, () => 0));
     const title = screen.getByRole('button', { name: 'Bâtir', expanded: true });
     fireEvent.click(title);
@@ -494,5 +499,37 @@ describe('App', () => {
       'data-working',
       'false',
     );
+  });
+  it('gathers Water in the Bioregion, raises a site and opens the Water Cycle (§7.4)', () => {
+    saveGame({
+      ...createInitialState(0),
+      seasons: 2,
+      seeds: 10,
+      totalLight: 2e7,
+      allTimeLight: 2e9,
+      resources: { light: 2e6, water: 0 },
+      allTimeWater: 4e5,
+    });
+    const store = renderApp();
+    const panel = screen.getByRole('region', { name: 'La Biorégion' });
+    fireEvent.click(within(panel).getByRole('button', { name: /bâtir citernes de toit/i }));
+    expect(store.getState().collectors.roofTanks).toBe(1);
+    expect(screen.getByTestId('water-chip')).toHaveTextContent('0');
+    act(() => store.dispatch((s) => tick(s, 60)));
+    expect(store.getState().resources.water).toBeCloseTo(60);
+    fireEvent.click(within(panel).getByRole('button', { name: /étendre zones humides/i }));
+    expect(store.getState().sites.wetlands).toBe(1);
+    // The land of the Bioregion is on the map, with its first wetland.
+    expect(screen.getByRole('radio', { name: 'La Biorégion' })).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-site="wetlands"] .marsh').length).toBeGreaterThan(0);
+    // One Source is already in reach.
+    fireEvent.click(screen.getByRole('button', { name: /Cycle de l’eau, 1 Sources à gagner/ }));
+    expect(screen.getByTestId('sources-gain')).toHaveTextContent('+1');
+    expect(screen.getByText('La rivière n’est pas encore prête')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer un nouveau Cycle' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Oui, recommencer le Cycle' }));
+    expect(store.getState().sources).toBe(1);
+    expect(store.getState().collectors.roofTanks).toBe(0);
+    expect(screen.getByTestId('sources-chip')).toHaveTextContent('1');
   });
 });

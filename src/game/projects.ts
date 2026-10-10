@@ -105,6 +105,7 @@ export const PROJECT_LIST: readonly ProjectDef[] = [
     bonuses: [
       { kind: 'generatorMultiplier', generator: 'greenhouse', factor: 1.25 },
       { kind: 'generatorMultiplier', generator: 'verticalFarm', factor: 1.25 },
+      { kind: 'water', factor: 1.25 },
     ],
   },
   {

@@ -184,10 +184,10 @@ describe('generatorCost', () => {
 
 describe('maxAffordable', () => {
   it('is the largest affordable bulk', () => {
-    expect(maxAffordable(withState({ resources: { light: 14 } }), 'pot')).toBe(0);
-    expect(maxAffordable(withState({ resources: { light: 15 } }), 'pot')).toBe(1);
+    expect(maxAffordable(withState({ resources: { water: 0, light: 14 } }), 'pot')).toBe(0);
+    expect(maxAffordable(withState({ resources: { water: 0, light: 15 } }), 'pot')).toBe(1);
     for (const light of [100, 1_234, 98_765, 1e9]) {
-      const state = withState({ resources: { light }, generators: owned({ pot: 7 }) });
+      const state = withState({ resources: { light, water: 0 }, generators: owned({ pot: 7 }) });
       const count = maxAffordable(state, 'pot');
       expect(generatorCost(state, 'pot', count)).toBeLessThanOrEqual(light);
       expect(generatorCost(state, 'pot', count + 1)).toBeGreaterThan(light);
@@ -196,7 +196,10 @@ describe('maxAffordable', () => {
 
   it('handles an exact bulk price', () => {
     const base = withState({ generators: owned({ balconyPanel: 4 }) });
-    const state = { ...base, resources: { light: generatorCost(base, 'balconyPanel', 25) } };
+    const state = {
+      ...base,
+      resources: { water: 0, light: generatorCost(base, 'balconyPanel', 25) },
+    };
     expect(maxAffordable(state, 'balconyPanel')).toBe(25);
   });
 });

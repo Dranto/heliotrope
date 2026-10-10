@@ -5,6 +5,8 @@ import { challengeProductionFactor, generatorLimit, upgradesAllowed } from './ch
 import { bonusesOf, costFactor, factorOf, globalBonus } from './bonuses';
 import { effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
+import { siteFactor } from './bioregion';
+import { sourceBonus } from './cycles';
 import { seedBonus } from './seasons';
 import { HERBIER_COMPLETE_FACTOR, isHerbierComplete, SPECIES_STEPS } from './species';
 import type { GameState } from './state';
@@ -25,10 +27,9 @@ export function clickUpgradeCount(state: GameState): number {
   return state.upgrades.filter((id) => CLICK_UPGRADE_SET.has(id)).length;
 }
 
-/** Multiplier from ×2 upgrades and synergies for one generator type. */
 /**
- * Multiplier from ×2 upgrades, synergies, restored parcels and projects (§5, §6.1, §6.2) for one
- * generator type.
+ * Multiplier from ×2 upgrades, synergies, restored parcels, projects and the sites of the
+ * Bioregion (§5, §6.1, §6.2, §7.4) for one generator type.
  */
 export function generatorMultiplier(state: GameState, id: GeneratorId): number {
   let factor = 1;
@@ -49,7 +50,12 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
   for (const bonus of bonusesOf(state, 'perType')) {
     if (bonus.generator === id) typeBonus += bonus.bonus * typesOwned(state);
   }
-  return factor * (1 + synergyBonus * factorOf(state, 'synergyFactor')) * (1 + typeBonus);
+  return (
+    factor *
+    (1 + synergyBonus * factorOf(state, 'synergyFactor')) *
+    (1 + typeBonus) *
+    siteFactor(state, id)
+  );
 }
 
 /** Number of generator types owned at least once. */
@@ -89,12 +95,14 @@ export function upgradeSynergyBonus(state: GameState): number {
 }
 
 /**
- * §8: multiplier applied to every generator: Seeds × Milestones × biodiversity × upgrade
- * synergies × parcels and projects × Floraison, and the constraint of a challenge Season (§7.3).
+ * §8: multiplier applied to every generator: Seeds × Sources × Milestones × biodiversity ×
+ * upgrade synergies × parcels and projects × Floraison, and the constraint of a challenge Season
+ * (§7.3).
  */
 export function globalMultiplier(state: GameState): number {
   return (
-    (1 + seedBonus(state.seeds)) *
+    (1 + seedBonus(state.seeds, state.sources)) *
+    (1 + sourceBonus(state.sources)) *
     (1 + globalBonus(state)) *
     (1 + achievementBonus(state)) *
     (1 + biodiversityBonus(state)) *

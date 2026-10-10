@@ -35,7 +35,12 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 
 /** A state with plenty of Light, in phase 3. */
 function rich(patch: Partial<GameState> = {}): GameState {
-  return withState({ resources: { light: 1e12 }, totalLight: 1e12, allTimeLight: 1e12, ...patch });
+  return withState({
+    resources: { water: 0, light: 1e12 },
+    totalLight: 1e12,
+    allTimeLight: 1e12,
+    ...patch,
+  });
 }
 
 describe('parcel and project data', () => {
@@ -68,7 +73,7 @@ describe('restoring parcels', () => {
   });
 
   it('restores a parcel for its cost, once', () => {
-    const state = withState({ resources: { light: 2_000 }, totalLight: 2_000 });
+    const state = withState({ resources: { water: 0, light: 2_000 }, totalLight: 2_000 });
     expect(canRestoreParcel(state, 'gardenStreet')).toBe(true);
     const next = restoreParcel(state, 'gardenStreet');
     expect(next.resources.light).toBe(500);
@@ -79,7 +84,7 @@ describe('restoring parcels', () => {
   });
 
   it('refuses a parcel the player cannot afford', () => {
-    const state = withState({ resources: { light: 1_000 }, totalLight: 1_000 });
+    const state = withState({ resources: { water: 0, light: 1_000 }, totalLight: 1_000 });
     expect(restoreParcel(state, 'gardenStreet')).toBe(state);
   });
 
@@ -109,7 +114,7 @@ describe('neighbourhood projects', () => {
   });
 
   it('carries out a project for its cost, once per Season', () => {
-    const state = withState({ resources: { light: 300 }, generators: owned({ pot: 5 }) });
+    const state = withState({ resources: { water: 0, light: 300 }, generators: owned({ pot: 5 }) });
     expect(canCarryOutProject(state, 'seedSwap')).toBe(true);
     const next = carryOutProject(state, 'seedSwap');
     expect(next.resources.light).toBe(50);

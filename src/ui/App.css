@@ -11,6 +11,9 @@
   --ink: #1f2a24;
   --ink-soft: #4a5a50;
   --concrete: #a7a39c;
+  --water: #4f9fb3;
+  --water-soft: #bfe3e6;
+  --water-deep: #2c6f80;
   --glass: rgb(255 255 255 / 0.55);
   --glass-border: rgb(255 255 255 / 0.8);
   --shadow: 0 1px 2px rgb(47 107 79 / 0.06), 0 12px 32px -12px rgb(200 115 79 / 0.18);
@@ -246,7 +249,7 @@ button {
   order: 1;
 }
 
-.side .generators {
+.side :is(.generators, .bioregion) {
   order: 2;
 }
 
@@ -1246,7 +1249,8 @@ button {
 
 /* Generators ------------------------------------------------------------- */
 
-.generators {
+.generators,
+.bioregion {
   padding: 1.25rem;
 }
 
@@ -1268,7 +1272,8 @@ button {
     no-repeat left center / contain;
 }
 
-.generators ul {
+.generators ul,
+.bioregion ul {
   display: grid;
   gap: 0.6rem;
   margin: 0;
@@ -1554,6 +1559,176 @@ button {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* Water and Springs (§7.4) ------------------------------------------------- */
+
+.counter-water {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid rgb(79 159 179 / 0.4);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--water-deep);
+}
+
+.water-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: none;
+  fill: var(--water-soft);
+  stroke: var(--water);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  vertical-align: -0.12em;
+}
+
+.counter-sources {
+  color: var(--water-deep);
+  border-left-color: rgb(79 159 179 / 0.4);
+}
+
+.counter-sources svg {
+  stroke: var(--water);
+}
+
+.cycles-button[data-ready='true'] {
+  border-color: rgb(79 159 179 / 0.7);
+  box-shadow: 0 0 0 3px rgb(79 159 179 / 0.18);
+}
+
+.cycles-button svg {
+  stroke: var(--water);
+}
+
+.bioregion .panel-head {
+  align-items: baseline;
+}
+
+.bioregion-rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--water-deep);
+}
+
+.bioregion-rate .counter-rate {
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.bioregion-subtitle {
+  margin: 0.9rem 0 0.35rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--water-deep);
+}
+
+.bioregion .owned {
+  color: var(--water-deep);
+  animation: level-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bioregion .buy:not(:disabled) {
+  border-color: rgb(79 159 179 / 0.55);
+}
+
+.water-buy .buy-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+@keyframes level-pop {
+  40% {
+    transform: scale(1.18);
+  }
+}
+
+.cycles {
+  background:
+    radial-gradient(24rem 12rem at 50% 0%, rgb(191 227 230 / 0.6), transparent 70%),
+    rgb(251 246 236 / 0.94);
+}
+
+.cycle-ornament .seasons-arch-fill {
+  fill: url(#cycle-sky);
+}
+
+.cycle-ornament .seasons-arch {
+  stroke: var(--water);
+}
+
+.cycle-drop {
+  fill: var(--water-soft);
+  stroke: var(--water);
+  stroke-width: 1.2;
+  transform-origin: 120px 56px;
+  animation: drop-fall 3.6s cubic-bezier(0.55, 0, 0.45, 1) infinite;
+}
+
+.cycle-ring,
+.cycle-wave {
+  fill: none;
+  stroke: var(--water);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.cycle-ring {
+  transform-origin: 120px 80px;
+  animation: ring-spread 3.6s ease-out infinite;
+}
+
+.cycle-ring.outer {
+  animation-delay: 0.5s;
+}
+
+.cycle-wave {
+  opacity: 0.55;
+}
+
+.season-button.cycle-button {
+  background: linear-gradient(135deg, var(--water-deep), var(--water));
+  color: #fff;
+}
+
+@keyframes drop-fall {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  35% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes ring-spread {
+  0%,
+  60% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
 }
 
 /* Seasons ---------------------------------------------------------------- */
@@ -2547,9 +2722,9 @@ button {
   }
 
   /* §10.3: one section at a time, picked in the tab bar. */
-  .app[data-tab='harvest'] :is(.upgrades, .generators, .cooperatives),
+  .app[data-tab='harvest'] :is(.upgrades, .generators, .bioregion, .cooperatives),
   .app[data-tab='build'] :is(.upgrades, .restoration, .cooperatives),
-  .app[data-tab='improve'] :is(.generators, .restoration),
+  .app[data-tab='improve'] :is(.generators, .bioregion, .restoration),
   .app[data-tab='more'] .layout {
     display: none;
   }

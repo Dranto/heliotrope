@@ -1,5 +1,10 @@
 // Display texts of a Milestone, resolved from its id and condition.
-import { LATE_HARVEST_SEEDS, UPGRADE_SETS, type AchievementDef } from '../game/achievements';
+import {
+  FLOOD_TIDE_SOURCES,
+  LATE_HARVEST_SEEDS,
+  UPGRADE_SETS,
+  type AchievementDef,
+} from '../game/achievements';
 import { formatNumber } from '../game/format';
 import { t } from './index';
 
@@ -54,6 +59,16 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.challenges(condition.count);
     case 'cooperativePurchases':
       return describe.cooperativePurchases(round(condition.count));
+    case 'allTimeWater':
+      return describe.allTimeWater(round(condition.amount));
+    case 'collectors':
+      return describe.collectors(condition.count);
+    case 'siteLevels':
+      return describe.siteLevels(condition.count);
+    case 'everySite':
+      return describe.everySite;
+    case 'cycles':
+      return describe.cycles(condition.count);
     case 'playSeconds':
       return describe.playHours(condition.seconds / 3600);
     case 'seasonSeconds':
@@ -72,6 +87,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
           return describe.goldenPollen;
         case 'justInTime':
           return describe.justInTime;
+        case 'floodTide':
+          return describe.floodTide(FLOOD_TIDE_SOURCES);
         default:
           return '';
       }

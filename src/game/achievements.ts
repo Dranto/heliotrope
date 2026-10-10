@@ -1,5 +1,6 @@
 // Milestones ("Jalons", docs/game-design.md §9.3). Data table plus pure unlock checks; names
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
+import { collectorsOwned, SITE_IDS, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
@@ -49,6 +50,16 @@ export type AchievementCondition =
   | { kind: 'challenges'; count: number }
   /** Purchases of every Cooperative together, over all Seasons (§7.2). */
   | { kind: 'cooperativePurchases'; count: number }
+  /** Water gathered over all Cycles (§7.4). */
+  | { kind: 'allTimeWater'; amount: number }
+  /** Water collectors owned, all kinds together (§7.4). */
+  | { kind: 'collectors'; count: number }
+  /** Levels of every regional site together (§7.4). */
+  | { kind: 'siteLevels'; count: number }
+  /** Every regional site raised to at least `count` levels (§7.4). */
+  | { kind: 'everySite'; count: number }
+  /** Cycles of water completed (§7.4). */
+  | { kind: 'cycles'; count: number }
   /** Seconds of play over all Seasons. */
   | { kind: 'playSeconds'; seconds: number }
   /** Seconds of play in the current Season. */
@@ -69,6 +80,7 @@ export const ACHIEVEMENT_FAMILIES = [
   'butterflies',
   'neighbourhood',
   'seasons',
+  'bioregion',
 ] as const;
 export type AchievementFamily = (typeof ACHIEVEMENT_FAMILIES)[number];
 
@@ -87,6 +99,10 @@ const SPECIES_STEPS = [1, 10, 18] as const;
 const CHALLENGE_STEPS = [1, 4] as const;
 const SEASON_STEPS = [1, 3, 5, 10, 25] as const;
 const PLAY_HOURS = [1, 24] as const;
+const WATER_EXPONENTS = [3, 6, 9] as const;
+const COLLECTOR_STEPS = [10, 50] as const;
+const SITE_STEPS = [1, 10, 25] as const;
+const CYCLE_STEPS = [1, 3] as const;
 
 export type AchievementId =
   | `light.${(typeof LIGHT_EXPONENTS)[number]}`
@@ -104,6 +120,12 @@ export type AchievementId =
   | `challenges.${(typeof CHALLENGE_STEPS)[number]}`
   | `seasons.${(typeof SEASON_STEPS)[number]}`
   | `playHours.${(typeof PLAY_HOURS)[number]}`
+  | `water.${(typeof WATER_EXPONENTS)[number]}`
+  | `collectors.${(typeof COLLECTOR_STEPS)[number]}`
+  | `sites.${(typeof SITE_STEPS)[number]}`
+  | `cycles.${(typeof CYCLE_STEPS)[number]}`
+  | 'watershed'
+  | 'floodTide'
   | 'mosaic'
   | 'patchwork'
   | 'wildGarden'
@@ -266,6 +288,29 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     hidden: true,
   },
   { id: 'earlySowing', family: 'seasons', condition: { kind: 'action' }, hidden: true },
+  // The Bioregion and the Cycle of water (§7.4).
+  ...WATER_EXPONENTS.map((exponent) => ({
+    id: `water.${exponent}` as const,
+    family: 'bioregion' as const,
+    condition: { kind: 'allTimeWater', amount: 10 ** exponent } as const,
+  })),
+  ...COLLECTOR_STEPS.map((count) => ({
+    id: `collectors.${count}` as const,
+    family: 'bioregion' as const,
+    condition: { kind: 'collectors', count } as const,
+  })),
+  ...SITE_STEPS.map((count) => ({
+    id: `sites.${count}` as const,
+    family: 'bioregion' as const,
+    condition: { kind: 'siteLevels', count } as const,
+  })),
+  { id: 'watershed', family: 'bioregion', condition: { kind: 'everySite', count: 1 } },
+  ...CYCLE_STEPS.map((count) => ({
+    id: `cycles.${count}` as const,
+    family: 'bioregion' as const,
+    condition: { kind: 'cycles', count } as const,
+  })),
+  { id: 'floodTide', family: 'bioregion', condition: { kind: 'action' }, hidden: true },
 ];
 
 export const ACHIEVEMENTS = Object.fromEntries(ACHIEVEMENT_LIST.map((a) => [a.id, a])) as Record<
@@ -275,6 +320,8 @@ export const ACHIEVEMENTS = Object.fromEntries(ACHIEVEMENT_LIST.map((a) => [a.id
 
 /** Seeds gained at once by a new Season that unlocks "Moisson tardive". */
 export const LATE_HARVEST_SEEDS = 50;
+/** Sources gained at once by a new Cycle of water that unlocks the hidden "Grandes eaux". */
+export const FLOOD_TIDE_SOURCES = 25;
 /** Seconds left on screen under which catching the butterfly unlocks "De justesse". */
 export const JUST_IN_TIME_SECONDS = 2;
 
@@ -342,6 +389,16 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
         Object.values(state.cooperatives.purchases).reduce((sum, n) => sum + n, 0) >=
         condition.count
       );
+    case 'allTimeWater':
+      return state.allTimeWater >= condition.amount;
+    case 'collectors':
+      return collectorsOwned(state) >= condition.count;
+    case 'siteLevels':
+      return siteLevels(state) >= condition.count;
+    case 'everySite':
+      return SITE_IDS.every((id) => state.sites[id] >= condition.count);
+    case 'cycles':
+      return state.cycles >= condition.count;
     case 'playSeconds':
       return state.playSeconds >= condition.seconds;
     case 'seasonSeconds':

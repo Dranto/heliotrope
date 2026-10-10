@@ -27,9 +27,9 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 });
 
 describe('Milestone data (§9.3)', () => {
-  it('has about 90 Milestones with unique ids', () => {
-    expect(ACHIEVEMENT_LIST.length).toBeGreaterThanOrEqual(85);
-    expect(ACHIEVEMENT_LIST.length).toBeLessThanOrEqual(100);
+  it('has about 100 Milestones with unique ids', () => {
+    expect(ACHIEVEMENT_LIST.length).toBeGreaterThanOrEqual(95);
+    expect(ACHIEVEMENT_LIST.length).toBeLessThanOrEqual(110);
     expect(new Set(ACHIEVEMENT_LIST.map((a) => a.id)).size).toBe(ACHIEVEMENT_LIST.length);
   });
 
@@ -81,7 +81,7 @@ describe('unlockAchievements', () => {
   });
 
   it('unlocks the hidden slow photosynthesis after 10 minutes without buying', () => {
-    let state = buyGenerator(withState({ resources: { light: 15 } }), 'pot');
+    let state = buyGenerator(withState({ resources: { water: 0, light: 15 } }), 'pot');
     state = tick(state, 599);
     expect(state.achievements).not.toContain('slowPhotosynthesis');
     expect(buyGenerator(tick(state, 0.5), 'pot').idleSeconds).toBe(0);

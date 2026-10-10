@@ -16,7 +16,7 @@ function withTalents(talents: TalentId[], extra: Partial<GameState> = {}): GameS
 
 /** `light` in reserve; only the pots and panels shown, unless `earned` says otherwise. */
 function rich(state: GameState, light: number, earned = 150): GameState {
-  return { ...state, resources: { light }, totalLight: earned, allTimeLight: earned };
+  return { ...state, resources: { light, water: 0 }, totalLight: earned, allTimeLight: earned };
 }
 
 describe('Cooperatives (§7.2)', () => {

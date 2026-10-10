@@ -150,7 +150,7 @@ une espèce de l'herbier, une parcelle rare).
 - **Satisfaction :** du contenu de fin de partie qui réutilise l'existant.
 - **Effort :** moyen ; demande P2 pour avoir des récompenses intéressantes.
 
-### P8 — Deuxième couche : la Biorégion *(reprend §13.4)*
+### P8 — Deuxième couche : la Biorégion *(reprend §13.4, livré en M9 : game-design §7.4)*
 
 Une nouvelle ressource, l'**Eau** (récoltée par des toits-réservoirs, des noues, une rivière restaurée), qui
 alimente une nouvelle rangée de générateurs à l'échelle de la région, puis un deuxième prestige plus rare au-dessus
@@ -183,7 +183,7 @@ Chaque jalon reste livrable et jouable seul, comme M1 à M4.
 | **M6 — Restaurer le quartier** *(livré)* | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons — voir game-design §6.1 à §6.3 | Donne enfin des paliers visibles sur la carte de M5 |
 | **M7 — La terre se souvient** *(livré)* | P2 Arbre des Saisons, P3 Coopératives — voir game-design §7.1 et §7.2 | Donne des choix à chaque Saison et retire la répétition des débuts |
 | **M8 — Le vivant revient** *(livré)* | P5 Herbier, P7 Saisons à défis, version anglaise — voir game-design §9.5, §7.3 et §14 Q1 | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
-| **M9 — La Biorégion** | P8 Eau, nouveaux générateurs, deuxième prestige | La grosse extension, une fois la boucle longue riche |
+| **M9 — La Biorégion** *(livré)* | P8 Eau, collecteurs et sites de la biorégion, deuxième prestige (le Cycle de l'eau), vue Biorégion sur la carte — voir game-design §7.4 | La grosse extension, une fois la boucle longue riche |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Pour adoucir l'équilibrage, on ajoute **beaucoup de synergies**,
 entre bâtiments et entre améliorations, plutôt que de retoucher les valeurs de base. Le fil d'équilibrage s'en charge
