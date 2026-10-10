@@ -39,6 +39,27 @@ interface Floater {
 
 let nextFloaterId = 0;
 
+/** The arbour's hoop, on the line where the click upgrades' sprigs hang (`ARCH_ORNAMENTS`). */
+const ARBOUR = 'M20 256 V100 C20 40 60 8 100 8 C140 8 180 40 180 100 V256';
+
+/** Leaves of the vine climbing the arbour: [x, y, angle], up both posts and over the top. */
+const VINE_LEAVES: [number, number, number][] = [
+  [23, 236, -40],
+  [17, 206, 35],
+  [23, 172, -35],
+  [17, 138, 40],
+  [26, 84, -60],
+  [44, 46, -25],
+  [70, 20, 20],
+  [130, 20, -20],
+  [156, 46, 25],
+  [174, 84, 60],
+  [183, 138, -40],
+  [177, 172, 35],
+  [183, 206, -35],
+  [177, 236, 40],
+];
+
 /** Florets are drawn from one corolla of size 10, scaled to each floret. */
 const COROLLA = floretPath(10);
 
@@ -245,7 +266,7 @@ const Plant = memo(function Plant({ stage, ornaments, bands, plantRef, headsRef 
 });
 
 /**
- * The clickable heliotrope, framed by an Art nouveau arch, standing in the home courtyard of the map (docs/game-design.md §10.1, §10.4). It
+ * The clickable heliotrope, standing in the home courtyard of the map under a garden arbour (docs/game-design.md §10.1, §10.4). It
  * grows through seven stages with the Light earned this Season, each click upgrade gilds the
  * arch with a sprig, and each Season completed leaves a golden seed on the pot.
  */
@@ -336,10 +357,6 @@ export function Flower() {
               <stop offset="60%" className="halo-b" />
               <stop offset="100%" className="halo-c" />
             </radialGradient>
-            <linearGradient id="arch-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFF8E6" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#F4ECDC" stopOpacity="0.2" />
-            </linearGradient>
             {[
               ['#E6DAF5', '#B79AD6', '#8E6CBB'],
               ['#D9C6F0', '#A486CB', '#7A58A8'],
@@ -351,9 +368,6 @@ export function Flower() {
                 <stop offset="100%" stopColor={c} />
               </radialGradient>
             ))}
-            <clipPath id="arch-clip">
-              <path d="M20 256 V100 C20 40 60 8 100 8 C140 8 180 40 180 100 V256 Z" />
-            </clipPath>
             <linearGradient id="leaf-fill" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#5E9471" />
               <stop offset="100%" stopColor="#2F6B4F" />
@@ -364,30 +378,35 @@ export function Flower() {
               <stop offset="100%" stopColor="#A8553A" />
             </linearGradient>
           </defs>
-          <path
-            className="arch-fill"
-            d="M20 256 V100 C20 40 60 8 100 8 C140 8 180 40 180 100 V256 Z"
-            fill="url(#arch-fill)"
-          />
+          {/* Its shadow on the courtyard paving, and the glow of its light around the heads. */}
+          <ellipse cx="100" cy="257" rx="46" ry="6" className="ground-shadow" />
           <circle
             cx="100"
             cy={headY}
-            r={60 + stage * 9}
+            r={48 + stage * 8}
             fill="url(#flower-halo)"
-            clipPath="url(#arch-clip)"
             className="halo"
-            style={{ opacity: 0.45 + stage * 0.09 }}
+            style={{ opacity: 0.4 + stage * 0.08 }}
           />
-          <path
-            className="arch"
-            d="M20 256 V100 C20 40 60 8 100 8 C140 8 180 40 180 100 V256"
-            fill="none"
-          />
-          <path
-            className="arch-inner"
-            d="M27 256 V101 C27 46 64 15 100 15 C136 15 173 46 173 101 V256"
-            fill="none"
-          />
+          {/* A garden arbour over the courtyard bed: a climbing vine on a fine gilded hoop, where
+              the click upgrades hang their sprigs. */}
+          <g className="arbour">
+            <path className="arch" d={ARBOUR} fill="none" />
+            <path className="arch-inner" d={ARBOUR} fill="none" />
+            {VINE_LEAVES.map(([x, y, angle]) => (
+              <ellipse
+                key={`${x},${y}`}
+                cx={x}
+                cy={y}
+                rx="4.2"
+                ry="1.9"
+                transform={`rotate(${angle} ${x} ${y})`}
+                className="vine-leaf"
+              />
+            ))}
+            <ellipse cx="20" cy="256" rx="6" ry="2.4" className="arbour-foot" />
+            <ellipse cx="180" cy="256" rx="6" ry="2.4" className="arbour-foot" />
+          </g>
           {/* A generous touch target around the plant, so a tap between two leaves still counts. */}
           <ellipse cx="100" cy="170" rx="62" ry="88" fill="transparent" className="flower-hit" />
           <g className="flower-sway" style={{ transform: `rotate(${tilt}deg)` }}>

@@ -337,10 +337,6 @@ button {
   pointer-events: visiblePainted;
 }
 
-.map-flower .arch-fill {
-  opacity: 0.45;
-}
-
 .flower-panel {
   display: flex;
   justify-content: center;
@@ -368,7 +364,6 @@ button {
   display: block;
   width: 100%;
   overflow: visible;
-  filter: drop-shadow(0 6px 10px rgb(59 51 40 / 0.28));
 }
 
 .flower-panel {
@@ -410,18 +405,33 @@ button {
     opacity 1.6s ease;
 }
 
+/* The arbour: a sage hoop with a gilded thread, wound with a vine, standing on the bed. */
 .arch {
-  stroke: var(--gold);
-  stroke-width: 1.2;
-  opacity: 0.75;
+  stroke: #6f8f6c;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  opacity: 0.85;
 }
 
 .arch-inner {
   stroke: var(--gold);
-  stroke-width: 0.5;
-  stroke-dasharray: 0.5 3.5;
+  stroke-width: 0.8;
+  stroke-dasharray: 0.6 4;
   stroke-linecap: round;
-  opacity: 0.6;
+}
+
+.vine-leaf {
+  fill: var(--foliage, #2f6b4f);
+  opacity: 0.85;
+  transition: fill 2s ease;
+}
+
+.arbour-foot {
+  fill: rgb(59 51 40 / 0.25);
+}
+
+.ground-shadow {
+  fill: rgb(59 51 40 / 0.22);
 }
 
 .ornament {
@@ -553,6 +563,7 @@ button {
   transform-origin: 100px 222px;
   transform-box: view-box;
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 4px 5px rgb(59 51 40 / 0.25));
 }
 
 .plant {
