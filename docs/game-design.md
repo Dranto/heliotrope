@@ -36,7 +36,7 @@
 - **Optimiste, jamais naïf.** Le monde a souffert, mais le jeu parle de réparation, pas de catastrophe. Pas de compte à rebours, pas de punition.
 - **Collectif.** Les bâtiments sont partagés (serre *communautaire*, réseau *d'entraide*). Les textes parlent de « nous » et de voisins, pas d'un magnat qui accumule.
 - **Organique et technique à la fois.** Le solarpunk mêle plantes et technologie douce : panneaux solaires couverts de lierre, miroirs de concentration au milieu des vergers.
-- **Doux et lisible.** Palette chaude (or, vert sauge, terracotta, crème), animations lentes, sons discrets. Le joueur doit pouvoir laisser l'onglet ouvert sans être agressé.
+- **Élégant et lumineux.** Design moderne et épuré, lumière dorée, touches florales (voir §10.4), animations lentes, sons discrets. Le joueur doit pouvoir laisser l'onglet ouvert sans être agressé.
 
 **Ce que le jeu n'est pas.** Pas de pay-to-win, pas de minuteurs frustrants, pas de pénalité pour l'absence, pas d'humour cynique.
 
@@ -324,10 +324,42 @@ Même contenu, une colonne : compteur en haut, fleur + scène au centre, barre d
 
 ### 10.4 Direction artistique
 
-- Illustrations vectorielles (SVG) en aplats, formes rondes, quelques textures légères.
-- Palette : or soleil, vert sauge, vert feuille, terracotta, crème ; gris béton pour le monde non restauré.
-- Typographie arrondie et lisible, chiffres à chasse fixe pour les compteurs (évite que le texte « saute »).
-- Accessibilité : contraste AA, animations réduites si `prefers-reduced-motion`, aucune information portée par la couleur seule.
+**Intention (décidée par Antoine, 2026-10-10) :** élégant et très moderne, dans un esprit solarpunk ensoleillé, avec une touche florale et naturelle légère. On vise l'interface d'un bel objet design, pas un jeu « cartoon » : beaucoup d'air, des lignes fines, de la lumière dorée.
+
+**Mots-clés.** Lumière de fin d'après-midi · verre dépoli · lignes botaniques fines · arches et courbes inspirées de l'Art nouveau · sobriété.
+
+**Typographie.**
+
+- **Titres et noms (générateurs, Saisons, Journal) : [Fraunces](https://fonts.google.com/specimen/Fraunces)**, serif variable aux formes douces et organiques ; réglée avec un peu de « SOFT » pour un côté floral sans être fantaisiste.
+- **Interface et chiffres : [Manrope](https://fonts.google.com/specimen/Manrope)**, sans-serif géométrique moderne, avec chiffres tabulaires (`font-variant-numeric: tabular-nums`) pour que les compteurs ne « sautent » pas.
+- Deux polices au maximum, toutes deux sous licence libre (OFL) et hébergées avec le jeu (pas d'appel à un service tiers au chargement).
+
+**Palette.**
+
+| Rôle | Couleur | Valeur indicative |
+|---|---|---|
+| Fond principal | Crème lumineuse | `#FBF6EC` |
+| Accent principal (Lumière, boutons) | Or soleil | `#E9A93B` |
+| Accent secondaire | Vert sauge | `#8FAE8B` |
+| Végétation, succès | Vert feuille profond | `#2F6B4F` |
+| Touche florale | Rose héliotrope / lilas | `#B79AD6` |
+| Chaleur | Terracotta | `#C8734F` |
+| Texte | Vert-noir encre | `#1F2A24` |
+| Monde non restauré | Gris béton | `#A7A39C` |
+
+L'or et le lilas (la couleur de la fleur d'héliotrope) forment le duo signature ; le reste reste discret.
+
+**Formes et matières.**
+
+- Cartes et panneaux en verre dépoli légèrement translucide sur un fond en dégradé doux (aube → midi → fin d'après-midi selon la phase), coins arrondis généreux, ombres très légères.
+- Motifs botaniques en trait fin (tiges, feuilles, pétales) en filigrane dans les bordures et les séparateurs, jamais chargés.
+- Arches et cadres courbes inspirés de l'Art nouveau pour les éléments importants (fleur cliquable, écran des Saisons).
+- Illustrations de la scène en vectoriel (SVG), aplats doux et dégradés subtils, un léger grain pour éviter l'effet « plat numérique ».
+- Icônes en trait fin, cohérentes avec les motifs botaniques.
+
+**Mouvement.** Animations lentes et fluides : l'héliotrope pivote doucement vers le curseur ou le soleil, les pétales s'ouvrent au clic, des particules de pollen dorées flottent. Rien de clignotant.
+
+**Accessibilité.** Contraste AA sur tout le texte (l'or et le lilas servent d'accents, pas de couleur de texte sur fond clair), animations réduites si `prefers-reduced-motion`, aucune information portée par la couleur seule.
 
 ---
 
@@ -409,6 +441,6 @@ Décisions qui appartiennent à Antoine. En attendant sa réponse, le document a
 | Q2 | Plateforme visée ? | Navigateur, bureau d'abord, mais jouable sur mobile (responsive) |
 | Q3 | Production hors ligne : 100 % plafonnée à 8 h ? | Oui |
 | Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP, pour livrer plus vite une boucle complète |
-| Q5 | Style graphique ? | Illustrations vectorielles (SVG) en aplats, palette chaude |
+| Q5 | ~~Style graphique ?~~ | **Décidé :** élégant, très moderne, solarpunk ensoleillé et légèrement floral (voir §10.4) |
 | Q6 | Monétisation ? | Aucune : jeu gratuit, sans pub |
 | Q7 | Récit : simple ambiance (Journal) ou vraie histoire avec personnages ? | Ambiance légère via le Journal du quartier |
