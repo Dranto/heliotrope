@@ -169,6 +169,16 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 - Phase 4 : à partir de la 2ᵉ Saison, la scène prend la teinte d'une saison, en commençant par le printemps puis en suivant le cycle (printemps, été, automne, hiver). La 1ʳᵉ Saison n'a pas de teinte propre. Le feuillage et le ciel changent de couleur ; rien d'autre ne change.
 - Le Journal compte 18 entrées déclenchées par la Lumière de la Saison, les premiers exemplaires de chaque bâtiment, le premier Papillon doré, les Jalons et les Saisons accomplies. Les entrées sont **conservées d'une Saison à l'autre** pour que l'histoire avance au lieu de se répéter ; les Saisons suivantes en débloquent de nouvelles. La dernière entrée s'affiche sous la scène, le carnet complet s'ouvre à la demande, et la fenêtre de retour hors ligne reprend la dernière entrée.
 
+**Scène vue du dessus (post-MVP, 2026-10-10).** Demande d'Antoine : une progression plus visuelle, la ville au centre de l'écran, vue du dessus, où les bâtiments apparaissent avec des animations élégantes au fil des achats. `src/ui/Neighbourhood.tsx` dessine la scène, `src/ui/neighbourhood.ts` porte le plan et les règles.
+
+- **Le plan.** Un quartier en SVG vu du dessus : trois rangées de trois îlots séparés par deux avenues et deux rues. Au centre, l'immeuble du joueur entoure une cour où pousse l'héliotrope. Au départ tout est gris : toits en béton, friches, parkings.
+- **Chaque générateur a ses places.** Pots autour de la cour, panneaux sur les toits voisins, potagers qui remplacent les toits gris (du plus proche au plus lointain), serres sur les friches, fermes verticales à la place de trois tours, champ de miroirs sur le parking du sud-est, arbres le long des rues (la canopée part de la cour et gagne la ville), arcologie en rosace de terrasses sur la grande friche du nord-ouest.
+- **Chaque achat se voit.** Chacun des premiers exemplaires ajoute un élément ; ensuite les éléments arrivent à des paliers de plus en plus espacés (12, 14, 16, 18, 20, 23… jusqu'à 500), pour qu'un achat tardif change encore l'image. Les arbres arrivent par bosquets de quatre et les miroirs par deux. Un nouvel élément pousse en place en 1,2 s, accompagné d'un anneau doré qui s'élargit ; ce qui existait déjà au chargement s'affiche sans animation.
+- **Les améliorations aussi.** Chaque amélioration ×2 (§5.1) fait scintiller une fois tous les éléments du générateur et les enrichit : plus de pétales dans les pots, cadre doré des panneaux, tomates puis fleurs dans les potagers, serres plus nervurées puis chauffées, terrasses supplémentaires sur les fermes, miroirs dorés puis rayons vers la tour, arbres en fleurs, arcologie fleurie. Les améliorations de clic font fleurir l'héliotrope de la cour, et chaque synergie (§5.3) trace un fil doré entre les deux générateurs qu'elle relie.
+- **La caméra recule par paliers.** Phase 1 : la cour et l'immeuble du joueur. Phase 2 : le quartier. Phase 3 : la ville entière. La caméra recule plus tôt si le joueur achète un générateur dont la place est hors champ, pour qu'aucun achat ne soit construit hors de vue. Le recul dure 2,8 s.
+- **La lumière suit la phase.** Les ombres des bâtiments tournent et changent de longueur (aube : longues vers l'ouest ; midi : courtes ; fin d'après-midi : longues vers l'est), un voile de lumière teinte la scène, des ombres de nuages la traversent lentement. Le quartier reverdit avec la production, et les teintes de saison (phase 4) s'appliquent au feuillage et à la lumière.
+- **Animations réduites.** Avec le réglage des Options ou `prefers-reduced-motion`, rien ne bouge : les éléments apparaissent directement, la caméra change de cadre sans transition, pas de scintillement.
+
 ---
 
 ## 7. Prestige : les Saisons
@@ -361,7 +371,7 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 ```
 
 - **Gauche :** l'héliotrope cliquable (petite animation et nombre flottant à chaque clic), valeur du clic.
-- **Centre :** la scène, qui évolue par phase ; le Papillon doré la traverse ; le Journal du quartier en bas.
+- **Centre :** la scène du quartier vue du dessus (§6), plus large que les deux colonnes latérales depuis 2026-10-10 : c'est la pièce maîtresse de l'écran. Le Papillon doré la traverse ; le Journal du quartier en bas.
 - **Droite :** améliorations disponibles (icônes avec infobulle) puis liste des générateurs (nom, quantité, prix, production, infobulle avec le détail des multiplicateurs).
 - **Haut :** compteur de Lumière, production/s, menu.
 

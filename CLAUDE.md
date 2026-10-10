@@ -40,7 +40,8 @@ a design decision changes, update that document in the same PR.
   - `format.ts`: number formatting for display (French notation, design doc §8)
 - `src/i18n/fr.ts`: every player-facing text (UI strings, generator, upgrade and Milestone names,
   flavour lines, journal entries).
-- `src/ui/`: React components. Read state with `useGameState()`, change it with
+- `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
+  rules in `neighbourhood.ts` (design doc §6). Read state with `useGameState()`, change it with
   `store.dispatch((s) => action(s))`.
 
 ## Conventions
