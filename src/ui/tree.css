@@ -1,0 +1,535 @@
+/* The Tree of Seasons and the Cooperatives (docs/game-design.md §7.1, §7.2, §10.4). */
+
+[data-branch='roots'] {
+  --branch: #c8734f;
+  --branch-soft: #efc9a4;
+}
+
+[data-branch='pollinators'] {
+  --branch: #9b78c4;
+  --branch-soft: #dccbef;
+}
+
+[data-branch='memory'] {
+  --branch: #2f6b4f;
+  --branch-soft: #bcd3b5;
+}
+
+/* ---------- Menu ---------- */
+
+.tree-button[data-ready='true'] {
+  border-color: rgb(47 107 79 / 0.45);
+  box-shadow: 0 0 0 3px rgb(143 174 139 / 0.22);
+}
+
+/* ---------- Tree screen ---------- */
+
+.tree-dialog {
+  width: min(44rem, 100%);
+}
+
+.seed-tiles.tree-tiles {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tree-legend {
+  display: flex;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+}
+
+.tree-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tree-legend span::before {
+  content: '';
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--branch);
+}
+
+.tree-stage {
+  position: relative;
+  margin: 0 0 0.9rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fdf6e6, #fbf1dc 62%, #efe2c8);
+  aspect-ratio: 360 / 330;
+}
+
+.tree-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tree-soil {
+  fill: url(#tree-soil);
+}
+
+.tree-foliage ellipse {
+  fill: #a9c79d;
+  opacity: calc(0.14 + var(--growth) * 0.4);
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  transform: scale(calc(0.72 + var(--growth) * 0.28));
+  transition:
+    opacity 1.2s ease,
+    transform 1.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tree-foliage ellipse[data-tone='2'] {
+  fill: #c5dab4;
+}
+
+.tree-trunk {
+  fill: #8a6a4a;
+}
+
+.tree-bark {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.22);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.tree-grass path {
+  fill: none;
+  stroke: #8fae8b;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.tree-branch {
+  fill: none;
+  stroke-linecap: round;
+  stroke: #cdbfa6;
+  stroke-width: 1.4;
+  stroke-dasharray: 0.02 0.03;
+  transition:
+    stroke 0.6s ease,
+    stroke-width 0.6s ease;
+}
+
+.tree-branch[data-state='learnt'] {
+  stroke: var(--branch);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+
+.tree-branch[data-state='ready'],
+.tree-branch[data-state='reachable'] {
+  stroke: var(--branch-soft);
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+/* Golden sap rises along a branch that has just been learnt. */
+.tree-branch.fresh {
+  stroke-dasharray: 1;
+  animation: sap 1.1s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes sap {
+  from {
+    stroke: #f4c063;
+    stroke-dashoffset: 1;
+  }
+
+  70% {
+    stroke: #f4c063;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.tree-bud {
+  fill: #fffaf0;
+  stroke: #cdbfa6;
+  stroke-width: 1.2;
+}
+
+.tree-node[data-state='reachable'] .tree-bud {
+  stroke: var(--branch);
+}
+
+.tree-node[data-state='ready'] .tree-bud {
+  fill: var(--branch-soft);
+  stroke: var(--branch);
+  stroke-width: 1.6;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: bud 2.4s ease-in-out infinite;
+}
+
+@keyframes bud {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+.tree-node[data-state='locked'] .tree-bud {
+  opacity: 0.55;
+}
+
+.tree-blossom .petal {
+  fill: var(--branch-soft);
+  stroke: var(--branch);
+  stroke-width: 0.8;
+}
+
+.tree-blossom .heart {
+  fill: #f2bd57;
+  stroke: #fff;
+  stroke-width: 0.8;
+}
+
+/* A talent just learnt opens once its sap has reached it. */
+.tree-node.fresh .tree-blossom {
+  animation: blossom 0.9s 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+@keyframes blossom {
+  from {
+    opacity: 0;
+    transform: scale(0.2) rotate(-40deg);
+  }
+}
+
+.tree-node.fresh .tree-blossom {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+/* Wide, invisible hit areas over the drawing, so each bud is easy to touch. */
+.tree-spot {
+  position: absolute;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: -1.3rem 0 0 -1.3rem;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tree-spot:hover,
+.tree-spot:focus-visible {
+  border-color: rgb(255 255 255 / 0.9);
+  background: rgb(255 255 255 / 0.25);
+  outline: none;
+}
+
+.tree-spot[aria-pressed='true'] {
+  border-color: var(--branch);
+  box-shadow: 0 0 0 4px rgb(255 255 255 / 0.6);
+}
+
+.tree-detail {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 0.9rem 0.85rem 1.1rem;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-left: 4px solid var(--branch);
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 0.55);
+}
+
+.tree-detail h3 {
+  margin: 0.1rem 0 0;
+  font-size: 1.15rem;
+}
+
+.tree-branch-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--branch);
+}
+
+.tree-effect {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--leaf);
+}
+
+.tree-learnt-tag,
+.tree-locked-tag {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.tree-learnt-tag {
+  background: var(--branch-soft);
+  color: var(--branch);
+}
+
+.tree-locked-tag {
+  max-width: 10rem;
+  text-align: center;
+  background: rgb(31 42 36 / 0.06);
+  color: var(--ink-soft);
+}
+
+.tree-link {
+  display: block;
+  margin: 0.4rem auto 0.8rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgb(47 107 79 / 0.35);
+  border-radius: 999px;
+  background: rgb(188 211 181 / 0.35);
+  color: var(--leaf);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Cooperatives panel ---------- */
+
+.cooperatives {
+  padding: 1.25rem;
+}
+
+.cooperatives h2 {
+  margin-bottom: 0.5rem;
+}
+
+.cooperatives .hint {
+  margin-top: 0;
+}
+
+.coop-list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 0.7rem;
+  padding: 0;
+  list-style: none;
+}
+
+.coop {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.5rem 0.6rem 0.5rem 0.55rem;
+  border: 1px solid rgb(255 255 255 / 0.75);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.5);
+  transition: opacity 0.4s ease;
+}
+
+.coop[data-working='false'] {
+  opacity: 0.62;
+}
+
+.coop-icon {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--coop-soft);
+}
+
+.coop-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  fill: none;
+  stroke: var(--coop);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The bike pedals while its cooperative works. */
+.coop[data-working='true'] .coop-icon svg {
+  animation: pedal 1.6s ease-in-out infinite;
+}
+
+@keyframes pedal {
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+.coop-text {
+  display: grid;
+  min-width: 0;
+}
+
+.coop-name {
+  font-weight: 700;
+}
+
+.coop-buys {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.coop-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--leaf);
+  font-variant-numeric: tabular-nums;
+}
+
+.coop-count span {
+  display: inline-block;
+  animation: count-pop 0.5s ease-out;
+}
+
+@keyframes count-pop {
+  from {
+    transform: translateY(-2px);
+    color: #c98a1d;
+  }
+}
+
+.coop-switch {
+  position: relative;
+  min-width: 5.6rem;
+  min-height: 2.2rem;
+  padding: 0 0.7rem 0 2.1rem;
+  border: 1px solid rgb(47 107 79 / 0.25);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.7);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.coop-switch::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.45rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: -0.6rem;
+  border-radius: 50%;
+  background: var(--concrete);
+  transition: background 0.3s ease;
+}
+
+.coop-switch[aria-checked='true'] {
+  border-color: rgb(47 107 79 / 0.45);
+  background: rgb(188 211 181 / 0.45);
+  color: var(--leaf);
+}
+
+.coop-switch[aria-checked='true']::before {
+  background: var(--leaf);
+  box-shadow: 0 0 0 3px rgb(143 174 139 / 0.35);
+}
+
+.coop-thrifty {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.coop-thrifty input {
+  margin-top: 0.25rem;
+  accent-color: var(--leaf);
+}
+
+.coop-thrifty > span {
+  display: grid;
+}
+
+.coop-thrifty-label {
+  font-weight: 700;
+}
+
+[data-cooperative='gardeners'] {
+  --coop: #2f6b4f;
+  --coop-soft: #d6e5cf;
+}
+
+[data-cooperative='roofers'] {
+  --coop: #c8734f;
+  --coop-soft: #f3d9c6;
+}
+
+[data-cooperative='farmers'] {
+  --coop: #c98a1d;
+  --coop-soft: #f7e3b5;
+}
+
+[data-cooperative='foresters'] {
+  --coop: #4f7f3a;
+  --coop-soft: #d9e8c7;
+}
+
+[data-cooperative='council'] {
+  --coop: #8a66b8;
+  --coop-soft: #e4d8f2;
+}
+
+/* ---------- Bikes on the map ---------- */
+
+.coop-bike .crate {
+  fill: var(--coop);
+  stroke: #fffaf0;
+  stroke-width: 0.7;
+}
+
+.coop-bike .crate-lid {
+  stroke: rgb(255 255 255 / 0.55);
+  stroke-width: 0.6;
+}
+
+.coop-bike .wheel {
+  stroke: #3e463f;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+.coop-bike .rider {
+  fill: #f7efe0;
+  stroke: #6b5a48;
+  stroke-width: 0.5;
+}
+
+.coop-bike .rider-head {
+  fill: #6b5a48;
+}
+
+.coop-bike[data-working='false'] {
+  opacity: 0.7;
+}
+
+.coop-ring {
+  stroke: #f4c063;
+  stroke-width: 1.4;
+}
+
+@media (max-width: 30rem) {
+  .seed-tiles.tree-tiles {
+    grid-template-columns: 1fr;
+  }
+}
+
+.coop-bike .bike-shadow {
+  fill: rgb(31 42 36 / 0.16);
+}

@@ -1,3 +1,4 @@
+import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
 import { PACING_TARGETS, simulate, simulateTwoSeasons } from './simulator';
 
@@ -34,6 +35,12 @@ describe('two Seasons in a row', () => {
   it('starts the second Season with the 10 advised Seeds', () => {
     expect(second.state.seasons).toBe(1);
     expect(second.state.seeds).toBe(10);
+  });
+
+  it('sows its 10 Seeds in the Tree of Seasons, and the cooperatives buy for it (§7)', () => {
+    expect(availableSeeds(second.state)).toBe(0);
+    expect(second.state.talents).toContain('gardenersCoop');
+    expect(second.state.cooperatives.purchases.gardeners).toBeGreaterThan(0);
   });
 
   it.each(GENERATOR_IDS)('buys the first %s sooner in the second Season', (id) => {

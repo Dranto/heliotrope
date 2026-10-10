@@ -5,6 +5,12 @@ import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
 import { t } from '../i18n/fr';
+import {
+  isCooperativeActive,
+  unlockedCooperatives,
+  type CooperativeId,
+} from '../game/cooperatives';
+import { CooperativeBikes } from './CooperativeArt';
 import { Neighbourhood } from './Neighbourhood';
 import { Restoration } from './Restoration';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
@@ -78,11 +84,19 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
     .map((p) => p.id)
     .join();
   const { parcels, projects } = state;
+  // Encoded as one string so the bikes only redraw when a cooperative starts, stops or buys.
+  const bikes = unlockedCooperatives(state)
+    .map(
+      (id) => `${id}:${isCooperativeActive(state, id) ? 1 : 0}:${state.cooperatives.purchases[id]}`,
+    )
+    .join();
+  const reduced = state.settings.reducedMotion || prefersReducedMotion();
   const ground = useMemo(() => <ParcelGround parcels={parcels} />, [parcels]);
   const overlay = useMemo(
     () => (
       <>
         <ProjectMarks projects={projects} />
+        <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <ParcelOffers
           offered={split(offered)}
           affordable={split(affordable)}
@@ -91,7 +105,7 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
         />
       </>
     ),
-    [projects, offered, affordable, highlight, restore],
+    [projects, bikes, reduced, offered, affordable, highlight, restore],
   );
   const phase = phaseOf(state);
   const season = visualSeason(state);
@@ -122,6 +136,25 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
       <Restoration onHighlight={setHighlight} />
     </figure>
   );
+}
+
+/** The device asks for less motion; SMIL animations do not follow the CSS rule by themselves. */
+function prefersReducedMotion(): boolean {
+  return typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+}
+
+function parseBikes(encoded: string) {
+  if (encoded === '') return [];
+  return encoded.split(',').map((entry) => {
+    const [id, working, purchases] = entry.split(':');
+    return {
+      id: id as CooperativeId,
+      working: working === '1',
+      purchases: Number(purchases),
+    };
+  });
 }
 
 function split(ids: string): ParcelId[] {

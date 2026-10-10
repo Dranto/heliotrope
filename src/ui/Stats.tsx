@@ -2,6 +2,7 @@ import { achievementBonus } from '../game/achievements';
 import { formatNumber, formatPercent } from '../game/format';
 import { biodiversityBonus, clickValue, lightPerSecond } from '../game/production';
 import { seedBonus } from '../game/seasons';
+import { TALENT_LIST } from '../game/talents';
 import { t } from '../i18n/fr';
 import { Dialog } from './Dialog';
 import { useGameState } from './useGame';
@@ -68,6 +69,20 @@ export function Stats({ onClose }: { onClose: () => void }) {
             label={t.stats.achievementBonus}
             value={t.stats.percent(formatPercent(achievementBonus(state)))}
           />
+          {state.seeds > 0 && (
+            <Row
+              label={t.stats.talents}
+              value={`${state.talents.length} / ${TALENT_LIST.length}`}
+            />
+          )}
+          {state.talents.length > 0 && (
+            <Row
+              label={t.stats.cooperativePurchases}
+              value={formatNumber(
+                Object.values(state.cooperatives.purchases).reduce((sum, n) => sum + n, 0),
+              )}
+            />
+          )}
         </dl>
       </section>
     </Dialog>

@@ -38,6 +38,12 @@ export function bonusText(bonus: Bonus): string {
       return b.harvestFactor(factor(bonus.factor));
     case 'offlineCap':
       return b.offlineCap(t.duration(bonus.seconds));
+    case 'keepGenerators':
+      return b.keepGenerators(formatPercent(bonus.fraction));
+    case 'perSeason':
+      return b.perSeason(formatPercent(bonus.bonus));
+    case 'globalPerType':
+      return b.globalPerType(formatPercent(bonus.bonus));
   }
 }
 

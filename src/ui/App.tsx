@@ -11,20 +11,23 @@ import {
   seedsToGain,
 } from '../game/seasons';
 import type { GameState } from '../game/state';
+import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
 import { achievementName } from '../i18n/achievements';
 import { t } from '../i18n/fr';
 import { Achievements } from './Achievements';
+import { Cooperatives } from './Cooperatives';
 import { Flower } from './Flower';
 import { Generators } from './Generators';
 import { Options } from './Options';
 import { Scene } from './Scene';
 import { Seasons } from './Seasons';
+import { SeasonTree } from './SeasonTree';
 import { Stats } from './Stats';
 import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
 import { useSounds } from './useSounds';
 
-type Screen = 'achievements' | 'seasons' | 'stats' | 'options';
+type Screen = 'achievements' | 'seasons' | 'tree' | 'stats' | 'options';
 /** §10.3: mobile tab bar sections. */
 type Tab = 'harvest' | 'build' | 'improve' | 'more';
 const TABS: Tab[] = ['harvest', 'build', 'improve', 'more'];
@@ -58,6 +61,23 @@ function TabIcon({ tab }: { tab: Tab }) {
       <path d={paths[tab]} />
     </svg>
   );
+}
+
+/** A young tree with three branches, the mark of the Tree of Seasons. */
+function TreeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 21v-9M12 15l-4-3M12 13l4-3M12 21c-2 0-3.5.6-4.5 1.5M12 21c2 0 3.5.6 4.5 1.5" />
+      <circle cx="12" cy="7" r="3.2" />
+      <circle cx="6.8" cy="10.6" r="2.2" />
+      <circle cx="17.2" cy="9.6" r="2.2" />
+    </svg>
+  );
+}
+
+/** The Tree of Seasons opens with the first Seed (§7.1). */
+function treeUnlocked(state: GameState): boolean {
+  return state.seeds > 0;
 }
 
 /** The Milestones screen opens from phase 2 (§10.2), or as soon as one is unlocked. */
@@ -108,6 +128,8 @@ export function App() {
   );
 
   const gain = seedsToGain(state);
+  const seedsToSow = availableSeeds(state);
+  const canSow = TALENT_LIST.some((talent) => canLearnTalent(state, talent.id));
 
   const menu = (
     <nav className="menu" aria-label={t.menu}>
@@ -142,6 +164,24 @@ export function App() {
           {gain > 0 && (
             <span className="menu-badge" aria-hidden="true">
               +{formatNumber(gain)}
+            </span>
+          )}
+        </button>
+      )}
+      {treeUnlocked(state) && (
+        <button
+          type="button"
+          className="ghost menu-button tree-button"
+          aria-haspopup="dialog"
+          aria-label={canSow ? t.tree.openWithSeeds(formatNumber(seedsToSow)) : undefined}
+          data-ready={canSow}
+          onClick={() => setScreen('tree')}
+        >
+          <TreeIcon />
+          {t.tree.open}
+          {canSow && (
+            <span className="menu-badge" aria-hidden="true">
+              {formatNumber(seedsToSow)}
             </span>
           )}
         </button>
@@ -245,6 +285,7 @@ export function App() {
         <div className="column">
           <Upgrades />
           <Generators />
+          <Cooperatives />
         </div>
       </main>
 
@@ -274,7 +315,10 @@ export function App() {
       </div>
 
       {screen === 'achievements' && <Achievements onClose={closeScreen} />}
-      {screen === 'seasons' && <Seasons onClose={closeScreen} />}
+      {screen === 'seasons' && (
+        <Seasons onClose={closeScreen} onOpenTree={() => setScreen('tree')} />
+      )}
+      {screen === 'tree' && <SeasonTree onClose={closeScreen} />}
       {screen === 'stats' && <Stats onClose={closeScreen} />}
       {screen === 'options' && <Options onClose={closeScreen} />}
     </div>

@@ -52,6 +52,8 @@ for (const [name, result] of [
   console.log('Owned:', JSON.stringify(result.state.generators));
   console.log('Parcels restored:', result.state.parcels.join(', ') || 'none');
   console.log('Projects carried out:', result.state.projects.join(', ') || 'none');
+  console.log('Talents learnt:', result.state.talents.join(', ') || 'none');
+  console.log('Cooperative purchases:', JSON.stringify(result.state.cooperatives.purchases));
   console.log(
     'Seeds owned:',
     result.state.seeds,
