@@ -1,7 +1,7 @@
 // Display texts of the Tree of Seasons and the Cooperatives, resolved from their data.
 import { COOPERATIVE_GENERATORS, type CooperativeId } from '../game/cooperatives';
 import type { TalentDef } from '../game/talents';
-import { t } from './fr';
+import { t } from './index';
 import { bonusesText } from './restoration';
 
 /** What a cooperative buys: "Héliotrope en pot et Panneau de balcon", or the upgrades. */

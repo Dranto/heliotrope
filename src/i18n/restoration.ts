@@ -1,9 +1,9 @@
 // Display texts of parcels and neighbourhood projects, resolved from their bonuses.
 import type { Bonus } from '../game/bonuses';
-import { formatPercent } from '../game/format';
-import { t } from './fr';
+import { formatDecimal, formatPercent } from '../game/format';
+import { t } from './index';
 
-const factor = (value: number) => String(value).replace('.', ',');
+const factor = formatDecimal;
 
 export function bonusText(bonus: Bonus): string {
   const b = t.restoration.bonus;

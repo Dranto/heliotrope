@@ -38,7 +38,13 @@ function playedState(): GameState {
     butterfly: { nextIn: 0, visible: 4.5 },
     effects: [{ kind: 'bloom', remaining: 20 }],
     rngSeed: 123_456,
-    settings: { notation: 'scientific', reducedMotion: true, volume: 0.3, muted: true },
+    settings: {
+      notation: 'scientific',
+      reducedMotion: true,
+      volume: 0.3,
+      muted: true,
+      language: 'en',
+    },
   };
 }
 
@@ -305,5 +311,14 @@ describe('export and import', () => {
       foresters: 0,
       council: 0,
     });
+  });
+
+  it('migrates a v8 save to the French interface and keeps a saved language', () => {
+    const v8 = JSON.stringify({ version: 8, settings: { notation: 'scientific' } });
+    expect(deserialize(v8, 0)!.settings).toMatchObject({ notation: 'scientific', language: 'fr' });
+    const json = (language: unknown) =>
+      JSON.stringify({ version: STATE_VERSION, settings: { language } });
+    expect(deserialize(json('en'), 0)!.settings.language).toBe('en');
+    expect(deserialize(json('klingon'), 0)!.settings.language).toBe('fr');
   });
 });

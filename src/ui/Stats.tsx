@@ -3,7 +3,7 @@ import { formatNumber, formatPercent } from '../game/format';
 import { biodiversityBonus, clickValue, lightPerSecond } from '../game/production';
 import { seedBonus } from '../game/seasons';
 import { TALENT_LIST } from '../game/talents';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { Dialog } from './Dialog';
 import { useGameState } from './useGame';
 

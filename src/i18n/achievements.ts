@@ -1,7 +1,7 @@
 // Display texts of a Milestone, resolved from its id and condition.
 import type { AchievementDef } from '../game/achievements';
 import { formatNumber } from '../game/format';
-import { t } from './fr';
+import { t } from './index';
 
 /** Round thresholds read better without decimals: "1 M" rather than "1,00 M". */
 function round(value: number): string {

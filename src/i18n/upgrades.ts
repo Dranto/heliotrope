@@ -1,7 +1,7 @@
 // Display texts of an upgrade, resolved from its id and effect.
 import { formatNumber, formatPercent } from '../game/format';
 import type { GeneratorUpgradeTier, UpgradeDef } from '../game/upgrades';
-import { t, type UpgradeText } from './fr';
+import { t, type UpgradeText } from './index';
 
 export function upgradeText(upgrade: UpgradeDef): UpgradeText {
   const { id, effect } = upgrade;
