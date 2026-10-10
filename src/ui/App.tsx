@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { formatNumber } from '../game/format';
-import { lightPerSecond } from '../game/tick';
+import { lightPerSecond } from '../game/production';
 import { t } from '../i18n/fr';
 import { Flower } from './Flower';
 import { Generators } from './Generators';
+import { Options } from './Options';
 import { Scene } from './Scene';
+import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
 
 function formatDuration(seconds: number): string {
@@ -15,9 +17,12 @@ function formatDuration(seconds: number): string {
 export function App() {
   const store = useGameStore();
   const state = useGameState();
+  const [showOptions, setShowOptions] = useState(false);
   const [showWelcome, setShowWelcome] = useState(
     store.offlineSeconds >= 60 && store.offlineLight >= 1,
   );
+
+  const closeOptions = useCallback(() => setShowOptions(false), []);
 
   return (
     <div className="app">
@@ -39,6 +44,17 @@ export function App() {
             +{formatNumber(lightPerSecond(state))} {t.perSecond}
           </span>
         </div>
+        <button
+          type="button"
+          className="ghost menu-button"
+          aria-haspopup="dialog"
+          onClick={() => setShowOptions(true)}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h10" />
+          </svg>
+          {t.options.open}
+        </button>
       </header>
       <p className="tagline">{t.tagline}</p>
 
@@ -59,8 +75,13 @@ export function App() {
       <main className="layout">
         <Flower />
         <Scene />
-        <Generators />
+        <div className="column">
+          <Upgrades />
+          <Generators />
+        </div>
       </main>
+
+      {showOptions && <Options onClose={closeOptions} />}
     </div>
   );
 }

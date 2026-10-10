@@ -1,6 +1,7 @@
 import { applyOfflineProgress, MAX_OFFLINE_SECONDS } from './offline';
 import { createInitialState, type GameState } from './state';
-import { lightPerSecond, tick } from './tick';
+import { lightPerSecond } from './production';
+import { tick } from './tick';
 
 function withPanels(now: number): GameState {
   const base = createInitialState(now);

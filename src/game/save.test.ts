@@ -1,4 +1,13 @@
-import { clearSave, deserialize, loadGame, SAVE_KEY, saveGame, serialize } from './save';
+import {
+  clearSave,
+  deserialize,
+  exportSave,
+  importSave,
+  loadGame,
+  SAVE_KEY,
+  saveGame,
+  serialize,
+} from './save';
 import { createInitialState, STATE_VERSION, type GameState } from './state';
 
 function playedState(): GameState {
@@ -7,6 +16,7 @@ function playedState(): GameState {
     ...base,
     resources: { light: 42.5 },
     generators: { ...base.generators, pot: 3, balconyPanel: 1 },
+    upgrades: ['pot.1', 'gloves'],
     totalLight: 300,
     clicks: 120,
   };
@@ -42,6 +52,7 @@ describe('save', () => {
       generators: { pot: -1, balconyPanel: 2.5, rooftopGarden: null },
       totalLight: NaN,
       clicks: 'many',
+      upgrades: 'all',
     });
     expect(deserialize(json, 500)).toEqual(createInitialState(500));
   });
@@ -49,5 +60,55 @@ describe('save', () => {
   it('migrates a v1 placeholder save to a fresh game that keeps its timestamp', () => {
     const v1 = JSON.stringify({ version: 1, resources: { sunlight: 9000 }, lastUpdate: 1234 });
     expect(deserialize(v1, 0)).toEqual(createInitialState(1234));
+  });
+
+  it('keeps known upgrades once and drops unknown ones', () => {
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      upgrades: ['pot.1', 'cheat', 'pot.1', 42, 'sharedCompost'],
+    });
+    expect(deserialize(json, 0)?.upgrades).toEqual(['pot.1', 'sharedCompost']);
+  });
+
+  it('migrates a v2 save, keeping its progress and adding no upgrades', () => {
+    const v2 = JSON.stringify({
+      version: 2,
+      resources: { light: 77 },
+      generators: { pot: 4, greenhouse: 1 },
+      totalLight: 20_000,
+      clicks: 300,
+      lastUpdate: 5000,
+    });
+    const state = deserialize(v2, 0)!;
+    expect(state.version).toBe(STATE_VERSION);
+    expect(state.upgrades).toEqual([]);
+    expect(state.resources.light).toBe(77);
+    expect(state.generators.pot).toBe(4);
+    expect(state.generators.greenhouse).toBe(1);
+    expect(state.generators.arcology).toBe(0);
+    expect(state.totalLight).toBe(20_000);
+    expect(state.lastUpdate).toBe(5000);
+  });
+});
+
+describe('export and import', () => {
+  it('round-trips a game, resuming at the import time', () => {
+    const state = playedState();
+    const text = exportSave(state);
+    expect(text).toMatch(/^[A-Za-z0-9+/]+=*$/);
+    expect(importSave(text, 99_000)).toEqual({ ...state, lastUpdate: 99_000 });
+  });
+
+  it('ignores whitespace around a pasted save', () => {
+    const state = playedState();
+    const text = exportSave(state);
+    expect(importSave(`  ${text.slice(0, 10)}\n${text.slice(10)}  `, 0)?.clicks).toBe(120);
+  });
+
+  it('rejects text that is not a save', () => {
+    expect(importSave('', 0)).toBeNull();
+    expect(importSave('not base64 at all!', 0)).toBeNull();
+    expect(importSave(btoa('{"version": 99}'), 0)).toBeNull();
+    expect(importSave(btoa('\xff\xfe'), 0)).toBeNull();
   });
 });

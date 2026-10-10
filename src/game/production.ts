@@ -1,0 +1,122 @@
+// Production, click and cost formulas (docs/game-design.md §4, §5, §8). Pure functions shared
+// by the game, the UI and the balancing simulator.
+import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
+import type { GameState } from './state';
+import { UPGRADES, type UpgradeDef, type UpgradeId } from './upgrades';
+
+/** §5.4: each generator type owned at these counts adds BIODIVERSITY_STEP to global production. */
+export const BIODIVERSITY_THRESHOLDS = [10, 50, 100] as const;
+export const BIODIVERSITY_STEP = 0.02;
+
+function boughtUpgrades(state: GameState): UpgradeDef[] {
+  return state.upgrades.map((id) => UPGRADES[id]);
+}
+
+/** Multiplier from ×2 upgrades and synergies for one generator type. */
+export function generatorMultiplier(state: GameState, id: GeneratorId): number {
+  let factor = 1;
+  let synergyBonus = 0;
+  for (const { effect } of boughtUpgrades(state)) {
+    if (effect.kind === 'generatorMultiplier' && effect.generator === id) factor *= effect.factor;
+    if (effect.kind === 'synergy' && effect.generator === id) {
+      synergyBonus += effect.bonusPerUnit * state.generators[effect.source];
+    }
+  }
+  return factor * (1 + synergyBonus);
+}
+
+/** §5.4: +2% global production per generator type at 10, 50 and 100 units owned. */
+export function biodiversityBonus(state: GameState): number {
+  let steps = 0;
+  for (const id of GENERATOR_IDS) {
+    for (const threshold of BIODIVERSITY_THRESHOLDS) {
+      if (state.generators[id] >= threshold) steps += 1;
+    }
+  }
+  return steps * BIODIVERSITY_STEP;
+}
+
+/** Multiplier applied to every generator (biodiversity; Seeds and Milestones come later). */
+export function globalMultiplier(state: GameState): number {
+  return 1 + biodiversityBonus(state);
+}
+
+/** Light per second produced by all units of one generator, multipliers included. */
+export function generatorProduction(state: GameState, id: GeneratorId): number {
+  const owned = state.generators[id];
+  if (owned === 0) return 0;
+  return (
+    GENERATORS[id].baseProduction * owned * generatorMultiplier(state, id) * globalMultiplier(state)
+  );
+}
+
+/** Total Light per second. */
+export function lightPerSecond(state: GameState): number {
+  let total = 0;
+  for (const id of GENERATOR_IDS) total += generatorProduction(state, id);
+  return total;
+}
+
+/** §5.2: click = 1 × click multipliers + share of the production per second. */
+export function clickValue(state: GameState): number {
+  let multiplier = 1;
+  let fraction = 0;
+  for (const { effect } of boughtUpgrades(state)) {
+    if (effect.kind === 'clickMultiplier') multiplier *= effect.factor;
+    if (effect.kind === 'clickFromProduction') fraction += effect.fraction;
+  }
+  return multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
+}
+
+/**
+ * Cost of `count` units of a generator bought from the current amount owned:
+ * baseCost × 1.15^owned × (1.15^count − 1) / 0.15. For one unit: baseCost × 1.15^owned.
+ */
+export function generatorCost(state: GameState, id: GeneratorId, count = 1): number {
+  const first = GENERATORS[id].baseCost * COST_GROWTH ** state.generators[id];
+  if (count === 1) return first;
+  return (first * (COST_GROWTH ** count - 1)) / (COST_GROWTH - 1);
+}
+
+/** Largest number of units of a generator affordable with the Light in reserve. */
+export function maxAffordable(state: GameState, id: GeneratorId): number {
+  const first = generatorCost(state, id);
+  const light = state.resources.light;
+  if (light < first) return 0;
+  let count = Math.floor(Math.log(1 + (light * (COST_GROWTH - 1)) / first) / Math.log(COST_GROWTH));
+  // Guard against floating-point error at the boundary.
+  while (count > 1 && generatorCost(state, id, count) > light) count -= 1;
+  while (generatorCost(state, id, count + 1) <= light) count += 1;
+  return Math.max(1, count);
+}
+
+/**
+ * A generator is shown once the player has earned half its base cost this Season.
+ * Owning one keeps it shown.
+ */
+export function isGeneratorRevealed(state: GameState, id: GeneratorId): boolean {
+  return state.generators[id] > 0 || state.totalLight >= GENERATORS[id].baseCost / 2;
+}
+
+export function isUpgradeBought(state: GameState, id: UpgradeId): boolean {
+  return state.upgrades.includes(id);
+}
+
+/** An upgrade appears when its condition is met; conditions never become false in a Season. */
+export function isUpgradeUnlocked(state: GameState, id: UpgradeId): boolean {
+  const { owned, totalLight } = UPGRADES[id].condition;
+  if (totalLight !== undefined && state.totalLight < totalLight) return false;
+  if (owned) {
+    for (const [generator, count] of Object.entries(owned) as [GeneratorId, number][]) {
+      if (state.generators[generator] < count) return false;
+    }
+  }
+  return true;
+}
+
+/** Unlocked upgrades not bought yet, cheapest first (§5). */
+export function availableUpgrades(state: GameState): UpgradeDef[] {
+  return Object.values(UPGRADES)
+    .filter((u) => !isUpgradeBought(state, u.id) && isUpgradeUnlocked(state, u.id))
+    .sort((a, b) => a.cost - b.cost);
+}

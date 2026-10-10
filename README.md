@@ -20,6 +20,7 @@ npm run dev      # start the dev server at http://localhost:5173
 | `npm run dev`          | Dev server with hot reload                         |
 | `npm run build`        | Typecheck and build the production bundle (`dist`) |
 | `npm run preview`      | Serve the production build locally                 |
+| `npm run simulate`     | Print the balancing simulator's pacing table       |
 | `npm test`             | Run the test suite once (Vitest)                   |
 | `npm run test:watch`   | Run tests in watch mode                            |
 | `npm run lint`         | ESLint                                             |

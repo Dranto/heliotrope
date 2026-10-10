@@ -175,7 +175,7 @@ Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Th
 ### Formule
 
 ```
-grainesTotalesMéritées = floor( sqrt( lumièreTotaleToutesSaisons / 1e9 ) )
+grainesTotalesMéritées = floor( sqrt( lumièreTotaleToutesSaisons / 5e7 ) )
 grainesGagnées         = grainesTotalesMéritées − grainesDéjàObtenues
 bonusProduction        = +5 % par Graine possédée (additif)
 ```
@@ -184,9 +184,11 @@ Points de repère *(à valider)* :
 
 | Lumière totale cumulée | Graines | Bonus |
 |---|---|---|
-| 1 Md (1e9) | 1 | +5 % |
-| 100 Md (1e11) | 10 | +50 % |
-| 10 000 Md (1e13) | 100 | +500 % |
+| 50 M (5e7) | 1 | +5 % |
+| 5 Md (5e9) | 10 | +50 % |
+| 500 Md (5e11) | 100 | +500 % |
+
+> Première passe d'équilibrage (jalon 2, 2026-10-10) : le diviseur passe de 1e9 à 5e7. Avec 1e9, le simulateur n'atteignait 10 Graines qu'après plus de 8 h de jeu, ce qui contredisait la cible de ~4 h du §8 alors que le rythme des générateurs, lui, tombait juste. Le diviseur est le seul réglage qui corrige cet écart sans décaler l'arrivée des générateurs.
 
 - Le bouton Nouvelle Saison est disponible dès qu'on gagnerait au moins **1** Graine, mais l'interface conseille d'attendre d'en gagner au moins 10 pour la première (« La terre n'est pas encore prête »). On ne bloque pas, on conseille.
 - L'écran de confirmation montre clairement : ce qui sera perdu, les Graines gagnées, le bonus avant/après.
@@ -235,6 +237,22 @@ valeurClic          = 1 × multClic + pctClic × productionGlobale/s
 ### Outil de simulation
 
 L'équilibrage doit être vérifié par un **simulateur sans interface** qui rejoue une stratégie simple (acheter à chaque instant l'option au meilleur ratio coût / gain de production) et sort le moment de chaque événement du tableau ci-dessus. Il réutilise exactement les mêmes fonctions de calcul et les mêmes données que le jeu. Tout changement de chiffre dans ce document devrait être accompagné d'une sortie du simulateur.
+
+**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Les Jalons et le Papillon doré (jalon 4) ne sont pas encore simulés : ils accéléreront la partie et demanderont une nouvelle passe.
+
+Sortie actuelle :
+
+| Événement | Cible | Simulé | Écart |
+|---|---|---|---|
+| 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok |
+| 1ᵉʳ Panneau de balcon | ~1 min | 44 s | −26 % |
+| 1ᵉʳ Potager sur le toit | ~4 min | 5,0 min | +25 % |
+| 1ʳᵉ Serre communautaire | ~12 min | 14,7 min | +23 % |
+| 1ʳᵉ Ferme verticale | ~30 min | 26,5 min | −12 % |
+| 1ʳᵉ Centrale à miroirs | ~1 h | 47 min | −21 % |
+| 1ʳᵉ Canopée urbaine | ~2 h | 1 h 30 | −25 % |
+| 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 04 | −13 % |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~4 h | 4 h 10 | +4 % |
 
 ### Affichage des nombres
 

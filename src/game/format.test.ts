@@ -1,4 +1,4 @@
-import { formatNumber } from './format';
+import { formatNumber, formatPercent } from './format';
 
 // Expected strings use "_" for the narrow no-break space to keep them readable.
 const s = (text: string) => text.replaceAll('_', ' ');
@@ -31,5 +31,16 @@ describe('formatNumber', () => {
 
   it('passes non-finite values through', () => {
     expect(formatNumber(Infinity)).toBe('Infinity');
+  });
+});
+
+describe('formatPercent', () => {
+  it.each([
+    [0.05, '5'],
+    [0.01, '1'],
+    [0.025, '2,5'],
+    [0.48, '48'],
+  ])('formats %d as %s', (ratio, expected) => {
+    expect(formatPercent(ratio)).toBe(expected);
   });
 });

@@ -1,5 +1,6 @@
 import { GENERATOR_IDS } from './generators';
 import { RESOURCE_IDS } from './resources';
+import { isUpgradeId, type UpgradeId } from './upgrades';
 import { createInitialState, STATE_VERSION, type GameState } from './state';
 
 export const SAVE_KEY = 'heliotrope.save';
@@ -11,6 +12,8 @@ const migrations: Record<number, Migration> = {
   // v1 only had the placeholder "sunlight" resource, which was free and has no equivalent in
   // the real game. Drop it so players start the real game fresh.
   1: ({ resources: _placeholder, ...rest }) => ({ ...rest, version: 2 }),
+  // v3 adds bought upgrades; v2 players had none.
+  2: (raw) => ({ ...raw, upgrades: [], version: 3 }),
 };
 
 function isFiniteNumber(value: unknown): value is number {
@@ -56,10 +59,37 @@ export function deserialize(json: string, now: number): GameState | null {
     const value = generators?.[id];
     if (isCount(value)) state.generators[id] = value;
   }
+  if (Array.isArray(data.upgrades)) {
+    state.upgrades = [...new Set<UpgradeId>(data.upgrades.filter(isUpgradeId))];
+  }
   if (isFiniteNumber(data.totalLight) && data.totalLight >= 0) state.totalLight = data.totalLight;
   if (isCount(data.clicks)) state.clicks = data.clicks;
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
   return state;
+}
+
+/** Export format (§9.4): the save JSON as UTF-8, base64-encoded so it pastes as one word. */
+export function exportSave(state: GameState): string {
+  const bytes = new TextEncoder().encode(serialize(state));
+  return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''));
+}
+
+/**
+ * Read an exported save. Returns null when the text is not a valid save. The imported game
+ * resumes from `now`: importing never grants offline progress.
+ */
+export function importSave(text: string, now: number): GameState | null {
+  let json: string;
+  try {
+    const binary = atob(text.replace(/\s+/g, ''));
+    json = new TextDecoder('utf-8', { fatal: true }).decode(
+      Uint8Array.from(binary, (char) => char.charCodeAt(0)),
+    );
+  } catch {
+    return null;
+  }
+  const state = deserialize(json, now);
+  return state && { ...state, lastUpdate: now };
 }
 
 export function saveGame(state: GameState, storage: Storage = localStorage): void {

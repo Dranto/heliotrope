@@ -48,3 +48,13 @@ export function formatNumber(value: number): string {
   const sign = value < 0 ? '-' : '';
   return sign + formatAbs(Math.abs(value));
 }
+
+/** A ratio as a French percentage number, without the sign: 0.05 -> "5", 0.025 -> "2,5". */
+export function formatPercent(ratio: number): string {
+  return formatNumber(Math.round(ratio * 1000) / 10);
+}
+
+/** Prices are shown rounded up so the displayed price is always enough to buy. */
+export function formatCost(cost: number): string {
+  return formatNumber(Math.ceil(cost));
+}
