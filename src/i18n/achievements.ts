@@ -1,5 +1,5 @@
 // Display texts of a Milestone, resolved from its id and condition.
-import type { AchievementDef } from '../game/achievements';
+import { LATE_HARVEST_SEEDS, UPGRADE_SETS, type AchievementDef } from '../game/achievements';
 import { formatNumber } from '../game/format';
 import { t } from './fr';
 
@@ -17,8 +17,16 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
   switch (condition.kind) {
     case 'allTimeLight':
       return describe.allTimeLight(round(condition.amount));
+    case 'lightPerSecond':
+      return describe.lightPerSecond(round(condition.amount));
+    case 'clickValue':
+      return describe.clickValue(round(condition.amount));
     case 'owned':
       return describe.owned(t.generators[condition.generator].name, condition.count);
+    case 'onlyGenerator':
+      return describe.onlyGenerator(t.generators[condition.generator].name, condition.count);
+    case 'noBuildings':
+      return describe.noBuildings(round(condition.amount));
     case 'clicks':
       return describe.clicks(round(condition.count));
     case 'butterflies':
@@ -27,9 +35,41 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.seasons(condition.count);
     case 'everyGenerator':
       return describe.everyGenerator(condition.count);
+    case 'upgrades':
+      return describe.upgrades(condition.count);
+    case 'upgradeSet':
+      if (condition.count === 1) return describe.firstThread;
+      return condition.set === 'synergies'
+        ? describe.goldenWeb(UPGRADE_SETS.synergies.length)
+        : describe.goldenHands(UPGRADE_SETS.clicks.length);
+    case 'parcels':
+      return describe.parcels(condition.count);
+    case 'projects':
+      return describe.projects(condition.count);
+    case 'talents':
+      return describe.talents(condition.count);
+    case 'cooperativePurchases':
+      return describe.cooperativePurchases(round(condition.count));
+    case 'playSeconds':
+      return describe.playHours(condition.seconds / 3600);
+    case 'seasonSeconds':
+      return describe.longSeason(condition.seconds / 3600);
+    case 'swiftSeason':
+      return describe.swiftSeason(condition.seeds, condition.seconds / 60);
     case 'idle':
       return describe.idle;
     case 'action':
-      return id === 'earlySowing' ? describe.earlySowing : '';
+      switch (id) {
+        case 'earlySowing':
+          return describe.earlySowing;
+        case 'lateHarvest':
+          return describe.lateHarvest(LATE_HARVEST_SEEDS);
+        case 'goldenPollen':
+          return describe.goldenPollen;
+        case 'justInTime':
+          return describe.justInTime;
+        default:
+          return '';
+      }
   }
 }
