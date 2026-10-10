@@ -1,4 +1,10 @@
-import { formatNumber, formatPercent, setNotation } from './format';
+import {
+  formatDecimal,
+  formatNumber,
+  formatPercent,
+  setNotation,
+  setNumberLanguage,
+} from './format';
 
 // Expected strings use "_" for the narrow no-break space to keep them readable.
 const s = (text: string) => text.replaceAll('_', ' ');
@@ -59,5 +65,30 @@ describe('scientific notation option (§8)', () => {
     expect(formatNumber(2e9)).toBe('2,00e9');
     setNotation('short');
     expect(formatNumber(2e9)).toBe(s('2,00_Md'));
+  });
+});
+
+describe('English numbers', () => {
+  afterEach(() => setNumberLanguage('fr'));
+
+  it.each([
+    [0.1, '0.1'],
+    [12_345, '12,345'],
+    [1_234_567, '1.23_M'],
+    [45_600_000_000, '45.6_B'],
+    [7.89e12, '7.89_T'],
+    [2e27, '2.00_Oc'],
+    [1.23e30, '1.23e30'],
+  ])('formats %d as %s', (value, expected) => {
+    setNumberLanguage('en');
+    expect(formatNumber(value)).toBe(s(expected));
+  });
+
+  it('writes percentages and factors with a decimal point', () => {
+    setNumberLanguage('en');
+    expect(formatPercent(0.025)).toBe('2.5');
+    expect(formatDecimal(1.5)).toBe('1.5');
+    setNumberLanguage('fr');
+    expect(formatDecimal(1.5)).toBe('1,5');
   });
 });

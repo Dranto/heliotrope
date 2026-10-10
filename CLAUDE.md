@@ -10,11 +10,23 @@ a design decision changes, update that document in the same PR.
 ## Commands
 
 - `npm run dev`: dev server
-- `npm run check`: lint, format check, typecheck and tests (run before every push)
-- `npm test`: tests only; `npx vitest run path/to/file.test.ts` for one file
+- `npm run check`: lint, format check, typecheck and tests (run before every push). Lint,
+  Prettier and tsc cache in `node_modules/.cache/`, so a re-run only checks changed files
+- `npm test`: tests only; `npx vitest run path/to/file.test.ts` for one file (fast; use it while
+  iterating, then `npm run check` once before pushing)
 - `npm run build`: production build
 - `npm run simulate [clicksPerSecond]`: print the balancing simulator's pacing table
 - `npm run format`: fix formatting
+- `npm run -s doc -- design [section]`: print one section of `docs/game-design.md` (e.g. `7.1`),
+  or its table of contents with line counts; `npm run -s doc -- roadmap [heading]` for the roadmap
+
+## Reading efficiently
+
+- The design doc is ~690 lines and the roadmap ~220: read the section you need with
+  `npm run -s doc`, not the whole file. The `§` numbers in this file are design doc sections.
+- Large files (`src/ui/App.css`, `Neighbourhood.tsx`, `RestorationArt.tsx`, `Flower.tsx`): grep
+  for the selector or symbol, then read that range.
+- Never read `package-lock.json` or `dist/`.
 
 ## Layout
 
@@ -42,20 +54,24 @@ a design decision changes, update that document in the same PR.
     targets within ±30%
   - `store.ts`: `GameStore`, which owns live state, the tick interval and autosave
   - `format.ts`: number formatting for display (French notation, design doc §8)
-- `src/i18n/fr.ts`: every player-facing text (UI strings, generator, upgrade and Milestone names,
-  flavour lines).
+- `src/i18n/`: every player-facing text (UI strings, generator, upgrade and Milestone names,
+  flavour lines). `fr.ts` is the reference and defines `Texts`; `en.ts` has the same shape. Read
+  texts through `t` from `src/i18n/index.ts`, which follows the language chosen in the Options;
+  add a key to both files.
 - `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
   rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
   the restored parcels and project marks, `Restoration.tsx` is the panel under the map.
   `SeasonTree.tsx` and `seasonTree.ts` draw the Tree of Seasons screen; `Cooperatives.tsx` is their
   panel, `CooperativeArt.tsx` and `cooperativeMap.ts` their cargo bikes on the map.
-  `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes. Read state with `useGameState()`, change it with
-  `store.dispatch((s) => action(s))`.
+  `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes.
+  Read state with `useGameState()`, change it with `store.dispatch((s) => action(s))`.
 
 ## Conventions
 
 - Code, comments and commit messages in English.
 - One branch and one draft PR per task. Never push to `main`. CI must be green before review.
+- Many threads merge in parallel: before every push and before merging, merge the latest `main`
+  into your branch and resolve conflicts yourself, without waiting to be asked.
 - Game logic changes come with unit tests in `src/game/*.test.ts`.
 - State transitions are pure: never mutate `GameState` in place.
 - Time-based logic uses elapsed real time (`dtSeconds`), never a fixed tick count, so throttled

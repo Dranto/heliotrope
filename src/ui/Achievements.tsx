@@ -5,7 +5,7 @@ import {
   type AchievementDef,
 } from '../game/achievements';
 import { formatNumber, formatPercent } from '../game/format';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { achievementDescription, achievementName } from '../i18n/achievements';
 import { Dialog } from './Dialog';
 import { useGameState } from './useGame';

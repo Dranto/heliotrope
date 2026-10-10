@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ACHIEVEMENTS, bonusPerAchievement, type AchievementId } from '../game/achievements';
 import { formatNumber, formatPercent } from '../game/format';
 import { achievementDescription, achievementName } from '../i18n/achievements';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { useGameState } from './useGame';
 
 /** How long one medallion stays on screen, its bloom and fade included. */

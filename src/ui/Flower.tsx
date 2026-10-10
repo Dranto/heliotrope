@@ -12,7 +12,7 @@ import { formatNumber } from '../game/format';
 import { visualSeason } from '../game/phases';
 import { clickValue } from '../game/production';
 import { clickHeliotrope } from '../game/tick';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import {
   ARCH_ORNAMENTS,
   MAX_POT_BANDS,

@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import { LANGUAGES } from '../game/format';
 import { exportSave } from '../game/save';
 import type { Settings } from '../game/state';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { Dialog } from './Dialog';
 import { useGameState, useGameStore } from './useGame';
 
 type ResetStep = 'idle' | 'confirm' | 'final';
 
 /**
- * Options panel (docs/game-design.md §8, §9.4, §10.2): number notation, reduced motion, sound, manual
+ * Options panel (docs/game-design.md §8, §9.4, §10.2, §14 Q1): language, number notation, reduced motion, sound, manual
  * save, export, import, full reset.
  */
 export function Options({ onClose }: { onClose: () => void }) {
@@ -61,6 +62,20 @@ export function Options({ onClose }: { onClose: () => void }) {
 
       <section>
         <h3>{t.options.displayTitle}</h3>
+        <fieldset className="choice">
+          <legend>{t.options.language}</legend>
+          {LANGUAGES.map((language) => (
+            <label key={language} lang={language}>
+              <input
+                type="radio"
+                name="language"
+                checked={settings.language === language}
+                onChange={() => change({ language })}
+              />
+              {t.languageNames[language]}
+            </label>
+          ))}
+        </fieldset>
         <fieldset className="choice">
           <legend>{t.options.notation}</legend>
           {(['short', 'scientific'] as const).map((notation) => (

@@ -4,7 +4,7 @@ import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restora
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import {
   isCooperativeActive,
   unlockedCooperatives,

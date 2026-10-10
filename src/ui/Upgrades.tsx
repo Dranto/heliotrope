@@ -3,7 +3,7 @@ import { formatCost } from '../game/format';
 import { availableUpgrades } from '../game/production';
 import { buyUpgrade, canBuyUpgrade } from '../game/tick';
 import type { UpgradeId } from '../game/upgrades';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { upgradeEffectText, upgradeText } from '../i18n/upgrades';
 import { UpgradeIcon } from './UpgradeIcon';
 import { useGameState, useGameStore } from './useGame';
