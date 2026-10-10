@@ -2830,3 +2830,23 @@ button {
   color: var(--ink-soft);
   vertical-align: middle;
 }
+
+/* The enriched WebGL map (§10.4): its canvas, and the SVG layer over it for what is touched. */
+.pixi-map,
+.pixi-canvas,
+.pixi-map > svg {
+  position: absolute;
+  inset: 0;
+}
+
+.pixi-map > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pixi-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

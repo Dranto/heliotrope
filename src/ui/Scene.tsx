@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react';
 import type { ParcelId } from '../game/parcels';
 import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restoration';
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
@@ -23,9 +32,14 @@ import {
   VIEWS,
   type View,
 } from './neighbourhood';
+import { PIXI_PARCELS } from './pixi/model';
+import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
+
+/** The enriched WebGL map (§10.4), downloaded only when chosen in the Options. */
+const PixiMap = lazy(() => import('./pixi/PixiMap'));
 
 /** The Golden Butterfly (§9.2), drawn with fine lines like the rest of the botanical motifs. */
 function ButterflyArt() {
@@ -178,6 +192,28 @@ export function Scene({
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
   // map only redraws when the colour visibly changes.
   const greenness = Math.round(Math.min(1, Math.log10(1 + lightPerSecond(state)) / 5) * 20) / 20;
+  const renderer = useMapRenderer();
+  const [webglFailed, setWebglFailed] = useState(false);
+  const enhanced = renderer === 'pixi' && !webglFailed;
+  // The WebGL map draws some parcels itself; the SVG layer over it keeps the others.
+  const enhancedGround = useMemo(
+    () => <ParcelGround parcels={parcels.filter((id) => !PIXI_PARCELS.includes(id))} />,
+    [parcels],
+  );
+  const svgMap = (
+    <Neighbourhood
+      generators={state.generators}
+      camera={camera}
+      width={width}
+      height={height}
+      upgrades={state.upgrades}
+      phase={phase}
+      greenness={greenness}
+      reduced={state.settings.reducedMotion}
+      ground={ground}
+      overlay={overlay}
+    />
+  );
 
   return (
     <figure
@@ -187,18 +223,27 @@ export function Scene({
       data-challenge={state.challenge ?? undefined}
     >
       <div className="scene-map" ref={mapRef}>
-        <Neighbourhood
-          generators={state.generators}
-          camera={camera}
-          width={width}
-          height={height}
-          upgrades={state.upgrades}
-          phase={phase}
-          greenness={greenness}
-          reduced={state.settings.reducedMotion}
-          ground={ground}
-          overlay={overlay}
-        />
+        {enhanced ? (
+          <Suspense fallback={svgMap}>
+            <PixiMap
+              generators={state.generators}
+              upgrades={state.upgrades}
+              parcels={parcels}
+              phase={phase}
+              season={season}
+              greenness={greenness}
+              reduced={reduced}
+              camera={camera}
+              width={width}
+              height={height}
+              ground={enhancedGround}
+              overlay={overlay}
+              onFail={() => setWebglFailed(true)}
+            />
+          </Suspense>
+        ) : (
+          svgMap
+        )}
         <div className="map-flower" style={{ left: flower.x, top: flower.y, width: flower.width }}>
           <Flower />
         </div>
