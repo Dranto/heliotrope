@@ -1,5 +1,6 @@
 // Headless balancing simulator (docs/game-design.md §8). Replays a simple active strategy with
 // the game's own formulas and data, and reports when each pacing event of §8 happens.
+import { catchButterfly } from './butterfly';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { availableUpgrades, clickValue, generatorCost, lightPerSecond } from './production';
 import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, startNewSeason } from './seasons';
@@ -13,6 +14,9 @@ export const ADVISED_SEASON_LIGHT = lightForSeeds(ADVISED_FIRST_SEASON_SEEDS);
 /** Click rate of the reference active player used for the §8 pacing table. */
 export const REFERENCE_CLICKS_PER_SECOND = 2.5;
 
+/** Share of Golden Butterflies the reference player catches. */
+export const REFERENCE_BUTTERFLY_CATCH_RATE = 1;
+
 export interface SimulationOptions {
   /** State to start from; a fresh game by default. */
   state?: GameState;
@@ -24,6 +28,8 @@ export interface SimulationOptions {
   maxSeconds?: number;
   /** Longest uninterrupted wait before options are re-evaluated (new upgrades may unlock). */
   maxStepSeconds?: number;
+  /** Share of Golden Butterflies the player catches (§9.2), deterministic: 0.5 = every other. */
+  butterflyCatchRate?: number;
 }
 
 export interface SimulationResult {
@@ -92,8 +98,26 @@ export function simulate({
   clicksPerSecond = REFERENCE_CLICKS_PER_SECOND,
   maxSeconds = 5 * 3600,
   maxStepSeconds = 10,
+  butterflyCatchRate = REFERENCE_BUTTERFLY_CATCH_RATE,
 }: SimulationOptions = {}): SimulationResult {
   let state = start;
+  let butterfliesSeen = 0;
+  let watching = false;
+  /** Catch the butterfly on screen, or let it fly away, to match the catch rate. */
+  const watchButterfly = () => {
+    if (state.butterfly.visible <= 0) {
+      watching = false;
+      return;
+    }
+    if (watching) return;
+    watching = true;
+    butterfliesSeen += 1;
+    const caughtBefore = Math.floor((butterfliesSeen - 1) * butterflyCatchRate);
+    if (Math.floor(butterfliesSeen * butterflyCatchRate) > caughtBefore) {
+      state = catchButterfly(state)?.state ?? state;
+      watching = false;
+    }
+  };
   let seconds = 0;
   const firstGenerator: SimulationResult['firstGenerator'] = {};
   let advisedSeason: number | undefined;
@@ -109,6 +133,7 @@ export function simulate({
       state = earnLight(tick(state, dt), clicks * clickValue(state));
       state = { ...state, clicks: state.clicks + clicks };
       seconds += dt;
+      watchButterfly();
       // Tiny floating-point leftovers: top up rather than looping on sub-microsecond waits.
       if (price - state.resources.light > 1e-9 * price) {
         if (advisedSeason === undefined && state.totalLight >= ADVISED_SEASON_LIGHT) {

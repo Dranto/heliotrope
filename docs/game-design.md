@@ -81,7 +81,7 @@ Le MVP se limite volontairement à **une seule monnaie de jeu** (la Lumière). U
 
 ## 4. Générateurs
 
-Huit générateurs, du balcon à la ville entière. Les valeurs de base reprennent la progression éprouvée de Cookie Clicker (coût ×~10 et production ×~6 par palier), qui donne un rythme où chaque nouveau palier rentabilise rapidement son prix.
+Huit générateurs, du balcon à la ville entière. Les valeurs de base partent de la progression éprouvée de Cookie Clicker (coût ×~10 et production ×~6 par palier), qui donne un rythme où chaque nouveau palier rentabilise rapidement son prix. Les quatre derniers paliers coûtent plus cher depuis le jalon 4 (voir la note sous le tableau).
 
 | # | Nom | Texte d'ambiance | Coût de base | Production de base (Lumière/s) | Rentabilité du 1er exemplaire |
 |---|---|---|---|---|---|
@@ -89,10 +89,12 @@ Huit générateurs, du balcon à la ville entière. Les valeurs de base reprenne
 | 2 | Panneau de balcon | « Un panneau, une prise, un début. » | 100 | 1 | 100 s |
 | 3 | Potager sur le toit | « Les tomates aiment la vue. » | 1 100 | 8 | 138 s |
 | 4 | Serre communautaire | « Chacun apporte ses semis. » | 12 000 | 47 | 255 s |
-| 5 | Ferme verticale | « Douze étages de laitues et de lumière. » | 130 000 | 260 | 500 s |
-| 6 | Centrale à miroirs | « Mille miroirs, un seul soleil. » | 1 400 000 | 1 400 | 1 000 s |
-| 7 | Canopée urbaine | « Les rues deviennent des sous-bois. » | 20 000 000 | 7 800 | 2 564 s |
-| 8 | Arcologie vivante | « Une ville qui respire. » | 330 000 000 | 44 000 | 7 500 s |
+| 5 | Ferme verticale | « Douze étages de laitues et de lumière. » | 200 000 | 260 | 769 s |
+| 6 | Centrale à miroirs | « Mille miroirs, un seul soleil. » | 3 000 000 | 1 400 | 2 143 s |
+| 7 | Canopée urbaine | « Les rues deviennent des sous-bois. » | 50 000 000 | 7 800 | 6 410 s |
+| 8 | Arcologie vivante | « Une ville qui respire. » | 800 000 000 | 44 000 | 18 182 s |
+
+> Passe d'équilibrage du jalon 4 (2026-10-10) : les Jalons (+1 % chacun) et le Papillon doré accélèrent surtout le milieu de partie. Avec les coûts d'origine (130 000, 1,4 M, 20 M et 330 M), le simulateur atteignait la Centrale à miroirs en 27 min au lieu d'une heure et la Canopée en 49 min au lieu de deux. Les coûts de base des générateurs 5 à 8 sont donc multipliés par 1,5, 2, 2,5 et 2,5 (arrondis), leurs améliorations ×2 suivent puisqu'elles sont indexées sur le coût de base, et la Floraison passe de ×7 à ×3 (§9.2). Les productions ne changent pas.
 
 **Règles.**
 
@@ -161,6 +163,12 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 
 **Journal du quartier.** Un fil de courts messages narratifs déclenchés par les paliers (« Mme Okafor a ramené des boutures de sa sœur. », « La rue des Tilleuls a voté pour un jardin partagé. »). Il porte l'histoire sans jamais bloquer le jeu.
 
+**Implémentation (jalon 4).** `src/game/phases.ts` et `src/game/journal.ts`.
+
+- La scène suit la phase : le ciel passe de l'aube (phase 1) au plein midi (phase 2) puis à la fin d'après-midi (phase 3), et le nom de la phase s'affiche en légende.
+- Phase 4 : à partir de la 2ᵉ Saison, la scène prend la teinte d'une saison, en commençant par le printemps puis en suivant le cycle (printemps, été, automne, hiver). La 1ʳᵉ Saison n'a pas de teinte propre. Le feuillage et le ciel changent de couleur ; rien d'autre ne change.
+- Le Journal compte 18 entrées déclenchées par la Lumière de la Saison, les premiers exemplaires de chaque bâtiment, le premier Papillon doré, les Jalons et les Saisons accomplies. Les entrées sont **conservées d'une Saison à l'autre** pour que l'histoire avance au lieu de se répéter ; les Saisons suivantes en débloquent de nouvelles. La dernière entrée s'affiche sous la scène, le carnet complet s'ouvre à la demande, et la fenêtre de retour hors ligne reprend la dernière entrée.
+
 ---
 
 ## 7. Prestige : les Saisons
@@ -170,7 +178,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Thématiquement : l'hiver passe, on replante tout, mais la terre garde la mémoire de ce qui a poussé.
 
 **Remis à zéro :** Lumière, générateurs, améliorations, phase visuelle.
-**Conservé :** Graines d'Héliotrope, Jalons, statistiques globales, options.
+**Conservé :** Graines d'Héliotrope, Jalons, Journal du quartier, statistiques globales, options.
 
 ### Formule
 
@@ -217,9 +225,10 @@ productionGlobale/s = Σ_types( prodBase × possédés × multTypes )
                       × (1 + 0,05 × graines)
                       × (1 + 0,01 × jalons)
                       × (1 + bonusBiodiversité)
-                      × multÉvénement            // Papillon doré
+                      × multÉvénement            // Floraison du Papillon doré : ×3
 coût(n)             = coûtBase × 1,15^n
-valeurClic          = 1 × multClic + pctClic × productionGlobale/s
+valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
+                      × multPollinisation         // Papillon doré : ×100
 ```
 
 ### Courbes et intentions
@@ -246,23 +255,23 @@ valeurClic          = 1 × multClic + pctClic × productionGlobale/s
 
 L'équilibrage doit être vérifié par un **simulateur sans interface** qui rejoue une stratégie simple (acheter à chaque instant l'option au meilleur ratio coût / gain de production) et sort le moment de chaque événement du tableau ci-dessus. Il réutilise exactement les mêmes fonctions de calcul et les mêmes données que le jeu. Tout changement de chiffre dans ce document devrait être accompagné d'une sortie du simulateur.
 
-**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Les Jalons et le Papillon doré (jalon 4) ne sont pas encore simulés : ils accéléreront la partie et demanderont une nouvelle passe.
+**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat varie peu selon la graine : sur cinq graines, aucun événement ne bouge de plus de 10 points de pourcentage.
 
-Sortie actuelle (jalon 3) :
+Sortie actuelle (jalon 4) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
 | 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 6 s |
-| 1ᵉʳ Panneau de balcon | ~1 min | 44,6 s | −26 % | 43,7 s |
-| 1ᵉʳ Potager sur le toit | ~4 min | 5,0 min | +25 % | 4,1 min |
-| 1ʳᵉ Serre communautaire | ~12 min | 14,7 min | +23 % | 10,8 min |
-| 1ʳᵉ Ferme verticale | ~30 min | 26,5 min | −12 % | 18,6 min |
-| 1ʳᵉ Centrale à miroirs | ~1 h | 47 min | −21 % | 32 min |
-| 1ʳᵉ Canopée urbaine | ~2 h | 1 h 30 | −25 % | 1 h 01 |
-| 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 04 | −13 % | 2 h 03 |
-| Saison conseillée (5 Md de Lumière dans la Saison) | ~4 h | 4 h 10 | +4 % | 2 h 48 |
+| 1ᵉʳ Panneau de balcon | ~1 min | 44,6 s | −26 % | 43,3 s |
+| 1ᵉʳ Potager sur le toit | ~4 min | 4,9 min | +23 % | 4,6 min |
+| 1ʳᵉ Serre communautaire | ~12 min | 13,5 min | +12 % | 9,2 min |
+| 1ʳᵉ Ferme verticale | ~30 min | 23,8 min | −21 % | 15,0 min |
+| 1ʳᵉ Centrale à miroirs | ~1 h | 44 min | −27 % | 30 min |
+| 1ʳᵉ Canopée urbaine | ~2 h | 1 h 40 | −17 % | 1 h 03 |
+| 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 57 | +13 % | 2 h 32 |
+| Saison conseillée (5 Md de Lumière dans la Saison) | ~4 h | 4 h 14 | +6 % | 2 h 42 |
 
-La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+Le joueur simulé atteint 20 Jalons et attrape 44 Papillons pendant sa 1ʳᵉ Saison. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 ### Affichage des nombres
 
@@ -292,6 +301,16 @@ Un papillon traverse l'écran à intervalle aléatoire (**toutes les 3 à 8 min*
 
 C'est la principale raison de garder l'onglet ouvert et de jouer activement, sans être obligatoire.
 
+> Jalon 4 : la Floraison passe de ×7 à ×3. À ×7, le simulateur arrivait à la Centrale à miroirs en 27 min au lieu d'une heure, même avec des générateurs plus chers (voir §4 et §8).
+
+**Implémentation (jalon 4).** `src/game/butterfly.ts`. Précisions retenues :
+
+- Le papillon vient à partir de la **phase 2** (Le Quartier, §6), comme prévu au tableau des phases.
+- Le hasard vient d'un générateur pseudo-aléatoire dont la graine est dans la sauvegarde : chaque transition reste une fonction pure, testable et reproductible, et recharger la page ne permet pas de retirer un effet.
+- Attraper le même effet pendant qu'il dure le relance pour sa durée complète, sans cumul.
+- Hors ligne, le papillon et les effets en cours sont **mis en pause** : ils ne produisent rien pendant l'absence et reprennent où ils en étaient au retour.
+- Avec les animations réduites, le papillon attend immobile au lieu de traverser la scène.
+
 ### 9.3 Jalons (succès)
 
 Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Familles :
@@ -302,6 +321,16 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 - Papillons attrapés (1, 10, 50)
 - Saisons accomplies (1, 5, 10)
 - Quelques jalons cachés amusants (ex. « Photosynthèse lente » : ne rien acheter pendant 10 min)
+
+**Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons :
+
+- Lumière totale gagnée sur toutes les Saisons : 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn (6).
+- 1, 50 et 100 exemplaires de chacun des 8 générateurs, dans la Saison en cours (24).
+- Clics (3), Papillons attrapés (3) et Saisons accomplies (3).
+- « Mosaïque » : 10 exemplaires de chaque générateur.
+- Cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées) et « Jardin sauvage » (100 exemplaires de chaque générateur).
+
+Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce chaque jalon atteint.
 
 ### 9.4 Sauvegarde
 
@@ -343,12 +372,14 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
-| **Options** | Notation des nombres, volume, sauvegarde manuelle, export / import, remise à zéro | Toujours |
+| **Options** | Notation des nombres, animations réduites, sauvegarde manuelle, export / import, remise à zéro | Toujours |
 | **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
+
+Le jeu n'a pas encore de son : le réglage du volume arrivera avec les sons (§13). Les Options proposent à la place de réduire les animations, en plus du réglage `prefers-reduced-motion` de l'appareil (§10.4).
 
 ### 10.3 Mobile
 
-Même contenu, une colonne : compteur en haut, fleur + scène au centre, barre d'onglets en bas (Récolte / Bâtir / Améliorer / Plus). Les cibles tactiles font au moins 44 px.
+Même contenu, une colonne : compteur en haut, fleur + scène au centre, barre d'onglets en bas (Récolte / Bâtir / Améliorer / Plus). Les cibles tactiles font au moins 44 px. *Livré au jalon 4 : « Plus » rassemble les Jalons, les Saisons, les Statistiques et les Options.*
 
 ### 10.4 Direction artistique
 
@@ -445,6 +476,8 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 
 **Critère de fin :** le jeu est présentable à des joueurs extérieurs.
 
+*Livré (jalon 4) : 43 Jalons et leur écran, Papillon doré, Journal du quartier, ciel par phase et teintes de saison, barre d'onglets mobile, options d'affichage, fenêtres accessibles au clavier, sauvegarde v5 ; nouvelle passe d'équilibrage (§4, §8, §9.2).*
+
 **Le MVP = M1 à M4.**
 
 ---
@@ -458,6 +491,7 @@ Idées à reprendre quand le MVP est stable, par ordre de priorité proposé :
 3. **Cycle jour / nuit et batteries.** La production solaire varie au fil d'une journée de jeu ; des batteries stockent le surplus. À tester avec prudence : ne doit jamais punir le joueur absent.
 4. **Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.
 5. **Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.
+6. **Sons discrets** (§1) et leur réglage de volume dans les Options.
 
 ---
 

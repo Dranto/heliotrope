@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { exportSave } from '../game/save';
+import type { Settings } from '../game/state';
 import { t } from '../i18n/fr';
 import { Dialog } from './Dialog';
-import { useGameStore } from './useGame';
+import { useGameState, useGameStore } from './useGame';
 
 type ResetStep = 'idle' | 'confirm' | 'final';
 
-/** Options panel (docs/game-design.md §9.4, §10.2): manual save, export, import, full reset. */
+/**
+ * Options panel (docs/game-design.md §8, §9.4, §10.2): number notation, reduced motion, manual
+ * save, export, import, full reset.
+ */
 export function Options({ onClose }: { onClose: () => void }) {
   const store = useGameStore();
+  const { settings } = useGameState();
   const [exported] = useState(() => exportSave(store.getState()));
   const [importText, setImportText] = useState('');
   const [message, setMessage] = useState('');
@@ -32,6 +37,11 @@ export function Options({ onClose }: { onClose: () => void }) {
     }
   }
 
+  function change(patch: Partial<Settings>) {
+    store.dispatch((s) => ({ ...s, settings: { ...s.settings, ...patch } }));
+    store.save();
+  }
+
   function reset() {
     store.reset();
     setResetStep('idle');
@@ -48,6 +58,33 @@ export function Options({ onClose }: { onClose: () => void }) {
       <p className="options-message" role="status">
         {message}
       </p>
+
+      <section>
+        <h3>{t.options.displayTitle}</h3>
+        <fieldset className="choice">
+          <legend>{t.options.notation}</legend>
+          {(['short', 'scientific'] as const).map((notation) => (
+            <label key={notation}>
+              <input
+                type="radio"
+                name="notation"
+                checked={settings.notation === notation}
+                onChange={() => change({ notation })}
+              />
+              {notation === 'short' ? t.options.notationShort : t.options.notationScientific}
+            </label>
+          ))}
+        </fieldset>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={settings.reducedMotion}
+            onChange={(event) => change({ reducedMotion: event.target.checked })}
+          />
+          {t.options.reducedMotion}
+        </label>
+        <p className="hint">{t.options.reducedMotionHint}</p>
+      </section>
 
       <section>
         <h3>{t.options.saveTitle}</h3>

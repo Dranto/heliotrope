@@ -1,0 +1,87 @@
+// The Golden Butterfly (docs/game-design.md §9.2): a random visitor that grants a temporary
+// effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
+import { EFFECTS, type ActiveEffect, type EffectKind } from './effects';
+import { earnLight } from './light';
+import { phaseOf } from './phases';
+import { lightPerSecond } from './production';
+import { nextRandom } from './random';
+import { butterflyDelay, type GameState } from './state';
+
+/** §9.2: a butterfly stays on screen, catchable, for 12 seconds. */
+export const BUTTERFLY_VISIBLE_SECONDS = 12;
+
+/** §9.2 Récolte: min(15% of the Light in reserve, 15 minutes of production). */
+export const HARVEST_RESERVE_SHARE = 0.15;
+export const HARVEST_PRODUCTION_SECONDS = 15 * 60;
+
+export type ButterflyOutcome = EffectKind | 'harvest';
+
+/** §9.2 odds: Floraison 50%, Récolte 40%, Pollinisation 10%. */
+export function butterflyOutcome(random: number): ButterflyOutcome {
+  if (random < 0.5) return 'bloom';
+  if (random < 0.9) return 'harvest';
+  return 'pollination';
+}
+
+/** The butterfly visits from phase 2 (Le Quartier, §6) on. */
+export function isButterflyUnlocked(state: GameState): boolean {
+  return phaseOf(state) >= 2;
+}
+
+/** Light a Récolte would bring right now. */
+export function harvestAmount(state: GameState): number {
+  return Math.min(
+    state.resources.light * HARVEST_RESERVE_SHARE,
+    lightPerSecond(state) * HARVEST_PRODUCTION_SECONDS,
+  );
+}
+
+/** Schedule the next butterfly after `state`'s one is caught or flew away. */
+function scheduleNext(state: GameState): GameState {
+  const [random, rngSeed] = nextRandom(state.rngSeed);
+  return { ...state, rngSeed, butterfly: { nextIn: butterflyDelay(random), visible: 0 } };
+}
+
+/** Move the butterfly clock forward by dtSeconds of online play. */
+export function advanceButterfly(state: GameState, dtSeconds: number): GameState {
+  const { nextIn, visible } = state.butterfly;
+  if (visible > 0) {
+    const left = visible - dtSeconds;
+    return left > 0 ? { ...state, butterfly: { nextIn, visible: left } } : scheduleNext(state);
+  }
+  if (!isButterflyUnlocked(state)) return state;
+  const wait = nextIn - dtSeconds;
+  if (wait > 0) return { ...state, butterfly: { nextIn: wait, visible: 0 } };
+  // Time left over after the butterfly appeared already counts against its 12 seconds.
+  const shown = BUTTERFLY_VISIBLE_SECONDS + wait;
+  if (shown > 0) return { ...state, butterfly: { nextIn: 0, visible: shown } };
+  return scheduleNext(state);
+}
+
+function startEffect(effects: readonly ActiveEffect[], kind: EffectKind): ActiveEffect[] {
+  // Catching the same effect again restarts it rather than stacking it.
+  return [...effects.filter((e) => e.kind !== kind), { kind, remaining: EFFECTS[kind].seconds }];
+}
+
+export interface CatchResult {
+  state: GameState;
+  outcome: ButterflyOutcome;
+  /** Light gained at once (Récolte), 0 otherwise. */
+  light: number;
+}
+
+/** Player action: catch the butterfly on screen. Returns null when there is none. */
+export function catchButterfly(state: GameState): CatchResult | null {
+  if (state.butterfly.visible <= 0) return null;
+  const [random, rngSeed] = nextRandom(state.rngSeed);
+  const outcome = butterflyOutcome(random);
+  let next: GameState = { ...state, rngSeed, butterflies: state.butterflies + 1 };
+  let light = 0;
+  if (outcome === 'harvest') {
+    light = harvestAmount(state);
+    next = earnLight(next, light);
+  } else {
+    next = { ...next, effects: startEffect(state.effects, outcome) };
+  }
+  return { state: scheduleNext(next), outcome, light };
+}

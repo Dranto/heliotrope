@@ -1,3 +1,4 @@
+import { achievementBonus } from '../game/achievements';
 import { formatNumber, formatPercent } from '../game/format';
 import { biodiversityBonus, clickValue, lightPerSecond } from '../game/production';
 import { seedBonus } from '../game/seasons';
@@ -56,6 +57,16 @@ export function Stats({ onClose }: { onClose: () => void }) {
           <Row
             label={t.stats.seedBonus}
             value={t.stats.percent(formatPercent(seedBonus(state.seeds)))}
+          />
+          <Row
+            label={t.stats.butterflies}
+            value={formatNumber(state.butterflies)}
+            testId="stat-butterflies"
+          />
+          <Row label={t.stats.achievements} value={formatNumber(state.achievements.length)} />
+          <Row
+            label={t.stats.achievementBonus}
+            value={t.stats.percent(formatPercent(achievementBonus(state)))}
           />
         </dl>
       </section>

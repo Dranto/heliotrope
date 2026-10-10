@@ -30,8 +30,8 @@ export const GENERATORS: Record<GeneratorId, GeneratorDef> = {
   balconyPanel: { id: 'balconyPanel', baseCost: 100, baseProduction: 1 },
   rooftopGarden: { id: 'rooftopGarden', baseCost: 1_100, baseProduction: 8 },
   greenhouse: { id: 'greenhouse', baseCost: 12_000, baseProduction: 47 },
-  verticalFarm: { id: 'verticalFarm', baseCost: 130_000, baseProduction: 260 },
-  mirrorPlant: { id: 'mirrorPlant', baseCost: 1_400_000, baseProduction: 1_400 },
-  urbanCanopy: { id: 'urbanCanopy', baseCost: 20_000_000, baseProduction: 7_800 },
-  arcology: { id: 'arcology', baseCost: 330_000_000, baseProduction: 44_000 },
+  verticalFarm: { id: 'verticalFarm', baseCost: 200_000, baseProduction: 260 },
+  mirrorPlant: { id: 'mirrorPlant', baseCost: 3_000_000, baseProduction: 1_400 },
+  urbanCanopy: { id: 'urbanCanopy', baseCost: 50_000_000, baseProduction: 7_800 },
+  arcology: { id: 'arcology', baseCost: 800_000_000, baseProduction: 44_000 },
 };

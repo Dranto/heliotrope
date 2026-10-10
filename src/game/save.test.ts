@@ -24,6 +24,14 @@ function playedState(): GameState {
     clicks: 120,
     playSeconds: 30_000,
     seasonSeconds: 600,
+    idleSeconds: 30,
+    achievements: ['light.3', 'pot.1'],
+    journal: ['firstLight', 'firstPot'],
+    butterflies: 3,
+    butterfly: { nextIn: 0, visible: 4.5 },
+    effects: [{ kind: 'bloom', remaining: 20 }],
+    rngSeed: 123_456,
+    settings: { notation: 'scientific', reducedMotion: true },
   };
 }
 
@@ -64,7 +72,7 @@ describe('save', () => {
 
   it('migrates a v1 placeholder save to a fresh game that keeps its timestamp', () => {
     const v1 = JSON.stringify({ version: 1, resources: { sunlight: 9000 }, lastUpdate: 1234 });
-    expect(deserialize(v1, 0)).toEqual(createInitialState(1234));
+    expect(deserialize(v1, 0)).toEqual({ ...createInitialState(0), lastUpdate: 1234 });
   });
 
   it('keeps known upgrades once and drops unknown ones', () => {
@@ -144,5 +152,52 @@ describe('export and import', () => {
     expect(importSave('not base64 at all!', 0)).toBeNull();
     expect(importSave(btoa('{"version": 99}'), 0)).toBeNull();
     expect(importSave(btoa('\xff\xfe'), 0)).toBeNull();
+  });
+
+  it('migrates a v4 save, keeping its progress with no Milestones yet', () => {
+    const v4 = JSON.stringify({
+      version: 4,
+      resources: { light: 50 },
+      generators: { pot: 2 },
+      upgrades: ['pot.1'],
+      totalLight: 900,
+      allTimeLight: 5e9,
+      seeds: 10,
+      seasons: 1,
+      clicks: 40,
+      playSeconds: 9000,
+      seasonSeconds: 300,
+      lastUpdate: 77,
+    });
+    const state = deserialize(v4, 0)!;
+    expect(state.version).toBe(STATE_VERSION);
+    expect(state.seeds).toBe(10);
+    expect(state.generators.pot).toBe(2);
+    expect(state.achievements).toEqual([]);
+    expect(state.journal).toEqual([]);
+    expect(state.settings).toEqual({ notation: 'short', reducedMotion: false });
+    expect(state.butterfly.visible).toBe(0);
+  });
+
+  it('drops invalid Milestones, journal entries, effects and settings', () => {
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      achievements: ['pot.1', 'cheat', 'pot.1'],
+      journal: ['firstLight', 'nope'],
+      butterflies: -2,
+      butterfly: { nextIn: 1e9, visible: 99 },
+      effects: [{ kind: 'bloom', remaining: 1e6 }, { kind: 'magic', remaining: 3 }, null],
+      rngSeed: -5,
+      settings: { notation: 'roman', reducedMotion: 'yes' },
+    });
+    const state = deserialize(json, 0)!;
+    const fresh = createInitialState(0);
+    expect(state.achievements).toEqual(['pot.1']);
+    expect(state.journal).toEqual(['firstLight']);
+    expect(state.butterflies).toBe(0);
+    expect(state.butterfly).toEqual({ nextIn: 8 * 60, visible: 12 });
+    expect(state.effects).toEqual([]);
+    expect(state.rngSeed).toBe(fresh.rngSeed);
+    expect(state.settings).toEqual(fresh.settings);
   });
 });

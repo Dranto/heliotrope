@@ -1,4 +1,6 @@
 // Prestige: the Seasons (docs/game-design.md §7). Pure formulas and the new Season transition.
+import { unlockAchievement, unlockAchievements } from './achievements';
+import { unlockJournal } from './journal';
 import { createInitialState, type GameState } from './state';
 
 /** §7: Seeds earned in total = floor(sqrt(Light earned over all Seasons / SEED_LIGHT_DIVISOR)). */
@@ -53,19 +55,29 @@ export function isSeasonsScreenUnlocked(state: GameState): boolean {
 }
 
 /**
- * Player action: start a new Season (§7). Resets Light, generators, upgrades and the Season
- * total; keeps Seeds (plus the ones gained), all-time statistics and the clock.
+ * Player action: start a new Season (§7). Resets Light, generators, upgrades, the Season total
+ * and running butterfly effects; keeps Seeds (plus the ones gained), Milestones, the journal,
+ * all-time statistics, options and the clock.
  * Returns the same state when no Seed would be gained.
  */
 export function startNewSeason(state: GameState): GameState {
   if (!canStartNewSeason(state)) return state;
   const fresh = createInitialState(state.lastUpdate);
-  return {
+  let next: GameState = {
     ...fresh,
     allTimeLight: state.allTimeLight,
     seeds: state.seeds + seedsToGain(state),
     seasons: state.seasons + 1,
     clicks: state.clicks,
     playSeconds: state.playSeconds,
+    achievements: state.achievements,
+    journal: state.journal,
+    butterflies: state.butterflies,
+    butterfly: { nextIn: state.butterfly.nextIn || fresh.butterfly.nextIn, visible: 0 },
+    rngSeed: state.rngSeed,
+    settings: state.settings,
   };
+  // Hidden Milestone (§9.3): sowing before the soil is ready.
+  if (isSeasonPremature(state)) next = unlockAchievement(next, 'earlySowing');
+  return unlockJournal(unlockAchievements(next));
 }

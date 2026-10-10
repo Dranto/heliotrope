@@ -8,6 +8,7 @@ import {
   canBuyUpgrade,
   clickHeliotrope,
   tick,
+  unlockProgress,
 } from './tick';
 
 function withState(patch: Partial<GameState>): GameState {
@@ -28,10 +29,10 @@ describe('generator data', () => {
       [100, 1],
       [1_100, 8],
       [12_000, 47],
-      [130_000, 260],
-      [1_400_000, 1_400],
-      [20_000_000, 7_800],
-      [330_000_000, 44_000],
+      [200_000, 260],
+      [3_000_000, 1_400],
+      [50_000_000, 7_800],
+      [800_000_000, 44_000],
     ]);
   });
 });
@@ -56,7 +57,7 @@ describe('tick', () => {
   });
 
   it('gives the same result for one long step or many short ones', () => {
-    const start = withState({ generators: owned({ pot: 7, rooftopGarden: 3 }) });
+    const start = unlockProgress(withState({ generators: owned({ pot: 7, rooftopGarden: 3 }) }));
     let stepped = start;
     for (let i = 0; i < 100; i++) stepped = tick(stepped, 0.1);
     expect(stepped.resources.light).toBeCloseTo(tick(start, 10).resources.light);

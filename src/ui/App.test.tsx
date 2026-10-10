@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { exportSave, saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
 import { GameStore } from '../game/store';
@@ -57,7 +57,7 @@ describe('App', () => {
     saveGame({ ...base, generators: { ...base.generators, balconyPanel: 1 } });
     renderApp(new GameStore(localStorage, () => 2 * 3600 * 1000));
     expect(screen.getByText(/pendant votre absence \(2 h\)/i)).toHaveTextContent(
-      /récolté 7.200 Lumière/,
+      /récolté 7.\d{3} Lumière/,
     );
   });
 
@@ -199,5 +199,82 @@ describe('App', () => {
     expect(dialog).toHaveTextContent(/3.h.05/);
     expect(dialog).toHaveTextContent(/1.min/);
     expect(dialog).toHaveTextContent(/\+50.%/);
+  });
+
+  it('lets the player catch the Golden Butterfly and tells what it brought', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      resources: { light: 20_000 },
+      totalLight: 20_000,
+      allTimeLight: 20_000,
+      generators: { ...base.generators, balconyPanel: 10 },
+      butterfly: { nextIn: 0, visible: 8 },
+    });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    expect(screen.getByText('Un Papillon doré traverse le quartier.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Attraper le Papillon doré' }));
+    expect(store.getState().butterflies).toBe(1);
+    expect(screen.queryByRole('button', { name: 'Attraper le Papillon doré' })).toBeNull();
+    expect(
+      screen.getByText(/^(Floraison|Récolte|Pollinisation) !/, { selector: '.toast' }),
+    ).toBeInTheDocument();
+  });
+
+  it('lists Milestones, with hidden ones as a question mark', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, totalLight: 20_000, achievements: ['light.3', 'pot.1'] });
+    renderApp(new GameStore(localStorage, () => 0));
+    fireEvent.click(screen.getByRole('button', { name: /^Jalons/ }));
+    const dialog = screen.getByRole('dialog', { name: 'Jalons' });
+    expect(screen.getByTestId('achievements-summary')).toHaveTextContent(
+      /^2 sur \d+ jalons, production \+2.%$/,
+    );
+    expect(dialog).toHaveTextContent('Première lueur');
+    expect(dialog).toHaveTextContent('Jalon caché');
+    expect(dialog).not.toHaveTextContent('Photosynthèse lente');
+  });
+
+  it('announces a Milestone when it is reached', () => {
+    let now = 0;
+    const store = renderApp(new GameStore(localStorage, () => now));
+    now = 100;
+    for (let i = 0; i < 100; i++) fireEvent.click(flower());
+    act(() => store.step());
+    expect(screen.getByText('Jalon atteint : Main tendue')).toBeInTheDocument();
+  });
+
+  it('writes the neighbourhood journal as the game goes', () => {
+    let now = 0;
+    const store = renderApp(new GameStore(localStorage, () => now));
+    now = 100;
+    expect(screen.getByText('Le carnet est encore vierge. Touchez la fleur.')).toBeInTheDocument();
+    fireEvent.click(flower());
+    act(() => store.step());
+    expect(screen.getByText(/l’héliotrope s’est tournée vers nous/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /journal du quartier/i }));
+    expect(screen.getByRole('dialog', { name: 'Journal du quartier' })).toBeInTheDocument();
+  });
+
+  it('switches to scientific notation from the options and keeps the choice', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, resources: { light: 2e6 }, totalLight: 2e6 });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    expect(screen.getByTestId('light')).toHaveTextContent('2,00 M');
+    fireEvent.click(screen.getByRole('button', { name: 'Options' }));
+    fireEvent.click(screen.getByRole('radio', { name: /scientifique/i }));
+    expect(screen.getByTestId('light')).toHaveTextContent('2,00e6');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Réduire les animations' }));
+    expect(store.getState().settings).toEqual({ notation: 'scientific', reducedMotion: true });
+    expect(new GameStore(localStorage, () => 0).getState().settings.notation).toBe('scientific');
+    fireEvent.click(screen.getByRole('radio', { name: /suffixes courts/i }));
+  });
+
+  it('offers a tab bar for small screens (§10.3)', () => {
+    renderApp();
+    const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });
+    expect(tabs).toHaveTextContent('RécolteBâtirAméliorerPlus');
+    fireEvent.click(screen.getByRole('button', { name: 'Bâtir' }));
+    expect(screen.getByRole('button', { name: 'Bâtir' })).toHaveAttribute('aria-current', 'page');
   });
 });

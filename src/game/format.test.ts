@@ -1,4 +1,4 @@
-import { formatNumber, formatPercent } from './format';
+import { formatNumber, formatPercent, setNotation } from './format';
 
 // Expected strings use "_" for the narrow no-break space to keep them readable.
 const s = (text: string) => text.replaceAll('_', ' ');
@@ -42,5 +42,22 @@ describe('formatPercent', () => {
     [0.48, '48'],
   ])('formats %d as %s', (ratio, expected) => {
     expect(formatPercent(ratio)).toBe(expected);
+  });
+});
+
+describe('scientific notation option (§8)', () => {
+  afterEach(() => setNotation('short'));
+
+  it('replaces the suffixes with scientific notation from one million', () => {
+    expect(formatNumber(1_234_567, 'scientific')).toBe('1,23e6');
+    expect(formatNumber(45_600_000_000, 'scientific')).toBe('4,56e10');
+    expect(formatNumber(12_345, 'scientific')).toBe(s('12_345'));
+  });
+
+  it('follows the notation set for the whole display', () => {
+    setNotation('scientific');
+    expect(formatNumber(2e9)).toBe('2,00e9');
+    setNotation('short');
+    expect(formatNumber(2e9)).toBe(s('2,00_Md'));
   });
 });
