@@ -106,7 +106,6 @@ export function App() {
   );
 
   const gain = seedsToGain(state);
-  const latestJournal = state.journal[state.journal.length - 1];
 
   const menu = (
     <nav className="menu" aria-label={t.menu}>
@@ -231,7 +230,6 @@ export function App() {
                 t.duration(store.offlineSeconds),
               )}
             </p>
-            {latestJournal && <p className="flavour">{t.journal.entries[latestJournal]}</p>}
           </div>
           <button type="button" className="ghost" onClick={() => setShowWelcome(false)}>
             {t.dismiss}

@@ -2,7 +2,6 @@ import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
 import { t } from '../i18n/fr';
-import { Journal } from './Journal';
 import { Neighbourhood } from './Neighbourhood';
 import { useGameState, useGameStore } from './useGame';
 
@@ -55,7 +54,7 @@ function Butterfly({ onCatch }: { onCatch: (result: CatchResult) => void }) {
  * The neighbourhood scene (docs/game-design.md §6, §10.4): the city seen from above, where each
  * purchase builds something with a soft entrance. The light and the shadows follow the phase
  * (dawn, noon, late afternoon) and, after the first Season, the season's tint. The Golden
- * Butterfly flies across it and the neighbourhood journal sits underneath.
+ * Butterfly flies across it.
  */
 export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
   const state = useGameState();
@@ -83,7 +82,6 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
         />
         <Butterfly onCatch={onCatch} />
       </div>
-      <Journal />
     </figure>
   );
 }

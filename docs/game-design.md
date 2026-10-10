@@ -36,6 +36,7 @@
 - **Optimiste, jamais naïf.** Le monde a souffert, mais le jeu parle de réparation, pas de catastrophe. Pas de compte à rebours, pas de punition.
 - **Collectif.** Les bâtiments sont partagés (serre *communautaire*, réseau *d'entraide*). Les textes parlent de « nous » et de voisins, pas d'un magnat qui accumule.
 - **Organique et technique à la fois.** Le solarpunk mêle plantes et technologie douce : panneaux solaires couverts de lierre, miroirs de concentration au milieu des vergers.
+- **Raconté par le jeu, pas par du texte.** Décision d'Antoine (2026-10-10) : pas de journal ni de récit écrit. L'histoire se lit uniquement dans le gameplay : la scène qui reverdit, les animations, les événements en jeu. Si un moment doit être raconté, il devient quelque chose qui se passe à l'écran ou une règle qui change, jamais une ligne de texte (voir §6).
 - **Élégant et lumineux.** Design moderne et épuré, lumière dorée, touches florales (voir §10.4), animations lentes, sons discrets. Le joueur doit pouvoir laisser l'onglet ouvert sans être agressé.
 
 **Ce que le jeu n'est pas.** Pas de pay-to-win, pas de minuteurs frustrants, pas de pénalité pour l'absence, pas d'humour cynique.
@@ -163,13 +164,15 @@ Chaque phase change la scène centrale (le décor reverdit) et débloque des él
 
 Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en cours** (seuils indicatifs : Phase 2 à 10 000, Phase 3 à 10 M).
 
-**Journal du quartier.** Un fil de courts messages narratifs déclenchés par les paliers (« Mme Okafor a ramené des boutures de sa sœur. », « La rue des Tilleuls a voté pour un jardin partagé. »). Il porte l'histoire sans jamais bloquer le jeu.
+**Le récit passe par le gameplay (2026-10-10).** Le Journal du quartier livré au jalon 4 a été retiré : il n'y a plus de messages narratifs. Ses temps forts sont repris ainsi :
 
-**Implémentation (jalon 4).** `src/game/phases.ts` et `src/game/journal.ts`.
+- **Déjà portés par la scène.** Premier pot, premier panneau, premier potager, serre, ferme verticale, miroirs, canopée, arcologie : chaque bâtiment apparaît sur la carte avec son animation. « Le quartier se réveille » et « d'autres quartiers verdissent » : la caméra qui recule de phase en phase et le quartier qui reverdit avec la production. Premier Papillon doré : le papillon lui-même. Dix Jalons : l'annonce et l'écran des Jalons (§9.3). Les Saisons accomplies : la teinte de saison de la scène.
+- **Pistes d'événements en jeu, plus tard.** Les voisins qui apportent des boutures et le vote du jardin partagé de la rue des Tilleuls peuvent devenir des Projets du quartier visibles sur la carte (roadmap, M6). « La terre se souvient » d'une Saison à l'autre prend corps avec les parcelles qui restent restaurées et l'Arbre des Saisons (roadmap, M6 et M7). Rien de tout cela n'est construit pour l'instant.
+
+**Implémentation (jalon 4).** `src/game/phases.ts`.
 
 - La scène suit la phase : le ciel passe de l'aube (phase 1) au plein midi (phase 2) puis à la fin d'après-midi (phase 3), et le nom de la phase s'affiche en légende.
 - Phase 4 : à partir de la 2ᵉ Saison, la scène prend la teinte d'une saison, en commençant par le printemps puis en suivant le cycle (printemps, été, automne, hiver). La 1ʳᵉ Saison n'a pas de teinte propre. Le feuillage et le ciel changent de couleur ; rien d'autre ne change.
-- Le Journal compte 18 entrées déclenchées par la Lumière de la Saison, les premiers exemplaires de chaque bâtiment, le premier Papillon doré, les Jalons et les Saisons accomplies. Les entrées sont **conservées d'une Saison à l'autre** pour que l'histoire avance au lieu de se répéter ; les Saisons suivantes en débloquent de nouvelles. La dernière entrée s'affiche sous la scène, le carnet complet s'ouvre à la demande, et la fenêtre de retour hors ligne reprend la dernière entrée.
 
 **Scène vue du dessus (post-MVP, 2026-10-10).** Demande d'Antoine : une progression plus visuelle, la ville au centre de l'écran, vue du dessus, où les bâtiments apparaissent avec des animations élégantes au fil des achats. `src/ui/Neighbourhood.tsx` dessine la scène, `src/ui/neighbourhood.ts` porte le plan et les règles.
 
@@ -190,7 +193,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Thématiquement : l'hiver passe, on replante tout, mais la terre garde la mémoire de ce qui a poussé.
 
 **Remis à zéro :** Lumière, générateurs, améliorations, phase visuelle.
-**Conservé :** Graines d'Héliotrope, Jalons, Journal du quartier, statistiques globales, options.
+**Conservé :** Graines d'Héliotrope, Jalons, statistiques globales, options.
 
 ### Formule
 
@@ -302,7 +305,7 @@ Le joueur simulé atteint 18 Jalons et attrape 29 Papillons pendant sa 1ʳᵉ Sa
 ### 9.1 Progression hors ligne
 
 - Au retour, le jeu calcule la production pendant l'absence à **100 %** de la production/s au moment du départ, **plafonnée à 8 h** *(à valider)*.
-- Une fenêtre « Pendant ton absence… » résume le gain, avec une phrase d'ambiance du Journal.
+- Une fenêtre « Pendant ton absence… » résume le gain.
 - Les événements temporaires (Papillon doré) ne comptent pas hors ligne.
 
 ### 9.2 Papillon doré
@@ -372,12 +375,12 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 │   le soleil)  │                             │ Héliotrope en pot 42│
 │               │                             │ Panneau de balcon 18│
 │   +12 / clic  │                             │ Potager sur le toit │
-│               │   Journal du quartier ▸     │ ░░ ??? ░░  1,4 M    │
+│               │                             │ ░░ ??? ░░  1,4 M    │
 └───────────────┴─────────────────────────────┴─────────────────────┘
 ```
 
 - **Gauche :** l'héliotrope cliquable (petite animation et nombre flottant à chaque clic), valeur du clic.
-- **Centre :** la scène du quartier vue du dessus (§6), plus large que les deux colonnes latérales depuis 2026-10-10 : c'est la pièce maîtresse de l'écran. Le Papillon doré la traverse ; le Journal du quartier en bas.
+- **Centre :** la scène du quartier vue du dessus (§6), plus large que les deux colonnes latérales depuis 2026-10-10 : c'est la pièce maîtresse de l'écran. Le Papillon doré la traverse.
 - **Droite :** améliorations disponibles (icônes avec infobulle) puis liste des générateurs (nom, quantité, prix, production, infobulle avec le détail des multiplicateurs).
 - **Haut :** compteur de Lumière, production/s, menu.
 
@@ -405,7 +408,7 @@ Même contenu, une colonne : compteur en haut, fleur + scène au centre, barre d
 
 **Typographie.**
 
-- **Titres et noms (générateurs, Saisons, Journal) : [Fraunces](https://fonts.google.com/specimen/Fraunces)**, serif variable aux formes douces et organiques ; réglée avec un peu de « SOFT » pour un côté floral sans être fantaisiste.
+- **Titres et noms (générateurs, Saisons, Jalons) : [Fraunces](https://fonts.google.com/specimen/Fraunces)**, serif variable aux formes douces et organiques ; réglée avec un peu de « SOFT » pour un côté floral sans être fantaisiste.
 - **Interface et chiffres : [Manrope](https://fonts.google.com/specimen/Manrope)**, sans-serif géométrique moderne, avec chiffres tabulaires (`font-variant-numeric: tabular-nums`) pour que les compteurs ne « sautent » pas.
 - Deux polices au maximum, toutes deux sous licence libre (OFL) et hébergées avec le jeu (pas d'appel à un service tiers au chargement).
 
@@ -442,7 +445,7 @@ L'or et le lilas (la couleur de la fleur d'héliotrope) forment le duo signature
 
 Ces points ne choisissent pas la technique (c'est le rôle du fil de mise en place), mais en découlent directement du design :
 
-- **Contenu piloté par les données.** Générateurs, améliorations, jalons et messages du Journal sont décrits dans des fichiers de données, pas codés en dur. Ajouter un générateur ne doit pas demander de toucher la logique.
+- **Contenu piloté par les données.** Générateurs, améliorations et jalons sont décrits dans des fichiers de données, pas codés en dur. Ajouter un générateur ne doit pas demander de toucher la logique.
 - **Logique pure, séparée de l'affichage.** Calcul de la production, des coûts, du prestige : fonctions pures testables et réutilisées par le simulateur (§8).
 - **Boucle basée sur le temps écoulé**, pas sur le nombre d'images : la production dépend du delta de temps réel, ce qui rend la progression hors ligne et les onglets en arrière-plan cohérents.
 - **Grands nombres.** Le MVP reste sous 1e300 ; les nombres JavaScript standards suffisent, mais tous les calculs passent par un petit module numérique pour pouvoir basculer plus tard vers une bibliothèque de grands nombres.
@@ -486,13 +489,13 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 
 - Jalons (succès) et leur bonus.
 - Papillon doré.
-- Journal du quartier.
+- ~~Journal du quartier~~ (retiré le 2026-10-10, voir §6).
 - Scène centrale évolutive par phase, saisons visuelles.
 - Mise en page mobile, accessibilité, écran Options complet.
 
 **Critère de fin :** le jeu est présentable à des joueurs extérieurs.
 
-*Livré (jalon 4) : 43 Jalons et leur écran, Papillon doré, Journal du quartier, ciel par phase et teintes de saison, barre d'onglets mobile, options d'affichage, fenêtres accessibles au clavier, sauvegarde v5 ; nouvelle passe d'équilibrage (§4, §8, §9.2).*
+*Livré (jalon 4) : 43 Jalons et leur écran, Papillon doré, Journal du quartier (retiré depuis, §6), ciel par phase et teintes de saison, barre d'onglets mobile, options d'affichage, fenêtres accessibles au clavier, sauvegarde v5 ; nouvelle passe d'équilibrage (§4, §8, §9.2).*
 
 **Le MVP = M1 à M4.**
 
@@ -523,4 +526,4 @@ Décisions qui appartiennent à Antoine. En attendant sa réponse, le document a
 | Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP, pour livrer plus vite une boucle complète |
 | Q5 | ~~Style graphique ?~~ | **Décidé :** élégant, très moderne, solarpunk ensoleillé et légèrement floral (voir §10.4) |
 | Q6 | Monétisation ? | Aucune : jeu gratuit, sans pub |
-| Q7 | Récit : simple ambiance (Journal) ou vraie histoire avec personnages ? | Ambiance légère via le Journal du quartier |
+| Q7 | ~~Récit : simple ambiance (Journal) ou vraie histoire avec personnages ?~~ | **Décidé (2026-10-10) :** ni l'un ni l'autre. Pas de journal ni de texte narratif : l'histoire est racontée uniquement par le gameplay (scène, animations, événements en jeu), voir §1 et §6 |

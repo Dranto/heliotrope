@@ -28,7 +28,6 @@ Ce que le jeu propose aujourd'hui (main au 2026-10-10, après la PR #8) :
 | Prestige | Saisons : Graines d'Héliotrope, +5 % de production chacune, conseil d'attendre 10 Graines | §7 |
 | Succès | 43 Jalons à +1 % chacun, dont 3 cachés, conservés entre les Saisons | §9.3 |
 | Événement | Papillon doré toutes les 3 à 8 min : Floraison, Récolte ou Pollinisation | §9.2 |
-| Récit | Journal du quartier, 18 entrées conservées entre les Saisons | §6 |
 | Scène | Vue de face, ciel selon la phase, teinte selon la saison visuelle | §6, §10.4 |
 | Confort | Hors ligne 100 % plafonné à 8 h, sauvegarde auto, export / import, notation scientifique, animations réduites, mise en page mobile | §9, §10 |
 
@@ -74,7 +73,7 @@ ensemble) et à la **satisfaction du joueur** (sentir qu'il progresse). L'effort
 
 Le quartier en vue du dessus montre des parcelles grises : un parking, une friche, un toit nu, un canal bétonné.
 Le joueur les restaure contre de la Lumière, une à une ; chacune devient un parc, un verger, une rivière, avec
-une animation, une entrée du Journal et un bonus ciblé (un parc : clic plus fort ; une rivière dépolluée :
+une animation et un bonus ciblé (un parc : clic plus fort ; une rivière dépolluée :
 +1 h de plafond hors ligne ; un verger : +% à un générateur). Les parcelles restent restaurées d'une Saison à
 l'autre, ou repartent en friche mais se restaurent moins cher (décision D2).
 
@@ -113,12 +112,12 @@ améliorations. On les débloque dans l'Arbre des Saisons ou par des Jalons, on 
 ### P4 — Projets du quartier
 
 Des projets uniques, présentés comme des décisions de l'assemblée de quartier (« Voter le jardin partagé de la
-rue des Tilleuls »), chacun avec un coût, une ligne de récit et un effet qui **change une règle** plutôt que de
+rue des Tilleuls »), chacun avec un coût, un changement visible sur la carte et un effet qui **change une règle** plutôt que de
 multiplier un chiffre : les Panneaux produisent aussi la nuit grâce aux batteries partagées, le Papillon doré
 peut amener un deuxième papillon, la Serre double la biodiversité… Une quinzaine pour commencer, débloqués par la
 phase et les parcelles.
 
-- **Thème :** collectif et narratif, dans la lignée du Journal ; prolonge le pilier « Collectif » (§1).
+- **Thème :** collectif ; prolonge le pilier « Collectif » (§1). Le projet se raconte par ce qu'il change à l'écran (le jardin apparaît dans la rue, les batteries s'allument), pas par du texte.
 - **Satisfaction :** des paliers qui surprennent, ce que les ×2 ne font plus après la première heure.
 - **Effort :** moyen, surtout de l'écriture.
 
@@ -147,7 +146,7 @@ Des Saisons à contrainte, choisies avant de lancer la Nouvelle Saison : « sans
 « un seul bâtiment par type de parcelle ». Chaque défi réussi donne une récompense unique (un nœud de l'arbre,
 une espèce de l'herbier, une parcelle rare).
 
-- **Thème :** des récits de Saison (« l'été de la sécheresse ») plutôt que des punitions.
+- **Thème :** des Saisons à thème (« l'été de la sécheresse »), montrées par la scène, plutôt que des punitions.
 - **Satisfaction :** du contenu de fin de partie qui réutilise l'existant.
 - **Effort :** moyen ; demande P2 pour avoir des récompenses intéressantes.
 
@@ -181,10 +180,13 @@ Chaque jalon reste livrable et jouable seul, comme M1 à M4.
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
 | **M5 — Le quartier se voit** *(en cours)* | Vue du dessus animée, équilibrage plus doux, temps avant achat et prochain objectif | Répond directement à la demande ; tout le reste s'appuie sur la carte |
-| **M6 — Restaurer le quartier** | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons | Donne enfin des paliers visibles et narratifs sur la carte de M5 |
+| **M6 — Restaurer le quartier** | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons | Donne enfin des paliers visibles sur la carte de M5 |
 | **M7 — La terre se souvient** | P2 Arbre des Saisons, P3 Coopératives | Donne des choix à chaque Saison et retire la répétition des débuts |
 | **M8 — Le vivant revient** | P5 Herbier, P7 Saisons à défis, version anglaise | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
 | **M9 — La Biorégion** | P8 Eau, nouveaux générateurs, deuxième prestige | La grosse extension, une fois la boucle longue riche |
+
+Aucun jalon n'ajoute de journal ni de texte narratif (décision d'Antoine du 2026-10-10, design doc §1) :
+ce qui doit être raconté passe par la scène, les animations ou un événement en jeu.
 
 Chaque jalon met à jour le design doc, rejoue le simulateur et, si l'état change, ajoute une migration de
 sauvegarde (`STATE_VERSION`), comme pour M1 à M4.
