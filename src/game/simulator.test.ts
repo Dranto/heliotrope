@@ -36,9 +36,18 @@ describe('two Seasons in a row', () => {
     expect(second.state.seeds).toBe(10);
   });
 
-  it.each(GENERATOR_IDS)('buys the first %s sooner in the second Season', (id) => {
-    expect(second.firstGenerator[id]!).toBeLessThan(first.firstGenerator[id]!);
+  // Seeds do not raise the base click, so the first pot, bought with clicks alone, can only
+  // come no later.
+  it('buys the first pot no later in the second Season', () => {
+    expect(second.firstGenerator.pot!).toBeLessThanOrEqual(first.firstGenerator.pot!);
   });
+
+  it.each(GENERATOR_IDS.filter((id) => id !== 'pot'))(
+    'buys the first %s sooner in the second Season',
+    (id) => {
+      expect(second.firstGenerator[id]!).toBeLessThan(first.firstGenerator[id]!);
+    },
+  );
 
   it('makes the next Season advisable sooner', () => {
     expect(second.advisedSeason!).toBeLessThan(first.advisedSeason!);
