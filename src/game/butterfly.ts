@@ -1,5 +1,6 @@
 // The Golden Butterfly (docs/game-design.md §9.2): a random visitor that grants a temporary
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
+import { effectDurationFactor, factorOf } from './bonuses';
 import { EFFECTS, type ActiveEffect, type EffectKind } from './effects';
 import { earnLight } from './light';
 import { phaseOf } from './phases';
@@ -30,16 +31,27 @@ export function isButterflyUnlocked(state: GameState): boolean {
 
 /** Light a Récolte would bring right now. */
 export function harvestAmount(state: GameState): number {
-  return Math.min(
-    state.resources.light * HARVEST_RESERVE_SHARE,
-    lightPerSecond(state) * HARVEST_PRODUCTION_SECONDS,
+  return (
+    Math.min(
+      state.resources.light * HARVEST_RESERVE_SHARE,
+      lightPerSecond(state) * HARVEST_PRODUCTION_SECONDS,
+    ) * factorOf(state, 'harvestFactor')
   );
 }
 
-/** Schedule the next butterfly after `state`'s one is caught or flew away. */
+/**
+ * Schedule the next butterfly after `state`'s one is caught or flew away. Parcels and projects
+ * can bring it sooner (§6.1, §6.2).
+ */
 function scheduleNext(state: GameState): GameState {
   const [random, rngSeed] = nextRandom(state.rngSeed);
-  return { ...state, rngSeed, butterfly: { nextIn: butterflyDelay(random), visible: 0 } };
+  const nextIn = butterflyDelay(random) * factorOf(state, 'butterflyInterval');
+  return { ...state, rngSeed, butterfly: { nextIn, visible: 0 } };
+}
+
+/** How long an effect lasts when caught, with the parcels and projects in force. */
+export function effectSeconds(state: GameState, kind: EffectKind): number {
+  return EFFECTS[kind].seconds * effectDurationFactor(state, kind);
 }
 
 /** Move the butterfly clock forward by dtSeconds of online play. */
@@ -58,9 +70,12 @@ export function advanceButterfly(state: GameState, dtSeconds: number): GameState
   return scheduleNext(state);
 }
 
-function startEffect(effects: readonly ActiveEffect[], kind: EffectKind): ActiveEffect[] {
+function startEffect(state: GameState, kind: EffectKind): ActiveEffect[] {
   // Catching the same effect again restarts it rather than stacking it.
-  return [...effects.filter((e) => e.kind !== kind), { kind, remaining: EFFECTS[kind].seconds }];
+  return [
+    ...state.effects.filter((e) => e.kind !== kind),
+    { kind, remaining: effectSeconds(state, kind) },
+  ];
 }
 
 export interface CatchResult {
@@ -81,7 +96,7 @@ export function catchButterfly(state: GameState): CatchResult | null {
     light = harvestAmount(state);
     next = earnLight(next, light);
   } else {
-    next = { ...next, effects: startEffect(state.effects, outcome) };
+    next = { ...next, effects: startEffect(state, outcome) };
   }
   return { state: scheduleNext(next), outcome, light };
 }

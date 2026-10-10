@@ -1,8 +1,14 @@
+import { offlineCapBonus } from './bonuses';
 import type { GameState } from './state';
 import { tick } from './tick';
 
 /** Offline progress is capped so a long absence stays rewarding but bounded. */
 export const MAX_OFFLINE_SECONDS = 8 * 60 * 60;
+
+/** The cap with the parcels in force (§6.1: the river adds two hours). */
+export function offlineCap(state: GameState): number {
+  return MAX_OFFLINE_SECONDS + offlineCapBonus(state);
+}
 
 /** Offline time is simulated in chunks so non-linear systems stay accurate. */
 const OFFLINE_STEP_SECONDS = 60;
@@ -20,7 +26,7 @@ export interface OfflineResult {
 export function applyOfflineProgress(
   state: GameState,
   now: number,
-  maxSeconds = MAX_OFFLINE_SECONDS,
+  maxSeconds = offlineCap(state),
 ): OfflineResult {
   const away = Math.max(0, (now - state.lastUpdate) / 1000);
   const elapsedSeconds = Math.min(away, maxSeconds);

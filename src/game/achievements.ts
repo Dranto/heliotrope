@@ -1,5 +1,6 @@
 // Milestones ("Jalons", docs/game-design.md §9.3). Data table plus pure unlock checks; names
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
+import { bonusesOf } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import type { GameState } from './state';
 
@@ -82,9 +83,10 @@ export function isAchievementId(value: unknown): value is AchievementId {
   return typeof value === 'string' && Object.hasOwn(ACHIEVEMENTS, value);
 }
 
-/** Additive production bonus from the Milestones unlocked. */
+/** Additive production bonus from the Milestones unlocked, raised by parcels and projects. */
 export function achievementBonus(state: GameState): number {
-  return state.achievements.length * ACHIEVEMENT_BONUS;
+  const extra = bonusesOf(state, 'perAchievement').reduce((sum, b) => sum + b.bonus, 0);
+  return state.achievements.length * (ACHIEVEMENT_BONUS + extra);
 }
 
 function isMet(state: GameState, condition: AchievementCondition): boolean {

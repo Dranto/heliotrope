@@ -50,6 +50,8 @@ for (const [name, result] of [
 ] as const) {
   console.log(`\n${name}: ${result.state.upgrades.length} upgrades bought`);
   console.log('Owned:', JSON.stringify(result.state.generators));
+  console.log('Parcels restored:', result.state.parcels.join(', ') || 'none');
+  console.log('Projects carried out:', result.state.projects.join(', ') || 'none');
   console.log(
     'Seeds owned:',
     result.state.seeds,

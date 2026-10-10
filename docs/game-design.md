@@ -218,6 +218,54 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 - **La lumière suit la phase.** Les ombres des bâtiments tournent et changent de longueur (aube : longues vers l'ouest ; midi : courtes ; fin d'après-midi : longues vers l'est), un voile de lumière teinte la scène, des ombres de nuages la traversent lentement. Le quartier reverdit avec la production, et les teintes de saison (phase 4) s'appliquent au feuillage et à la lumière.
 - **Animations réduites.** Avec le réglage des Options ou `prefers-reduced-motion`, rien ne bouge : les éléments apparaissent directement, la caméra change de cadre sans transition, pas de scintillement.
 
+### 6.1 Parcelles à restaurer (M6, post-MVP)
+
+Le quartier garde des places grises qu'aucun bâtiment n'occupe : une avenue, deux rues, un parking, un entrepôt, les toits, les carrefours. Le joueur les **restaure une à une contre de la Lumière**. Une parcelle restaurée **le reste pour toujours**, d'une Saison à l'autre (décision D2 d'Antoine) : la terre se souvient, et le quartier de la Saison suivante démarre déjà plus vert. Les données sont dans `src/game/parcels.ts`, les règles dans `src/game/restoration.ts`.
+
+| Parcelle | Place sur la carte | Phase | Coût | Effet |
+|---|---|---|---|---|
+| Rue jardin | L'avenue devant l'immeuble, dépavée, avec îlots fleuris et bancs | 1 | 1 500 | Clic ×2 |
+| Jardins de pluie | L'avenue derrière l'immeuble : deux noues plantées de roseaux | 1 | 8 000 | Héliotropes en pot ×2, Panneaux de balcon ×1,5 |
+| Corridor des pollinisateurs | La rue ouest, sur toute sa longueur : une prairie fleurie | 2 | 100 000 | Le Papillon doré revient 20 % plus vite |
+| Rivière retrouvée | La rue est : la rivière enterrée coule à nouveau, sous des passerelles | 2 | 2 M | +2 h de plafond hors ligne (§9.1) |
+| Parc du parking | Le parking de l'est : pelouse, étang, bosquets | 3 | 30 M | Toute la production +10 % |
+| Verger de l'entrepôt | L'entrepôt du sud-ouest ouvre son toit à deux rangées d'arbres fruitiers | 3 | 300 M | Potagers ×1,5, Serres ×1,5 |
+| Toits vivants | Tous les toits gris se couvrent d'orpin et de fleurs | 3 | 3 Md | Bonus de biodiversité ×2 |
+| Places plantées | Les quatre carrefours autour de l'immeuble deviennent des places rondes autour d'un arbre | 3 | 30 Md | Chaque Jalon donne +2 % au lieu de +1 % |
+
+- **Quand une parcelle est proposée.** Quand sa place est dans le cadre de la caméra (sa phase) et que la Saison en cours a récolté la moitié de son prix, comme pour les générateurs (§4). Une première Saison en restaure environ six ; les deux dernières sont des objectifs lointains pour les Saisons suivantes.
+- **Sur la carte.** Une parcelle proposée est cernée d'un pointillé doré qui respire, avec une épingle en forme de pousse là où elle commencera à reverdir ; l'épingle est dorée quand on peut se l'offrir, et un clic dessus la restaure. Passer sur la parcelle dans le panneau sous la carte éclaire sa place.
+- **L'animation.** La parcelle restaurée se dévoile depuis son épingle : un cercle qui s'élargit découvre le nouveau sol pendant que des pétales jaillissent, avec un anneau doré. Une parcelle déjà restaurée au chargement s'affiche sans animation.
+- **Le panneau « Le quartier ».** Sous la carte, une rangée de huit pastilles montre les parcelles restaurées pour toujours, puis les quatre offres les moins chères (parcelles et projets mêlés) avec leur effet et leur prix.
+
+### 6.2 Projets du quartier (M6, post-MVP)
+
+Des décisions uniques du quartier qui **changent une règle** plutôt que de multiplier un chiffre : des bâtiments moins chers, un Papillon qui revient plus vite, une biodiversité qui compte plus tôt… Ils se mènent **pour la Saison en cours** et se relancent à chaque Saison, comme les améliorations. Chaque projet laisse **une trace visible sur la carte** (un stand, des guirlandes, un tram, des lanternes…) : il n'y a ni récit ni texte d'ambiance, seulement le nom du projet et son effet (règle d'Antoine : l'histoire se raconte par le jeu, la scène et les animations). Données dans `src/game/projects.ts`.
+
+| Projet | Condition | Coût | Effet | Trace sur la carte |
+|---|---|---|---|---|
+| Troc de graines | 5 Héliotropes en pot | 250 | Le clic rapporte +0,2 par Héliotrope en pot | Une table de sachets dans la cour |
+| Outilthèque | 5 Panneaux de balcon | 2 000 | Tous les bâtiments coûtent 10 % de moins | Une cabane dans la cour |
+| Compost collectif | 5 Potagers | 20 000 | La biodiversité (§5.4) compte aussi chaque bâtiment possédé à 5 exemplaires | Trois bacs dans la cour |
+| Batteries partagées | 25 Panneaux | 50 000 | Panneaux +5 % par type de bâtiment possédé | Des armoires de batteries sous les panneaux |
+| Ruchers partagés | Phase 2, 1 Serre | 150 000 | Le Papillon doré revient 20 % plus vite | Deux ruches et des abeilles dans la cour |
+| Fête de quartier | 10 Serres | 800 000 | La Floraison dure ×1,5 | Des guirlandes de fanions au-dessus de la cour |
+| Pistes cyclables | 1 Ferme verticale, 2 parcelles restaurées | 3 M | Toute la production +2 % par parcelle restaurée | Des pistes vertes sur les avenues |
+| Marché paysan | 10 Fermes verticales | 20 M | Récolte du Papillon doré ×2 | Des étals rayés sur l'avenue nord-est |
+| Repair café | Phase 3 | 50 M | Tous les bâtiments coûtent encore 10 % de moins | Une terrasse de parasols |
+| Eau de pluie | Rivière retrouvée, 1 Ferme verticale | 100 M | Serres et Fermes verticales ×1,25 | Des citernes près du parking |
+| Jardin à papillons | Corridor des pollinisateurs, phase 3 | 200 M | La Pollinisation dure ×2 | Des buddleias le long du corridor |
+| Ombrières solaires | 10 Centrales à miroirs | 500 M | Centrales +10 % par type de bâtiment possédé | Des ombrières sur l'avenue sud-ouest |
+| Tram végétalisé | 10 Canopées | 2 Md | Chaque Jalon donne +0,5 % de plus | Un tram qui glisse sur une voie engazonnée |
+| Assemblée de quartier | 5 parcelles restaurées, phase 3 | 10 Md | Synergies (§5.3) ×1,5 | Des gradins autour de l'héliotrope |
+| Fête des lumières | 1 Arcologie | 30 Md | Toute la production +25 % | Des lanternes le long de toutes les rues |
+
+Les effets des parcelles et des projets s'ajoutent aux formules du §8 : les multiplicateurs par générateur se multiplient aux ×2, les bonus globaux s'additionnent entre eux puis multiplient la production, les remises se multiplient (deux remises de 10 % donnent ×0,81).
+
+### 6.3 Sons discrets (M6, post-MVP)
+
+Le pilier « Élégant et lumineux » (§1) promettait des sons discrets. Ils sont synthétisés dans le navigateur (Web Audio, aucun fichier audio) et accordés sur une même gamme pentatonique, pour ne jamais sonner faux quand ils se superposent : une note pincée à chaque clic, qui change de hauteur d'un clic à l'autre ; un petit accord à chaque bâtiment ; un scintillement pour une amélioration ; un arpège pour une parcelle restaurée ; une cloche pour un projet ; un trille pour le Papillon doré ; deux notes pour un Jalon ; un accord lent pour une nouvelle Saison. À partir de la phase 2, des oiseaux chantent de temps en temps quand l'onglet est visible. Quand plusieurs choses arrivent ensemble, seul le son le plus rare joue. Les Options règlent le volume (50 % par défaut) et coupent le son. Code dans `src/ui/sound.ts` et `src/ui/useSounds.ts`.
+
 ---
 
 ## 7. Prestige : les Saisons
@@ -226,8 +274,8 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 
 Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Thématiquement : l'hiver passe, on replante tout, mais la terre garde la mémoire de ce qui a poussé.
 
-**Remis à zéro :** Lumière, générateurs, améliorations, phase visuelle.
-**Conservé :** Graines d'Héliotrope, Jalons, statistiques globales, options.
+**Remis à zéro :** Lumière, générateurs, améliorations, projets du quartier (§6.2), phase visuelle.
+**Conservé :** Graines d'Héliotrope, Jalons, parcelles restaurées (§6.1), statistiques globales, options.
 
 ### Formule
 
@@ -274,11 +322,12 @@ Les Graines servent aussi de monnaie pour un arbre de talents permanents (garder
 ```
 productionGlobale/s = Σ_types( prodBase × possédés × multTypes )
                       × (1 + 0,05 × graines)
+                      × (1 + bonusGlobauxParcellesEtProjets)   // §6.1, §6.2
                       × (1 + 0,01 × jalons)
                       × (1 + bonusBiodiversité)
                       × (1 + bonusSynergiesAméliorations)   // §5.3, entre améliorations
                       × multÉvénement            // Floraison du Papillon doré : ×3
-coût(n)             = coûtBase × 1,15^n
+coût(n)             = coûtBase × remises × 1,15^n      // remises des projets, §6.2
 valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
                       × multPollinisation         // Papillon doré : ×100
 ```
@@ -325,6 +374,8 @@ Sortie actuelle (avec les synergies) :
 | 1ʳᵉ Arcologie vivante | ~1 h 45 | 1 h 45 | 0 % | 1 h 07 |
 | Saison conseillée (2 Md de Lumière dans la Saison) | ~2 h 15 | 2 h 12 | −2 % | 1 h 22 |
 
+> Restaurer le quartier (M6) : le joueur de référence considère aussi les parcelles et les projets, avec la même règle (attente + coût / gain de revenu). Ceux dont l'effet ne touche pas le revenu (Papillon, plafond hors ligne, remises) ne lui rapportent rien de mesurable et ne sont achetés que lorsqu'un autre effet les rend rentables (les Pistes cyclables, par exemple, donnent du prix à chaque parcelle). Dans sa 1ʳᵉ Saison, il restaure cinq parcelles et mène cinq projets, et le rythme s'accélère encore : Ferme verticale à 15,0 min (0 %), Centrale à 31,6 min (−10 %), Canopée à 55,2 min (−15 %), Arcologie à 1 h 28 (−16 %), Saison conseillée à 1 h 46 (−21 %, la marge la plus faible). Les effets ont été réduits pour rester dans les ±30 % (Batteries partagées +5 % par type au lieu de +25 %, Verger ×1,5 au lieu de ×2, Eau de pluie ×1,25, Pistes cyclables +2 % par parcelle). Comme les parcelles restent acquises, la 2ᵉ Saison est bien plus rapide : Saison conseillée en 1 h au lieu de 1 h 22.
+
 Le joueur simulé atteint 20 Jalons, attrape 22 Papillons et achète 31 améliorations (dont 6 synergies entre bâtiments et 2 entre améliorations) pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −4 % et +21 % de sa cible. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 ### Affichage des nombres
@@ -339,7 +390,7 @@ Le joueur simulé atteint 20 Jalons, attrape 22 Papillons et achète 31 amélior
 
 ### 9.1 Progression hors ligne
 
-- Au retour, le jeu calcule la production pendant l'absence à **100 %** de la production/s au moment du départ, **plafonnée à 8 h** *(à valider)*.
+- Au retour, le jeu calcule la production pendant l'absence à **100 %** de la production/s au moment du départ, **plafonnée à 8 h** *(à valider)*, ou 10 h une fois la Rivière retrouvée (§6.1).
 - Une fenêtre « Pendant ton absence… » résume le gain.
 - Les événements temporaires (Papillon doré) ne comptent pas hors ligne.
 
@@ -426,10 +477,10 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
-| **Options** | Notation des nombres, animations réduites, sauvegarde manuelle, export / import, remise à zéro | Toujours |
+| **Options** | Notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
 | **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
 
-Le jeu n'a pas encore de son : le réglage du volume arrivera avec les sons (§13). Les Options proposent à la place de réduire les animations, en plus du réglage `prefers-reduced-motion` de l'appareil (§10.4).
+Les Options proposent aussi de réduire les animations, en plus du réglage `prefers-reduced-motion` de l'appareil (§10.4), et, depuis M6, de régler le volume des sons ou de les couper (§6.3).
 
 ### 10.3 Mobile
 
@@ -556,12 +607,12 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 
 Idées à reprendre quand le MVP est stable, par ordre de priorité proposé :
 
-1. **Carte du quartier.** Une grille de parcelles grises (friches, parkings, toits nus) à restaurer contre de la Lumière. Chaque parcelle restaurée apporte un bonus ciblé (un parc : +clic ; une rivière dépolluée : +1 h de plafond hors ligne ; un verger : +% à un générateur). Rend la restauration du monde concrète et visuelle.
+1. ~~**Carte du quartier.**~~ *Livré en M6 (§6.1).* Une grille de parcelles grises (friches, parkings, toits nus) à restaurer contre de la Lumière. Chaque parcelle restaurée apporte un bonus ciblé (un parc : +clic ; une rivière dépolluée : +1 h de plafond hors ligne ; un verger : +% à un générateur). Rend la restauration du monde concrète et visuelle.
 2. **Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.
 3. **Cycle jour / nuit et batteries.** La production solaire varie au fil d'une journée de jeu ; des batteries stockent le surplus. À tester avec prudence : ne doit jamais punir le joueur absent.
 4. **Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.
 5. **Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.
-6. **Sons discrets** (§1) et leur réglage de volume dans les Options.
+6. ~~**Sons discrets** (§1) et leur réglage de volume dans les Options.~~ *Livré en M6 (§6.3).*
 
 ---
 
@@ -574,7 +625,7 @@ Décisions qui appartiennent à Antoine. En attendant sa réponse, le document a
 | Q1 | Langue de l'interface du jeu ? | Français d'abord, textes externalisés pour ajouter l'anglais ensuite |
 | Q2 | Plateforme visée ? | Navigateur, bureau d'abord, mais jouable sur mobile (responsive) |
 | Q3 | Production hors ligne : 100 % plafonnée à 8 h ? | Oui |
-| Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP, pour livrer plus vite une boucle complète |
+| Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP : livrée en M6 (parcelles, §6.1) |
 | Q5 | ~~Style graphique ?~~ | **Décidé :** élégant, très moderne, solarpunk ensoleillé et légèrement floral (voir §10.4) |
 | Q6 | Monétisation ? | Aucune : jeu gratuit, sans pub |
 | Q7 | ~~Récit : simple ambiance (Journal) ou vraie histoire avec personnages ?~~ | **Décidé (2026-10-10) :** ni l'un ni l'autre. Pas de journal ni de texte narratif : l'histoire est racontée uniquement par le gameplay (scène, animations, événements en jeu), voir §1 et §6 |

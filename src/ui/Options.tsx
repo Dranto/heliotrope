@@ -8,7 +8,7 @@ import { useGameState, useGameStore } from './useGame';
 type ResetStep = 'idle' | 'confirm' | 'final';
 
 /**
- * Options panel (docs/game-design.md §8, §9.4, §10.2): number notation, reduced motion, manual
+ * Options panel (docs/game-design.md §8, §9.4, §10.2): number notation, reduced motion, sound, manual
  * save, export, import, full reset.
  */
 export function Options({ onClose }: { onClose: () => void }) {
@@ -84,6 +84,34 @@ export function Options({ onClose }: { onClose: () => void }) {
           {t.options.reducedMotion}
         </label>
         <p className="hint">{t.options.reducedMotionHint}</p>
+      </section>
+
+      <section>
+        <h3>{t.options.soundTitle}</h3>
+        <label className="range">
+          {t.options.volume}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={Math.round(settings.volume * 100)}
+            disabled={settings.muted}
+            onChange={(event) => change({ volume: Number(event.target.value) / 100 })}
+          />
+          <span className="range-value" aria-hidden="true">
+            {Math.round(settings.volume * 100)}
+          </span>
+        </label>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={settings.muted}
+            onChange={(event) => change({ muted: event.target.checked })}
+          />
+          {t.options.muted}
+        </label>
+        <p className="hint">{t.options.soundHint}</p>
       </section>
 
       <section>

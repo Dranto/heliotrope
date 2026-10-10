@@ -22,6 +22,7 @@ import { Seasons } from './Seasons';
 import { Stats } from './Stats';
 import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
+import { useSounds } from './useSounds';
 
 type Screen = 'achievements' | 'seasons' | 'stats' | 'options';
 /** §10.3: mobile tab bar sections. */
@@ -75,6 +76,7 @@ export function App() {
   const [showWelcome, setShowWelcome] = useState(
     store.offlineSeconds >= 60 && store.offlineLight >= 1,
   );
+  useSounds(state);
   // Every number on screen follows the notation chosen in the Options (§8).
   setNotation(state.settings.notation);
 

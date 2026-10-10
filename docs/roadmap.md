@@ -180,7 +180,7 @@ Chaque jalon reste livrable et jouable seul, comme M1 à M4.
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
 | **M5 — Le quartier se voit** *(en cours)* | Vue du dessus animée, équilibrage plus doux porté par de nombreuses synergies, temps avant achat et prochain objectif | Répond directement à la demande ; tout le reste s'appuie sur la carte |
-| **M6 — Restaurer le quartier** | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons | Donne enfin des paliers visibles sur la carte de M5 |
+| **M6 — Restaurer le quartier** *(livré)* | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons — voir game-design §6.1 à §6.3 | Donne enfin des paliers visibles sur la carte de M5 |
 | **M7 — La terre se souvient** | P2 Arbre des Saisons, P3 Coopératives | Donne des choix à chaque Saison et retire la répétition des débuts |
 | **M8 — Le vivant revient** | P5 Herbier, P7 Saisons à défis, version anglaise | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
 | **M9 — La Biorégion** | P8 Eau, nouveaux générateurs, deuxième prestige | La grosse extension, une fois la boucle longue riche |

@@ -1,6 +1,7 @@
 // Production, click and cost formulas (docs/game-design.md §4, §5, §8). Pure functions shared
 // by the game, the UI and the balancing simulator.
 import { achievementBonus } from './achievements';
+import { bonusesOf, costFactor, factorOf, globalBonus } from './bonuses';
 import { effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import { seedBonus } from './seasons';
@@ -16,6 +17,10 @@ function boughtUpgrades(state: GameState): UpgradeDef[] {
 }
 
 /** Multiplier from ×2 upgrades and synergies for one generator type. */
+/**
+ * Multiplier from ×2 upgrades, synergies, restored parcels and projects (§5, §6.1, §6.2) for one
+ * generator type.
+ */
 export function generatorMultiplier(state: GameState, id: GeneratorId): number {
   let factor = 1;
   let synergyBonus = 0;
@@ -25,18 +30,34 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
       synergyBonus += effect.bonusPerUnit * state.generators[effect.source];
     }
   }
-  return factor * (1 + synergyBonus);
+  for (const bonus of bonusesOf(state, 'generatorMultiplier')) {
+    if (bonus.generator === id) factor *= bonus.factor;
+  }
+  let typeBonus = 0;
+  for (const bonus of bonusesOf(state, 'perType')) {
+    if (bonus.generator === id) typeBonus += bonus.bonus * typesOwned(state);
+  }
+  return factor * (1 + synergyBonus * factorOf(state, 'synergyFactor')) * (1 + typeBonus);
+}
+
+/** Number of generator types owned at least once. */
+export function typesOwned(state: GameState): number {
+  return GENERATOR_IDS.filter((id) => state.generators[id] > 0).length;
 }
 
 /** §5.4: +2% global production per generator type at 10, 50 and 100 units owned. */
 export function biodiversityBonus(state: GameState): number {
+  const thresholds = [
+    ...BIODIVERSITY_THRESHOLDS,
+    ...bonusesOf(state, 'biodiversityThreshold').map((b) => b.threshold),
+  ];
   let steps = 0;
   for (const id of GENERATOR_IDS) {
-    for (const threshold of BIODIVERSITY_THRESHOLDS) {
+    for (const threshold of thresholds) {
       if (state.generators[id] >= threshold) steps += 1;
     }
   }
-  return steps * BIODIVERSITY_STEP;
+  return steps * BIODIVERSITY_STEP * factorOf(state, 'biodiversityFactor');
 }
 
 /** §5.3: additive global bonus from the upgrades that grow with the other upgrades bought. */
@@ -53,11 +74,12 @@ export function upgradeSynergyBonus(state: GameState): number {
 
 /**
  * §8: multiplier applied to every generator: Seeds × Milestones × biodiversity × upgrade
- * synergies × Floraison.
+ * synergies × parcels and projects × Floraison.
  */
 export function globalMultiplier(state: GameState): number {
   return (
     (1 + seedBonus(state.seeds)) *
+    (1 + globalBonus(state)) *
     (1 + achievementBonus(state)) *
     (1 + biodiversityBonus(state)) *
     (1 + upgradeSynergyBonus(state)) *
@@ -82,26 +104,30 @@ export function lightPerSecond(state: GameState): number {
 }
 
 /**
- * §5.2: click = 1 × click multipliers + share of the production per second, all ×100 during a
+ * §5.2: click = (1 + Light per unit from projects) × click multipliers + share of the production per second, all ×100 during a
  * Pollinisation (§9.2).
  */
 export function clickValue(state: GameState): number {
-  let multiplier = 1;
+  let multiplier = factorOf(state, 'clickMultiplier');
   let fraction = 0;
+  let flat = 1;
+  for (const bonus of bonusesOf(state, 'clickPerUnit')) {
+    flat += bonus.amount * state.generators[bonus.generator];
+  }
   for (const { effect } of boughtUpgrades(state)) {
     if (effect.kind === 'clickMultiplier') multiplier *= effect.factor;
     if (effect.kind === 'clickFromProduction') fraction += effect.fraction;
   }
-  const base = multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
+  const base = flat * multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
   return base * effectFactor(state.effects, 'pollination');
 }
 
 /**
- * Cost of `count` units of a generator bought from the current amount owned:
- * baseCost × 1.15^owned × (1.15^count − 1) / 0.15. For one unit: baseCost × 1.15^owned.
+ * Cost of `count` units of a generator bought from the current amount owned, after the
+ * discounts of projects (§6.2): baseCost × 1.15^owned × (1.15^count − 1) / 0.15. For one unit: baseCost × 1.15^owned.
  */
 export function generatorCost(state: GameState, id: GeneratorId, count = 1): number {
-  const first = GENERATORS[id].baseCost * COST_GROWTH ** state.generators[id];
+  const first = GENERATORS[id].baseCost * costFactor(state) * COST_GROWTH ** state.generators[id];
   if (count === 1) return first;
   return (first * (COST_GROWTH ** count - 1)) / (COST_GROWTH - 1);
 }
