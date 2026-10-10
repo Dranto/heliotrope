@@ -4,7 +4,7 @@ import type { AchievementId } from '../game/achievements';
 import type { GeneratorId } from '../game/generators';
 import type { JournalId } from '../game/journal';
 import type { VisualSeason } from '../game/phases';
-import type { ClickUpgradeId, SynergyId } from '../game/upgrades';
+import type { ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
 export interface GeneratorText {
   name: string;
@@ -62,6 +62,8 @@ export const fr = {
       `Chaque clic rapporte aussi ${percent}\u00a0% de la production par seconde`,
     synergy: (generator: string, percent: string, source: string) =>
       `${generator}\u00a0: +${percent}\u00a0% par ${source} possédé`,
+    upgradeSynergy: (percent: string, counted: 'all' | 'synergies') =>
+      `Toute la production\u00a0: +${percent}\u00a0% par ${counted === 'all' ? 'amélioration achetée' : 'synergie achetée'}`,
   },
   buyUpgradeLabel: (name: string, cost: string) => `Acheter ${name} pour ${cost} Lumière`,
   sceneLabel: 'Le quartier, qui reverdit à mesure que vous construisez',
@@ -399,10 +401,33 @@ export const fr = {
     solarHarvest: u('Cueillette solaire', 'Cueillir un rayon comme une fraise.'),
   } satisfies Record<ClickUpgradeId, UpgradeText>,
   synergies: {
+    sunnyPots: u('Pots au soleil', 'Les panneaux font juste assez d’ombre aux héliotropes.'),
+    wiredRoofs: u('Toits branchés', 'Une rallonge passe d’un balcon à l’autre.'),
     sharedCompost: u('Compost partagé', 'Les serres nourrissent les toits.'),
+    seedlingTowers: u(
+      'Tours à semis',
+      'Les fermes verticales gardent une étagère pour les serres.',
+    ),
+    reflectedLight: u('Lumière réfléchie', 'Un miroir sur dix vise les fenêtres des fermes.'),
+    coolMirrors: u('Miroirs au frais', 'Sous les arbres, les miroirs ne surchauffent plus.'),
+    livingRoots: u('Racines vivantes', 'L’arcologie arrose toute la canopée.'),
+    potCuttings: u('Boutures de pot', 'Chaque pot donne une bouture au balcon d’à côté.'),
+    rooftopSockets: u('Prises sur le toit', 'Les panneaux alimentent l’arrosage des potagers.'),
+    gardenersCorner: u('Coin des jardiniers', 'Les potagers prêtent leurs outils aux serres.'),
+    nurseryFloors: u('Étages pépinière', 'Les serres fournissent les jeunes plants des fermes.'),
+    farmFlowers: u('Fleurs de ferme', 'Les abeilles des fermes nettoient les miroirs.'),
+    sunlitGlades: u('Clairières ensoleillées', 'Les miroirs éclairent le sous-bois des rues.'),
     usefulShade: u('Ombre utile', 'Sous chaque arbre, un panneau au frais.'),
+    canopyCorridors: u('Corridors de canopée', 'Les oiseaux passent d’un parc à l’arcologie.'),
     recoveredHeat: u('Chaleur récupérée', 'Les miroirs chauffent nos semis.'),
+    thousandPots: u('Mille pots', 'L’arcologie garde une place pour chaque héliotrope.'),
+    citizenGrid: u('Réseau citoyen', 'Chaque balcon renvoie un peu de courant aux miroirs.'),
   } satisfies Record<SynergyId, UpgradeText>,
+  upgradeSynergies: {
+    sharedKnowledge: u('Savoirs partagés', 'Ce que l’un apprend, le voisin le sait le lendemain.'),
+    seedLibrary: u('Grainothèque', 'On emprunte des graines comme des livres.'),
+    commons: u('Les communs', 'Ce qui est à tous pousse mieux.'),
+  } satisfies Record<UpgradeSynergyId, UpgradeText>,
 };
 
 export const t = fr;

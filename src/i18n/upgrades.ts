@@ -10,6 +10,9 @@ export function upgradeText(upgrade: UpgradeDef): UpgradeText {
     return t.generatorUpgrades[effect.generator][tier - 1]!;
   }
   if (effect.kind === 'synergy') return t.synergies[id as keyof typeof t.synergies];
+  if (effect.kind === 'upgradeSynergy') {
+    return t.upgradeSynergies[id as keyof typeof t.upgradeSynergies];
+  }
   return t.clickUpgrades[id as keyof typeof t.clickUpgrades];
 }
 
@@ -28,5 +31,7 @@ export function upgradeEffectText(upgrade: UpgradeDef): string {
         formatPercent(effect.bonusPerUnit),
         t.generators[effect.source].name,
       );
+    case 'upgradeSynergy':
+      return t.upgradeEffect.upgradeSynergy(formatPercent(effect.bonusPerUpgrade), effect.counts);
   }
 }
