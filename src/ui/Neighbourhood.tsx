@@ -818,7 +818,8 @@ export const Neighbourhood = memo(function Neighbourhood({
             </Layer>
           )}
 
-          <Planter blooms={clickLevel(upgrades)} />
+          {/* Ten click upgrades (§5.2) fill the five bloom steps the planter is drawn for. */}
+          <Planter blooms={Math.ceil(clickLevel(upgrades) / 2)} />
 
           {flows.map((id) => (
             <path key={id} className="flow" d={FLOWS[id]} />
