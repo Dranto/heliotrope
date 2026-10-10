@@ -186,7 +186,7 @@ button {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(14rem, 0.85fr) minmax(0, 1.55fr) minmax(23rem, 1.4fr);
+  grid-template-columns: minmax(13rem, 0.7fr) minmax(0, 2fr) minmax(22rem, 1.25fr);
   gap: 1.25rem;
   align-items: start;
 }
@@ -321,10 +321,14 @@ button {
   color: var(--ink-soft);
 }
 
-/* Scene ------------------------------------------------------------------ */
+/* Scene: the neighbourhood seen from above (§6, §10.4) ------------------- */
 
 .scene {
   overflow: hidden;
+}
+
+.scene-map {
+  position: relative;
 }
 
 .scene svg {
@@ -333,77 +337,302 @@ button {
   height: auto;
 }
 
-.scene .sun {
-  transform-origin: 300px 62px;
-  transform-box: view-box;
-  animation: breathe 9s ease-in-out infinite;
+/* The camera pulls back slowly when a new part of the city opens up. */
+.camera {
+  transform-origin: 0 0;
+  transition: transform 2.8s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-@keyframes breathe {
-  50% {
-    transform: scale(1.06);
+.asphalt {
+  fill: #c4bfb5;
+}
+
+.lane {
+  stroke: rgb(255 255 255 / 0.55);
+  stroke-width: 0.8;
+  stroke-dasharray: 6 6;
+}
+
+.block {
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 1;
+  transition: fill 3s ease;
+}
+
+/* Buildings cast shadows whose length and direction follow the sun of the phase. */
+.shadow {
+  fill: rgb(70 55 40 / 0.16);
+  transform: translate(calc(var(--storeys) * var(--sun-x)), calc(var(--storeys) * var(--sun-y)));
+  transition: transform 3s ease;
+}
+
+.shadow-soft,
+.tree-shadow {
+  fill: rgb(70 55 40 / 0.14);
+}
+
+.parapet {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.45);
+  stroke-width: 0.8;
+}
+
+.vent {
+  fill: rgb(255 255 255 / 0.35);
+}
+
+.wasteland rect {
+  fill: #cdc6b8;
+  stroke: rgb(31 42 36 / 0.18);
+  stroke-width: 0.8;
+  stroke-dasharray: 3 3;
+}
+
+.wasteland circle {
+  fill: rgb(31 42 36 / 0.18);
+}
+
+.carpark rect {
+  fill: #b3aea4;
+}
+
+.carpark path {
+  stroke: rgb(255 255 255 / 0.6);
+  stroke-width: 0.8;
+}
+
+.blossom {
+  fill: var(--lilac);
+}
+
+.pot {
+  fill: var(--terracotta);
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.6;
+}
+
+.petal {
+  fill: var(--lilac);
+}
+
+.heart {
+  fill: #f4c063;
+}
+
+.panel-art rect {
+  fill: #2e4a5c;
+}
+
+.panel-art rect.framed {
+  stroke: var(--gold);
+  stroke-width: 0.7;
+}
+
+.panel-art path {
+  stroke: #8fb3c9;
+  stroke-width: 0.5;
+}
+
+.panel-art .glint {
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 0.8;
+  stroke-dasharray: 2 12;
+  animation: glint 5s linear infinite;
+}
+
+@keyframes glint {
+  to {
+    stroke-dashoffset: -28;
   }
 }
 
-.window-line {
-  stroke: rgb(255 255 255 / 0.45);
-  stroke-width: 2;
-  stroke-dasharray: 4 6;
-}
-
-.rail {
-  stroke: var(--concrete);
-  stroke-width: 2;
-}
-
-.rail.thin {
-  stroke-width: 1;
-  opacity: 0.6;
-}
-
-.greenhouse {
-  fill: rgb(220 236 226 / 0.75);
+.greenhouse .glass {
+  fill: rgb(225 240 232 / 0.85);
   stroke: var(--leaf);
-  stroke-width: 1.2;
+  stroke-width: 0.9;
 }
 
-.arcology path {
-  fill: rgb(143 174 139 / 0.35);
+.greenhouse .warmth {
+  fill: rgb(246 213 143 / 0.3);
+}
+
+.greenhouse .rib,
+.greenhouse .ridge {
   stroke: rgb(47 107 79 / 0.55);
-  stroke-width: 1.2;
+  stroke-width: 0.6;
 }
 
-.arcology path + path {
+.farm-glass {
+  fill: #eef3ea;
+}
+
+.farm rect:not(.shadow, .row) {
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.6;
+}
+
+.bed {
+  fill: #d9cbb2;
+  stroke: rgb(255 255 255 / 0.6);
+  stroke-width: 0.6;
+}
+
+.row {
   fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0 4;
 }
 
-.mirror-tower path {
+.row-fruit {
   fill: none;
-  stroke: rgb(31 42 36 / 0.35);
-  stroke-width: 1.4;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0 8;
 }
 
-.mirror-tower circle {
-  fill: #fff4d6;
+.foliage-stroke {
+  stroke: var(--foliage);
+  transition: stroke 2s ease;
+}
+
+.tomato-stroke {
+  stroke: var(--terracotta);
+}
+
+.blossom-stroke {
+  stroke: var(--lilac);
+}
+
+.farm .skylight {
+  fill: rgb(225 240 232 / 0.95);
+  stroke: var(--leaf);
+  stroke-width: 0.6;
+}
+
+.mirror {
+  fill: #9dbdd1;
+  stroke: #4f7690;
+  stroke-width: 0.5;
+}
+
+.mirror.gilded {
+  fill: #fdf0cf;
   stroke: var(--gold);
 }
 
-.mirror-tower .rays {
-  stroke: rgb(233 169 59 / 0.55);
-  stroke-dasharray: 2 4;
+.tower {
+  fill: var(--cream);
+  stroke: var(--gold);
+  stroke-width: 1;
 }
 
-.grow {
+.beam {
+  stroke: rgb(233 169 59 / 0.35);
+  stroke-width: 0.5;
+}
+
+.terrace {
+  stroke: rgb(47 107 79 / 0.35);
+  stroke-width: 0.6;
+}
+
+.glass-terrace {
+  fill: rgb(225 240 232 / 0.9);
+}
+
+.water {
+  fill: #bfe0e3;
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 1.2;
+}
+
+.planter-ring {
+  fill: #e9dcc7;
+  stroke: var(--terracotta);
+  stroke-width: 1.2;
+}
+
+.flow {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 5;
+  opacity: 0.8;
+  animation:
+    flow 3s linear infinite,
+    fade-in 1.5s ease;
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+/* A newly built element grows into place while a golden ring widens around it. */
+.appear {
   transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: grow 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: 50% 50%;
+  animation: appear 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes grow {
+@keyframes appear {
   from {
     opacity: 0;
-    transform: scale(0.6);
+    transform: scale(0.3) rotate(-8deg);
   }
+
+  60% {
+    opacity: 1;
+  }
+}
+
+.appear-ring {
+  fill: none;
+  stroke: #f4c063;
+  stroke-width: 1.2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: appear-ring 1.4s ease-out;
+}
+
+@keyframes appear-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Cloud shadows drift slowly across the map. */
+.cloud {
+  animation: drift 80s linear infinite;
+}
+
+.cloud.slow {
+  animation-duration: 120s;
+  animation-delay: -40s;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-300px);
+  }
+
+  to {
+    transform: translateX(900px);
+  }
+}
+
+.daylight {
+  pointer-events: none;
 }
 
 /* Right column: upgrades above generators (§10.1) ------------------------ */
@@ -1158,21 +1387,27 @@ button {
 
 /* Scene phases and seasons (§6) ---------------------------------------- */
 
+/* Dawn, noon, late afternoon: the light warms and the shadows turn as the city grows. */
 .scene {
-  --sky-top: #f6e2d4;
-  --sky-bottom: #fbf6ec;
+  --light-a: rgb(246 196 180 / 0.35);
+  --light-b: rgb(251 246 236 / 0);
+  --sun-x: -2.2px;
+  --sun-y: 1.4px;
   --foliage: #2f6b4f;
   --foliage-light: #8fae8b;
 }
 
-/* Dawn, noon, late afternoon: the sky warms as the city grows. */
 .scene[data-phase='2'] {
-  --sky-top: #fce9c2;
+  --light-a: rgb(255 236 186 / 0.3);
+  --sun-x: 0.6px;
+  --sun-y: 1.2px;
 }
 
 .scene[data-phase='3'] {
-  --sky-top: #f5c78a;
-  --sky-bottom: #fbebd6;
+  --light-a: rgb(245 180 110 / 0.35);
+  --light-b: rgb(251 235 214 / 0.12);
+  --sun-x: 2.4px;
+  --sun-y: 1.6px;
 }
 
 .scene[data-season='spring'] {
@@ -1181,29 +1416,29 @@ button {
 }
 
 .scene[data-season='summer'] {
-  --sky-top: #f8d58d;
+  --light-a: rgb(248 213 141 / 0.4);
 }
 
 .scene[data-season='autumn'] {
-  --sky-top: #f2c49a;
+  --light-a: rgb(242 196 154 / 0.4);
   --foliage: #a65f3a;
   --foliage-light: #e2a04a;
 }
 
 .scene[data-season='winter'] {
-  --sky-top: #dfe6ea;
-  --sky-bottom: #f7f5f0;
+  --light-a: rgb(223 230 234 / 0.5);
+  --light-b: rgb(247 245 240 / 0.2);
   --foliage: #4c6b5e;
   --foliage-light: #dde7e4;
 }
 
-.sky-top {
-  stop-color: var(--sky-top);
-  transition: stop-color 2s ease;
+.light-a {
+  stop-color: var(--light-a);
+  transition: stop-color 3s ease;
 }
 
-.sky-bottom {
-  stop-color: var(--sky-bottom);
+.light-b {
+  stop-color: var(--light-b);
 }
 
 .foliage {
@@ -1228,6 +1463,14 @@ button {
   font-size: 0.9rem;
   font-variation-settings: 'SOFT' 100;
   color: var(--ink-soft);
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background: rgb(251 246 236 / 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.scene-phase {
+  animation: fade-in 1.2s ease;
 }
 
 .scene-season::before {

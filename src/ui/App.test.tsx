@@ -52,6 +52,34 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /pour 18 lumière/i })).toBeDisabled();
   });
 
+  it('builds each purchase on the neighbourhood map, with an entrance', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, resources: { light: 400 }, totalLight: 400 });
+    const { container } = render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const pots = () => container.querySelectorAll('[data-generator="pot"] .pot');
+    expect(pots()).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: /acheter héliotrope en pot pour 15/i }));
+    expect(pots()).toHaveLength(1);
+    expect(container.querySelectorAll('[data-generator="pot"] .appear-ring')).toHaveLength(1);
+  });
+
+  it('draws what the player already owns without replaying the entrance', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, generators: { ...base.generators, pot: 3, balconyPanel: 2 } });
+    const { container } = render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    expect(container.querySelectorAll('[data-generator="pot"] .pot')).toHaveLength(3);
+    expect(container.querySelectorAll('[data-generator="balconyPanel"] rect')).toHaveLength(2);
+    expect(container.querySelector('.appear-ring')).toBeNull();
+  });
+
   it('welcomes the player back with the Light produced offline', () => {
     const base = createInitialState(0);
     saveGame({ ...base, generators: { ...base.generators, balconyPanel: 1 } });
