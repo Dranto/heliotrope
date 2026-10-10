@@ -1,7 +1,7 @@
 # Heliotrope — Feuille de route après le MVP
 
-> Statut : proposition v0.1 (2026-10-10), à valider par Antoine. Ce document classe les mécaniques à ajouter
-> maintenant que le MVP (jalons M1 à M4) est livré. Il ne fixe aucun chiffre : `docs/game-design.md` reste la
+> Statut : v1.0 (2026-10-10), validée par Antoine : les jalons M5 à M9 sont réalisés dans cet ordre.
+> Ce document classe les mécaniques à ajouter maintenant que le MVP (jalons M1 à M4) est livré. Il ne fixe aucun chiffre : `docs/game-design.md` reste la
 > référence pour les mécaniques et l'équilibrage, et chaque mécanique retenue y sera décrite dans la PR qui
 > l'implémente. Les valeurs données ici sont des ordres de grandeur à confirmer avec le simulateur (§8).
 
@@ -12,7 +12,7 @@
 3. [Mécaniques proposées, par priorité](#3-mécaniques-proposées-par-priorité)
 4. [Jalons proposés](#4-jalons-proposés)
 5. [Ce qu'on écarte ou repousse](#5-ce-quon-écarte-ou-repousse)
-6. [Décisions pour Antoine](#6-décisions-pour-antoine)
+6. [Décisions d'Antoine](#6-décisions-dantoine)
 
 ---
 
@@ -179,13 +179,18 @@ Chaque jalon reste livrable et jouable seul, comme M1 à M4.
 
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
-| **M5 — Le quartier se voit** *(en cours)* | Vue du dessus animée, équilibrage plus doux, temps avant achat et prochain objectif | Répond directement à la demande ; tout le reste s'appuie sur la carte |
+| **M5 — Le quartier se voit** *(en cours)* | Vue du dessus animée, équilibrage plus doux porté par de nombreuses synergies, temps avant achat et prochain objectif | Répond directement à la demande ; tout le reste s'appuie sur la carte |
 | **M6 — Restaurer le quartier** | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons | Donne enfin des paliers visibles sur la carte de M5 |
 | **M7 — La terre se souvient** | P2 Arbre des Saisons, P3 Coopératives | Donne des choix à chaque Saison et retire la répétition des débuts |
 | **M8 — Le vivant revient** | P5 Herbier, P7 Saisons à défis, version anglaise | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
 | **M9 — La Biorégion** | P8 Eau, nouveaux générateurs, deuxième prestige | La grosse extension, une fois la boucle longue riche |
 
-Aucun jalon n'ajoute de journal ni de texte narratif (décision d'Antoine du 2026-10-10, design doc §1) :
+**Synergies (décision d'Antoine, 2026-10-10).** Pour adoucir l'équilibrage, on ajoute **beaucoup de synergies**,
+entre bâtiments et entre améliorations, plutôt que de retoucher les valeurs de base. Le fil d'équilibrage s'en charge
+dans M5 ; les jalons suivants gardent ce réflexe : chaque nouvelle mécanique (parcelles, projets, arbre, espèces)
+devrait se lier à l'existant par une synergie plutôt qu'ajouter un multiplicateur isolé.
+
+**Récit par le jeu (décision d'Antoine, 2026-10-10).** Aucun jalon n'ajoute de journal ni de texte narratif (design doc §1) :
 ce qui doit être raconté passe par la scène, les animations ou un événement en jeu.
 
 Chaque jalon met à jour le design doc, rejoue le simulateur et, si l'état change, ajoute une migration de
@@ -205,13 +210,13 @@ sauvegarde (`STATE_VERSION`), comme pour M1 à M4.
 
 ---
 
-## 6. Décisions pour Antoine
+## 6. Décisions d'Antoine
 
-En attendant ta réponse, la feuille de route applique le choix recommandé.
+Antoine a validé les quatre recommandations le 2026-10-10.
 
-| # | Question | Choix recommandé |
+| # | Question | Décision |
 |---|---|---|
-| D1 | Après la vue du dessus, quoi d'abord : restaurer le quartier (M6) ou l'Arbre des Saisons (M7) ? | **Restaurer le quartier d'abord** : c'est ce qui rend la progression visible, ta priorité, et ça réutilise tout de suite la vue du dessus |
+| D1 | Après la vue du dessus, quoi d'abord : restaurer le quartier (M6) ou l'Arbre des Saisons (M7) ? | **Restaurer le quartier d'abord** : c'est ce qui rend la progression visible, la priorité d'Antoine, et ça réutilise tout de suite la vue du dessus |
 | D2 | Les parcelles restaurées restent-elles d'une Saison à l'autre ? | **Oui, elles restent** : le monde garde la trace de chaque Saison, et le joueur voit son quartier grandir sur plusieurs jours |
 | D3 | L'automatisation (Coopératives) se gagne ou est disponible d'emblée ? | **Elle se gagne** (arbre ou Jalons), dès la 2ᵉ Saison pour les premiers bâtiments : c'est une récompense, et la 1ʳᵉ Saison garde ses décisions |
 | D4 | Deuxième ressource de la Biorégion : Eau, Biodiversité ou Habitants ? | **L'Eau** : concrète, facile à montrer sur la carte (pluie, rivière), et la biodiversité reste le bonus qu'elle est déjà |
