@@ -1,6 +1,7 @@
 // Production, click and cost formulas (docs/game-design.md §4, §5, §8). Pure functions shared
 // by the game, the UI and the balancing simulator.
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
+import { seedBonus } from './seasons';
 import type { GameState } from './state';
 import { UPGRADES, type UpgradeDef, type UpgradeId } from './upgrades';
 
@@ -36,9 +37,9 @@ export function biodiversityBonus(state: GameState): number {
   return steps * BIODIVERSITY_STEP;
 }
 
-/** Multiplier applied to every generator (biodiversity; Seeds and Milestones come later). */
+/** §8: multiplier applied to every generator: Seeds × biodiversity (Milestones come later). */
 export function globalMultiplier(state: GameState): number {
-  return 1 + biodiversityBonus(state);
+  return (1 + seedBonus(state.seeds)) * (1 + biodiversityBonus(state));
 }
 
 /** Light per second produced by all units of one generator, multipliers included. */

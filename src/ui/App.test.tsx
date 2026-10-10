@@ -130,4 +130,74 @@ describe('App', () => {
     expect(store.getState().clicks).toBe(0);
     expect(screen.getByText('La partie a été remise à zéro.')).toBeInTheDocument();
   });
+
+  it('hides the Seasons until a Seed can be gained', () => {
+    renderApp();
+    expect(screen.queryByRole('button', { name: /saisons/i })).not.toBeInTheDocument();
+  });
+
+  it('starts a new Season after a confirmation, keeping the Seeds', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      resources: { light: 1e9 },
+      generators: { ...base.generators, arcology: 3 },
+      upgrades: ['gloves'],
+      totalLight: 2e8,
+      allTimeLight: 2e8,
+      clicks: 77,
+    });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    fireEvent.click(screen.getByRole('button', { name: 'Saisons, 2 Graines à gagner' }));
+    expect(screen.getByRole('dialog', { name: 'Les Saisons' })).toBeInTheDocument();
+    expect(screen.getByTestId('seeds-owned')).toHaveTextContent('0');
+    expect(screen.getByTestId('seeds-gain')).toHaveTextContent('+2');
+    expect(screen.getByTestId('seeds-bonus')).toHaveTextContent(/\+0.% → \+10.%/);
+    // Before 10 Seeds the first Season is advised against, but not blocked.
+    expect(screen.getByText('La terre n’est pas encore prête')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pas encore' }));
+    expect(store.getState().seeds).toBe(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' }));
+    expect(screen.getByText(/récolter 2 Graines/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Oui, replanter' }));
+    expect(store.getState()).toMatchObject({
+      seeds: 2,
+      seasons: 1,
+      clicks: 77,
+      upgrades: [],
+      totalLight: 0,
+      resources: { light: 0 },
+    });
+    expect(store.getState().generators.arcology).toBe(0);
+    expect(screen.getByText('La 2ᵉ Saison commence. La terre se souvient.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' })).toBeDisabled();
+    expect(screen.getByTestId('seeds-chip')).toHaveTextContent('2');
+    // The new Season is saved right away.
+    expect(new GameStore(localStorage, () => 0).getState().seeds).toBe(2);
+  });
+
+  it('shows Season and all-time statistics', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      totalLight: 1234,
+      allTimeLight: 5e9,
+      seeds: 10,
+      seasons: 1,
+      clicks: 12,
+      playSeconds: 3 * 3600 + 5 * 60,
+      seasonSeconds: 90,
+    });
+    renderApp(new GameStore(localStorage, () => 0));
+    fireEvent.click(screen.getByRole('button', { name: 'Statistiques' }));
+    const dialog = screen.getByRole('dialog', { name: 'Statistiques' });
+    expect(dialog).toHaveTextContent('Cette Saison (2ᵉ Saison)');
+    expect(screen.getByTestId('stat-season-light')).toHaveTextContent(/1.234/);
+    expect(screen.getByTestId('stat-all-light')).toHaveTextContent('5,00 Md');
+    expect(screen.getByTestId('stat-seasons')).toHaveTextContent('1');
+    expect(dialog).toHaveTextContent(/3.h.05/);
+    expect(dialog).toHaveTextContent(/1.min/);
+    expect(dialog).toHaveTextContent(/\+50.%/);
+  });
 });

@@ -194,6 +194,14 @@ Points de repère *(à valider)* :
 - L'écran de confirmation montre clairement : ce qui sera perdu, les Graines gagnées, le bonus avant/après.
 - Cible : 1ʳᵉ Saison rentable vers **3–4 h** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
 
+**Implémentation (jalon 3).** `src/game/seasons.ts`. Précisions retenues :
+
+- Le bonus des Graines multiplie la production des générateurs (et donc la part du clic indexée sur la production, §5.2), pas la valeur de base du clic : `multiplicateurGlobal = (1 + 0,05 × graines) × (1 + bonusBiodiversité)`.
+- Le conseil « La terre n'est pas encore prête » ne s'affiche que pour la première Saison, tant qu'on gagnerait moins de 10 Graines. Les Saisons suivantes ne sont jamais déconseillées.
+- L'écran des Saisons apparaît dès qu'une Graine est à gagner, puis reste accessible une fois une Saison accomplie. Le bouton du menu montre les Graines à gagner.
+- La Lumière totale cumulée, les clics, le temps de jeu, le nombre de Saisons et les Graines sont conservés ; la durée et la Lumière de la Saison en cours repartent de zéro. Le temps de jeu compte aussi la progression hors ligne.
+- La nouvelle Saison est sauvegardée immédiatement.
+
 ### Arbre des Saisons (post-MVP)
 
 Les Graines servent aussi de monnaie pour un arbre de talents permanents (garder 10 % des générateurs, Papillon doré plus fréquent, production hors ligne plus longue…). Dépenser une Graine **ne réduit pas** le bonus de +5 % : le bonus dépend des Graines obtenues au total, la monnaie dépensable est un compteur séparé. C'est le modèle de Cookie Clicker (niveau de prestige vs. puces célestes) : le joueur n'est jamais puni pour avoir dépensé.
@@ -238,21 +246,23 @@ valeurClic          = 1 × multClic + pctClic × productionGlobale/s
 
 L'équilibrage doit être vérifié par un **simulateur sans interface** qui rejoue une stratégie simple (acheter à chaque instant l'option au meilleur ratio coût / gain de production) et sort le moment de chaque événement du tableau ci-dessus. Il réutilise exactement les mêmes fonctions de calcul et les mêmes données que le jeu. Tout changement de chiffre dans ce document devrait être accompagné d'une sortie du simulateur.
 
-**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Les Jalons et le Papillon doré (jalon 4) ne sont pas encore simulés : ils accéléreront la partie et demanderont une nouvelle passe.
+**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Les Jalons et le Papillon doré (jalon 4) ne sont pas encore simulés : ils accéléreront la partie et demanderont une nouvelle passe.
 
-Sortie actuelle :
+Sortie actuelle (jalon 3) :
 
-| Événement | Cible | Simulé | Écart |
-|---|---|---|---|
-| 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok |
-| 1ᵉʳ Panneau de balcon | ~1 min | 44 s | −26 % |
-| 1ᵉʳ Potager sur le toit | ~4 min | 5,0 min | +25 % |
-| 1ʳᵉ Serre communautaire | ~12 min | 14,7 min | +23 % |
-| 1ʳᵉ Ferme verticale | ~30 min | 26,5 min | −12 % |
-| 1ʳᵉ Centrale à miroirs | ~1 h | 47 min | −21 % |
-| 1ʳᵉ Canopée urbaine | ~2 h | 1 h 30 | −25 % |
-| 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 04 | −13 % |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~4 h | 4 h 10 | +4 % |
+| Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
+|---|---|---|---|---|
+| 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 6 s |
+| 1ᵉʳ Panneau de balcon | ~1 min | 44,6 s | −26 % | 43,7 s |
+| 1ᵉʳ Potager sur le toit | ~4 min | 5,0 min | +25 % | 4,1 min |
+| 1ʳᵉ Serre communautaire | ~12 min | 14,7 min | +23 % | 10,8 min |
+| 1ʳᵉ Ferme verticale | ~30 min | 26,5 min | −12 % | 18,6 min |
+| 1ʳᵉ Centrale à miroirs | ~1 h | 47 min | −21 % | 32 min |
+| 1ʳᵉ Canopée urbaine | ~2 h | 1 h 30 | −25 % | 1 h 01 |
+| 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 04 | −13 % | 2 h 03 |
+| Saison conseillée (5 Md de Lumière dans la Saison) | ~4 h | 4 h 10 | +4 % | 2 h 48 |
+
+La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 ### Affichage des nombres
 
@@ -422,6 +432,8 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 - Écran Statistiques.
 
 **Critère de fin :** on peut enchaîner deux Saisons, et la seconde atteint plus vite chaque palier.
+
+*Livré (jalon 3) : Graines, écran des Saisons avec conseil et confirmation, écran Statistiques, sauvegarde v4 ; le simulateur vérifie le critère de fin.*
 
 ### M4 — Vie et finitions
 

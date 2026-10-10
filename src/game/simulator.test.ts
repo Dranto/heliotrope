@@ -1,5 +1,5 @@
 import { GENERATOR_IDS } from './generators';
-import { PACING_TARGETS, simulate } from './simulator';
+import { PACING_TARGETS, simulate, simulateTwoSeasons } from './simulator';
 
 describe('balancing simulator', () => {
   // Milestone 2 exit criterion (docs/game-design.md §12): the simulator reproduces the §8 pacing
@@ -23,5 +23,24 @@ describe('balancing simulator', () => {
     const ratio = result.advisedSeason! / PACING_TARGETS.advisedSeason;
     expect(ratio).toBeGreaterThanOrEqual(0.7);
     expect(ratio).toBeLessThanOrEqual(1.3);
+  });
+});
+
+describe('two Seasons in a row', () => {
+  // Milestone 3 exit criterion (docs/game-design.md §12): the second Season reaches every
+  // pacing event sooner than the first.
+  const { first, second } = simulateTwoSeasons();
+
+  it('starts the second Season with the 10 advised Seeds', () => {
+    expect(second.state.seasons).toBe(1);
+    expect(second.state.seeds).toBe(10);
+  });
+
+  it.each(GENERATOR_IDS)('buys the first %s sooner in the second Season', (id) => {
+    expect(second.firstGenerator[id]!).toBeLessThan(first.firstGenerator[id]!);
+  });
+
+  it('makes the next Season advisable sooner', () => {
+    expect(second.advisedSeason!).toBeLessThan(first.advisedSeason!);
   });
 });

@@ -65,8 +65,78 @@ export const fr = {
   welcomeBack: (light: string, duration: string) =>
     `Pendant votre absence (${duration}), le quartier a récolté ${light} Lumière.`,
   dismiss: 'Fermer',
-  minutes: (n: number) => `${n} min`,
-  hours: (h: number, m: number) => (m === 0 ? `${h} h` : `${h} h ${m}`),
+  /** A duration in seconds, at most two units: "42 s", "12 min", "2 h 05", "3 j 4 h". */
+  duration: (seconds: number) => {
+    const s = Math.max(0, Math.floor(seconds));
+    if (s < 60) return `${s}\u00a0s`;
+    const minutes = Math.floor(s / 60);
+    if (minutes < 60) return `${minutes}\u00a0min`;
+    const hours = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (hours < 24)
+      return m === 0 ? `${hours}\u00a0h` : `${hours}\u00a0h\u00a0${String(m).padStart(2, '0')}`;
+    const days = Math.floor(hours / 24);
+    const h = hours % 24;
+    return h === 0 ? `${days}\u00a0j` : `${days}\u00a0j\u00a0${h}\u00a0h`;
+  },
+  menu: 'Menu',
+  seeds: {
+    open: 'Saisons',
+    openWithGain: (seeds: string) => `Saisons, ${seeds} Graines à gagner`,
+    title: 'Les Saisons',
+    close: 'Fermer les Saisons',
+    intro:
+      'L’hiver passe, nous replantons tout. Mais la terre garde la mémoire de ce qui a poussé.',
+    chip: (seeds: string, percent: string) => `${seeds} Graines, production +${percent}\u00a0%`,
+    owned: 'Graines d’Héliotrope',
+    ownedHint: (percent: string) => `+${percent}\u00a0% de production`,
+    toGain: 'À récolter',
+    toGainHint: 'en lançant une nouvelle Saison',
+    bonus: 'Bonus de production',
+    bonusAfter: 'après la nouvelle Saison',
+    nextSeed: (light: string) => `Prochaine Graine dans ${light} Lumière.`,
+    formula:
+      'Chaque Graine ajoute 5\u00a0% à toute la production. Les Graines viennent de la Lumière récoltée au fil de toutes les Saisons.',
+    notReadyTitle: 'La terre n’est pas encore prête',
+    notReady: (advised: string) =>
+      `Rien ne vous en empêche, mais pour une première Saison, mieux vaut attendre d’avoir au moins ${advised} Graines à récolter.`,
+    noSeedYet: 'Il faut au moins une Graine à récolter pour commencer une nouvelle Saison.',
+    lostTitle: 'Repart de zéro',
+    lost: [
+      'La Lumière en réserve',
+      'Les bâtiments',
+      'Les améliorations',
+      'Le décor du quartier, qui reverdira plus vite',
+    ],
+    keptTitle: 'Reste acquis',
+    kept: ['Les Graines d’Héliotrope', 'Les statistiques', 'Les options'],
+    start: 'Commencer une nouvelle Saison',
+    confirm: (seeds: string) => `Replanter maintenant et récolter ${seeds} Graines\u00a0?`,
+    confirmYes: 'Oui, replanter',
+    cancel: 'Pas encore',
+    started: (season: string) => `La ${season} commence. La terre se souvient.`,
+    seasonName: (n: number) => (n === 1 ? '1ʳᵉ Saison' : `${n}ᵉ Saison`),
+  },
+  stats: {
+    open: 'Statistiques',
+    title: 'Statistiques',
+    close: 'Fermer les statistiques',
+    seasonTitle: (season: string) => `Cette Saison (${season})`,
+    allTitle: 'Depuis le début',
+    seasonLight: 'Lumière récoltée',
+    seasonTime: 'Durée',
+    production: 'Production',
+    perSecond: (light: string) => `${light} / s`,
+    clickValue: 'Valeur du clic',
+    biodiversity: 'Biodiversité',
+    allLight: 'Lumière récoltée',
+    playTime: 'Temps de jeu',
+    clicks: 'Clics sur l’héliotrope',
+    seasons: 'Saisons accomplies',
+    seeds: 'Graines d’Héliotrope',
+    seedBonus: 'Bonus des Graines',
+    percent: (percent: string) => `+${percent}\u00a0%`,
+  },
   options: {
     open: 'Options',
     title: 'Options',

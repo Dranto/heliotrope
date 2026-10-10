@@ -9,12 +9,13 @@ import type { GeneratorId } from './generators';
 import type { GameState } from './state';
 import { UPGRADES, type UpgradeId } from './upgrades';
 
-/** Add Light to the reserve and to the Season total. */
+/** Add Light to the reserve, to the Season total and to the all-time total. */
 export function earnLight(state: GameState, amount: number): GameState {
   return {
     ...state,
     resources: { ...state.resources, light: state.resources.light + amount },
     totalLight: state.totalLight + amount,
+    allTimeLight: state.allTimeLight + amount,
   };
 }
 
@@ -22,7 +23,12 @@ export function earnLight(state: GameState, amount: number): GameState {
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
   const next = earnLight(state, lightPerSecond(state) * dtSeconds);
-  return { ...next, lastUpdate: state.lastUpdate + dtSeconds * 1000 };
+  return {
+    ...next,
+    playSeconds: state.playSeconds + dtSeconds,
+    seasonSeconds: state.seasonSeconds + dtSeconds,
+    lastUpdate: state.lastUpdate + dtSeconds * 1000,
+  };
 }
 
 /** Player action: click the heliotrope. */
