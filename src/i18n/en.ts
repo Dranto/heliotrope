@@ -8,12 +8,9 @@ const u = (name: string, flavour: string): UpgradeText => ({ name, flavour: q(fl
 
 export const en: Texts = {
   title: 'Heliotrope',
-  tagline: 'Greening the city, one ray at a time',
   light: 'Light',
   perSecond: '/ s',
-  perClick: 'per click',
   clickFlower: 'Harvest the heliotrope’s light',
-  clickHint: 'Touch the flower to harvest its light',
   generatorsTitle: 'Build',
   owned: 'owned',
   produces: 'produces',
@@ -48,6 +45,12 @@ export const en: Texts = {
     summer: 'Summer',
     autumn: 'Autumn',
     winter: 'Winter',
+  },
+  layout: {
+    views: 'Map view',
+    panels: 'Menus',
+    hidePanels: 'Fold the menus to enlarge the map',
+    showPanels: 'Unfold the menus',
   },
   tabs: {
     label: 'Game sections',

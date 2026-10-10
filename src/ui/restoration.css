@@ -432,11 +432,10 @@
   stroke-linecap: round;
 }
 
-/* ---------- Panel under the map ---------- */
+/* ---------- Panel in the side menu ---------- */
 
 .restoration {
-  padding: 0.9rem 1.25rem 0.4rem;
-  border-top: 1px solid rgb(31 42 36 / 0.06);
+  padding: 1.1rem 1.25rem 0.6rem;
 }
 
 .restoration-head {
@@ -505,7 +504,7 @@
   }
 }
 
-.scene .restoration-icon svg {
+.restoration-icon svg {
   display: block;
   width: 1.6rem;
   height: 1.6rem;

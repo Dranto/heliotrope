@@ -13,6 +13,8 @@ import {
 import type { GameState } from '../game/state';
 import { buyGenerator, canBuyGenerator } from '../game/tick';
 import { t } from '../i18n';
+import { usePanelOpen } from './layoutPrefs';
+import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
 
 type BuyAmount = 1 | 10 | 100 | 'max';
@@ -36,14 +38,17 @@ export function Generators() {
   const store = useGameStore();
   const state = useGameState();
   const [amount, setAmount] = useState<BuyAmount>(1);
+  const [open, toggle] = usePanelOpen('generators');
   const revealed = GENERATOR_IDS.filter((id) => isGeneratorRevealed(state, id));
   const next = GENERATOR_IDS.find((id) => !isGeneratorRevealed(state, id));
   const biodiversity = biodiversityBonus(state);
 
   return (
-    <section className="panel generators" aria-labelledby="generators-title">
+    <section className="panel generators" aria-labelledby="generators-title" data-open={open}>
       <div className="panel-head">
-        <h2 id="generators-title">{t.generatorsTitle}</h2>
+        <PanelTitle id="generators-title" open={open} onToggle={toggle}>
+          {t.generatorsTitle}
+        </PanelTitle>
         <div className="segmented" role="radiogroup" aria-label={t.buyAmount}>
           {BUY_AMOUNTS.map((option) => (
             <button

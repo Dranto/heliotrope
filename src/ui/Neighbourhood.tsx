@@ -16,7 +16,6 @@ import {
   ARCOLOGY_SITE,
   BLOCKS,
   BUILDINGS,
-  CAMERAS,
   CAR_PARKS,
   COURTYARD,
   FARM_SITES,
@@ -30,7 +29,6 @@ import {
   STREETS,
   TREES,
   WORLD,
-  cameraLevel,
   cameraTransform,
   centre,
   clickLevel,
@@ -38,6 +36,7 @@ import {
   visibleElements,
   type Box,
   type Building,
+  type Camera,
 } from './neighbourhood';
 
 const CONCRETE = [0xa7, 0xa3, 0x9c];
@@ -559,27 +558,34 @@ function Arcology({ rings, level }: { rings: number; level: number }) {
   );
 }
 
+/**
+ * The heliotrope's bed in the courtyard: a warm glow where the flower stands, and a ring of
+ * blooms around its pot that fills in with each click upgrade.
+ */
 function Planter({ blooms }: { blooms: number }) {
-  const petals = 5 + blooms * 2;
-  const radius = 2.6 + blooms * 0.7;
+  const petals = 6 + blooms * 3;
   return (
     <g className="planter">
-      <circle cx={PLANTER.x} cy={PLANTER.y} r="10" className="planter-ring" />
+      <ellipse cx={PLANTER.x} cy={PLANTER.y} rx="30" ry="20" fill="url(#hearth)" />
+      <ellipse cx={PLANTER.x} cy={PLANTER.y} rx="17" ry="10.5" className="planter-ring" />
       {Array.from({ length: petals }, (_, i) => {
         const a = (i / petals) * Math.PI * 2;
         return (
           <circle
             key={`${blooms}-${i}`}
-            cx={PLANTER.x + Math.cos(a) * radius}
-            cy={PLANTER.y + Math.sin(a) * radius}
-            r={1.8 + blooms * 0.15}
-            className="petal"
+            cx={round1(PLANTER.x + Math.cos(a) * 14)}
+            cy={round1(PLANTER.y + Math.sin(a) * 8)}
+            r={1.5 + blooms * 0.12}
+            className={i % 3 === 2 ? 'heart' : 'petal'}
           />
         );
       })}
-      <circle cx={PLANTER.x} cy={PLANTER.y} r="1.4" className="heart" />
     </g>
   );
+}
+
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
 }
 
 /** Zebra crossings on the four sides of every crossroads. */
@@ -604,6 +610,11 @@ const FLOWS: Record<string, string> = {
 
 export interface NeighbourhoodProps {
   generators: Record<GeneratorId, number>;
+  /** What the camera frames, chosen with the view switch. */
+  camera: Camera;
+  /** Size of the drawing in screen units, so the map fills its place whatever its shape. */
+  width: number;
+  height: number;
   upgrades: readonly UpgradeId[];
   phase: Phase;
   /** 0 with nothing built, 1 well into the city phase, rounded so the map redraws rarely. */
@@ -618,11 +629,15 @@ export interface NeighbourhoodProps {
 /**
  * The neighbourhood seen from above (docs/game-design.md §6, §10.4): a grey city block grid in
  * which every generator has its places. Each purchase builds the next element with a soft
- * entrance, ×2 upgrades refine a generator's elements, and the camera pulls back from the home
- * courtyard to the neighbourhood and then the whole city as the Season progresses.
+ * entrance, ×2 upgrades refine a generator's elements. The camera frames the home courtyard, the
+ * neighbourhood or the whole city, and the grey outskirts around the world fill the rest of the
+ * screen.
  */
 export const Neighbourhood = memo(function Neighbourhood({
   generators,
+  camera,
+  width,
+  height,
   upgrades,
   phase,
   greenness,
@@ -636,7 +651,6 @@ export const Neighbourhood = memo(function Neighbourhood({
   }, []);
 
   const level = (id: GeneratorId) => upgradeLevel(upgrades, id);
-  const camera = CAMERAS[cameraLevel(phase, generators)];
   const roofFill = mix(CONCRETE, SAGE, greenness * 0.45);
   const gardens = visibleElements(generators.rooftopGarden, GARDEN_ROOFS.length);
   const greenhouses = visibleElements(generators.greenhouse, GREENHOUSE_SITES.length);
@@ -656,7 +670,12 @@ export const Neighbourhood = memo(function Neighbourhood({
 
   return (
     <LiveContext.Provider value={live}>
-      <svg viewBox={`0 0 ${WORLD.width} ${WORLD.height}`} role="img" aria-label={t.sceneLabel}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMidYMid slice"
+        role="img"
+        aria-label={t.sceneLabel}
+      >
         <defs>
           <radialGradient id="hearth">
             <stop offset="0%" stopColor="#FFF4D6" />
@@ -690,13 +709,30 @@ export const Neighbourhood = memo(function Neighbourhood({
             <circle cx="2" cy="3" r="0.45" className="grain" />
             <circle cx="6.5" cy="7" r="0.35" className="grain" />
           </pattern>
+          <pattern
+            id="outskirts"
+            width={OUTSKIRTS_TILE.width}
+            height={OUTSKIRTS_TILE.height}
+            patternUnits="userSpaceOnUse"
+            patternTransform={`translate(${STREETS.vertical[0]} ${STREETS.horizontal[0]})`}
+          >
+            <rect width={OUTSKIRTS_TILE.width} height={OUTSKIRTS_TILE.height} className="asphalt" />
+            <rect x="24" y="24" width="182" height="124" rx="6" className="outskirts-block" />
+            {OUTSKIRTS_TILE.buildings.map(([x, y, w, h]) => (
+              <g key={`${x},${y}`}>
+                <rect x={x} y={y + 2} width={w} height={h} rx="2" className="outskirts-shadow" />
+                <rect x={x} y={y} width={w} height={h} rx="2" className="outskirts-roof" />
+              </g>
+            ))}
+          </pattern>
           <radialGradient id="vignette" r="75%">
             <stop offset="70%" stopColor="#fbf6ec" stopOpacity="0" />
             <stop offset="100%" stopColor="#fbf6ec" stopOpacity="0.6" />
           </radialGradient>
         </defs>
 
-        <g className="camera" style={{ transform: cameraTransform(camera) }}>
+        <g className="camera" style={{ transform: cameraTransform(camera, width, height) }}>
+          <Outskirts />
           <rect width={WORLD.width} height={WORLD.height} className="asphalt" />
           <rect width={WORLD.width} height={WORLD.height} fill="url(#asphalt-grain)" />
           {STREETS.horizontal.map((y) => (
@@ -844,33 +880,98 @@ export const Neighbourhood = memo(function Neighbourhood({
           {overlay}
         </g>
 
-        <g className="clouds" aria-hidden="true">
-          <ellipse className="cloud" cx="120" cy="140" rx="150" ry="70" fill="url(#cloud)" />
-          <ellipse className="cloud slow" cx="-200" cy="330" rx="180" ry="80" fill="url(#cloud)" />
-        </g>
-        <rect
-          width={WORLD.width}
-          height={WORLD.height}
-          fill="url(#daylight)"
-          className="daylight"
-        />
-        <rect width={WORLD.width} height={WORLD.height} fill="url(#vignette)" />
-
-        {phase >= 2 &&
-          POLLEN.map(([x, y, delay]) => (
-            <circle
-              key={x}
-              className="pollen"
-              cx={x}
-              cy={y}
-              r="2"
-              style={{ animationDelay: `${delay}s` }}
+        <g
+          className="sky"
+          aria-hidden="true"
+          transform={`scale(${round2(width / WORLD.width)} ${round2(height / WORLD.height)})`}
+        >
+          <g className="clouds">
+            <ellipse className="cloud" cx="120" cy="140" rx="150" ry="70" fill="url(#cloud)" />
+            <ellipse
+              className="cloud slow"
+              cx="-200"
+              cy="330"
+              rx="180"
+              ry="80"
+              fill="url(#cloud)"
             />
-          ))}
+          </g>
+          <rect
+            width={WORLD.width}
+            height={WORLD.height}
+            fill="url(#daylight)"
+            className="daylight"
+          />
+          <rect width={WORLD.width} height={WORLD.height} fill="url(#vignette)" />
+
+          {phase >= 2 &&
+            POLLEN.map(([x, y, delay]) => (
+              <circle
+                key={x}
+                className="pollen"
+                cx={x}
+                cy={y}
+                r="2"
+                style={{ animationDelay: `${delay}s` }}
+              />
+            ))}
+        </g>
       </svg>
     </LiveContext.Provider>
   );
 });
+
+/** One block of the grey outskirts, repeated around the world along the city's street grid. */
+const OUTSKIRTS_TILE = {
+  width: STREETS.vertical[1] - STREETS.vertical[0],
+  height: STREETS.horizontal[1] - STREETS.horizontal[0],
+  buildings: [
+    [32, 30, 76, 52],
+    [118, 30, 80, 40],
+    [32, 92, 56, 48],
+    [126, 80, 72, 60],
+  ] as Box[],
+};
+
+/** How far the outskirts reach around the world, enough for the widest screens. */
+const OUTSKIRTS_REACH = 1200;
+
+/**
+ * The rest of the city, never restored this Season: grey blocks on the same street grid, with a
+ * ring road around the world, slightly faded so the player's part of the city stands out.
+ */
+const Outskirts = memo(function Outskirts() {
+  const r = OUTSKIRTS_REACH;
+  const { width: w, height: h } = WORLD;
+  const road = STREETS.width;
+  return (
+    <g className="outskirts" aria-hidden="true">
+      <rect x={-r} y={-r} width={w + 2 * r} height={h + 2 * r} fill="url(#outskirts)" />
+      <path
+        className="asphalt"
+        fillRule="evenodd"
+        d={`M${-road} ${-road}H${w + road}V${h + road}H${-road}Z M0 0V${h}H${w}V0Z`}
+      />
+      <rect
+        className="lane"
+        x={-road / 2}
+        y={-road / 2}
+        width={w + road}
+        height={h + road}
+        fill="none"
+      />
+      <path
+        className="outskirts-veil"
+        fillRule="evenodd"
+        d={`M${-r} ${-r}H${w + r}V${h + r}H${-r}Z M0 0V${h}H${w}V0Z`}
+      />
+    </g>
+  );
+});
+
+function round2(value: number): number {
+  return Math.round(value * 1000) / 1000;
+}
 
 /** Whether `inner` lies within `outer`. */
 function inside([x, y, w, h]: Box, [ox, oy, ow, oh]: Box): boolean {

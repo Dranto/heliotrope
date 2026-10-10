@@ -41,7 +41,19 @@ export function clickLevel(upgrades: readonly UpgradeId[]): number {
   return CLICK_UPGRADE_IDS.filter((id) => upgrades.includes(id)).length;
 }
 
-export type CameraLevel = Phase;
+/** The three views of the map (§6): the home courtyard, the neighbourhood, the whole city. */
+export type View = Phase;
+export const VIEWS: readonly View[] = [1, 2, 3];
+
+/**
+ * Part of the world each view keeps fully in sight, whatever the shape of the screen: the home
+ * block and its streets, the blocks around it, the whole city.
+ */
+export const VIEW_FRAMES: Record<View, Box> = {
+  1: [204, 158, 214, 156],
+  2: [96, 56, 430, 338],
+  3: [0, 0, 600, 450],
+};
 
 export interface Camera {
   /** World point at the centre of the view. */
@@ -50,15 +62,8 @@ export interface Camera {
   scale: number;
 }
 
-/** The camera pulls back as the city grows: the home block, the neighbourhood, the city. */
-export const CAMERAS: Record<CameraLevel, Camera> = {
-  1: { x: 311, y: 236, scale: 2.2 },
-  2: { x: 311, y: 236, scale: 1.4 },
-  3: { x: 300, y: 225, scale: 1 },
-};
-
-/** Camera level each generator needs so that its first elements are in view. */
-const GENERATOR_RING: Record<GeneratorId, CameraLevel> = {
+/** View each generator needs so that its first elements are in sight. */
+const GENERATOR_RING: Record<GeneratorId, View> = {
   pot: 1,
   balconyPanel: 1,
   rooftopGarden: 1,
@@ -70,21 +75,88 @@ const GENERATOR_RING: Record<GeneratorId, CameraLevel> = {
 };
 
 /**
- * The camera follows the phase, and pulls back early when the player owns a generator whose
- * place is further out, so a purchase is never built out of sight.
+ * The furthest view the player can switch to. It follows the phase, and opens early when the
+ * player owns a generator whose place is further out, so a purchase is never built out of reach.
  */
-export function cameraLevel(phase: Phase, generators: Record<GeneratorId, number>): CameraLevel {
-  let level: CameraLevel = phase;
+export function furthestView(phase: Phase, generators: Record<GeneratorId, number>): View {
+  let level: View = phase;
   for (const id of Object.keys(GENERATOR_RING) as GeneratorId[]) {
     if (generators[id] > 0 && GENERATOR_RING[id] > level) level = GENERATOR_RING[id];
   }
   return level;
 }
 
-/** SVG transform that frames `camera` in the world-sized view. */
-export function cameraTransform({ x, y, scale }: Camera): string {
-  const tx = WORLD.width / 2 - x * scale;
-  const ty = WORLD.height / 2 - y * scale;
+/** Room taken over the map by the flower and the controls, in screen units. */
+export interface Insets {
+  top: number;
+  left: number;
+  bottom: number;
+}
+
+/**
+ * Camera that shows the whole frame of `view` in a `width` × `height` screen, as large as it
+ * fits beside `insets`. The rest of the screen shows the city around it.
+ */
+export function fitCamera(
+  view: View,
+  width: number,
+  height: number,
+  insets: Insets = { top: 0, left: 0, bottom: 0 },
+): Camera {
+  const [fx, fy, fw, fh] = VIEW_FRAMES[view];
+  // An inset only counts when keeping it free still leaves most of the screen to the frame.
+  const left = insets.left < width * 0.4 ? insets.left : 0;
+  const top = insets.top < height * 0.2 ? insets.top : 0;
+  const bottom = insets.bottom + top < height * 0.45 ? insets.bottom : 0;
+  const scale = Math.min((width - left) / fw, (height - top - bottom) / fh);
+  // Centre the frame in the free area, then express it as the world point at the screen centre.
+  const freeX = left + (width - left) / 2;
+  const freeY = top + (height - top - bottom) / 2;
+  return {
+    x: round(fx + fw / 2 - (freeX - width / 2) / scale),
+    y: round(fy + fh / 2 - (freeY - height / 2) / scale),
+    scale: Math.round(scale * 1000) / 1000,
+  };
+}
+
+/** Width of the clickable heliotrope on screen, whatever the view: never too small to touch. */
+export const FLOWER_SIZE = { min: 136, perScale: 75, max: 290, share: 0.24 } as const;
+/** Height of the flower drawing for its width (its arch is 200 × 260). */
+const FLOWER_RATIO = 260 / 200;
+/** Part of the drawing's height above the bottom of its pot. */
+const POT_BASE = 0.96;
+
+/**
+ * Where the flower stands on screen: its pot on the courtyard planter, its arch rising above the
+ * home block, sized with the zoom so its sprigs and glow keep room to show. `x`, `y` is the
+ * drawing's top-left corner in screen units.
+ */
+export function flowerFrame(
+  camera: Camera,
+  width: number,
+  height: number,
+  at: { x: number; y: number },
+): { x: number; y: number; width: number } {
+  // On a narrow map the smallest flower still leaves most of the city in sight.
+  const min = Math.min(FLOWER_SIZE.min, width * FLOWER_SIZE.share);
+  const size = Math.min(FLOWER_SIZE.max, Math.max(min, camera.scale * FLOWER_SIZE.perScale));
+  const sx = width / 2 + (at.x - camera.x) * camera.scale;
+  const sy = height / 2 + (at.y - camera.y) * camera.scale;
+  return {
+    x: round(sx - size / 2),
+    y: round(sy - size * FLOWER_RATIO * POT_BASE),
+    width: Math.round(size),
+  };
+}
+
+/** SVG transform that frames `camera` in a `width` × `height` view. */
+export function cameraTransform(
+  { x, y, scale }: Camera,
+  width: number = WORLD.width,
+  height: number = WORLD.height,
+): string {
+  const tx = width / 2 - x * scale;
+  const ty = height / 2 - y * scale;
   return `translate(${round(tx)}px, ${round(ty)}px) scale(${scale})`;
 }
 
@@ -202,8 +274,8 @@ export const PANEL_SPOTS: [number, number][] = [
   [548, 28],
 ];
 
-/** Potted heliotropes (§4, generator 1) around the courtyard. */
-export const POT_SPOTS: [number, number][] = [268, 285, 302, 320, 337, 354].flatMap((x) => [
+/** Potted heliotropes (§4, generator 1) around the courtyard, clear of the heliotrope's bed. */
+export const POT_SPOTS: [number, number][] = [266, 278, 290, 332, 344, 356].flatMap((x) => [
   [x, 220] as [number, number],
   [x, 252] as [number, number],
 ]);

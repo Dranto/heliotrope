@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { exportSave, saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
 import { GameStore } from '../game/store';
@@ -131,7 +131,9 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: 'Terreau maison' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /acheter gants de jardinage pour 100/i }));
     expect(screen.getByText(/de nouvelles améliorations apparaîtront/i)).toBeInTheDocument();
-    expect(screen.getByText('+2', { selector: 'strong' })).toBeInTheDocument();
+    // The gloves double the click: the next touch floats a +2 from the flower.
+    fireEvent.click(screen.getByRole('button', { name: /récolter la lumière/i }));
+    expect(screen.getByText('+2', { selector: '.floater' })).toBeInTheDocument();
   });
 
   it('imports a save from the options', () => {
@@ -369,8 +371,57 @@ describe('App', () => {
     renderApp();
     const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });
     expect(tabs).toHaveTextContent('RécolteBâtirAméliorerPlus');
-    fireEvent.click(screen.getByRole('button', { name: 'Bâtir' }));
-    expect(screen.getByRole('button', { name: 'Bâtir' })).toHaveAttribute('aria-current', 'page');
+    fireEvent.click(within(tabs).getByRole('button', { name: 'Bâtir' }));
+    expect(within(tabs).getByRole('button', { name: 'Bâtir' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('keeps the flower in the map, with no text under it', () => {
+    renderApp();
+    const map = document.querySelector('.scene-map')!;
+    expect(
+      within(map as HTMLElement).getByRole('button', { name: /récolter la lumière/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/touchez la fleur/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/par clic/i)).not.toBeInTheDocument();
+  });
+
+  it('switches between the map views opened so far (§6)', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, totalLight: 2e4, generators: { ...base.generators, pot: 3 } });
+    renderApp(new GameStore(localStorage, () => 0));
+    const views = screen.getByRole('radiogroup', { name: 'Vue de la carte' });
+    expect(
+      within(views)
+        .getAllByRole('radio')
+        .map((b) => b.textContent),
+    ).toEqual(['Le Balcon', 'Le Quartier']);
+    expect(within(views).getByRole('radio', { name: 'Le Quartier' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    fireEvent.click(within(views).getByRole('radio', { name: 'Le Balcon' }));
+    expect(within(views).getByRole('radio', { name: 'Le Balcon' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    expect(localStorage.getItem('heliotrope.layout.view')).toBe('1');
+  });
+
+  it('folds a panel away and the side menu with it (§10.1)', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, resources: { light: 50 }, totalLight: 50 });
+    renderApp(new GameStore(localStorage, () => 0));
+    const title = screen.getByRole('button', { name: 'Bâtir', expanded: true });
+    fireEvent.click(title);
+    expect(title).toHaveAttribute('aria-expanded', 'false');
+    expect(title.closest('.panel')).toHaveAttribute('data-open', 'false');
+    const side = screen.getByRole('button', { name: /replier les menus/i });
+    fireEvent.click(side);
+    expect(side).toHaveAttribute('aria-expanded', 'false');
+    expect(document.querySelector('.app')).toHaveAttribute('data-side', 'closed');
   });
 
   it('spends Seeds in the Tree of Seasons and brings in a cooperative (§7.1, §7.2)', () => {

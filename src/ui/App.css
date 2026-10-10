@@ -73,9 +73,12 @@ button {
 
 .app {
   position: relative;
-  max-width: 78rem;
-  margin: 0 auto;
-  padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0.75rem clamp(0.75rem, 1.6vw, 1.5rem);
 }
 
 /* Top bar ---------------------------------------------------------------- */
@@ -85,14 +88,15 @@ button {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem 2rem;
+  gap: 0.6rem 1.5rem;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  margin: 0;
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
   font-weight: 400;
   font-variation-settings:
     'SOFT' 100,
@@ -110,19 +114,11 @@ button {
   stroke-linecap: round;
 }
 
-.tagline {
-  margin: 0.15rem 0 1.5rem;
-  font-family: var(--serif);
-  font-style: italic;
-  font-variation-settings: 'SOFT' 100;
-  color: var(--ink-soft);
-}
-
 .counter {
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  padding: 0.6rem 1.25rem;
+  padding: 0.45rem 1.25rem;
   border: 1px solid var(--glass-border);
   border-radius: 999px;
   background: var(--glass);
@@ -159,7 +155,6 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.25rem;
   padding: 0.75rem 0.75rem 0.75rem 1.25rem;
   border: 1px solid var(--glass-border);
   border-left: 3px solid var(--gold);
@@ -184,11 +179,129 @@ button {
 
 /* Layout ----------------------------------------------------------------- */
 
+/* The map takes the screen; the side menu holds the panels and folds away (§10.1). */
 .layout {
+  --side-width: clamp(25rem, 31vw, 36rem);
   display: grid;
-  grid-template-columns: minmax(13rem, 0.7fr) minmax(0, 2fr) minmax(22rem, 1.25fr);
-  gap: 1.25rem;
-  align-items: start;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) var(--side-width);
+  gap: 1rem;
+  min-height: 0;
+}
+
+.app[data-side='closed'] .layout {
+  --side-width: 2.75rem;
+}
+
+.side {
+  display: flex;
+  gap: 0.6rem;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.side-toggle {
+  position: sticky;
+  top: 0;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.side-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.side-panels {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+  padding-bottom: 1rem;
+}
+
+.app[data-side='closed'] .side-panels {
+  display: none;
+}
+
+/* One column: each panel in reading order. Two columns on very large screens. */
+.side-column {
+  display: contents;
+}
+
+.side .upgrades {
+  order: 1;
+}
+
+.side .generators {
+  order: 2;
+}
+
+.side .restoration {
+  order: 3;
+}
+
+.side .cooperatives {
+  order: 4;
+}
+
+/* Folding a panel keeps only its title, so the others and the map get the room. */
+.panel-title {
+  margin: 0;
+}
+
+.panel-title button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.panel-title button:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 3px;
+  border-radius: 0.4rem;
+}
+
+.panel-title .fold {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+
+.panel-title button[aria-expanded='false'] .fold {
+  transform: rotate(-90deg);
+}
+
+.panel[data-open='false'] > :not(.panel-head, .panel-title, .restoration-head),
+.panel[data-open='false'] .panel-head > :not(.panel-title) {
+  display: none;
+}
+
+.panel[data-open='false'] :is(.panel-head, .panel-title) {
+  margin-bottom: 0;
 }
 
 .panel {
@@ -203,18 +316,40 @@ button {
 
 /* Flower ----------------------------------------------------------------- */
 
+/* The heliotrope rises from the home courtyard, at the heart of the city, inside a light gilded
+   arch that leaves the city visible behind it. Only the plant catches the pointer, so the map
+   around it stays clickable. It glides with the camera. */
+.map-flower {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition:
+    left 1.1s cubic-bezier(0.65, 0, 0.35, 1),
+    top 1.1s cubic-bezier(0.65, 0, 0.35, 1),
+    width 1.1s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.map-flower .flower-button {
+  pointer-events: none;
+}
+
+.map-flower :is(.flower-sway, .flower-hit) {
+  pointer-events: visiblePainted;
+}
+
+.map-flower .arch-fill {
+  opacity: 0.45;
+}
+
 .flower-panel {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.25rem 1rem 1.5rem;
-  text-align: center;
+  justify-content: center;
 }
 
 .flower-button {
   position: relative;
   width: 100%;
-  max-width: 15rem;
+  pointer-events: auto;
   padding: 0;
   border: none;
   border-radius: 999px 999px 1.25rem 1.25rem;
@@ -233,6 +368,7 @@ button {
   display: block;
   width: 100%;
   overflow: visible;
+  filter: drop-shadow(0 6px 10px rgb(59 51 40 / 0.28));
 }
 
 .flower-panel {
@@ -473,16 +609,6 @@ button {
   }
 }
 
-.click-value {
-  margin: 0.75rem 0 0;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-soft);
-}
-
-.click-value strong {
-  color: var(--ink);
-}
-
 .hint {
   margin: 0.25rem 0 0;
   font-size: 0.85rem;
@@ -492,23 +618,49 @@ button {
 /* Scene: the neighbourhood seen from above (§6, §10.4) ------------------- */
 
 .scene {
+  display: flex;
+  min-height: 0;
   overflow: hidden;
 }
 
 .scene-map {
   position: relative;
+  flex: 1;
+  min-height: 22rem;
+  container-type: size;
 }
 
-.scene svg {
+.scene-map > svg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
-/* The camera pulls back slowly when a new part of the city opens up. */
+/* The camera glides from one view to the next. */
 .camera {
   transform-origin: 0 0;
-  transition: transform 2.8s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* The grey outskirts around the world: the rest of the city, faded behind a warm veil. */
+.outskirts-block {
+  fill: #d4cfc4;
+  stroke: #e4ded2;
+  stroke-width: 2;
+}
+
+.outskirts-roof {
+  fill: #b3aea5;
+}
+
+.outskirts-shadow {
+  fill: #8f8a82;
+}
+
+.outskirts-veil {
+  fill: rgb(251 246 236 / 0.42);
 }
 
 .asphalt {
@@ -909,12 +1061,7 @@ button {
   pointer-events: none;
 }
 
-/* Right column: upgrades above generators (§10.1) ------------------------ */
-
-.column {
-  display: grid;
-  gap: 1.25rem;
-}
+/* Panels of the side menu (§10.1) --------------------------------------- */
 
 .panel-head {
   display: flex;
@@ -1728,28 +1875,35 @@ button {
 .scene-caption {
   position: absolute;
   top: 0.75rem;
-  left: 1rem;
-  z-index: 1;
+  left: 0.75rem;
+  z-index: 2;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 0.4rem;
+}
+
+.scene-phase,
+.scene-season {
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(251 246 236 / 0.85);
+  backdrop-filter: blur(6px);
   font-family: var(--serif);
   font-style: italic;
   font-size: 0.9rem;
   font-variation-settings: 'SOFT' 100;
   color: var(--ink-soft);
-  padding: 0.2rem 0.75rem;
-  border-radius: 999px;
-  background: rgb(251 246 236 / 0.82);
-  backdrop-filter: blur(6px);
 }
 
 .scene-phase {
   animation: fade-in 1.2s ease;
 }
 
-.scene-season::before {
-  content: '·';
-  margin-right: 0.4rem;
+.views {
+  background: rgb(251 246 236 / 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
 }
 
 .pollen {
@@ -2282,14 +2436,64 @@ button {
 
 /* Responsive and motion -------------------------------------------------- */
 
-@media (max-width: 72rem) {
+/* Desktop: the whole game fits the window; only the side menu scrolls. */
+@media (min-width: 64rem) and (min-height: 32rem) {
+  .app {
+    height: 100vh;
+    height: 100dvh;
+  }
+}
+
+/* Very large screens: the side menu widens into two columns so everything shows at once. */
+@media (min-width: 110rem) {
   .layout {
-    grid-template-columns: minmax(14rem, 1fr) minmax(0, 1.5fr);
+    --side-width: clamp(46rem, 44vw, 62rem);
   }
 
-  .scene {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .side-panels {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: start;
+  }
+
+  .side-column {
+    display: grid;
+    gap: 1rem;
+  }
+}
+
+/* Tablets: the map on top, as tall as most of the screen, the panels under it. */
+@media (max-width: 63.99rem) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .scene-map {
+    min-height: 0;
+    height: clamp(20rem, 62vh, 44rem);
+  }
+
+  .side {
+    overflow: visible;
+  }
+
+  .side-toggle {
+    display: none;
+  }
+
+  .app[data-side='closed'] .side-panels {
+    display: grid;
+  }
+}
+
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+  .side-panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .side-column {
+    display: grid;
+    gap: 1rem;
   }
 }
 
@@ -2298,38 +2502,48 @@ button {
     padding-bottom: 6rem;
   }
 
-  .layout {
-    grid-template-columns: 1fr;
+  /* The map stays in sight on every tab, smaller while building or improving, so each purchase
+     is seen growing on it. */
+  .scene-map {
+    height: clamp(15rem, 36vh, 22rem);
   }
 
-  .scene {
-    grid-row: auto;
+  .app[data-tab='harvest'] .scene-map {
+    height: clamp(20rem, 58vh, 34rem);
   }
 
-  .flower-button {
-    max-width: 11rem;
+  .scene-caption {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  .views button {
+    min-width: 0;
+    padding: 0 0.55rem;
+    font-size: 0.78rem;
   }
 
   .counter {
     order: 3;
     width: 100%;
     flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
     justify-content: space-between;
   }
 
+  .counter-amount {
+    font-size: 1.3rem;
+  }
+
   /* §10.3: one section at a time, picked in the tab bar. */
-  .app[data-tab='harvest'] .column,
-  .app[data-tab='build'] :is(.flower-panel, .scene, .upgrades, .cooperatives),
-  .app[data-tab='improve'] :is(.flower-panel, .scene, .generators),
+  .app[data-tab='harvest'] :is(.upgrades, .generators, .cooperatives),
+  .app[data-tab='build'] :is(.upgrades, .restoration, .cooperatives),
+  .app[data-tab='improve'] :is(.generators, .restoration),
   .app[data-tab='more'] .layout {
     display: none;
   }
 
   .app:not([data-tab='more']) .menu {
-    display: none;
-  }
-
-  .app[data-tab='more'] .tagline {
     display: none;
   }
 

@@ -8,6 +8,8 @@ import {
 } from '../game/cooperatives';
 import { t } from '../i18n';
 import { cooperativeBuysText } from '../i18n/talents';
+import { usePanelOpen } from './layoutPrefs';
+import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
 
 /** A cargo bike, the mark of the cooperatives in the panel and on the map. */
@@ -29,12 +31,15 @@ export function Cooperatives() {
   const store = useGameStore();
   const state = useGameState();
   const unlocked = unlockedCooperatives(state);
+  const [open, toggleOpen] = usePanelOpen('cooperatives');
   if (unlocked.length === 0) return null;
   const toggle = (id: CooperativeId) => store.dispatch((s) => toggleCooperative(s, id));
 
   return (
-    <section className="panel cooperatives" aria-labelledby="cooperatives-title">
-      <h2 id="cooperatives-title">{t.cooperatives.title}</h2>
+    <section className="panel cooperatives" aria-labelledby="cooperatives-title" data-open={open}>
+      <PanelTitle id="cooperatives-title" open={open} onToggle={toggleOpen}>
+        {t.cooperatives.title}
+      </PanelTitle>
       <p className="hint">{t.cooperatives.hint}</p>
       <ul className="coop-list">
         {unlocked.map((id) => {
