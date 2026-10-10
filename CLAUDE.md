@@ -40,3 +40,10 @@ a design decision changes, update that document in the same PR.
   `save.ts` so existing players keep their saves.
 - Numbers are plain JS `number` for now. Switch to a big-number library only when the design
   doc's progression needs values past ~1e308.
+
+## Reviews and bug fixes
+
+- `REVIEW.md` lists what blocks a PR and what is optional.
+- `.claude/agents/code-reviewer.md` reviews a PR; `.claude/agents/bug-fixer.md` fixes one bug
+  with a regression test. A scheduled Claude routine runs both on open PRs and on issues
+  labelled `bug`.

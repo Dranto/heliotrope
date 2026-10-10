@@ -1,0 +1,23 @@
+name: Bug report
+description: Something in the game does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start a new game
+        2. ...
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: Firefox 140, Chrome 150...
