@@ -39,12 +39,28 @@ export function biodiversityBonus(state: GameState): number {
   return steps * BIODIVERSITY_STEP;
 }
 
-/** §8: multiplier applied to every generator: Seeds × Milestones × biodiversity × Floraison. */
+/** §5.3: additive global bonus from the upgrades that grow with the other upgrades bought. */
+export function upgradeSynergyBonus(state: GameState): number {
+  const upgrades = boughtUpgrades(state);
+  const synergies = upgrades.filter(({ effect }) => effect.kind === 'synergy').length;
+  let bonus = 0;
+  for (const { effect } of upgrades) {
+    if (effect.kind !== 'upgradeSynergy') continue;
+    bonus += effect.bonusPerUpgrade * (effect.counts === 'all' ? upgrades.length : synergies);
+  }
+  return bonus;
+}
+
+/**
+ * §8: multiplier applied to every generator: Seeds × Milestones × biodiversity × upgrade
+ * synergies × Floraison.
+ */
 export function globalMultiplier(state: GameState): number {
   return (
     (1 + seedBonus(state.seeds)) *
     (1 + achievementBonus(state)) *
     (1 + biodiversityBonus(state)) *
+    (1 + upgradeSynergyBonus(state)) *
     effectFactor(state.effects, 'bloom')
   );
 }
@@ -116,8 +132,13 @@ export function isUpgradeBought(state: GameState, id: UpgradeId): boolean {
 
 /** An upgrade appears when its condition is met; conditions never become false in a Season. */
 export function isUpgradeUnlocked(state: GameState, id: UpgradeId): boolean {
-  const { owned, totalLight } = UPGRADES[id].condition;
+  const { owned, totalLight, upgrades, synergies } = UPGRADES[id].condition;
   if (totalLight !== undefined && state.totalLight < totalLight) return false;
+  if (upgrades !== undefined && state.upgrades.length < upgrades) return false;
+  if (synergies !== undefined) {
+    const bought = boughtUpgrades(state).filter(({ effect }) => effect.kind === 'synergy');
+    if (bought.length < synergies) return false;
+  }
   if (owned) {
     for (const [generator, count] of Object.entries(owned) as [GeneratorId, number][]) {
       if (state.generators[generator] < count) return false;

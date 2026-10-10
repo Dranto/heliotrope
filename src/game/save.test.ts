@@ -26,7 +26,6 @@ function playedState(): GameState {
     seasonSeconds: 600,
     idleSeconds: 30,
     achievements: ['light.3', 'pot.1'],
-    journal: ['firstLight', 'firstPot'],
     butterflies: 3,
     butterfly: { nextIn: 0, visible: 4.5 },
     effects: [{ kind: 'bloom', remaining: 20 }],
@@ -174,16 +173,27 @@ describe('export and import', () => {
     expect(state.seeds).toBe(10);
     expect(state.generators.pot).toBe(2);
     expect(state.achievements).toEqual([]);
-    expect(state.journal).toEqual([]);
+    expect(state).not.toHaveProperty('journal');
     expect(state.settings).toEqual({ notation: 'short', reducedMotion: false });
     expect(state.butterfly.visible).toBe(0);
   });
 
-  it('drops invalid Milestones, journal entries, effects and settings', () => {
+  it('migrates a v5 save, dropping the journal and keeping everything else', () => {
+    const played = playedState();
+    const v5 = JSON.stringify({
+      ...played,
+      version: 5,
+      journal: ['firstLight', 'firstPot'],
+    });
+    const state = deserialize(v5, 0)!;
+    expect(state).toEqual(played);
+    expect(state).not.toHaveProperty('journal');
+  });
+
+  it('drops invalid Milestones, effects and settings', () => {
     const json = JSON.stringify({
       version: STATE_VERSION,
       achievements: ['pot.1', 'cheat', 'pot.1'],
-      journal: ['firstLight', 'nope'],
       butterflies: -2,
       butterfly: { nextIn: 1e9, visible: 99 },
       effects: [{ kind: 'bloom', remaining: 1e6 }, { kind: 'magic', remaining: 3 }, null],
@@ -193,7 +203,6 @@ describe('export and import', () => {
     const state = deserialize(json, 0)!;
     const fresh = createInitialState(0);
     expect(state.achievements).toEqual(['pot.1']);
-    expect(state.journal).toEqual(['firstLight']);
     expect(state.butterflies).toBe(0);
     expect(state.butterfly).toEqual({ nextIn: 8 * 60, visible: 12 });
     expect(state.effects).toEqual([]);

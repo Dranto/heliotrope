@@ -1856,48 +1856,6 @@ button {
   }
 }
 
-/* Neighbourhood journal (§6) -------------------------------------------- */
-
-.journal {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  padding: 0.85rem 1.25rem 1rem;
-  border-top: 1px solid rgb(143 174 139 / 0.35);
-}
-
-.journal-latest {
-  flex: 1 1 16rem;
-  margin: 0;
-  font-family: var(--serif);
-  font-style: italic;
-  font-variation-settings: 'SOFT' 100;
-  color: var(--ink);
-  animation: fade-in 0.8s ease;
-}
-
-.journal-open {
-  font-size: 0.9rem;
-  min-height: 2.75rem;
-}
-
-.journal-list {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1rem 0 0;
-  padding-left: 1.5rem;
-  font-family: var(--serif);
-  font-variation-settings: 'SOFT' 100;
-}
-
-.journal-list li::marker {
-  color: var(--sage);
-  font-family: var(--sans);
-  font-size: 0.8rem;
-}
-
 /* Effects, notifications ------------------------------------------------ */
 
 .effects {
@@ -1953,10 +1911,6 @@ button {
 
 .notice h2 {
   font-size: 1.1rem;
-}
-
-.notice .flavour {
-  margin-top: 0.25rem;
 }
 
 .menu-count {

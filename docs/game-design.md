@@ -36,6 +36,7 @@
 - **Optimiste, jamais naïf.** Le monde a souffert, mais le jeu parle de réparation, pas de catastrophe. Pas de compte à rebours, pas de punition.
 - **Collectif.** Les bâtiments sont partagés (serre *communautaire*, réseau *d'entraide*). Les textes parlent de « nous » et de voisins, pas d'un magnat qui accumule.
 - **Organique et technique à la fois.** Le solarpunk mêle plantes et technologie douce : panneaux solaires couverts de lierre, miroirs de concentration au milieu des vergers.
+- **Raconté par le jeu, pas par du texte.** Décision d'Antoine (2026-10-10) : pas de journal ni de récit écrit. L'histoire se lit uniquement dans le gameplay : la scène qui reverdit, les animations, les événements en jeu. Si un moment doit être raconté, il devient quelque chose qui se passe à l'écran ou une règle qui change, jamais une ligne de texte (voir §6).
 - **Élégant et lumineux.** Design moderne et épuré, lumière dorée, touches florales (voir §10.4), animations lentes, sons discrets. Le joueur doit pouvoir laisser l'onglet ouvert sans être agressé.
 
 **Ce que le jeu n'est pas.** Pas de pay-to-win, pas de minuteurs frustrants, pas de pénalité pour l'absence, pas d'humour cynique.
@@ -136,13 +137,47 @@ Le clic vaut donc `(1 × multiplicateursDeClic) + (% de la production/s)`. Cela 
 
 ### 5.3 Synergies
 
-Petites améliorations qui lient deux générateurs, pour récompenser une ville variée plutôt qu'un seul bâtiment empilé. Exemples :
+Petites améliorations qui lient deux générateurs, pour récompenser une ville variée plutôt qu'un seul bâtiment empilé. Le générateur indiqué gagne un bonus (additif) par exemplaire possédé de la source.
 
-- **Compost partagé** : le Potager sur le toit gagne +5 % par Serre communautaire possédée.
-- **Ombre utile** : la Canopée urbaine gagne +1 % par Panneau de balcon possédé.
-- **Chaleur récupérée** : la Serre communautaire gagne +2 % par Centrale à miroirs possédée.
+**Entre bâtiments voisins.** Chaque paire de bâtiments voisins est liée dans les deux sens : le plus cher aide généreusement le moins cher, et le moins cher, possédé en nombre, aide un peu le plus cher.
 
-Condition : 15 exemplaires de chacun des deux générateurs. Coût : ~10 000 × le coût de base du plus cher des deux *(à valider)*.
+| Nom | Gagne | Par exemplaire de | Bonus |
+|---|---|---|---|
+| Pots au soleil | Héliotrope en pot | Panneau de balcon | +5 % |
+| Toits branchés | Panneau de balcon | Potager sur le toit | +5 % |
+| Compost partagé | Potager sur le toit | Serre communautaire | +5 % |
+| Tours à semis | Serre communautaire | Ferme verticale | +4 % |
+| Lumière réfléchie | Ferme verticale | Centrale à miroirs | +3 % |
+| Miroirs au frais | Centrale à miroirs | Canopée urbaine | +3 % |
+| Racines vivantes | Canopée urbaine | Arcologie vivante | +3 % |
+| Boutures de pot | Panneau de balcon | Héliotrope en pot | +1 % |
+| Prises sur le toit | Potager sur le toit | Panneau de balcon | +1 % |
+| Coin des jardiniers | Serre communautaire | Potager sur le toit | +1 % |
+| Étages pépinière | Ferme verticale | Serre communautaire | +1 % |
+| Fleurs de ferme | Centrale à miroirs | Ferme verticale | +1 % |
+| Clairières ensoleillées | Canopée urbaine | Centrale à miroirs | +1 % |
+| Corridors de canopée | Arcologie vivante | Canopée urbaine | +1 % |
+
+**Entre bâtiments éloignés.**
+
+| Nom | Gagne | Par exemplaire de | Bonus |
+|---|---|---|---|
+| Ombre utile | Canopée urbaine | Panneau de balcon | +1 % |
+| Chaleur récupérée | Serre communautaire | Centrale à miroirs | +2 % |
+| Mille pots | Arcologie vivante | Héliotrope en pot | +0,5 % |
+| Réseau citoyen | Centrale à miroirs | Panneau de balcon | +0,5 % |
+
+Condition : 10 exemplaires de chacun des deux générateurs, ou 5 quand l'un des deux fait partie des trois derniers (Centrale, Canopée, Arcologie), plus rares. Coût : 2 000 × le coût de base du plus cher des deux, ou 100 × pour les synergies des trois derniers, pour qu'elles restent à portée. Celles des derniers bâtiments arrivent surtout à partir de la 2ᵉ Saison, ce qui laisse quelque chose à découvrir après le premier prestige.
+
+**Entre améliorations.** Trois améliorations grandissent avec les autres améliorations achetées. Leur bonus s'ajoute à toute la production (multiplicateur global, §8) :
+
+| Nom | Condition | Coût | Effet |
+|---|---|---|---|
+| Savoirs partagés | 10 améliorations achetées | 50 000 | +0,5 % par amélioration achetée |
+| Grainothèque | 30 améliorations achetées | 50 M | +0,5 % par amélioration achetée |
+| Les communs | 6 synergies entre bâtiments achetées | 500 M | +3 % par synergie entre bâtiments achetée |
+
+> Synergies (après le MVP, 2026-10-10) : Antoine voulait adoucir encore l'équilibrage en ajoutant beaucoup de synergies plutôt qu'en touchant aux valeurs des générateurs. On passe de 3 synergies à 18 entre bâtiments et 3 entre améliorations. Les synergies se débloquent plus tôt (10 exemplaires au lieu de 15) et coûtent moins cher (2 000 × au lieu de 10 000 × le coût de base). Les coûts et productions des générateurs ne changent pas. La 1ʳᵉ Saison conseillée arrive vers 2 h 15 au lieu de 2 h 50 (§8).
 
 ### 5.4 Bonus de biodiversité
 
@@ -158,18 +193,20 @@ Chaque phase change la scène centrale (le décor reverdit) et débloque des él
 |---|---|---|---|---|
 | 1 | **Le Balcon** | 0 – 6 min | Clic, générateurs 1 à 3, premières améliorations | Un balcon gris, une fleur, puis des pots et un panneau |
 | 2 | **Le Quartier** | 6 min – 30 min | Générateurs 4 et 5, synergies, Jalons, Papillon doré | Les toits verdissent, une serre apparaît |
-| 3 | **La Ville** | 30 min – 2 h 40 | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
+| 3 | **La Ville** | 30 min – 2 h 15 | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
 | 4 | **Les Saisons** | après la 1ʳᵉ Saison | Écran des Saisons, statistiques de prestige | La scène change de teinte selon la saison (printemps, été, automne, hiver) |
 
 Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en cours** (seuils indicatifs : Phase 2 à 10 000, Phase 3 à 10 M).
 
-**Journal du quartier.** Un fil de courts messages narratifs déclenchés par les paliers (« Mme Okafor a ramené des boutures de sa sœur. », « La rue des Tilleuls a voté pour un jardin partagé. »). Il porte l'histoire sans jamais bloquer le jeu.
+**Le récit passe par le gameplay (2026-10-10).** Le Journal du quartier livré au jalon 4 a été retiré : il n'y a plus de messages narratifs. Ses temps forts sont repris ainsi :
 
-**Implémentation (jalon 4).** `src/game/phases.ts` et `src/game/journal.ts`.
+- **Déjà portés par la scène.** Premier pot, premier panneau, premier potager, serre, ferme verticale, miroirs, canopée, arcologie : chaque bâtiment apparaît sur la carte avec son animation. « Le quartier se réveille » et « d'autres quartiers verdissent » : la caméra qui recule de phase en phase et le quartier qui reverdit avec la production. Premier Papillon doré : le papillon lui-même. Dix Jalons : l'annonce et l'écran des Jalons (§9.3). Les Saisons accomplies : la teinte de saison de la scène.
+- **Pistes d'événements en jeu, plus tard.** Les voisins qui apportent des boutures et le vote du jardin partagé de la rue des Tilleuls peuvent devenir des Projets du quartier visibles sur la carte (roadmap, M6). « La terre se souvient » d'une Saison à l'autre prend corps avec les parcelles qui restent restaurées et l'Arbre des Saisons (roadmap, M6 et M7). Rien de tout cela n'est construit pour l'instant.
+
+**Implémentation (jalon 4).** `src/game/phases.ts`.
 
 - La scène suit la phase : le ciel passe de l'aube (phase 1) au plein midi (phase 2) puis à la fin d'après-midi (phase 3), et le nom de la phase s'affiche en légende.
 - Phase 4 : à partir de la 2ᵉ Saison, la scène prend la teinte d'une saison, en commençant par le printemps puis en suivant le cycle (printemps, été, automne, hiver). La 1ʳᵉ Saison n'a pas de teinte propre. Le feuillage et le ciel changent de couleur ; rien d'autre ne change.
-- Le Journal compte 18 entrées déclenchées par la Lumière de la Saison, les premiers exemplaires de chaque bâtiment, le premier Papillon doré, les Jalons et les Saisons accomplies. Les entrées sont **conservées d'une Saison à l'autre** pour que l'histoire avance au lieu de se répéter ; les Saisons suivantes en débloquent de nouvelles. La dernière entrée s'affiche sous la scène, le carnet complet s'ouvre à la demande, et la fenêtre de retour hors ligne reprend la dernière entrée.
 
 **Scène vue du dessus (post-MVP, 2026-10-10).** Demande d'Antoine : une progression plus visuelle, la ville au centre de l'écran, vue du dessus, où les bâtiments apparaissent avec des animations élégantes au fil des achats. `src/ui/Neighbourhood.tsx` dessine la scène, `src/ui/neighbourhood.ts` porte le plan et les règles.
 
@@ -190,7 +227,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Thématiquement : l'hiver passe, on replante tout, mais la terre garde la mémoire de ce qui a poussé.
 
 **Remis à zéro :** Lumière, générateurs, améliorations, phase visuelle.
-**Conservé :** Graines d'Héliotrope, Jalons, Journal du quartier, statistiques globales, options.
+**Conservé :** Graines d'Héliotrope, Jalons, statistiques globales, options.
 
 ### Formule
 
@@ -214,7 +251,7 @@ Points de repère *(à valider)* :
 
 - Le bouton Nouvelle Saison est disponible dès qu'on gagnerait au moins **1** Graine, mais l'interface conseille d'attendre d'en gagner au moins 10 pour la première (« La terre n'est pas encore prête »). On ne bloque pas, on conseille.
 - L'écran de confirmation montre clairement : ce qui sera perdu, les Graines gagnées, le bonus avant/après.
-- Cible : 1ʳᵉ Saison rentable vers **2 h 30 – 3 h** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
+- Cible : 1ʳᵉ Saison rentable vers **2 h – 2 h 30** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
 
 **Implémentation (jalon 3).** `src/game/seasons.ts`. Précisions retenues :
 
@@ -239,6 +276,7 @@ productionGlobale/s = Σ_types( prodBase × possédés × multTypes )
                       × (1 + 0,05 × graines)
                       × (1 + 0,01 × jalons)
                       × (1 + bonusBiodiversité)
+                      × (1 + bonusSynergiesAméliorations)   // §5.3, entre améliorations
                       × multÉvénement            // Floraison du Papillon doré : ×3
 coût(n)             = coûtBase × 1,15^n
 valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
@@ -259,13 +297,13 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 | 1ᵉʳ Panneau de balcon | ~45 s |
 | 1ᵉʳ Potager sur le toit | ~2 min 30 |
 | 1ʳᵉ Serre communautaire | ~7 min |
-| 1ʳᵉ Ferme verticale | ~17 min |
+| 1ʳᵉ Ferme verticale | ~15 min |
 | 1ʳᵉ Centrale à miroirs | ~35 min |
-| 1ʳᵉ Canopée urbaine | ~1 h 10 |
-| 1ʳᵉ Arcologie vivante | ~2 h 05 |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~2 h 40 |
+| 1ʳᵉ Canopée urbaine | ~1 h 05 |
+| 1ʳᵉ Arcologie vivante | ~1 h 45 |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~2 h 15 |
 
-Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments.
+Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie.
 
 ### Outil de simulation
 
@@ -273,7 +311,7 @@ L'équilibrage doit être vérifié par un **simulateur sans interface** qui rej
 
 **Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat dépend un peu de la graine, surtout en milieu de partie où un Papillon tombe plus ou moins tôt (chiffres sous le tableau ci-dessous).
 
-Sortie actuelle (équilibrage adouci) :
+Sortie actuelle (avec les synergies) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
@@ -281,13 +319,13 @@ Sortie actuelle (équilibrage adouci) :
 | 1ᵉʳ Panneau de balcon | ~45 s | 44,6 s | −1 % | 43,3 s |
 | 1ᵉʳ Potager sur le toit | ~2 min 30 | 2,7 min | +8 % | 2,2 min |
 | 1ʳᵉ Serre communautaire | ~7 min | 7,5 min | +7 % | 5,2 min |
-| 1ʳᵉ Ferme verticale | ~17 min | 14,7 min | −14 % | 10,8 min |
-| 1ʳᵉ Centrale à miroirs | ~35 min | 35,8 min | +2 % | 25,3 min |
-| 1ʳᵉ Canopée urbaine | ~1 h 10 | 1 h 03 | −10 % | 41 min |
-| 1ʳᵉ Arcologie vivante | ~2 h 05 | 2 h 16 | +9 % | 1 h 22 |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~2 h 40 | 2 h 51 | +7 % | 1 h 47 |
+| 1ʳᵉ Ferme verticale | ~15 min | 14,7 min | −2 % | 10,5 min |
+| 1ʳᵉ Centrale à miroirs | ~35 min | 35,8 min | +2 % | 23,7 min |
+| 1ʳᵉ Canopée urbaine | ~1 h 05 | 1 h 05 | +1 % | 42 min |
+| 1ʳᵉ Arcologie vivante | ~1 h 45 | 1 h 45 | 0 % | 1 h 07 |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~2 h 15 | 2 h 12 | −2 % | 1 h 22 |
 
-Le joueur simulé atteint 18 Jalons et attrape 29 Papillons pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −16 % et +26 % de sa cible. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+Le joueur simulé atteint 20 Jalons, attrape 22 Papillons et achète 31 améliorations (dont 6 synergies entre bâtiments et 2 entre améliorations) pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −4 % et +21 % de sa cible. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 ### Affichage des nombres
 
@@ -302,7 +340,7 @@ Le joueur simulé atteint 18 Jalons et attrape 29 Papillons pendant sa 1ʳᵉ Sa
 ### 9.1 Progression hors ligne
 
 - Au retour, le jeu calcule la production pendant l'absence à **100 %** de la production/s au moment du départ, **plafonnée à 8 h** *(à valider)*.
-- Une fenêtre « Pendant ton absence… » résume le gain, avec une phrase d'ambiance du Journal.
+- Une fenêtre « Pendant ton absence… » résume le gain.
 - Les événements temporaires (Papillon doré) ne comptent pas hors ligne.
 
 ### 9.2 Papillon doré
@@ -372,12 +410,12 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 │   le soleil)  │                             │ Héliotrope en pot 42│
 │               │                             │ Panneau de balcon 18│
 │   +12 / clic  │                             │ Potager sur le toit │
-│               │   Journal du quartier ▸     │ ░░ ??? ░░  1,4 M    │
+│               │                             │ ░░ ??? ░░  1,4 M    │
 └───────────────┴─────────────────────────────┴─────────────────────┘
 ```
 
 - **Gauche :** l'héliotrope cliquable (petite animation et nombre flottant à chaque clic), valeur du clic.
-- **Centre :** la scène du quartier vue du dessus (§6), plus large que les deux colonnes latérales depuis 2026-10-10 : c'est la pièce maîtresse de l'écran. Le Papillon doré la traverse ; le Journal du quartier en bas.
+- **Centre :** la scène du quartier vue du dessus (§6), plus large que les deux colonnes latérales depuis 2026-10-10 : c'est la pièce maîtresse de l'écran. Le Papillon doré la traverse.
 - **Droite :** améliorations disponibles (icônes avec infobulle) puis liste des générateurs (nom, quantité, prix, production, infobulle avec le détail des multiplicateurs).
 - **Haut :** compteur de Lumière, production/s, menu.
 
@@ -405,7 +443,7 @@ Même contenu, une colonne : compteur en haut, fleur + scène au centre, barre d
 
 **Typographie.**
 
-- **Titres et noms (générateurs, Saisons, Journal) : [Fraunces](https://fonts.google.com/specimen/Fraunces)**, serif variable aux formes douces et organiques ; réglée avec un peu de « SOFT » pour un côté floral sans être fantaisiste.
+- **Titres et noms (générateurs, Saisons, Jalons) : [Fraunces](https://fonts.google.com/specimen/Fraunces)**, serif variable aux formes douces et organiques ; réglée avec un peu de « SOFT » pour un côté floral sans être fantaisiste.
 - **Interface et chiffres : [Manrope](https://fonts.google.com/specimen/Manrope)**, sans-serif géométrique moderne, avec chiffres tabulaires (`font-variant-numeric: tabular-nums`) pour que les compteurs ne « sautent » pas.
 - Deux polices au maximum, toutes deux sous licence libre (OFL) et hébergées avec le jeu (pas d'appel à un service tiers au chargement).
 
@@ -458,7 +496,7 @@ Les têtes sont des dômes de fleurettes à cinq lobes, disposées selon l'angle
 
 Ces points ne choisissent pas la technique (c'est le rôle du fil de mise en place), mais en découlent directement du design :
 
-- **Contenu piloté par les données.** Générateurs, améliorations, jalons et messages du Journal sont décrits dans des fichiers de données, pas codés en dur. Ajouter un générateur ne doit pas demander de toucher la logique.
+- **Contenu piloté par les données.** Générateurs, améliorations et jalons sont décrits dans des fichiers de données, pas codés en dur. Ajouter un générateur ne doit pas demander de toucher la logique.
 - **Logique pure, séparée de l'affichage.** Calcul de la production, des coûts, du prestige : fonctions pures testables et réutilisées par le simulateur (§8).
 - **Boucle basée sur le temps écoulé**, pas sur le nombre d'images : la production dépend du delta de temps réel, ce qui rend la progression hors ligne et les onglets en arrière-plan cohérents.
 - **Grands nombres.** Le MVP reste sous 1e300 ; les nombres JavaScript standards suffisent, mais tous les calculs passent par un petit module numérique pour pouvoir basculer plus tard vers une bibliothèque de grands nombres.
@@ -502,13 +540,13 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 
 - Jalons (succès) et leur bonus.
 - Papillon doré.
-- Journal du quartier.
+- ~~Journal du quartier~~ (retiré le 2026-10-10, voir §6).
 - Scène centrale évolutive par phase, saisons visuelles.
 - Mise en page mobile, accessibilité, écran Options complet.
 
 **Critère de fin :** le jeu est présentable à des joueurs extérieurs.
 
-*Livré (jalon 4) : 43 Jalons et leur écran, Papillon doré, Journal du quartier, ciel par phase et teintes de saison, barre d'onglets mobile, options d'affichage, fenêtres accessibles au clavier, sauvegarde v5 ; nouvelle passe d'équilibrage (§4, §8, §9.2).*
+*Livré (jalon 4) : 43 Jalons et leur écran, Papillon doré, Journal du quartier (retiré depuis, §6), ciel par phase et teintes de saison, barre d'onglets mobile, options d'affichage, fenêtres accessibles au clavier, sauvegarde v5 ; nouvelle passe d'équilibrage (§4, §8, §9.2).*
 
 **Le MVP = M1 à M4.**
 
@@ -539,4 +577,4 @@ Décisions qui appartiennent à Antoine. En attendant sa réponse, le document a
 | Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP, pour livrer plus vite une boucle complète |
 | Q5 | ~~Style graphique ?~~ | **Décidé :** élégant, très moderne, solarpunk ensoleillé et légèrement floral (voir §10.4) |
 | Q6 | Monétisation ? | Aucune : jeu gratuit, sans pub |
-| Q7 | Récit : simple ambiance (Journal) ou vraie histoire avec personnages ? | Ambiance légère via le Journal du quartier |
+| Q7 | ~~Récit : simple ambiance (Journal) ou vraie histoire avec personnages ?~~ | **Décidé (2026-10-10) :** ni l'un ni l'autre. Pas de journal ni de texte narratif : l'histoire est racontée uniquement par le gameplay (scène, animations, événements en jeu), voir §1 et §6 |
