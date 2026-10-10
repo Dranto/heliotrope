@@ -31,13 +31,13 @@ describe('upgrade data', () => {
   it('prices ×2 upgrades from the generator base cost (§5.1)', () => {
     expect(UPGRADES['pot.1'].cost).toBe(150);
     expect(UPGRADES['pot.4'].cost).toBe(750_000);
-    expect(UPGRADES['arcology.7'].cost).toBe(800_000_000 * 50_000_000_000);
+    expect(UPGRADES['arcology.7'].cost).toBe(200_000_000 * 50_000_000_000);
     expect(UPGRADES['greenhouse.3'].condition).toEqual({ owned: { greenhouse: 25 } });
   });
 
   it('prices synergies at 10 000 × the dearer base cost (§5.3)', () => {
-    expect(UPGRADES.sharedCompost.cost).toBe(120_000_000);
-    expect(UPGRADES.usefulShade.cost).toBe(500_000_000_000);
+    expect(UPGRADES.sharedCompost.cost).toBe(60_000_000);
+    expect(UPGRADES.usefulShade.cost).toBe(280_000_000_000);
     expect(UPGRADES.recoveredHeat.cost).toBe(30_000_000_000);
   });
 });

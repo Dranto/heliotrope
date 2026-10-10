@@ -27,12 +27,12 @@ describe('generator data', () => {
     ).toEqual([
       [15, 0.1],
       [100, 1],
-      [1_100, 8],
-      [12_000, 47],
+      [400, 8],
+      [6_000, 30],
       [200_000, 260],
       [3_000_000, 1_400],
-      [50_000_000, 7_800],
-      [800_000_000, 44_000],
+      [28_000_000, 7_800],
+      [200_000_000, 44_000],
     ]);
   });
 });
@@ -44,7 +44,7 @@ describe('production', () => {
 
   it('sums base production × owned over all generators', () => {
     const state = withState({ generators: owned({ pot: 3, balconyPanel: 2, greenhouse: 1 }) });
-    expect(lightPerSecond(state)).toBeCloseTo(0.3 + 2 + 47);
+    expect(lightPerSecond(state)).toBeCloseTo(0.3 + 2 + 30);
   });
 });
 

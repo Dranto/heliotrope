@@ -143,8 +143,8 @@ describe('App', () => {
       resources: { light: 1e9 },
       generators: { ...base.generators, arcology: 3 },
       upgrades: ['gloves'],
-      totalLight: 2e8,
-      allTimeLight: 2e8,
+      totalLight: 8e7,
+      allTimeLight: 8e7,
       clicks: 77,
     });
     const store = renderApp(new GameStore(localStorage, () => 0));
