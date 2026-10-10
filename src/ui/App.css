@@ -235,51 +235,219 @@ button {
   overflow: visible;
 }
 
+.flower-panel {
+  --halo-a: rgb(255 231 168 / 0.95);
+  --halo-b: rgb(255 231 168 / 0.35);
+}
+
+.flower-panel[data-season='spring'] {
+  --halo-a: rgb(252 222 230 / 0.95);
+  --halo-b: rgb(248 210 226 / 0.35);
+}
+
+.flower-panel[data-season='autumn'] {
+  --halo-a: rgb(255 214 160 / 0.95);
+  --halo-b: rgb(242 180 120 / 0.35);
+}
+
+.flower-panel[data-season='winter'] {
+  --halo-a: rgb(240 246 250 / 0.95);
+  --halo-b: rgb(214 228 236 / 0.4);
+}
+
+.halo-a {
+  stop-color: var(--halo-a);
+}
+
+.halo-b {
+  stop-color: var(--halo-b);
+}
+
+.halo-c {
+  stop-color: var(--halo-b);
+  stop-opacity: 0;
+}
+
+.halo {
+  transition:
+    r 1.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1.6s ease;
+}
+
 .arch {
   stroke: var(--gold);
   stroke-width: 1.2;
-  opacity: 0.7;
+  opacity: 0.75;
+}
+
+.arch-inner {
+  stroke: var(--gold);
+  stroke-width: 0.5;
+  stroke-dasharray: 0.5 3.5;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.ornament {
+  fill: #f3d58b;
+  stroke: var(--gold);
+  stroke-width: 0.6;
+  animation: fade-in 1.2s ease;
+}
+
+.rays path {
+  stroke: var(--gold);
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  opacity: 0.45;
+}
+
+.rays {
+  transform-box: view-box;
+  animation: spin 120s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
 }
 
 .stem {
-  stroke: var(--leaf);
-  stroke-width: 3;
+  fill: none;
+  stroke: #2f6b4f;
+  stroke-width: 3.4;
   stroke-linecap: round;
 }
 
+.stem.branch {
+  stroke-width: 2.2;
+}
+
+.stem-light {
+  fill: none;
+  stroke: #8fae8b;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  opacity: 0.7;
+  transform: translateX(-0.8px);
+}
+
 .leaf {
-  fill: var(--sage);
-  stroke: var(--leaf);
-  stroke-width: 1;
+  fill: url(#leaf-fill);
+  stroke: #24563f;
+  stroke-width: 0.6;
+}
+
+.leaf-veins {
+  fill: none;
+  stroke: rgb(214 232 210 / 0.55);
+  stroke-width: 0.55;
+  stroke-linecap: round;
+}
+
+.head-shade {
+  fill: rgb(60 40 90 / 0.08);
+}
+
+.corolla {
+  stroke: rgb(94 64 140 / 0.35);
+  stroke-width: 0.5;
+}
+
+.eye {
+  fill: #fbf6ec;
 }
 
 .pistil {
-  fill: #fff4d6;
+  fill: #e9a93b;
+}
+
+.pistil.solar {
+  fill: #f4c063;
+  filter: drop-shadow(0 0 1.5px rgb(244 192 99 / 0.95));
+}
+
+.bud {
+  fill: #6e4c9a;
+}
+
+.bud.green {
+  fill: #6f9a6c;
+}
+
+.bud-light {
+  fill: rgb(255 255 255 / 0.28);
+}
+
+.mote {
+  fill: #f4c063;
+  opacity: 0;
+  animation: pollen 7s ease-in-out infinite;
+}
+
+.pot-body {
+  fill: url(#pot-fill);
+}
+
+.pot-sheen {
+  fill: none;
+  stroke: rgb(255 236 220 / 0.55);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.pot-rim {
+  fill: #c97753;
+  stroke: rgb(255 240 225 / 0.5);
+  stroke-width: 0.6;
+}
+
+.soil {
+  fill: #5a4231;
+}
+
+.season-seed {
+  fill: #f4c063;
+  stroke: #fff4d6;
+  stroke-width: 0.5;
 }
 
 .flower-sway {
-  transform-origin: 100px 250px;
+  transform-origin: 100px 222px;
   transform-box: view-box;
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.blossoms {
-  transform-origin: 100px 90px;
+.plant {
+  transform-origin: 100px 222px;
   transform-box: view-box;
-  animation: bloom 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.flower-button:hover .blossoms {
+/* The plant breathes in the breeze, very slowly. */
+.plant-idle {
+  transform-origin: 100px 222px;
+  transform-box: view-box;
+  animation: breeze 9s ease-in-out infinite;
+}
+
+@keyframes breeze {
+  0%,
+  100% {
+    rotate: -0.8deg;
+  }
+  50% {
+    rotate: 0.8deg;
+  }
+}
+
+.heads {
+  transform-box: view-box;
+  transition: filter 0.4s ease;
+}
+
+.flower-button:hover .heads {
   filter: drop-shadow(0 0 6px rgb(246 213 143 / 0.9));
-}
-
-@keyframes bloom {
-  from {
-    transform: scale(0.94);
-  }
-  to {
-    transform: scale(1);
-  }
 }
 
 .floater {
@@ -354,9 +522,109 @@ button {
 }
 
 .block {
-  stroke: rgb(255 255 255 / 0.7);
-  stroke-width: 1;
+  stroke: #ece6da;
+  stroke-width: 2.4;
   transition: fill 3s ease;
+}
+
+.grain {
+  fill: rgb(255 255 255 / 0.35);
+}
+
+.crossing {
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 4;
+  stroke-dasharray: 1.4 1.6;
+}
+
+.grass-tuft {
+  fill: none;
+  stroke: var(--foliage);
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+.grass-flower {
+  fill: var(--lilac);
+  opacity: 0.7;
+}
+
+.paving-joint {
+  fill: none;
+  stroke: rgb(140 120 100 / 0.16);
+  stroke-width: 0.35;
+}
+
+/* Facades: the south face of each building, with a strip of windows catching the light. */
+.facade {
+  fill: #8f8a82;
+}
+
+.windows {
+  fill: none;
+  stroke: #e8dcc0;
+  stroke-dasharray: 1.6 2.2;
+  opacity: 0.85;
+}
+
+.skylights {
+  fill: none;
+  stroke: #c9dbe3;
+  stroke-width: 3;
+  stroke-dasharray: 4 2;
+}
+
+.tank circle {
+  fill: #bdb7ad;
+  stroke: rgb(255 255 255 / 0.5);
+  stroke-width: 0.5;
+}
+
+.tank .tank-lid {
+  fill: #9f998f;
+}
+
+.units rect {
+  fill: #d3cec5;
+  stroke: rgb(70 55 40 / 0.2);
+  stroke-width: 0.4;
+}
+
+.crack {
+  fill: none;
+  stroke: rgb(31 42 36 / 0.22);
+  stroke-width: 0.5;
+}
+
+.rubble {
+  fill: #a9a194;
+}
+
+.weeds {
+  fill: none;
+  stroke: #8a9a6e;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.car .windscreen {
+  fill: rgb(220 232 238 / 0.75);
+}
+
+.car rect:first-child {
+  stroke: rgb(31 42 36 / 0.2);
+  stroke-width: 0.4;
+}
+
+.greenhouse .sheen {
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.canopy-glint {
+  fill: rgb(255 250 230 / 0.35);
 }
 
 /* Buildings cast shadows whose length and direction follow the sun of the phase. */
@@ -366,9 +634,15 @@ button {
   transition: transform 3s ease;
 }
 
-.shadow-soft,
-.tree-shadow {
+.shadow-soft {
   fill: rgb(70 55 40 / 0.14);
+}
+
+/* Tree shadows follow the sun like the buildings'. */
+.tree-shadow {
+  fill: rgb(70 55 40 / 0.16);
+  transform: translate(calc(2.4 * var(--sun-x)), calc(2.4 * var(--sun-y)));
+  transition: transform 3s ease;
 }
 
 .parapet {
