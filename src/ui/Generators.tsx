@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { generatorLimit } from '../game/challenges';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from '../game/generators';
 import {
@@ -78,10 +79,20 @@ export function Generators() {
           const units = unitsFor(state, id, amount);
           const cost = formatCost(generatorCost(state, id, units));
           const affordable = canBuyGenerator(state, id, units);
+          const limit = generatorLimit(state, id);
           return (
             <li key={id} className="generator">
               <div className="generator-text">
-                <h3>{text.name}</h3>
+                <h3>
+                  {text.name}
+                  {limit !== Infinity && (
+                    <span className="generator-limit">
+                      {limit === 0
+                        ? t.challenges.blockedTag
+                        : t.challenges.limitTag(formatNumber(limit))}
+                    </span>
+                  )}
+                </h3>
                 <p className="flavour">{text.flavour}</p>
                 <p className="generator-stats">
                   {owned > 0

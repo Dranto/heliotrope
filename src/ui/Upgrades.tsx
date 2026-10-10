@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { upgradesAllowed } from '../game/challenges';
 import { formatCost } from '../game/format';
 import { availableUpgrades } from '../game/production';
 import { buyUpgrade, canBuyUpgrade } from '../game/tick';
@@ -23,8 +24,9 @@ export function Upgrades() {
   const [selectedId, setSelectedId] = useState<UpgradeId | null>(null);
   const [open, toggle] = usePanelOpen('upgrades');
   const selected = available.find((u) => u.id === selectedId) ?? available[0];
+  const wild = !upgradesAllowed(state);
   // Nothing to show before the first upgrade unlocks.
-  if (selected === undefined && state.upgrades.length === 0) return null;
+  if (selected === undefined && state.upgrades.length === 0 && !wild) return null;
 
   return (
     <section className="panel upgrades" aria-labelledby="upgrades-title" data-open={open}>
@@ -32,7 +34,7 @@ export function Upgrades() {
         {t.upgradesTitle}
       </PanelTitle>
       {selected === undefined ? (
-        <p className="empty">{t.noUpgrades}</p>
+        <p className="empty">{wild ? t.challenges.noUpgrades : t.noUpgrades}</p>
       ) : (
         <>
           <ul className="upgrade-grid">

@@ -29,6 +29,9 @@ function playedState(): GameState {
     parcels: ['gardenStreet', 'river'],
     projects: ['seedSwap'],
     talents: ['gardenersCoop', 'roofersCoop', 'nectarFlowers'],
+    challenge: 'frugal',
+    challenges: ['cloudy'],
+    species: ['frog', 'kingfisher'],
     cooperatives: {
       paused: ['roofers'],
       thrifty: true,
@@ -320,5 +323,27 @@ describe('export and import', () => {
       JSON.stringify({ version: STATE_VERSION, settings: { language } });
     expect(deserialize(json('en'), 0)!.settings.language).toBe('en');
     expect(deserialize(json('klingon'), 0)!.settings.language).toBe('fr');
+  });
+
+  it('migrates a v9 save with no challenge and an empty Herbier, and drops unknown entries', () => {
+    const v9 = deserialize(JSON.stringify({ version: 9, parcels: ['river'] }), 0)!;
+    expect(v9).toMatchObject({ challenge: null, challenges: [], species: [] });
+    const state = deserialize(
+      JSON.stringify({
+        version: STATE_VERSION,
+        challenge: 'wild',
+        challenges: ['cloudy', 'storm', 'cloudy'],
+        species: ['frog', 'dragon', 'frog'],
+      }),
+      0,
+    )!;
+    expect(state).toMatchObject({ challenge: 'wild', challenges: ['cloudy'], species: ['frog'] });
+    // A challenge already won cannot be running.
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      challenge: 'cloudy',
+      challenges: ['cloudy'],
+    });
+    expect(deserialize(json, 0)!.challenge).toBeNull();
   });
 });

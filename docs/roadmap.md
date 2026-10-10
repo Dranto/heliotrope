@@ -168,7 +168,7 @@ Petits ajouts sans jalon dédié, à placer dans la PR la plus proche :
 - **Prochain objectif** rappelé sous le compteur (la règle d'or du §2 rendue visible).
 - **Raccourcis clavier** pour acheter (1 à 8 pour les générateurs, M pour Max), sans raccourci de clic pour ne pas encourager l'autoclic.
 - **Courbe de la production** dans les Statistiques, Saison par Saison.
-- **Version anglaise** (§14 Q1) : les textes sont déjà regroupés dans `src/i18n/fr.ts`.
+- ~~**Version anglaise** (§14 Q1)~~ : livrée en M8, choix de la langue dans les Options.
 - **Installation en application** (PWA) pour jouer hors connexion et retrouver le jeu sur l'écran d'accueil.
 
 ---
@@ -182,7 +182,7 @@ Chaque jalon reste livrable et jouable seul, comme M1 à M4.
 | **M5 — Le quartier se voit** *(en cours)* | Vue du dessus animée, équilibrage plus doux porté par de nombreuses synergies, temps avant achat et prochain objectif | Répond directement à la demande ; tout le reste s'appuie sur la carte |
 | **M6 — Restaurer le quartier** *(livré)* | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons — voir game-design §6.1 à §6.3 | Donne enfin des paliers visibles sur la carte de M5 |
 | **M7 — La terre se souvient** *(livré)* | P2 Arbre des Saisons, P3 Coopératives — voir game-design §7.1 et §7.2 | Donne des choix à chaque Saison et retire la répétition des débuts |
-| **M8 — Le vivant revient** | P5 Herbier, P7 Saisons à défis, version anglaise | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
+| **M8 — Le vivant revient** *(livré)* | P5 Herbier, P7 Saisons à défis, version anglaise — voir game-design §9.5, §7.3 et §14 Q1 | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
 | **M9 — La Biorégion** | P8 Eau, nouveaux générateurs, deuxième prestige | La grosse extension, une fois la boucle longue riche |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Pour adoucir l'équilibrage, on ajoute **beaucoup de synergies**,

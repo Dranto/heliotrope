@@ -43,6 +43,10 @@ export type AchievementCondition =
   | { kind: 'projects'; count: number }
   /** Talents learnt in the Tree of Seasons (§7.1). */
   | { kind: 'talents'; count: number }
+  /** Species of the Herbier back, kept across Seasons (§9.5). */
+  | { kind: 'species'; count: number }
+  /** Challenge Seasons won (§7.3). */
+  | { kind: 'challenges'; count: number }
   /** Purchases of every Cooperative together, over all Seasons (§7.2). */
   | { kind: 'cooperativePurchases'; count: number }
   /** Seconds of play over all Seasons. */
@@ -79,6 +83,8 @@ const PARCEL_STEPS = [1, 4, 8] as const;
 const PROJECT_STEPS = [1, 8, 15] as const;
 const TALENT_STEPS = [1, 9, 17] as const;
 const COOPERATIVE_STEPS = [100, 1_000] as const;
+const SPECIES_STEPS = [1, 10, 18] as const;
+const CHALLENGE_STEPS = [1, 4] as const;
 const SEASON_STEPS = [1, 3, 5, 10, 25] as const;
 const PLAY_HOURS = [1, 24] as const;
 
@@ -94,6 +100,8 @@ export type AchievementId =
   | `projects.${(typeof PROJECT_STEPS)[number]}`
   | `talents.${(typeof TALENT_STEPS)[number]}`
   | `cooperatives.${(typeof COOPERATIVE_STEPS)[number]}`
+  | `species.${(typeof SPECIES_STEPS)[number]}`
+  | `challenges.${(typeof CHALLENGE_STEPS)[number]}`
   | `seasons.${(typeof SEASON_STEPS)[number]}`
   | `playHours.${(typeof PLAY_HOURS)[number]}`
   | 'mosaic'
@@ -222,6 +230,16 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'neighbourhood' as const,
     condition: { kind: 'cooperativePurchases', count } as const,
   })),
+  ...SPECIES_STEPS.map((count) => ({
+    id: `species.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'species', count } as const,
+  })),
+  ...CHALLENGE_STEPS.map((count) => ({
+    id: `challenges.${count}` as const,
+    family: 'seasons' as const,
+    condition: { kind: 'challenges', count } as const,
+  })),
   // Seasons and time.
   ...SEASON_STEPS.map((count) => ({
     id: `seasons.${count}` as const,
@@ -315,6 +333,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.projects.length >= condition.count;
     case 'talents':
       return state.talents.length >= condition.count;
+    case 'species':
+      return state.species.length >= condition.count;
+    case 'challenges':
+      return state.challenges.length >= condition.count;
     case 'cooperativePurchases':
       return (
         Object.values(state.cooperatives.purchases).reduce((sum, n) => sum + n, 0) >=

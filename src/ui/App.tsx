@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { activeChallenge } from '../game/challenges';
 import type { CatchResult } from '../game/butterfly';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { phaseOf } from '../game/phases';
@@ -12,10 +13,12 @@ import {
 import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
 import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
+import { challengeRulesText, challengeTitle, speciesName } from '../i18n/herbier';
 import { setLanguage, t } from '../i18n';
 import { Achievements } from './Achievements';
 import { Cooperatives } from './Cooperatives';
 import { Generators } from './Generators';
+import { Herbier } from './Herbier';
 import { useLayoutPref } from './layoutPrefs';
 import { MilestoneBloom } from './MilestoneBloom';
 import { Options } from './Options';
@@ -23,12 +26,13 @@ import { Restoration } from './Restoration';
 import { Scene } from './Scene';
 import { Seasons } from './Seasons';
 import { SeasonTree } from './SeasonTree';
+import { SpeciesArt } from './SpeciesArt';
 import { Stats } from './Stats';
 import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
 import { useSounds } from './useSounds';
 
-type Screen = 'achievements' | 'seasons' | 'tree' | 'stats' | 'options';
+type Screen = 'achievements' | 'herbier' | 'seasons' | 'tree' | 'stats' | 'options';
 /** §10.3: mobile tab bar sections. */
 type Tab = 'harvest' | 'build' | 'improve' | 'more';
 const TABS: Tab[] = ['harvest', 'build', 'improve', 'more'];
@@ -81,6 +85,20 @@ function treeUnlocked(state: GameState): boolean {
   return state.seeds > 0;
 }
 
+/** The Herbier opens with the first species back (§9.5), or after the first Season. */
+function herbierUnlocked(state: GameState): boolean {
+  return state.species.length > 0 || state.seasons > 0;
+}
+
+/** A pressed leaf, the mark of the Herbier. */
+function LeafIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14ZM5 19l9-9M9 15h3.5M12 12V8.5" />
+    </svg>
+  );
+}
+
 /** The Milestones screen opens from phase 2 (§10.2), or as soon as one is unlocked. */
 function achievementsUnlocked(state: GameState): boolean {
   return phaseOf(state) >= 2 || state.achievements.length > 0 || state.seasons > 0;
@@ -116,6 +134,21 @@ export function App() {
     setTimeout(() => setToasts((list) => list.filter((toast) => toast.id !== id)), TOAST_MS);
   }, []);
 
+  // Announce species as they come back (§9.5) and challenges as they are won (§7.3).
+  const seenSpecies = useRef(state.species.length);
+  useEffect(() => {
+    const fresh = state.species.slice(seenSpecies.current);
+    seenSpecies.current = state.species.length;
+    if (fresh.length > 3) notify(t.herbier.returnedMany(formatNumber(fresh.length)));
+    else for (const id of fresh) notify(t.herbier.returned(speciesName(id)));
+  }, [state.species, notify]);
+  const seenChallenges = useRef(state.challenges.length);
+  useEffect(() => {
+    const fresh = state.challenges.slice(seenChallenges.current);
+    seenChallenges.current = state.challenges.length;
+    for (const id of fresh) notify(t.challenges.won(challengeTitle(id)));
+  }, [state.challenges, notify]);
+
   const onCatch = useCallback(
     ({ outcome, light }: CatchResult) => {
       notify(
@@ -127,6 +160,8 @@ export function App() {
     [notify],
   );
 
+  const challenge = activeChallenge(state);
+  const challengeProgress = challenge ? Math.min(1, state.totalLight / challenge.goal) : 0;
   const gain = seedsToGain(state);
   const seedsToSow = availableSeeds(state);
   const canSow = TALENT_LIST.some((talent) => canLearnTalent(state, talent.id));
@@ -148,6 +183,20 @@ export function App() {
           {/* Re-mounted on each new Milestone, so the count glints once (§9.3). */}
           <span key={state.achievements.length} className="menu-count" aria-hidden="true">
             {state.achievements.length}
+          </span>
+        </button>
+      )}
+      {herbierUnlocked(state) && (
+        <button
+          type="button"
+          className="ghost menu-button"
+          aria-haspopup="dialog"
+          onClick={() => setScreen('herbier')}
+        >
+          <LeafIcon />
+          {t.herbier.open}
+          <span className="menu-count" aria-hidden="true">
+            {state.species.length}
           </span>
         </button>
       )}
@@ -250,6 +299,25 @@ export function App() {
               </span>
             </span>
           )}
+          {challenge && (
+            <span
+              className="challenge-chip"
+              data-testid="challenge-chip"
+              title={challengeRulesText(challenge)}
+            >
+              <SpeciesArt id={challenge.species} />
+              {challengeTitle(challenge.id)}
+              <span className="challenge-meter" aria-hidden="true">
+                <span style={{ width: `${challengeProgress * 100}%` }} />
+              </span>
+              <span className="visually-hidden">
+                {t.challenges.progress(
+                  challengeTitle(challenge.id),
+                  formatPercent(challengeProgress),
+                )}
+              </span>
+            </span>
+          )}
           {state.effects.length > 0 && (
             <span className="effects" aria-label={t.butterfly.effects}>
               {state.effects.map((effect) => (
@@ -337,6 +405,7 @@ export function App() {
       <MilestoneBloom />
 
       {screen === 'achievements' && <Achievements onClose={closeScreen} />}
+      {screen === 'herbier' && <Herbier onClose={closeScreen} />}
       {screen === 'seasons' && (
         <Seasons onClose={closeScreen} onOpenTree={() => setScreen('tree')} />
       )}

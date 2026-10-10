@@ -48,6 +48,10 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.projects(condition.count);
     case 'talents':
       return describe.talents(condition.count);
+    case 'species':
+      return describe.species(condition.count);
+    case 'challenges':
+      return describe.challenges(condition.count);
     case 'cooperativePurchases':
       return describe.cooperativePurchases(round(condition.count));
     case 'playSeconds':

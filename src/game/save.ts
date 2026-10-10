@@ -10,6 +10,8 @@ import { isParcelId, type ParcelId } from './parcels';
 import { isProjectId, type ProjectId } from './projects';
 import { validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
+import { isChallengeId, type ChallengeId } from './challenges';
+import { isSpeciesId, type SpeciesId } from './species';
 
 export const SAVE_KEY = 'heliotrope.save';
 
@@ -46,6 +48,9 @@ const migrations: Record<number, Migration> = {
   7: (raw) => ({ ...raw, version: 8 }),
   // v9 adds the language setting (§14 Q1); older saves keep the French interface.
   8: (raw) => ({ ...raw, version: 9 }),
+  // v10 adds challenge Seasons and the Herbier (§7.3, §9.5). Defaults from the fresh state: no
+  // challenge, no species yet; species already deserved return on the first tick.
+  9: (raw) => ({ ...raw, version: 10 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -148,6 +153,15 @@ export function deserialize(json: string, now: number): GameState | null {
   for (const id of COOPERATIVE_IDS) {
     const value = purchases?.[id];
     if (isCount(value)) state.cooperatives.purchases[id] = value;
+  }
+  if (Array.isArray(data.challenges)) {
+    state.challenges = [...new Set<ChallengeId>(data.challenges.filter(isChallengeId))];
+  }
+  if (isChallengeId(data.challenge) && !state.challenges.includes(data.challenge)) {
+    state.challenge = data.challenge;
+  }
+  if (Array.isArray(data.species)) {
+    state.species = [...new Set<SpeciesId>(data.species.filter(isSpeciesId))];
   }
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;

@@ -1,10 +1,12 @@
 // Production, click and cost formulas (docs/game-design.md §4, §5, §8). Pure functions shared
 // by the game, the UI and the balancing simulator.
 import { achievementBonus } from './achievements';
+import { challengeProductionFactor, generatorLimit, upgradesAllowed } from './challenges';
 import { bonusesOf, costFactor, factorOf, globalBonus } from './bonuses';
 import { effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import { seedBonus } from './seasons';
+import { HERBIER_COMPLETE_FACTOR, isHerbierComplete, SPECIES_STEPS } from './species';
 import type { GameState } from './state';
 import { CLICK_UPGRADE_IDS, UPGRADES, type UpgradeDef, type UpgradeId } from './upgrades';
 
@@ -55,19 +57,23 @@ export function typesOwned(state: GameState): number {
   return GENERATOR_IDS.filter((id) => state.generators[id] > 0).length;
 }
 
-/** §5.4: +2% global production per generator type at 10, 50 and 100 units owned. */
+/**
+ * §5.4: +2% global production per generator type at 10, 50 and 100 units owned, and per species
+ * of the Herbier (§9.5); ×1.5 with the complete Herbier.
+ */
 export function biodiversityBonus(state: GameState): number {
   const thresholds = [
     ...BIODIVERSITY_THRESHOLDS,
     ...bonusesOf(state, 'biodiversityThreshold').map((b) => b.threshold),
   ];
-  let steps = 0;
+  let steps = state.species.length * SPECIES_STEPS;
   for (const id of GENERATOR_IDS) {
     for (const threshold of thresholds) {
       if (state.generators[id] >= threshold) steps += 1;
     }
   }
-  return steps * BIODIVERSITY_STEP * factorOf(state, 'biodiversityFactor');
+  const herbier = isHerbierComplete(state) ? HERBIER_COMPLETE_FACTOR : 1;
+  return steps * BIODIVERSITY_STEP * factorOf(state, 'biodiversityFactor') * herbier;
 }
 
 /** §5.3: additive global bonus from the upgrades that grow with the other upgrades bought. */
@@ -84,7 +90,7 @@ export function upgradeSynergyBonus(state: GameState): number {
 
 /**
  * §8: multiplier applied to every generator: Seeds × Milestones × biodiversity × upgrade
- * synergies × parcels and projects × Floraison.
+ * synergies × parcels and projects × Floraison, and the constraint of a challenge Season (§7.3).
  */
 export function globalMultiplier(state: GameState): number {
   return (
@@ -93,7 +99,8 @@ export function globalMultiplier(state: GameState): number {
     (1 + achievementBonus(state)) *
     (1 + biodiversityBonus(state)) *
     (1 + upgradeSynergyBonus(state)) *
-    effectFactor(state.effects, 'bloom')
+    effectFactor(state.effects, 'bloom') *
+    challengeProductionFactor(state)
   );
 }
 
@@ -145,16 +152,20 @@ export function generatorCost(state: GameState, id: GeneratorId, count = 1): num
   return (first * (COST_GROWTH ** count - 1)) / (COST_GROWTH - 1);
 }
 
-/** Largest number of units of a generator affordable with the Light in reserve. */
+/**
+ * Largest number of units of a generator affordable with the Light in reserve, within the limit
+ * of a challenge Season (§7.3).
+ */
 export function maxAffordable(state: GameState, id: GeneratorId): number {
   const first = generatorCost(state, id);
   const light = state.resources.light;
-  if (light < first) return 0;
+  const room = generatorLimit(state, id) - state.generators[id];
+  if (light < first || room < 1) return 0;
   let count = Math.floor(Math.log(1 + (light * (COST_GROWTH - 1)) / first) / Math.log(COST_GROWTH));
   // Guard against floating-point error at the boundary.
   while (count > 1 && generatorCost(state, id, count) > light) count -= 1;
   while (generatorCost(state, id, count + 1) <= light) count += 1;
-  return Math.max(1, count);
+  return Math.min(room, Math.max(1, count));
 }
 
 /**
@@ -169,8 +180,12 @@ export function isUpgradeBought(state: GameState, id: UpgradeId): boolean {
   return state.upgrades.includes(id);
 }
 
-/** An upgrade appears when its condition is met; conditions never become false in a Season. */
+/**
+ * An upgrade appears when its condition is met; conditions never become false in a Season. The
+ * wild challenge Season (§7.3) offers none until it is won.
+ */
 export function isUpgradeUnlocked(state: GameState, id: UpgradeId): boolean {
+  if (!upgradesAllowed(state)) return false;
   const { owned, totalLight, upgrades, synergies, clicks, clickUpgrades } = UPGRADES[id].condition;
   if (totalLight !== undefined && state.totalLight < totalLight) return false;
   if (clicks !== undefined && state.clicks < clicks) return false;

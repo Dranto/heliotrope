@@ -9,9 +9,17 @@ import {
   seedsToGain,
   startNewSeason,
 } from '../game/seasons';
+import { offeredChallenges, type ChallengeId } from '../game/challenges';
 import { canLearnTalent, TALENT_LIST } from '../game/talents';
 import { t } from '../i18n';
+import {
+  challengeGoalText,
+  challengeRewardText,
+  challengeRulesText,
+  challengeTitle,
+} from '../i18n/herbier';
 import { Dialog } from './Dialog';
+import { SpeciesArt } from './SpeciesArt';
 import { useGameState, useGameStore } from './useGame';
 
 /** A sprouting seed under an Art nouveau arch (§10.4: arches frame the Seasons screen). */
@@ -45,13 +53,16 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
   const store = useGameStore();
   const state = useGameState();
   const [confirming, setConfirming] = useState(false);
+  const challenges = offeredChallenges(state);
+  const [challenge, setChallenge] = useState<ChallengeId | null>(null);
   const [message, setMessage] = useState('');
   const gain = seedsToGain(state);
   const available = canStartNewSeason(state);
   const premature = isSeasonPremature(state);
 
   function start() {
-    store.dispatch(startNewSeason);
+    store.dispatch((s) => startNewSeason(s, challenge));
+    setChallenge(null);
     store.save();
     setConfirming(false);
     setMessage(t.seeds.started(t.seeds.seasonName(store.getState().seasons + 1)));
@@ -134,12 +145,49 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
         </button>
       )}
 
+      {challenges.length > 0 && available && (
+        <fieldset className="challenge-choice">
+          <legend>{t.challenges.title}</legend>
+          <p className="hint">{t.challenges.hint}</p>
+          <label className="challenge-option">
+            <input
+              type="radio"
+              name="challenge"
+              checked={challenge === null}
+              onChange={() => setChallenge(null)}
+            />
+            <span aria-hidden="true" />
+            <span>
+              <strong>{t.challenges.free}</strong>
+              <span>{t.challenges.freeHint}</span>
+            </span>
+          </label>
+          {challenges.map((c) => (
+            <label key={c.id} className="challenge-option" data-challenge={c.id}>
+              <input
+                type="radio"
+                name="challenge"
+                checked={challenge === c.id}
+                onChange={() => setChallenge(c.id)}
+              />
+              <SpeciesArt id={c.species} />
+              <span>
+                <strong>{challengeTitle(c.id)}</strong>
+                <span>{challengeRulesText(c)}</span>
+                <span>{challengeGoalText(c)}</span>
+                <span className="challenge-reward">{challengeRewardText(c.id)}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
+
       {!available && <p className="hint">{t.seeds.noSeedYet}</p>}
       {confirming && available ? (
         <div className="confirm-row">
           <span>{t.seeds.confirm(formatNumber(gain))}</span>
           <button type="button" className="season-button" onClick={start}>
-            {t.seeds.confirmYes}
+            {challenge ? t.challenges.startWith(t.challenges.names[challenge]) : t.seeds.confirmYes}
           </button>
           <button type="button" className="ghost" onClick={() => setConfirming(false)}>
             {t.seeds.cancel}
