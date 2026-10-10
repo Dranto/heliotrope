@@ -5,7 +5,7 @@ import {
   lightPerSecond,
   clickValue,
 } from './production';
-import { unlockAchievements } from './achievements';
+import { unlockAchievement, unlockAchievements } from './achievements';
 import { advanceButterfly } from './butterfly';
 import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
@@ -59,7 +59,10 @@ export function tick(state: GameState, dtSeconds: number): GameState {
 
 /** Player action: click the heliotrope. */
 export function clickHeliotrope(state: GameState): GameState {
-  return { ...earnLight(state, clickValue(state)), clicks: state.clicks + 1 };
+  const next = { ...earnLight(state, clickValue(state)), clicks: state.clicks + 1 };
+  // Milestone "Pollen d'or" (§9.3): a click during a Pollinisation.
+  const pollinating = state.effects.some((effect) => effect.kind === 'pollination');
+  return pollinating ? unlockAchievement(next, 'goldenPollen') : next;
 }
 
 export function canBuyGenerator(state: GameState, id: GeneratorId, count = 1): boolean {
