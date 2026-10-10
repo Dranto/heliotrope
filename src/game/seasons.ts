@@ -4,7 +4,7 @@ import { unlockJournal } from './journal';
 import { createInitialState, type GameState } from './state';
 
 /** §7: Seeds earned in total = floor(sqrt(Light earned over all Seasons / SEED_LIGHT_DIVISOR)). */
-export const SEED_LIGHT_DIVISOR = 5e7;
+export const SEED_LIGHT_DIVISOR = 2e7;
 /** §7: each Seed owned adds +5% to global production (additive). */
 export const SEED_BONUS = 0.05;
 /** §7: the interface advises waiting for this many Seeds before the first Season. */

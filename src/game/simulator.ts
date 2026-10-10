@@ -8,7 +8,7 @@ import { createInitialState, type GameState } from './state';
 import { buyGenerator, buyUpgrade, earnLight, tick } from './tick';
 import type { UpgradeId } from './upgrades';
 
-/** Light earned in a Season that makes the first Season advisable: 10 Seeds (§7), 5e9. */
+/** Light earned in a Season that makes the first Season advisable: 10 Seeds (§7), 2e9. */
 export const ADVISED_SEASON_LIGHT = lightForSeeds(ADVISED_FIRST_SEASON_SEEDS);
 
 /** Click rate of the reference active player used for the §8 pacing table. */
@@ -35,7 +35,7 @@ export interface SimulationOptions {
 export interface SimulationResult {
   /** Seconds of play when the first unit of each generator was bought. */
   firstGenerator: Partial<Record<GeneratorId, number>>;
-  /** Seconds of play when the Season total reached ADVISED_SEASON_LIGHT (5e9 Light). */
+  /** Seconds of play when the Season total reached ADVISED_SEASON_LIGHT (2e9 Light). */
   advisedSeason?: number;
   /** State at the end of the simulation. */
   state: GameState;
@@ -174,12 +174,12 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
 /** §8 pacing targets for a first active playthrough, in seconds. */
 export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   pot: 15,
-  balconyPanel: 60,
-  rooftopGarden: 4 * 60,
-  greenhouse: 12 * 60,
-  verticalFarm: 30 * 60,
-  mirrorPlant: 60 * 60,
-  urbanCanopy: 2 * 3600,
-  arcology: 3.5 * 3600,
-  advisedSeason: 4 * 3600,
+  balconyPanel: 45,
+  rooftopGarden: 2.5 * 60,
+  greenhouse: 7 * 60,
+  verticalFarm: 17 * 60,
+  mirrorPlant: 35 * 60,
+  urbanCanopy: 70 * 60,
+  arcology: 125 * 60,
+  advisedSeason: 160 * 60,
 };

@@ -81,20 +81,22 @@ Le MVP se limite volontairement à **une seule monnaie de jeu** (la Lumière). U
 
 ## 4. Générateurs
 
-Huit générateurs, du balcon à la ville entière. Les valeurs de base partent de la progression éprouvée de Cookie Clicker (coût ×~10 et production ×~6 par palier), qui donne un rythme où chaque nouveau palier rentabilise rapidement son prix. Les quatre derniers paliers coûtent plus cher depuis le jalon 4 (voir la note sous le tableau).
+Huit générateurs, du balcon à la ville entière. Les valeurs de base partent de la progression éprouvée de Cookie Clicker (coût ×~10 et production ×~6 par palier), qui donne un rythme où chaque nouveau palier rentabilise rapidement son prix. Les valeurs ont été retouchées au jalon 4 puis adoucies juste après le MVP (voir les notes sous le tableau).
 
 | # | Nom | Texte d'ambiance | Coût de base | Production de base (Lumière/s) | Rentabilité du 1er exemplaire |
 |---|---|---|---|---|---|
 | 1 | Héliotrope en pot | « Elle suit le soleil. Nous aussi. » | 15 | 0,1 | 150 s |
 | 2 | Panneau de balcon | « Un panneau, une prise, un début. » | 100 | 1 | 100 s |
-| 3 | Potager sur le toit | « Les tomates aiment la vue. » | 1 100 | 8 | 138 s |
-| 4 | Serre communautaire | « Chacun apporte ses semis. » | 12 000 | 47 | 255 s |
+| 3 | Potager sur le toit | « Les tomates aiment la vue. » | 400 | 8 | 50 s |
+| 4 | Serre communautaire | « Chacun apporte ses semis. » | 6 000 | 30 | 200 s |
 | 5 | Ferme verticale | « Douze étages de laitues et de lumière. » | 200 000 | 260 | 769 s |
 | 6 | Centrale à miroirs | « Mille miroirs, un seul soleil. » | 3 000 000 | 1 400 | 2 143 s |
-| 7 | Canopée urbaine | « Les rues deviennent des sous-bois. » | 50 000 000 | 7 800 | 6 410 s |
-| 8 | Arcologie vivante | « Une ville qui respire. » | 800 000 000 | 44 000 | 18 182 s |
+| 7 | Canopée urbaine | « Les rues deviennent des sous-bois. » | 28 000 000 | 7 800 | 3 590 s |
+| 8 | Arcologie vivante | « Une ville qui respire. » | 200 000 000 | 44 000 | 4 545 s |
 
 > Passe d'équilibrage du jalon 4 (2026-10-10) : les Jalons (+1 % chacun) et le Papillon doré accélèrent surtout le milieu de partie. Avec les coûts d'origine (130 000, 1,4 M, 20 M et 330 M), le simulateur atteignait la Centrale à miroirs en 27 min au lieu d'une heure et la Canopée en 49 min au lieu de deux. Les coûts de base des générateurs 5 à 8 sont donc multipliés par 1,5, 2, 2,5 et 2,5 (arrondis), leurs améliorations ×2 suivent puisqu'elles sont indexées sur le coût de base, et la Floraison passe de ×7 à ×3 (§9.2). Les productions ne changent pas.
+
+> Équilibrage adouci (après le MVP, 2026-10-10) : Antoine trouvait la progression trop lente et voulait mieux sentir chaque palier. Le rythme cible du §8 est raccourci d'environ un tiers (1ʳᵉ Saison conseillée vers 2 h 40 au lieu de 4 h). Le Potager passe à 400 (au lieu de 1 100), la Serre à 6 000 pour 30 Lumière/s (au lieu de 12 000 pour 47), la Canopée à 28 M (au lieu de 50 M) et l'Arcologie à 200 M (au lieu de 800 M). La rentabilité du 1ᵉʳ exemplaire monte désormais en pente douce d'un palier à l'autre, au lieu de tripler à chaque palier en fin de partie (6 410 s puis 18 182 s auparavant). La Serre produit un peu moins pour que l'arrivée de la Ferme verticale ne s'emballe pas. Les améliorations ×2 et les synergies suivent, puisqu'elles sont indexées sur les coûts de base.
 
 **Règles.**
 
@@ -154,9 +156,9 @@ Chaque phase change la scène centrale (le décor reverdit) et débloque des él
 
 | Phase | Nom | Durée cible (1ʳᵉ partie) | Ce qui se débloque | La scène montre |
 |---|---|---|---|---|
-| 1 | **Le Balcon** | 0 – 10 min | Clic, générateurs 1 à 3, premières améliorations | Un balcon gris, une fleur, puis des pots et un panneau |
-| 2 | **Le Quartier** | 10 min – 1 h | Générateurs 4 et 5, synergies, Jalons, Papillon doré | Les toits verdissent, une serre apparaît |
-| 3 | **La Ville** | 1 h – 4 h | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
+| 1 | **Le Balcon** | 0 – 6 min | Clic, générateurs 1 à 3, premières améliorations | Un balcon gris, une fleur, puis des pots et un panneau |
+| 2 | **Le Quartier** | 6 min – 30 min | Générateurs 4 et 5, synergies, Jalons, Papillon doré | Les toits verdissent, une serre apparaît |
+| 3 | **La Ville** | 30 min – 2 h 40 | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
 | 4 | **Les Saisons** | après la 1ʳᵉ Saison | Écran des Saisons, statistiques de prestige | La scène change de teinte selon la saison (printemps, été, automne, hiver) |
 
 Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en cours** (seuils indicatifs : Phase 2 à 10 000, Phase 3 à 10 M).
@@ -183,7 +185,7 @@ Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Th
 ### Formule
 
 ```
-grainesTotalesMéritées = floor( sqrt( lumièreTotaleToutesSaisons / 5e7 ) )
+grainesTotalesMéritées = floor( sqrt( lumièreTotaleToutesSaisons / 2e7 ) )
 grainesGagnées         = grainesTotalesMéritées − grainesDéjàObtenues
 bonusProduction        = +5 % par Graine possédée (additif)
 ```
@@ -192,15 +194,17 @@ Points de repère *(à valider)* :
 
 | Lumière totale cumulée | Graines | Bonus |
 |---|---|---|
-| 50 M (5e7) | 1 | +5 % |
-| 5 Md (5e9) | 10 | +50 % |
-| 500 Md (5e11) | 100 | +500 % |
+| 20 M (2e7) | 1 | +5 % |
+| 2 Md (2e9) | 10 | +50 % |
+| 200 Md (2e11) | 100 | +500 % |
 
 > Première passe d'équilibrage (jalon 2, 2026-10-10) : le diviseur passe de 1e9 à 5e7. Avec 1e9, le simulateur n'atteignait 10 Graines qu'après plus de 8 h de jeu, ce qui contredisait la cible de ~4 h du §8 alors que le rythme des générateurs, lui, tombait juste. Le diviseur est le seul réglage qui corrige cet écart sans décaler l'arrivée des générateurs.
 
+> Équilibrage adouci (après le MVP) : le diviseur passe de 5e7 à 2e7 pour que les 10 Graines conseillées arrivent vers 2 h 40, au même rythme raccourci d'un tiers que les générateurs (§8).
+
 - Le bouton Nouvelle Saison est disponible dès qu'on gagnerait au moins **1** Graine, mais l'interface conseille d'attendre d'en gagner au moins 10 pour la première (« La terre n'est pas encore prête »). On ne bloque pas, on conseille.
 - L'écran de confirmation montre clairement : ce qui sera perdu, les Graines gagnées, le bonus avant/après.
-- Cible : 1ʳᵉ Saison rentable vers **3–4 h** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
+- Cible : 1ʳᵉ Saison rentable vers **2 h 30 – 3 h** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
 
 **Implémentation (jalon 3).** `src/game/seasons.ts`. Précisions retenues :
 
@@ -242,36 +246,38 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 | Événement | Moment cible |
 |---|---|
 | 1ᵉʳ Héliotrope en pot | < 15 s |
-| 1ᵉʳ Panneau de balcon | ~1 min |
-| 1ᵉʳ Potager sur le toit | ~4 min |
-| 1ʳᵉ Serre communautaire | ~12 min |
-| 1ʳᵉ Ferme verticale | ~30 min |
-| 1ʳᵉ Centrale à miroirs | ~1 h |
-| 1ʳᵉ Canopée urbaine | ~2 h |
-| 1ʳᵉ Arcologie vivante | ~3 h 30 |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~4 h |
+| 1ᵉʳ Panneau de balcon | ~45 s |
+| 1ᵉʳ Potager sur le toit | ~2 min 30 |
+| 1ʳᵉ Serre communautaire | ~7 min |
+| 1ʳᵉ Ferme verticale | ~17 min |
+| 1ʳᵉ Centrale à miroirs | ~35 min |
+| 1ʳᵉ Canopée urbaine | ~1 h 10 |
+| 1ʳᵉ Arcologie vivante | ~2 h 05 |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~2 h 40 |
+
+Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments.
 
 ### Outil de simulation
 
 L'équilibrage doit être vérifié par un **simulateur sans interface** qui rejoue une stratégie simple (acheter à chaque instant l'option au meilleur ratio coût / gain de production) et sort le moment de chaque événement du tableau ci-dessus. Il réutilise exactement les mêmes fonctions de calcul et les mêmes données que le jeu. Tout changement de chiffre dans ce document devrait être accompagné d'une sortie du simulateur.
 
-**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat varie peu selon la graine : sur cinq graines, aucun événement ne bouge de plus de 10 points de pourcentage.
+**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat dépend un peu de la graine, surtout en milieu de partie où un Papillon tombe plus ou moins tôt (chiffres sous le tableau ci-dessous).
 
-Sortie actuelle (jalon 4) :
+Sortie actuelle (équilibrage adouci) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
 | 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 6 s |
-| 1ᵉʳ Panneau de balcon | ~1 min | 44,6 s | −26 % | 43,3 s |
-| 1ᵉʳ Potager sur le toit | ~4 min | 4,9 min | +23 % | 4,6 min |
-| 1ʳᵉ Serre communautaire | ~12 min | 13,5 min | +12 % | 9,2 min |
-| 1ʳᵉ Ferme verticale | ~30 min | 23,8 min | −21 % | 15,0 min |
-| 1ʳᵉ Centrale à miroirs | ~1 h | 44 min | −27 % | 30 min |
-| 1ʳᵉ Canopée urbaine | ~2 h | 1 h 40 | −17 % | 1 h 03 |
-| 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 57 | +13 % | 2 h 32 |
-| Saison conseillée (5 Md de Lumière dans la Saison) | ~4 h | 4 h 14 | +6 % | 2 h 42 |
+| 1ᵉʳ Panneau de balcon | ~45 s | 44,6 s | −1 % | 43,3 s |
+| 1ᵉʳ Potager sur le toit | ~2 min 30 | 2,7 min | +8 % | 2,2 min |
+| 1ʳᵉ Serre communautaire | ~7 min | 7,5 min | +7 % | 5,2 min |
+| 1ʳᵉ Ferme verticale | ~17 min | 14,7 min | −14 % | 10,8 min |
+| 1ʳᵉ Centrale à miroirs | ~35 min | 35,8 min | +2 % | 25,3 min |
+| 1ʳᵉ Canopée urbaine | ~1 h 10 | 1 h 03 | −10 % | 41 min |
+| 1ʳᵉ Arcologie vivante | ~2 h 05 | 2 h 16 | +9 % | 1 h 22 |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~2 h 40 | 2 h 51 | +7 % | 1 h 47 |
 
-Le joueur simulé atteint 20 Jalons et attrape 44 Papillons pendant sa 1ʳᵉ Saison. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+Le joueur simulé atteint 18 Jalons et attrape 29 Papillons pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −16 % et +26 % de sa cible. La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 ### Affichage des nombres
 

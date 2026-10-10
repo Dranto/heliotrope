@@ -28,10 +28,10 @@ export const COST_GROWTH = 1.15;
 export const GENERATORS: Record<GeneratorId, GeneratorDef> = {
   pot: { id: 'pot', baseCost: 15, baseProduction: 0.1 },
   balconyPanel: { id: 'balconyPanel', baseCost: 100, baseProduction: 1 },
-  rooftopGarden: { id: 'rooftopGarden', baseCost: 1_100, baseProduction: 8 },
-  greenhouse: { id: 'greenhouse', baseCost: 12_000, baseProduction: 47 },
+  rooftopGarden: { id: 'rooftopGarden', baseCost: 400, baseProduction: 8 },
+  greenhouse: { id: 'greenhouse', baseCost: 6_000, baseProduction: 30 },
   verticalFarm: { id: 'verticalFarm', baseCost: 200_000, baseProduction: 260 },
   mirrorPlant: { id: 'mirrorPlant', baseCost: 3_000_000, baseProduction: 1_400 },
-  urbanCanopy: { id: 'urbanCanopy', baseCost: 50_000_000, baseProduction: 7_800 },
-  arcology: { id: 'arcology', baseCost: 800_000_000, baseProduction: 44_000 },
+  urbanCanopy: { id: 'urbanCanopy', baseCost: 28_000_000, baseProduction: 7_800 },
+  arcology: { id: 'arcology', baseCost: 200_000_000, baseProduction: 44_000 },
 };
