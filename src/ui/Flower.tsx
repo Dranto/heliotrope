@@ -1,6 +1,7 @@
 import { useState, type MouseEvent, type PointerEvent } from 'react';
 import { formatNumber } from '../game/format';
-import { clickHeliotrope, clickValue } from '../game/tick';
+import { clickValue } from '../game/production';
+import { clickHeliotrope } from '../game/tick';
 import { t } from '../i18n/fr';
 import { useGameState, useGameStore } from './useGame';
 

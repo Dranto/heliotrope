@@ -13,6 +13,7 @@ a design decision changes, update that document in the same PR.
 - `npm run check`: lint, format check, typecheck and tests (run before every push)
 - `npm test`: tests only; `npx vitest run path/to/file.test.ts` for one file
 - `npm run build`: production build
+- `npm run simulate [clicksPerSecond]`: print the balancing simulator's pacing table
 - `npm run format`: fix formatting
 
 ## Layout
@@ -20,13 +21,19 @@ a design decision changes, update that document in the same PR.
 - `src/game/`: the simulation, framework-free and pure. No React or DOM imports here.
   - `resources.ts`: resource ids (the MVP has one currency, Light)
   - `generators.ts`: generator data table (base cost and production); add generators here
+  - `upgrades.ts`: upgrade data table (×2 per generator, click upgrades, synergies)
+  - `production.ts`: pure formulas: production, multipliers, biodiversity, click value, costs,
+    upgrade availability
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
   - `tick.ts`: `tick(state, dtSeconds)` and player actions; pure functions returning new state
   - `offline.ts`: offline progress on load, capped by `MAX_OFFLINE_SECONDS`, simulated in chunks
-  - `save.ts`: localStorage save/load with versioned migrations
+  - `save.ts`: localStorage save/load with versioned migrations, base64 export/import
+  - `simulator.ts`: headless balancing simulator (design doc §8); its test keeps the pacing
+    targets within ±30%
   - `store.ts`: `GameStore`, which owns live state, the tick interval and autosave
   - `format.ts`: number formatting for display (French notation, design doc §8)
-- `src/i18n/fr.ts`: every player-facing text (UI strings, generator names and flavour lines).
+- `src/i18n/fr.ts`: every player-facing text (UI strings, generator and upgrade names and
+  flavour lines).
 - `src/ui/`: React components. Read state with `useGameState()`, change it with
   `store.dispatch((s) => action(s))`.
 

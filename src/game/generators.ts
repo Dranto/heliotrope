@@ -1,8 +1,16 @@
 // Generator data (docs/game-design.md §4). Adding a generator only means adding a row here
 // and its texts in src/i18n; the game logic reads everything from this table.
-// Milestone 1 ships generators 1 to 4; the other four arrive with milestone 2.
 
-export const GENERATOR_IDS = ['pot', 'balconyPanel', 'rooftopGarden', 'greenhouse'] as const;
+export const GENERATOR_IDS = [
+  'pot',
+  'balconyPanel',
+  'rooftopGarden',
+  'greenhouse',
+  'verticalFarm',
+  'mirrorPlant',
+  'urbanCanopy',
+  'arcology',
+] as const;
 
 export type GeneratorId = (typeof GENERATOR_IDS)[number];
 
@@ -22,4 +30,8 @@ export const GENERATORS: Record<GeneratorId, GeneratorDef> = {
   balconyPanel: { id: 'balconyPanel', baseCost: 100, baseProduction: 1 },
   rooftopGarden: { id: 'rooftopGarden', baseCost: 1_100, baseProduction: 8 },
   greenhouse: { id: 'greenhouse', baseCost: 12_000, baseProduction: 47 },
+  verticalFarm: { id: 'verticalFarm', baseCost: 130_000, baseProduction: 260 },
+  mirrorPlant: { id: 'mirrorPlant', baseCost: 1_400_000, baseProduction: 1_400 },
+  urbanCanopy: { id: 'urbanCanopy', baseCost: 20_000_000, baseProduction: 7_800 },
+  arcology: { id: 'arcology', baseCost: 330_000_000, baseProduction: 44_000 },
 };

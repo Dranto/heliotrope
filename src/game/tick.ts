@@ -1,41 +1,16 @@
-import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
+import {
+  generatorCost,
+  isUpgradeBought,
+  isUpgradeUnlocked,
+  lightPerSecond,
+  clickValue,
+} from './production';
+import type { GeneratorId } from './generators';
 import type { GameState } from './state';
+import { UPGRADES, type UpgradeId } from './upgrades';
 
-/** Light per second produced by all units of one generator. */
-export function generatorProduction(state: GameState, id: GeneratorId): number {
-  return GENERATORS[id].baseProduction * state.generators[id];
-}
-
-/** Total Light per second. */
-export function lightPerSecond(state: GameState): number {
-  let total = 0;
-  for (const id of GENERATOR_IDS) total += generatorProduction(state, id);
-  return total;
-}
-
-/** Light gained per click on the heliotrope. Click upgrades arrive with milestone 2. */
-export function clickValue(_state: GameState): number {
-  return 1;
-}
-
-/** Cost of the next unit of a generator: baseCost × 1.15^owned. */
-export function generatorCost(state: GameState, id: GeneratorId): number {
-  return GENERATORS[id].baseCost * COST_GROWTH ** state.generators[id];
-}
-
-export function canBuyGenerator(state: GameState, id: GeneratorId): boolean {
-  return state.resources.light >= generatorCost(state, id);
-}
-
-/**
- * A generator is shown once the player has earned half its base cost this Season.
- * Owning one keeps it shown.
- */
-export function isGeneratorRevealed(state: GameState, id: GeneratorId): boolean {
-  return state.generators[id] > 0 || state.totalLight >= GENERATORS[id].baseCost / 2;
-}
-
-function addLight(state: GameState, amount: number): GameState {
+/** Add Light to the reserve and to the Season total. */
+export function earnLight(state: GameState, amount: number): GameState {
   return {
     ...state,
     resources: { ...state.resources, light: state.resources.light + amount },
@@ -46,22 +21,48 @@ function addLight(state: GameState, amount: number): GameState {
 /** Advance the simulation by dtSeconds. Pure: returns a new state. */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const next = addLight(state, lightPerSecond(state) * dtSeconds);
+  const next = earnLight(state, lightPerSecond(state) * dtSeconds);
   return { ...next, lastUpdate: state.lastUpdate + dtSeconds * 1000 };
 }
 
 /** Player action: click the heliotrope. */
 export function clickHeliotrope(state: GameState): GameState {
-  return { ...addLight(state, clickValue(state)), clicks: state.clicks + 1 };
+  return { ...earnLight(state, clickValue(state)), clicks: state.clicks + 1 };
 }
 
-/** Player action: buy one unit of a generator. Returns the same state when unaffordable. */
-export function buyGenerator(state: GameState, id: GeneratorId): GameState {
-  const cost = generatorCost(state, id);
-  if (state.resources.light < cost) return state;
+export function canBuyGenerator(state: GameState, id: GeneratorId, count = 1): boolean {
+  return count > 0 && state.resources.light >= generatorCost(state, id, count);
+}
+
+/**
+ * Player action: buy `count` units of a generator at once (§4, bulk buy).
+ * Returns the same state when unaffordable.
+ */
+export function buyGenerator(state: GameState, id: GeneratorId, count = 1): GameState {
+  if (!canBuyGenerator(state, id, count)) return state;
+  const cost = generatorCost(state, id, count);
   return {
     ...state,
-    resources: { ...state.resources, light: state.resources.light - cost },
-    generators: { ...state.generators, [id]: state.generators[id] + 1 },
+    // Clamp so floating-point error never leaves a tiny negative reserve.
+    resources: { ...state.resources, light: Math.max(0, state.resources.light - cost) },
+    generators: { ...state.generators, [id]: state.generators[id] + count },
+  };
+}
+
+export function canBuyUpgrade(state: GameState, id: UpgradeId): boolean {
+  return (
+    !isUpgradeBought(state, id) &&
+    isUpgradeUnlocked(state, id) &&
+    state.resources.light >= UPGRADES[id].cost
+  );
+}
+
+/** Player action: buy an upgrade. Returns the same state when not available or unaffordable. */
+export function buyUpgrade(state: GameState, id: UpgradeId): GameState {
+  if (!canBuyUpgrade(state, id)) return state;
+  return {
+    ...state,
+    resources: { ...state.resources, light: state.resources.light - UPGRADES[id].cost },
+    upgrades: [...state.upgrades, id],
   };
 }

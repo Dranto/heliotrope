@@ -1,12 +1,12 @@
-import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
+import { GENERATOR_IDS, GENERATORS } from './generators';
+import { generatorCost, isGeneratorRevealed, lightPerSecond } from './production';
 import { createInitialState, type GameState } from './state';
 import {
   buyGenerator,
+  buyUpgrade,
   canBuyGenerator,
+  canBuyUpgrade,
   clickHeliotrope,
-  generatorCost,
-  isGeneratorRevealed,
-  lightPerSecond,
   tick,
 } from './tick';
 
@@ -28,6 +28,10 @@ describe('generator data', () => {
       [100, 1],
       [1_100, 8],
       [12_000, 47],
+      [130_000, 260],
+      [1_400_000, 1_400],
+      [20_000_000, 7_800],
+      [330_000_000, 44_000],
     ]);
   });
 });
@@ -106,6 +110,16 @@ describe('buyGenerator', () => {
     expect(buyGenerator(state, 'pot')).toBe(state);
   });
 
+  it('buys several units at once for the bulk price', () => {
+    const state = withState({ resources: { light: 1_000 }, generators: owned({ pot: 2 }) });
+    const cost = generatorCost(state, 'pot', 10);
+    const next = buyGenerator(state, 'pot', 10);
+    expect(next.generators.pot).toBe(12);
+    expect(next.resources.light).toBeCloseTo(1_000 - cost);
+    const poor = { ...state, resources: { light: cost - 1 } };
+    expect(buyGenerator(poor, 'pot', 10)).toBe(poor);
+  });
+
   it('charges the increased price for the next unit', () => {
     let state = withState({ resources: { light: 15 + 17.25 } });
     state = buyGenerator(buyGenerator(state, 'pot'), 'pot');
@@ -127,28 +141,21 @@ describe('isGeneratorRevealed', () => {
   });
 });
 
-describe('first session pacing', () => {
-  // Milestone 1 exit criterion (docs/game-design.md §12): within 15 minutes of active play
-  // the player can buy the first four generators. Simulates 4 clicks per second, in 1 s steps,
-  // always saving for the generator that minimises time-to-afford + payback time.
-  it('reaches the first Community greenhouse within 15 minutes', () => {
-    const clicksPerSecond = 4;
-    let state = createInitialState(0);
-    let seconds = 0;
-    while (state.generators.greenhouse === 0 && seconds < 15 * 60) {
-      for (let i = 0; i < clicksPerSecond; i++) state = clickHeliotrope(state);
-      state = tick(state, 1);
-      seconds += 1;
-      const income = lightPerSecond(state) + clicksPerSecond;
-      const score = (id: GeneratorId) => {
-        const cost = generatorCost(state, id);
-        const wait = Math.max(0, cost - state.resources.light) / income;
-        return wait + cost / GENERATORS[id].baseProduction;
-      };
-      const target = [...GENERATOR_IDS].sort((a, b) => score(a) - score(b))[0]!;
-      state = buyGenerator(state, target);
-    }
-    expect(state.generators.greenhouse).toBe(1);
-    expect(seconds).toBeGreaterThan(8 * 60);
+describe('buyUpgrade', () => {
+  it('spends the cost and records the upgrade once', () => {
+    const state = withState({ resources: { light: 200 }, generators: owned({ pot: 1 }) });
+    expect(canBuyUpgrade(state, 'pot.1')).toBe(true);
+    const next = buyUpgrade(state, 'pot.1');
+    expect(next.resources.light).toBe(50);
+    expect(next.upgrades).toEqual(['pot.1']);
+    expect(state.upgrades).toEqual([]);
+    expect(buyUpgrade(next, 'pot.1')).toBe(next);
+  });
+
+  it('refuses locked or unaffordable upgrades', () => {
+    const locked = withState({ resources: { light: 1e6 } });
+    expect(buyUpgrade(locked, 'pot.1')).toBe(locked);
+    const poor = withState({ resources: { light: 149 }, generators: owned({ pot: 1 }) });
+    expect(buyUpgrade(poor, 'pot.1')).toBe(poor);
   });
 });

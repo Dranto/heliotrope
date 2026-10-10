@@ -1,10 +1,11 @@
 import { applyOfflineProgress } from './offline';
-import { loadGame, saveGame } from './save';
+import { clearSave, importSave, loadGame, saveGame } from './save';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
 
 export const TICK_MS = 100;
-export const AUTOSAVE_MS = 10_000;
+/** §9.4: autosave every 30 s (and when the tab is hidden or closed, see main.tsx). */
+export const AUTOSAVE_MS = 30_000;
 
 type Listener = () => void;
 
@@ -58,6 +59,27 @@ export class GameStore {
   };
 
   save = (): void => saveGame(this.state, this.storage);
+
+  /** Replace the game with an imported one and save it right away. */
+  load = (state: GameState): void => {
+    this.setState(state);
+    this.save();
+  };
+
+  /** Import an exported save (§9.4). Returns false, leaving the game untouched, when invalid. */
+  importText = (text: string): boolean => {
+    const imported = importSave(text, this.now());
+    if (!imported) return false;
+    this.load(imported);
+    return true;
+  };
+
+  /** Full reset (§9.4): erase the save and start a fresh game. */
+  reset = (): void => {
+    clearSave(this.storage);
+    this.setState(createInitialState(this.now()));
+    this.save();
+  };
 
   start(): void {
     if (this.tickTimer) return;

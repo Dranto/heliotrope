@@ -1,4 +1,4 @@
-import { saveGame } from './save';
+import { exportSave, saveGame } from './save';
 import { createInitialState } from './state';
 import { GameStore } from './store';
 import { clickHeliotrope } from './tick';
@@ -38,5 +38,30 @@ describe('GameStore', () => {
     store.dispatch(clickHeliotrope);
     expect(store.getState().resources.light).toBeCloseTo(4);
     expect(listener).toHaveBeenCalledTimes(2);
+  });
+
+  it('loads an imported game and saves it', () => {
+    const store = new GameStore(localStorage, () => 1000);
+    const imported = { ...withPanel(1000), clicks: 50 };
+    store.load(imported);
+    expect(store.getState()).toBe(imported);
+    expect(new GameStore(localStorage, () => 1000).getState().clicks).toBe(50);
+  });
+
+  it('resets to a fresh game and overwrites the save', () => {
+    saveGame(withPanel(0));
+    const store = new GameStore(localStorage, () => 5000);
+    store.reset();
+    expect(store.getState()).toEqual(createInitialState(5000));
+    expect(new GameStore(localStorage, () => 5000).getState().generators.balconyPanel).toBe(0);
+  });
+
+  it('imports an exported save, or refuses invalid text', () => {
+    const store = new GameStore(localStorage, () => 7000);
+    expect(store.importText('garbage')).toBe(false);
+    expect(store.getState()).toEqual(createInitialState(7000));
+    expect(store.importText(exportSave({ ...withPanel(0), clicks: 9 }))).toBe(true);
+    expect(store.getState().clicks).toBe(9);
+    expect(store.getState().lastUpdate).toBe(7000);
   });
 });
