@@ -239,7 +239,7 @@ L'équilibrage doit être vérifié par un **simulateur sans interface** qui rej
 ### Affichage des nombres
 
 - Jusqu'à 999 999 : chiffres complets avec séparateur de milliers (« 12 345 »).
-- Au-delà : suffixes courts avec 3 chiffres significatifs (« 1,23 M », « 45,6 Md », « 7,89 Bn »…), puis notation scientifique au-delà du dernier suffixe.
+- Au-delà : suffixes courts de l'échelle longue avec 3 chiffres significatifs (« 1,23 M », « 45,6 Md », « 7,89 Bn »…) : M (million, 1e6), Md (milliard), Bn (billion), Bd (billiard), Tn (trillion), Td (trilliard), Qn (quadrillion), Qd (quadrilliard, 1e27), puis notation scientifique (« 1,23e30 ») au-delà du dernier suffixe.
 - Option pour forcer la notation scientifique partout.
 
 ---

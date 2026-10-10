@@ -1,3 +1,4 @@
+import { GENERATOR_IDS } from './generators';
 import { RESOURCE_IDS } from './resources';
 import { createInitialState, STATE_VERSION, type GameState } from './state';
 
@@ -6,7 +7,19 @@ export const SAVE_KEY = 'heliotrope.save';
 type Migration = (raw: Record<string, unknown>) => Record<string, unknown>;
 
 /** migrations[n] upgrades a save from version n to n + 1. */
-const migrations: Record<number, Migration> = {};
+const migrations: Record<number, Migration> = {
+  // v1 only had the placeholder "sunlight" resource, which was free and has no equivalent in
+  // the real game. Drop it so players start the real game fresh.
+  1: ({ resources: _placeholder, ...rest }) => ({ ...rest, version: 2 }),
+};
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isCount(value: unknown): value is number {
+  return isFiniteNumber(value) && Number.isInteger(value) && value >= 0;
+}
 
 export function serialize(state: GameState): string {
   return JSON.stringify(state);
@@ -36,11 +49,16 @@ export function deserialize(json: string, now: number): GameState | null {
   const resources = data.resources as Record<string, unknown> | undefined;
   for (const id of RESOURCE_IDS) {
     const value = resources?.[id];
-    if (typeof value === 'number' && Number.isFinite(value)) state.resources[id] = value;
+    if (isFiniteNumber(value) && value >= 0) state.resources[id] = value;
   }
-  if (typeof data.lastUpdate === 'number' && Number.isFinite(data.lastUpdate)) {
-    state.lastUpdate = data.lastUpdate;
+  const generators = data.generators as Record<string, unknown> | undefined;
+  for (const id of GENERATOR_IDS) {
+    const value = generators?.[id];
+    if (isCount(value)) state.generators[id] = value;
   }
+  if (isFiniteNumber(data.totalLight) && data.totalLight >= 0) state.totalLight = data.totalLight;
+  if (isCount(data.clicks)) state.clicks = data.clicks;
+  if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
   return state;
 }
 

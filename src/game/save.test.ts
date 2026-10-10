@@ -1,16 +1,27 @@
 import { clearSave, deserialize, loadGame, SAVE_KEY, saveGame, serialize } from './save';
-import { createInitialState, STATE_VERSION } from './state';
+import { createInitialState, STATE_VERSION, type GameState } from './state';
+
+function playedState(): GameState {
+  const base = createInitialState(1000);
+  return {
+    ...base,
+    resources: { light: 42.5 },
+    generators: { ...base.generators, pot: 3, balconyPanel: 1 },
+    totalLight: 300,
+    clicks: 120,
+  };
+}
 
 describe('save', () => {
   beforeEach(() => localStorage.clear());
 
   it('round-trips through serialize/deserialize', () => {
-    const state = { ...createInitialState(1000), resources: { sunlight: 42 } };
+    const state = playedState();
     expect(deserialize(serialize(state), 0)).toEqual(state);
   });
 
   it('round-trips through localStorage', () => {
-    const state = { ...createInitialState(1000), resources: { sunlight: 7 } };
+    const state = playedState();
     saveGame(state);
     expect(localStorage.getItem(SAVE_KEY)).not.toBeNull();
     expect(loadGame(0)).toEqual(state);
@@ -25,7 +36,18 @@ describe('save', () => {
   });
 
   it('fills missing or invalid fields with defaults', () => {
-    const json = JSON.stringify({ version: STATE_VERSION, resources: { sunlight: 'lots' } });
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      resources: { light: 'lots' },
+      generators: { pot: -1, balconyPanel: 2.5, rooftopGarden: null },
+      totalLight: NaN,
+      clicks: 'many',
+    });
     expect(deserialize(json, 500)).toEqual(createInitialState(500));
+  });
+
+  it('migrates a v1 placeholder save to a fresh game that keeps its timestamp', () => {
+    const v1 = JSON.stringify({ version: 1, resources: { sunlight: 9000 }, lastUpdate: 1234 });
+    expect(deserialize(v1, 0)).toEqual(createInitialState(1234));
   });
 });

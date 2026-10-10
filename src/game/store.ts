@@ -19,6 +19,8 @@ export class GameStore {
   private saveTimer: ReturnType<typeof setInterval> | undefined;
   /** Seconds of offline progress applied when the store was created. */
   readonly offlineSeconds: number;
+  /** Light produced during those offline seconds. */
+  readonly offlineLight: number;
 
   constructor(
     private readonly storage: Storage = localStorage,
@@ -29,9 +31,11 @@ export class GameStore {
       const result = applyOfflineProgress(loaded, this.now());
       this.state = result.state;
       this.offlineSeconds = result.elapsedSeconds;
+      this.offlineLight = result.state.totalLight - loaded.totalLight;
     } else {
       this.state = createInitialState(this.now());
       this.offlineSeconds = 0;
+      this.offlineLight = 0;
     }
   }
 
@@ -42,7 +46,7 @@ export class GameStore {
     return () => this.listeners.delete(listener);
   };
 
-  /** Apply a pure state transition, e.g. store.dispatch((s) => gather(s, 'sunlight')). */
+  /** Apply a pure state transition, e.g. store.dispatch(clickHeliotrope). */
   dispatch = (update: (state: GameState) => GameState): void => {
     this.setState(update(this.state));
   };
