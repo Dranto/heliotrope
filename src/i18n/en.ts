@@ -165,6 +165,11 @@ export const en: Texts = {
       'talents.1': 'First root',
       'talents.9': 'Branches',
       'talents.17': 'Great tree',
+      'species.1': 'First return',
+      'species.10': 'The neighbourhood hums',
+      'species.18': 'Complete herbarium',
+      'challenges.1': 'Season braved',
+      'challenges.4': 'All the seasons of the world',
       'cooperatives.100': 'Cargo bike',
       'cooperatives.1000': 'Network of cooperatives',
       'seasons.1': 'First winter',
@@ -211,6 +216,12 @@ export const en: Texts = {
         count === 1
           ? 'Carry out a neighbourhood project'
           : `Carry out ${count} neighbourhood projects in the same Season`,
+      species: (count: number) =>
+        count === 1
+          ? 'See a species of the herbarium come back'
+          : `See ${count} species of the herbarium come back`,
+      challenges: (count: number) =>
+        count === 1 ? 'Win a challenge Season' : `Win ${count} challenge Seasons`,
       talents: (count: number) =>
         count === 1
           ? 'Sow a first Seed in the Tree of Seasons'

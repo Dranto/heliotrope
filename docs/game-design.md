@@ -378,7 +378,7 @@ Des voisins achètent à la place du joueur : ce sont les talents de la branche 
 
 - **Règles.** Un bâtiment interdit ou plein reste affiché avec l'étiquette « Pas cette Saison » ou « Au plus 25 » ; ni le joueur ni les Coopératives (§7.2) ne peuvent l'acheter. Les Boutures (§7.1) ne gardent que ce que le défi autorise. Les bonus des défis gagnés suivent la forme commune des parcelles, projets et talents (`Bonus`), donc se combinent avec eux comme des synergies.
 - **Pendant le défi.** Une pastille sous le compteur montre l'espèce à gagner, le nom du défi et une jauge qui se remplit avec la Lumière de la Saison. À la victoire, la contrainte se lève, la scène retrouve sa lumière et l'espèce apparaît sur la carte.
-- **Rythme.** Le joueur de référence (§8) les gagne en 3ᵉ Saison en 34 à 42 min, contre 30 min pour une Saison libre : un peu plus long, jamais une punition. Le test du simulateur garde chaque défi entre 20 min et 1 h.
+- **Rythme.** Le joueur de référence (§8) les gagne en 3ᵉ Saison en 33 à 40 min, contre une demi-heure environ pour une Saison libre : un peu plus long, jamais une punition. Le test du simulateur garde chaque défi entre 20 min et 1 h.
 
 ---
 
@@ -434,12 +434,12 @@ Sortie actuelle (améliorations de clic, parcelles et projets, Arbre et Coopéra
 | 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 1 s |
 | 1ᵉʳ Panneau de balcon | ~35 s | 31,5 s | −10 % | 6 s |
 | 1ᵉʳ Potager sur le toit | ~1 min 30 | 1,5 min | 0 % | 36 s |
-| 1ʳᵉ Serre communautaire | ~5 min 30 | 5,7 min | +3 % | 1,7 min |
-| 1ʳᵉ Ferme verticale | ~12 min | 11,4 min | −5 % | 5,0 min |
-| 1ʳᵉ Centrale à miroirs | ~26 min | 22,6 min | −13 % | 9,3 min |
-| 1ʳᵉ Canopée urbaine | ~50 min | 40 min | −20 % | 19,5 min |
-| 1ʳᵉ Arcologie vivante | ~1 h 20 | 1 h 07 | −16 % | 32 min |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 40 | 1 h 21 | −19 % | 39 min |
+| 1ʳᵉ Serre communautaire | ~5 min 30 | 5,6 min | +2 % | 1,6 min |
+| 1ʳᵉ Ferme verticale | ~12 min | 11,1 min | −8 % | 4,8 min |
+| 1ʳᵉ Centrale à miroirs | ~26 min | 22 min | −16 % | 10,4 min |
+| 1ʳᵉ Canopée urbaine | ~50 min | 40 min | −20 % | 17,4 min |
+| 1ʳᵉ Arcologie vivante | ~1 h 20 | 1 h 01 | −24 % | 30 min |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 40 | 1 h 14 | −26 % | 36 min |
 
 Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −14 % et +9 % de sa cible. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
@@ -447,7 +447,7 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 
 > La terre se souvient (M7) : la 1ʳᵉ Saison ne change pas (pas encore de Graine à semer). Au début de la 2ᵉ, le joueur de référence sème ses 10 Graines dans cet ordre, tant qu'elles suffisent : les jardiniers, Fleurs nectarifères, Mycorhizes, les maraîchers, Haies fleuries, Boutures, Sous-bois, Veilleurs de nuit (ordre complet dans `REFERENCE_TALENTS`). Les deux coopératives achètent pour lui pendant qu'il joue sa stratégie habituelle (environ 45 et 95 achats). Sa 2ᵉ Saison conseillée passe de 52 min à 43 min (Arcologie à 36 min au lieu de 41), sans toucher aux cibles de la 1ʳᵉ.
 >
-> Le vivant revient (M8) : les espèces de l'Herbier (§9.5) s'ajoutent à la biodiversité dès la 1ʳᵉ Saison (le joueur de référence en ramène 8 : Coquelicot, Fougère, Abeille, Coccinelle, Bourdon, Grenouille, Hérisson, Citron). Comme Antoine le souhaite, c'est une synergie de plus plutôt qu'un changement de valeurs : la Saison conseillée passe de 1 h 28 à 1 h 21 (−19 % de la cible), l'Arcologie de 1 h 11 à 1 h 07, la Canopée de 44 à 40 min, et la 2ᵉ Saison de 43 à 39 min. Les Saisons à défi (§7.3) sont jouées comme 3ᵉ Saison : `npm run simulate` affiche aussi le moment où chacune est gagnée.
+> Le vivant revient (M8) : les espèces de l'Herbier (§9.5) s'ajoutent à la biodiversité dès la 1ʳᵉ Saison (le joueur de référence en ramène 8 : Coquelicot, Fougère, Abeille, Coccinelle, Bourdon, Grenouille, Hérisson, Citron). Comme Antoine le souhaite, c'est une synergie de plus plutôt qu'un changement de valeurs. Avec les 92 jalons et les jalons de M8, la Saison conseillée passe de 1 h 23 à 1 h 14 (−26 % de la cible, encore dans les ±30 %), l'Arcologie à 1 h 01 et la 2ᵉ Saison à 36 min. Les Saisons à défi (§7.3) sont jouées comme 3ᵉ Saison : `npm run simulate` affiche aussi le moment où chacune est gagnée.
 
 ### Affichage des nombres
 
@@ -501,19 +501,17 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons**, toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
 - **Améliorations** (dans une même Saison) : 10, 25, 50, 75 améliorations ; « Fil doré » (une première synergie entre bâtiments), « Toile dorée » (les 18 synergies entre bâtiments), « Mains d'or » (les 10 améliorations du clic).
 - **La fleur** : 10, 100, 1 000, 10 000, 100 000 clics ; un clic qui vaut 1 000 puis 1 M Lumière ; caché : « Graine qui dort » (récolter 1 000 Lumière dans une Saison sans aucun bâtiment).
 - **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
-- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 100 et 1 000 achats des coopératives.
-- **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
+- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
+- **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
 
 Les jalons sont conservés d'une Saison à l'autre. Chaque jalon atteint **éclot** en haut de l'écran : un médaillon dont l'anneau doré se dessine, une couronne de laurier qui pousse feuille à feuille, des pétales lilas qui s'ouvrent, avec le nom du jalon, sa condition et « Production +1 % » ; il s'efface après environ 4 s. Plusieurs jalons atteints ensemble éclosent l'un après l'autre (au-delà de trois d'un coup, un seul médaillon les compte). Le compteur du bouton « Jalons » scintille à chaque nouveau jalon. Pas de texte d'ambiance : seulement le nom et la condition. Avec les animations réduites, le médaillon apparaît et disparaît sans mouvement. Les lecteurs d'écran entendent « Jalon atteint : nom ».
-
-**Pistes pour M8 (Herbier, Saisons à défis).** À brancher quand ces systèmes existeront : espèces de l'Herbier découvertes (1, 10, toutes), une Saison à défi réussie, toutes les Saisons à défis réussies.
 
 ### 9.4 Sauvegarde
 

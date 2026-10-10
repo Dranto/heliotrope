@@ -200,6 +200,11 @@ export const fr = {
       'talents.1': 'Première racine',
       'talents.9': 'Ramure',
       'talents.17': 'Grand arbre',
+      'species.1': 'Premier retour',
+      'species.10': 'Le quartier bourdonne',
+      'species.18': 'Herbier complet',
+      'challenges.1': 'Saison bravée',
+      'challenges.4': 'Toutes les saisons du monde',
       'cooperatives.100': 'Vélo-cargo',
       'cooperatives.1000': 'Réseau de coopératives',
       'seasons.1': 'Premier hiver',
@@ -250,6 +255,12 @@ export const fr = {
         count === 1
           ? 'Mener un projet du quartier'
           : `Mener ${count} projets du quartier dans une même Saison`,
+      species: (count: number) =>
+        count === 1
+          ? 'Voir revenir une espèce de l’Herbier'
+          : `Voir revenir ${count} espèces de l’Herbier`,
+      challenges: (count: number) =>
+        count === 1 ? 'Réussir une Saison à défi' : `Réussir ${count} Saisons à défi`,
       talents: (count: number) =>
         count === 1
           ? 'Semer une première Graine dans l’Arbre des Saisons'
