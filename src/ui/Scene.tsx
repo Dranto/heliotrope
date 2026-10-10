@@ -1,8 +1,13 @@
+import { useCallback, useMemo, useState } from 'react';
+import type { ParcelId } from '../game/parcels';
+import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restoration';
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
 import { t } from '../i18n/fr';
 import { Neighbourhood } from './Neighbourhood';
+import { Restoration } from './Restoration';
+import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
 /** The Golden Butterfly (§9.2), drawn with fine lines like the rest of the botanical motifs. */
@@ -57,7 +62,37 @@ function Butterfly({ onCatch }: { onCatch: (result: CatchResult) => void }) {
  * Butterfly flies across it.
  */
 export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
+  const store = useGameStore();
   const state = useGameState();
+  const [highlight, setHighlight] = useState<ParcelId | null>(null);
+  const restore = useCallback(
+    (id: ParcelId) => store.dispatch((s) => restoreParcel(s, id)),
+    [store],
+  );
+  // Joined into strings so the map layers only redraw when an offer actually changes.
+  const offered = offeredParcels(state)
+    .map((p) => p.id)
+    .join();
+  const affordable = offeredParcels(state)
+    .filter((p) => canRestoreParcel(state, p.id))
+    .map((p) => p.id)
+    .join();
+  const { parcels, projects } = state;
+  const ground = useMemo(() => <ParcelGround parcels={parcels} />, [parcels]);
+  const overlay = useMemo(
+    () => (
+      <>
+        <ProjectMarks projects={projects} />
+        <ParcelOffers
+          offered={split(offered)}
+          affordable={split(affordable)}
+          highlight={highlight}
+          onRestore={restore}
+        />
+      </>
+    ),
+    [projects, offered, affordable, highlight, restore],
+  );
   const phase = phaseOf(state);
   const season = visualSeason(state);
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
@@ -79,9 +114,16 @@ export function Scene({ onCatch }: { onCatch: (result: CatchResult) => void }) {
           phase={phase}
           greenness={greenness}
           reduced={state.settings.reducedMotion}
+          ground={ground}
+          overlay={overlay}
         />
         <Butterfly onCatch={onCatch} />
       </div>
+      <Restoration onHighlight={setHighlight} />
     </figure>
   );
+}
+
+function split(ids: string): ParcelId[] {
+  return ids === '' ? [] : (ids.split(',') as ParcelId[]);
 }

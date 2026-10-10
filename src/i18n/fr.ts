@@ -2,7 +2,9 @@
 // English translation can be added later).
 import type { AchievementId } from '../game/achievements';
 import type { GeneratorId } from '../game/generators';
+import type { ParcelId } from '../game/parcels';
 import type { VisualSeason } from '../game/phases';
+import type { ProjectId } from '../game/projects';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
 export interface GeneratorText {
@@ -165,6 +167,70 @@ export const fr = {
       earlySowing: 'Commencer une Saison avant que la terre soit prête',
     },
   },
+  restoration: {
+    title: 'Le quartier',
+    parcels: 'Parcelles à restaurer',
+    parcelsHint: 'Restaurées pour toujours, d’une Saison à l’autre.',
+    projects: 'Projets du quartier',
+    projectsHint: 'Menés pour cette Saison.',
+    restore: 'Restaurer',
+    carryOut: 'Lancer',
+    restoreLabel: (name: string, cost: string) => `Restaurer ${name} pour ${cost} Lumière`,
+    carryOutLabel: (name: string, cost: string) => `Lancer le projet ${name} pour ${cost} Lumière`,
+    restored: (name: string) => `${name} restaurée`,
+    started: (name: string) => `Projet lancé\u00a0: ${name}`,
+    parcelNames: {
+      gardenStreet: 'Rue jardin',
+      rainGardens: 'Jardins de pluie',
+      pollinatorStrip: 'Corridor des pollinisateurs',
+      river: 'Rivière retrouvée',
+      park: 'Parc du parking',
+      orchard: 'Verger de l’entrepôt',
+      livingRoofs: 'Toits vivants',
+      squares: 'Places plantées',
+    } satisfies Record<ParcelId, string>,
+    projectNames: {
+      seedSwap: 'Troc de graines',
+      toolLibrary: 'Outilthèque',
+      compost: 'Compost collectif',
+      sharedBatteries: 'Batteries partagées',
+      beehives: 'Ruchers partagés',
+      festival: 'Fête de quartier',
+      bikeLanes: 'Pistes cyclables',
+      market: 'Marché paysan',
+      repairCafe: 'Repair café',
+      rainwater: 'Eau de pluie',
+      butterflyGarden: 'Jardin à papillons',
+      solarCanopy: 'Ombrières solaires',
+      tram: 'Tram végétalisé',
+      assembly: 'Assemblée de quartier',
+      lightFestival: 'Fête des lumières',
+    } satisfies Record<ProjectId, string>,
+    bonus: {
+      generatorMultiplier: (generator: string, factor: string) =>
+        `${generator}\u00a0: production ×${factor}`,
+      perType: (generator: string, percent: string) =>
+        `${generator}\u00a0: +${percent}\u00a0% par type de bâtiment possédé`,
+      global: (percent: string) => `Toute la production +${percent}\u00a0%`,
+      perParcel: (percent: string) =>
+        `Toute la production +${percent}\u00a0% par parcelle restaurée`,
+      clickMultiplier: (factor: string) => `Valeur du clic ×${factor}`,
+      clickPerUnit: (amount: string, generator: string) =>
+        `Le clic rapporte +${amount} par ${generator}`,
+      discount: (percent: string) => `Tous les bâtiments coûtent ${percent}\u00a0% de moins`,
+      biodiversityThreshold: (count: string) =>
+        `La biodiversité compte aussi chaque bâtiment possédé à ${count} exemplaires`,
+      biodiversityFactor: (factor: string) => `Bonus de biodiversité ×${factor}`,
+      perAchievement: (percent: string) => `Chaque jalon donne +${percent}\u00a0% de plus`,
+      synergyFactor: (factor: string) => `Synergies ×${factor}`,
+      butterflyInterval: (percent: string) =>
+        `Le Papillon doré revient ${percent}\u00a0% plus vite`,
+      effectDuration: (effect: string, factor: string) => `${effect} dure ×${factor}`,
+      harvestFactor: (factor: string) => `Récolte du Papillon doré ×${factor}`,
+      offlineCap: (duration: string) => `Progression hors ligne\u00a0: +${duration} de plafond`,
+    },
+    effectNames: { bloom: 'La Floraison', pollination: 'La Pollinisation' },
+  },
   welcomeTitle: 'Pendant votre absence…',
   welcomeBack: (light: string, duration: string) =>
     `Pendant votre absence (${duration}), le quartier a récolté ${light} Lumière.`,
@@ -253,6 +319,11 @@ export const fr = {
     notationShort: 'Suffixes courts (1,23\u00a0M)',
     notationScientific: 'Scientifique (1,23e6)',
     reducedMotion: 'Réduire les animations',
+    soundTitle: 'Son',
+    volume: 'Volume',
+    muted: 'Couper le son',
+    soundHint:
+      'Des sons discrets accompagnent la récolte, les achats et la restauration du quartier.',
     reducedMotionHint:
       'Arrête le pollen, la respiration du soleil et le vol du papillon. Suit aussi le réglage de votre appareil.',
     saveTitle: 'Sauvegarde',

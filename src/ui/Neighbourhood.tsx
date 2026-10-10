@@ -73,7 +73,7 @@ const POLLEN: [number, number, number][] = [
 const LiveContext = createContext<{ current: boolean }>({ current: false });
 
 /** One element of the map: grows into place with a golden ring when it is newly built. */
-function Appear({
+export function Appear({
   at,
   size,
   children,
@@ -609,6 +609,10 @@ export interface NeighbourhoodProps {
   /** 0 with nothing built, 1 well into the city phase, rounded so the map redraws rarely. */
   greenness: number;
   reduced: boolean;
+  /** Drawn over the grey city, under the generators: restored parcels (§6.1). */
+  ground?: ReactNode;
+  /** Drawn over everything in the city: projects and parcels on offer (§6.1, §6.2). */
+  overlay?: ReactNode;
 }
 
 /**
@@ -623,6 +627,8 @@ export const Neighbourhood = memo(function Neighbourhood({
   phase,
   greenness,
   reduced,
+  ground,
+  overlay,
 }: NeighbourhoodProps) {
   const live = useRef(false);
   useEffect(() => {
@@ -763,6 +769,8 @@ export const Neighbourhood = memo(function Neighbourhood({
             <Roof key={box.join()} box={box} storeys={storeys} fill={roofFill} bare />
           ))}
 
+          {ground}
+
           <Layer
             id="rooftopGarden"
             shown={gardens}
@@ -832,6 +840,8 @@ export const Neighbourhood = memo(function Neighbourhood({
               </Appear>
             ))}
           </Layer>
+
+          {overlay}
         </g>
 
         <g className="clouds" aria-hidden="true">

@@ -1,0 +1,554 @@
+/* Restored parcels and neighbourhood projects on the map, and their panel under it
+   (docs/game-design.md §6.1, §6.2, §10.4). */
+
+/* ---------- Restored ground ---------- */
+
+.parcels .paving {
+  fill: #eee4d0;
+}
+
+.parcels .paving-edge {
+  stroke: rgb(255 255 255 / 0.75);
+  stroke-width: 0.8;
+}
+
+.parcels .meadow {
+  fill: #b9cf9f;
+}
+
+.parcels .lawn {
+  fill: #b5cc98;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.8;
+}
+
+.parcels .bench {
+  fill: #c39a6b;
+}
+
+.bloom-lilac {
+  fill: var(--lilac);
+}
+
+.bloom-gold {
+  fill: #f4c063;
+}
+
+.bloom-white {
+  fill: #fffaf0;
+}
+
+.bloom-rose {
+  fill: #e8a3b8;
+}
+
+.parcels .swale {
+  fill: none;
+  stroke: #9fcfd4;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.parcels .reed {
+  stroke: var(--leaf);
+  stroke-width: 0.7;
+  stroke-linecap: round;
+}
+
+.parcels .mown-path {
+  stroke: rgb(255 250 235 / 0.7);
+  stroke-width: 3;
+  stroke-dasharray: 5 3;
+}
+
+.parcels .bank {
+  fill: #b9cf9f;
+}
+
+.parcels .river-bed {
+  fill: none;
+  stroke: #d9cdb0;
+  stroke-width: 15;
+  stroke-linecap: round;
+}
+
+.parcels .river-water {
+  fill: none;
+  stroke: #8ec7d0;
+  stroke-width: 11;
+  stroke-linecap: round;
+}
+
+/* Light ripples drift downstream. */
+.parcels .river-ripple {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.65);
+  stroke-width: 1;
+  stroke-dasharray: 3 14;
+  animation: ripple 6s linear infinite;
+}
+
+@keyframes ripple {
+  to {
+    stroke-dashoffset: -34;
+  }
+}
+
+.parcels .footbridge rect {
+  fill: #d8b98d;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.6;
+}
+
+.parcels .footbridge path {
+  stroke: #9c7a52;
+  stroke-width: 0.6;
+}
+
+.parcels .park-path {
+  fill: none;
+  stroke: #eee4d0;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.parcels .pond {
+  fill: #8ec7d0;
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 1.2;
+}
+
+.parcels .pond-light {
+  fill: #bfe0e3;
+}
+
+.parcels .fruit {
+  fill: var(--terracotta);
+}
+
+.parcels .sedum {
+  fill: #a9c08d;
+}
+
+.parcels .sedum-dot {
+  fill: rgb(47 107 79 / 0.25);
+}
+
+.parcels .square-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 0.6;
+  stroke-dasharray: 1 2;
+}
+
+/* A parcel restored while playing is unveiled from its pin, with petals bursting out. */
+.unveil {
+  animation: unveil 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes unveil {
+  from {
+    r: 0;
+  }
+}
+
+.unveil-ring {
+  fill: none;
+  stroke: #f4c063;
+  stroke-width: 1.4;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: appear-ring 2s ease-out;
+}
+
+.burst {
+  opacity: 0;
+  animation: burst 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes burst {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.4);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.6);
+  }
+}
+
+/* ---------- Project marks ---------- */
+
+.projects .table,
+.projects .shed {
+  fill: #e2c79e;
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.6;
+}
+
+.projects .shed {
+  fill: var(--terracotta);
+}
+
+.projects .shed-ridge,
+.projects .tool {
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.projects .compost {
+  fill: #8a6a4a;
+  stroke: rgb(255 255 255 / 0.5);
+  stroke-width: 0.5;
+}
+
+.projects .battery {
+  fill: #3e6b6a;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.5;
+}
+
+.projects .bolt {
+  fill: none;
+  stroke: #f4c063;
+  stroke-width: 0.6;
+}
+
+.projects .hive {
+  fill: #f2c25c;
+  stroke: #9c7a52;
+  stroke-width: 0.4;
+}
+
+.projects .hive-line {
+  stroke: #9c7a52;
+  stroke-width: 0.4;
+}
+
+.projects .bee {
+  fill: #3b3328;
+  animation: buzz 4s ease-in-out infinite alternate;
+}
+
+@keyframes buzz {
+  33% {
+    transform: translate(3px, -2px);
+  }
+
+  66% {
+    transform: translate(-2px, 2px);
+  }
+
+  to {
+    transform: translate(2px, 3px);
+  }
+}
+
+.projects .garland-string {
+  fill: none;
+  stroke: rgb(156 122 82 / 0.6);
+  stroke-width: 0.35;
+}
+
+.projects .flag {
+  animation: sway 3s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  to {
+    transform: translateY(0.6px);
+  }
+}
+
+.projects .bike-lane {
+  stroke: #7fb069;
+  stroke-width: 1.6;
+  opacity: 0.85;
+}
+
+.projects .awning {
+  fill: #fffaf0;
+  stroke: rgb(156 122 82 / 0.4);
+  stroke-width: 0.5;
+}
+
+.projects .awning-stripe {
+  stroke: var(--terracotta);
+  stroke-width: 1.6;
+}
+
+.projects .awning-stripe.gold {
+  stroke: var(--gold);
+}
+
+.projects .parasol {
+  fill: #fffaf0;
+  stroke: var(--sage);
+  stroke-width: 0.8;
+}
+
+.projects .parasol-rib {
+  stroke: rgb(143 174 139 / 0.7);
+  stroke-width: 0.4;
+}
+
+.projects .cistern {
+  fill: #e9e3d6;
+  stroke: #6fa8b2;
+  stroke-width: 0.8;
+}
+
+.projects .cistern-water {
+  fill: #8ec7d0;
+}
+
+.projects .buddleia {
+  fill: #8a6fb0;
+  opacity: 0.85;
+}
+
+.projects .canopy-panel {
+  fill: #2e4a5c;
+  stroke: var(--gold);
+  stroke-width: 0.6;
+}
+
+.projects .canopy-grid {
+  stroke: #8fb3c9;
+  stroke-width: 0.4;
+}
+
+.projects .track-grass {
+  stroke: #b9cf9f;
+  stroke-width: 6;
+}
+
+.projects .track {
+  stroke: #8a8378;
+  stroke-width: 0.6;
+}
+
+.projects .tram-body {
+  fill: #fffaf0;
+  stroke: var(--leaf);
+  stroke-width: 0.7;
+}
+
+.projects .tram-roof {
+  fill: var(--sage);
+}
+
+/* The tram glides slowly along its green track. */
+.projects .tram-car {
+  animation: tram 40s ease-in-out infinite alternate;
+}
+
+@keyframes tram {
+  to {
+    transform: translateX(100px);
+  }
+}
+
+.projects .assembly-seats {
+  fill: none;
+  stroke: #c39a6b;
+  stroke-width: 1.4;
+  stroke-dasharray: 2 1.6;
+}
+
+.projects .lantern {
+  fill: #ffe3a3;
+  filter: drop-shadow(0 0 1.5px rgb(244 192 99 / 0.95));
+  animation: lantern 3s ease-in-out infinite alternate;
+}
+
+@keyframes lantern {
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* ---------- Parcels on offer ---------- */
+
+.offer-outline {
+  fill: rgb(244 192 99 / 0.08);
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  animation: offer 2.6s ease-in-out infinite alternate;
+}
+
+.offer[data-highlight='true'] .offer-outline {
+  fill: rgb(244 192 99 / 0.28);
+  stroke-width: 1.8;
+}
+
+@keyframes offer {
+  to {
+    stroke-dashoffset: -12;
+    fill: rgb(244 192 99 / 0.18);
+  }
+}
+
+.pin {
+  cursor: default;
+}
+
+.offer[data-ready='true'] .pin {
+  cursor: pointer;
+}
+
+.pin-halo {
+  fill: rgb(244 192 99 / 0.25);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: halo 2.6s ease-in-out infinite;
+}
+
+@keyframes halo {
+  50% {
+    transform: scale(1.35);
+    opacity: 0.4;
+  }
+}
+
+.pin-disc {
+  fill: #fffaf0;
+  stroke: var(--gold);
+  stroke-width: 1;
+}
+
+.offer[data-ready='false'] .pin-disc {
+  stroke: #a7a39c;
+}
+
+.pin-sprout {
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+
+/* ---------- Panel under the map ---------- */
+
+.restoration {
+  padding: 0.9rem 1.25rem 0.4rem;
+  border-top: 1px solid rgb(31 42 36 / 0.06);
+}
+
+.restoration-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.restoration h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.restored-dots {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.restored-dots li {
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 1px solid rgb(167 163 156 / 0.8);
+  border-radius: 50%;
+}
+
+.restored-dots li[data-done='true'] {
+  border-color: var(--leaf);
+  background: radial-gradient(circle at 35% 35%, #b9cf9f, var(--leaf));
+}
+
+.restoration-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.7rem 0 0.6rem;
+  padding: 0;
+  list-style: none;
+}
+
+.restoration-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.6rem 0.55rem 0.7rem;
+  border: 1px solid rgb(233 169 59 / 0.35);
+  border-radius: 1rem;
+  background: rgb(255 250 240 / 0.7);
+  animation: card-in 0.6s ease both;
+}
+
+.restoration-card[data-kind='project'] {
+  border-color: rgb(143 174 139 / 0.45);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.scene .restoration-icon svg {
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.restoration-text {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.restoration-name {
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+.restoration-effect {
+  color: var(--leaf);
+  font-size: 0.8rem;
+}
+
+.restoration-card .buy {
+  min-width: 5.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unveil,
+  .burst,
+  .unveil-ring,
+  .restoration-card,
+  .offer-outline,
+  .pin-halo {
+    animation: none !important;
+  }
+}
+
+/* Light, clouds and pollen float over the city without catching the pointer, so the pins of
+   parcels on offer stay clickable. */
+.scene-map svg > :not(.camera) {
+  pointer-events: none;
+}
