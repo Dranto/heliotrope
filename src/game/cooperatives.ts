@@ -1,6 +1,7 @@
 // The Cooperatives (docs/game-design.md §7.2): neighbours who buy for the player once a talent of
 // the Tree of Seasons brings them in. Each one looks after some buildings, the council after the
 // upgrades. Pure: `runCooperatives` returns new state, called by every tick.
+import { generatorLimit } from './challenges';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import {
   availableUpgrades,
@@ -121,7 +122,9 @@ export const COUNCIL_PRIORITY = 30;
 function nextPurchase(state: GameState): Purchase | null {
   const scores = new Map<GeneratorId, number>();
   for (const id of GENERATOR_IDS) {
-    if (isGeneratorRevealed(state, id)) scores.set(id, payback(state, id));
+    if (isGeneratorRevealed(state, id) && state.generators[id] < generatorLimit(state, id)) {
+      scores.set(id, payback(state, id));
+    }
   }
   let best: { cooperative: CooperativeId; id: GeneratorId; score: number } | null = null;
   for (const cooperative of COOPERATIVE_IDS) {

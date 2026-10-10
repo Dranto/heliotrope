@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { exportSave, saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
+import { tick } from '../game/tick';
 import { GameStore } from '../game/store';
 import { App } from './App';
 import { GameStoreContext } from './useGame';
@@ -213,6 +214,41 @@ describe('App', () => {
     expect(screen.getByTestId('seeds-chip')).toHaveTextContent('2');
     // The new Season is saved right away.
     expect(new GameStore(localStorage, () => 0).getState().seeds).toBe(2);
+  });
+
+  it('starts a challenge Season, shows its goal and lifts it once won (§7.3)', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, seeds: 10, seasons: 1, allTimeLight: 1e11, totalLight: 1e9 });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    fireEvent.click(screen.getByRole('button', { name: /^Saisons/ }));
+    const dialog = screen.getByRole('dialog', { name: 'Les Saisons' });
+    expect(dialog).toHaveTextContent('Saison à défi');
+    fireEvent.click(screen.getByRole('radio', { name: /La Saison des nuages/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer la Saison des nuages' }));
+    expect(store.getState().challenge).toBe('cloudy');
+    expect(screen.getByTestId('challenge-chip')).toHaveTextContent('La Saison des nuages');
+    fireEvent.click(screen.getByRole('button', { name: /Fermer les Saisons/ }));
+    act(() => store.dispatch((s) => ({ ...s, totalLight: 2e9 })));
+    act(() => store.dispatch((s) => tick(s, 0.1)));
+    expect(store.getState()).toMatchObject({ challenge: null, challenges: ['cloudy'] });
+    expect(screen.queryByTestId('challenge-chip')).not.toBeInTheDocument();
+    expect(screen.getByText(/Défi réussi/)).toBeInTheDocument();
+    expect(screen.getByText(/De retour dans le quartier.*Martin-pêcheur/)).toBeInTheDocument();
+  });
+
+  it('shows the Herbier, with the species back drawn on the map (§9.5)', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, parcels: ['river'], species: ['frog'] });
+    renderApp(new GameStore(localStorage, () => 0));
+    expect(document.querySelector('.species [data-species="frog"]')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Herbier/ }));
+    const dialog = screen.getByRole('dialog', { name: 'L’Herbier' });
+    expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 18');
+    expect(dialog.querySelector('[data-species="frog"]')).toHaveAttribute('data-found', 'true');
+    expect(dialog.querySelector('[data-species="hedgehog"]')).toHaveTextContent(
+      'Restaurer Parc du parking',
+    );
   });
 
   it('shows Season and all-time statistics', () => {

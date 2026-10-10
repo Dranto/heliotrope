@@ -44,6 +44,8 @@ a design decision changes, update that document in the same PR.
   - `parcels.ts`, `projects.ts`: parcels to restore (kept across Seasons) and neighbourhood
     projects (per Season), data tables (§6.1, §6.2); `bonuses.ts` reads their shared effect
     shape for the formulas; `restoration.ts` holds when they are offered and the buy actions
+  - `species.ts`: the Herbier (§9.5), species that return on game conditions and add biodiversity;
+    `challenges.ts`: challenge Seasons (§7.3), their constraints, goals and rewards
   - `phases.ts`: progression phases and visual seasons of the scene (§6)
   - `random.ts`: seeded random numbers; the seed lives in `GameState` so random events stay pure
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
@@ -63,6 +65,8 @@ a design decision changes, update that document in the same PR.
   the restored parcels and project marks, `Restoration.tsx` is their panel in the side menu.
   `Scene.tsx` frames the map with the view switch (`fitCamera`) and stands the clickable `Flower.tsx` in the courtyard (`flowerFrame`);
   `PanelTitle.tsx` and `layoutPrefs.ts` fold the panels and remember layout choices per browser.
+  `Herbier.tsx` is the Herbier screen, `speciesDrawings.tsx` the species drawings, `SpeciesLife.tsx`
+  and `speciesMap.ts` the species on the map.
   `SeasonTree.tsx` and `seasonTree.ts` draw the Tree of Seasons screen; `Cooperatives.tsx` is their
   panel, `CooperativeArt.tsx` and `cooperativeMap.ts` their cargo bikes on the map.
   `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes.

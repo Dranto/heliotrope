@@ -6,7 +6,9 @@ import type { GeneratorId } from '../game/generators';
 import type { ParcelId } from '../game/parcels';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
+import type { ChallengeId } from '../game/challenges';
 import type { CooperativeId } from '../game/cooperatives';
+import type { SpeciesId } from '../game/species';
 import type { TalentBranch, TalentId } from '../game/talents';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
@@ -333,6 +335,72 @@ export const fr = {
     },
     effectNames: { bloom: 'La Floraison', pollination: 'La Pollinisation' },
   },
+  herbier: {
+    open: 'Herbier',
+    title: 'L’Herbier',
+    close: 'Fermer l’herbier',
+    summary: (count: string, total: string) => `${count} espèces revenues sur ${total}`,
+    hint: 'Chaque espèce revenue compte comme un palier de biodiversité (+2\u00a0%). L’herbier complet multiplie toute la biodiversité par 1,5.',
+    returned: (name: string) => `De retour dans le quartier\u00a0: ${name}`,
+    returnedMany: (count: string) => `${count} espèces reviennent dans le quartier\u00a0!`,
+    unknown: 'Espèce à retrouver',
+    found: 'Revenue',
+    names: {
+      poppy: 'Coquelicot',
+      bee: 'Abeille',
+      fern: 'Fougère',
+      ladybird: 'Coccinelle',
+      bumblebee: 'Bourdon',
+      sparrow: 'Moineau',
+      blueTit: 'Mésange bleue',
+      brimstone: 'Citron',
+      frog: 'Grenouille rousse',
+      hedgehog: 'Hérisson',
+      robin: 'Rouge-gorge',
+      swift: 'Martinet',
+      glowWorm: 'Ver luisant',
+      bat: 'Pipistrelle',
+      kingfisher: 'Martin-pêcheur',
+      orchid: 'Orchis pyramidal',
+      stagBeetle: 'Lucane cerf-volant',
+      owl: 'Chouette hulotte',
+    } satisfies Record<SpeciesId, string>,
+    describe: {
+      parcel: (parcel: string) => `Restaurer ${parcel}`,
+      owned: (generator: string, count: number) => `Posséder ${count} × ${generator}`,
+      butterflies: (count: number) => `Attraper ${count} Papillons dorés`,
+      project: (project: string) => `Lancer le projet ${project}`,
+      talent: (talent: string) => `Apprendre ${talent} dans l’Arbre`,
+      challenge: (challenge: string) => `Réussir ${challenge}`,
+    },
+  },
+  challenges: {
+    title: 'Saison à défi',
+    hint: 'Une contrainte pour toute la Saison. Atteindre l’objectif la lève, ramène une espèce rare et donne un bonus pour toujours.',
+    free: 'Saison libre',
+    freeHint: 'Sans contrainte',
+    names: {
+      cloudy: 'la Saison des nuages',
+      wild: 'la Saison sauvage',
+      frugal: 'la Saison sobre',
+      hands: 'la Saison des mains',
+    } satisfies Record<ChallengeId, string>,
+    rules: {
+      blocked: (buildings: string) => `Impossible de bâtir\u00a0: ${buildings}`,
+      noUpgrades: 'Aucune amélioration',
+      maxPerGenerator: (count: string) => `Au plus ${count} de chaque bâtiment`,
+      productionFactor: (factor: string) => `Production des bâtiments divisée par ${factor}`,
+    },
+    goal: (light: string) => `Objectif\u00a0: ${light} Lumière dans la Saison`,
+    reward: (species: string, bonus: string) => `Récompense\u00a0: ${species} · ${bonus}`,
+    won: (name: string) => `Défi réussi\u00a0: ${name}\u00a0! La contrainte est levée.`,
+    wonTag: 'Réussi',
+    progress: (name: string, percent: string) => `${name}, objectif atteint à ${percent}\u00a0%`,
+    blockedTag: 'Pas cette Saison',
+    limitTag: (count: string) => `Au plus ${count}`,
+    noUpgrades: 'La Saison sauvage pousse sans amélioration.',
+    startWith: (name: string) => `Commencer ${name}`,
+  },
   welcomeTitle: 'Pendant votre absence…',
   welcomeBack: (light: string, duration: string) =>
     `Pendant votre absence (${duration}), le quartier a récolté ${light} Lumière.`,
@@ -385,6 +453,7 @@ export const fr = {
       'Les Graines d’Héliotrope',
       'Les parcelles restaurées',
       'L’Arbre des Saisons et ses coopératives',
+      'L’Herbier et les défis réussis',
       'Les statistiques',
       'Les options',
     ],

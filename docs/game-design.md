@@ -365,6 +365,21 @@ Des voisins achètent à la place du joueur : ce sont les talents de la branche 
 - **Panneau.** Un panneau « Coopératives » sous les bâtiments liste celles qui sont venues, ce qu'elles achètent, leur nombre d'achats et un interrupteur « En marche / À l'arrêt ». Sur mobile, il est dans l'onglet Améliorer.
 - **Sur la carte.** Chaque coopérative est un vélo-cargo à sa couleur qui fait sa tournée dans les rues du quartier tant qu'elle travaille ; à chaque achat, un anneau doré part du vélo, et le bâtiment acheté apparaît sur la carte comme d'habitude. Une coopérative à l'arrêt gare son vélo. Avec les animations réduites (option ou réglage de l'appareil), les vélos restent garés.
 
+### 7.3 Saisons à défi (M8)
+
+À partir de la 2ᵉ Saison, l'écran des Saisons propose, au moment de replanter, de faire de la Saison suivante une **Saison à défi** : une contrainte pour toute la Saison, montrée par la lumière de la scène plutôt que par du texte. Atteindre l'objectif de Lumière dans la Saison **lève la contrainte** pour le reste de la Saison, ramène une espèce rare de l'Herbier (§9.5) et donne un bonus gardé pour toujours. Chaque défi ne se gagne qu'une fois ; une Saison libre reste toujours possible.
+
+| Défi | Contrainte | Objectif dans la Saison | Espèce | Bonus pour toujours | Scène |
+|---|---|---|---|---|---|
+| La Saison des nuages | Ni Panneaux de balcon ni Centrales à miroirs | 2 Md | Martin-pêcheur | +2 % de production par parcelle restaurée | Ombres de nuages qui glissent sur les toits |
+| La Saison sauvage | Aucune amélioration (ni le joueur ni le conseil de quartier) | 200 M | Orchis pyramidal | Synergies ×1,25 | Herbes hautes au bord de la carte |
+| La Saison sobre | Au plus 25 exemplaires de chaque bâtiment | 2 Md | Lucane cerf-volant | Bâtiments 5 % moins chers | Lumière chaude et sèche |
+| La Saison des mains | Production des bâtiments ÷10 | 50 M | Chouette hulotte | Valeur du clic ×3 | Crépuscule sur les machines |
+
+- **Règles.** Un bâtiment interdit ou plein reste affiché avec l'étiquette « Pas cette Saison » ou « Au plus 25 » ; ni le joueur ni les Coopératives (§7.2) ne peuvent l'acheter. Les Boutures (§7.1) ne gardent que ce que le défi autorise. Les bonus des défis gagnés suivent la forme commune des parcelles, projets et talents (`Bonus`), donc se combinent avec eux comme des synergies.
+- **Pendant le défi.** Une pastille sous le compteur montre l'espèce à gagner, le nom du défi et une jauge qui se remplit avec la Lumière de la Saison. À la victoire, la contrainte se lève, la scène retrouve sa lumière et l'espèce apparaît sur la carte.
+- **Rythme.** Le joueur de référence (§8) les gagne en 3ᵉ Saison en 34 à 42 min, contre 30 min pour une Saison libre : un peu plus long, jamais une punition. Le test du simulateur garde chaque défi entre 20 min et 1 h.
+
 ---
 
 ## 8. Équilibrage
@@ -412,25 +427,27 @@ L'équilibrage doit être vérifié par un **simulateur sans interface** qui rej
 
 **Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat dépend un peu de la graine, surtout en milieu de partie où un Papillon tombe plus ou moins tôt (chiffres sous le tableau ci-dessous).
 
-Sortie actuelle (améliorations de clic, parcelles et projets) :
+Sortie actuelle (améliorations de clic, parcelles et projets, Arbre et Coopératives en 2ᵉ Saison, Herbier) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
-| 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 3 s |
-| 1ᵉʳ Panneau de balcon | ~35 s | 31,5 s | −10 % | 15,4 s |
-| 1ᵉʳ Potager sur le toit | ~1 min 30 | 1,5 min | 0 % | 47 s |
-| 1ʳᵉ Serre communautaire | ~5 min 30 | 5,7 min | +3 % | 3,0 min |
-| 1ʳᵉ Ferme verticale | ~12 min | 11,6 min | −3 % | 6,7 min |
-| 1ʳᵉ Centrale à miroirs | ~26 min | 23,1 min | −11 % | 15,2 min |
-| 1ʳᵉ Canopée urbaine | ~50 min | 44 min | −12 % | 27 min |
-| 1ʳᵉ Arcologie vivante | ~1 h 20 | 1 h 11 | −11 % | 41 min |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 40 | 1 h 28 | −12 % | 52 min |
+| 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 1 s |
+| 1ᵉʳ Panneau de balcon | ~35 s | 31,5 s | −10 % | 6 s |
+| 1ᵉʳ Potager sur le toit | ~1 min 30 | 1,5 min | 0 % | 36 s |
+| 1ʳᵉ Serre communautaire | ~5 min 30 | 5,7 min | +3 % | 1,7 min |
+| 1ʳᵉ Ferme verticale | ~12 min | 11,4 min | −5 % | 5,0 min |
+| 1ʳᵉ Centrale à miroirs | ~26 min | 22,6 min | −13 % | 9,3 min |
+| 1ʳᵉ Canopée urbaine | ~50 min | 40 min | −20 % | 19,5 min |
+| 1ʳᵉ Arcologie vivante | ~1 h 20 | 1 h 07 | −16 % | 32 min |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 40 | 1 h 21 | −19 % | 39 min |
 
 Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −14 % et +9 % de sa cible. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 > Restaurer le quartier (M6) : le joueur de référence considère aussi les parcelles et les projets, avec la même règle (attente + coût / gain de revenu). Ceux dont l'effet ne touche pas le revenu (Papillon, plafond hors ligne, remises) ne lui rapportent rien de mesurable et ne sont achetés que lorsqu'un autre effet les rend rentables (les Pistes cyclables, par exemple, donnent du prix à chaque parcelle). Dans sa 1ʳᵉ Saison, il restaure cinq parcelles et mène cinq projets, et le rythme s'accélère encore : Ferme verticale à 15,0 min (0 %), Centrale à 31,6 min (−10 %), Canopée à 55,2 min (−15 %), Arcologie à 1 h 28 (−16 %), Saison conseillée à 1 h 46 (−21 %, la marge la plus faible). Les effets ont été réduits pour rester dans les ±30 % (Batteries partagées +5 % par type au lieu de +25 %, Verger ×1,5 au lieu de ×2, Eau de pluie ×1,25, Pistes cyclables +2 % par parcelle). Comme les parcelles restent acquises, la 2ᵉ Saison est bien plus rapide : Saison conseillée en 1 h au lieu de 1 h 22.
 
 > La terre se souvient (M7) : la 1ʳᵉ Saison ne change pas (pas encore de Graine à semer). Au début de la 2ᵉ, le joueur de référence sème ses 10 Graines dans cet ordre, tant qu'elles suffisent : les jardiniers, Fleurs nectarifères, Mycorhizes, les maraîchers, Haies fleuries, Boutures, Sous-bois, Veilleurs de nuit (ordre complet dans `REFERENCE_TALENTS`). Les deux coopératives achètent pour lui pendant qu'il joue sa stratégie habituelle (environ 45 et 95 achats). Sa 2ᵉ Saison conseillée passe de 52 min à 43 min (Arcologie à 36 min au lieu de 41), sans toucher aux cibles de la 1ʳᵉ.
+>
+> Le vivant revient (M8) : les espèces de l'Herbier (§9.5) s'ajoutent à la biodiversité dès la 1ʳᵉ Saison (le joueur de référence en ramène 8 : Coquelicot, Fougère, Abeille, Coccinelle, Bourdon, Grenouille, Hérisson, Citron). Comme Antoine le souhaite, c'est une synergie de plus plutôt qu'un changement de valeurs : la Saison conseillée passe de 1 h 28 à 1 h 21 (−19 % de la cible), l'Arcologie de 1 h 11 à 1 h 07, la Canopée de 44 à 40 min, et la 2ᵉ Saison de 43 à 39 min. Les Saisons à défi (§7.3) sont jouées comme 3ᵉ Saison : `npm run simulate` affiche aussi le moment où chacune est gagnée.
 
 ### Affichage des nombres
 
@@ -505,6 +522,25 @@ Les jalons sont conservés d'une Saison à l'autre. Chaque jalon atteint **éclo
 - Remise à zéro complète avec double confirmation.
 - Chaque sauvegarde porte un numéro de version, avec une migration quand le format change.
 
+### 9.5 L'Herbier (M8)
+
+Les espèces reviennent à mesure que le quartier reverdit. Chacune revient par une condition du jeu, puis vit sur la carte, près de ce qui l'a ramenée, dans un petit médaillon (les insectes butinent, les oiseaux sautillent, les martinets et la chauve-souris volent au-dessus des toits). Elles restent d'une Saison à l'autre.
+
+| Espèce | Revient avec | Espèce | Revient avec |
+|---|---|---|---|
+| Coquelicot | Rue jardin | Grenouille rousse | Rivière retrouvée |
+| Abeille | 25 Potagers sur le toit | Hérisson | Parc du parking |
+| Fougère | Jardins de pluie | Rouge-gorge | Verger de l'entrepôt |
+| Coccinelle | 25 Serres communautaires | Martinet | Toits vivants |
+| Bourdon | Corridor des pollinisateurs | Ver luisant | Projet Fête des lumières |
+| Moineau | 100 Héliotropes en pot | Pipistrelle | Talent Veilleurs de nuit |
+| Mésange bleue | 10 Canopées urbaines | Martin-pêcheur | La Saison des nuages (§7.3) |
+| Citron | 5 Papillons dorés attrapés | Orchis pyramidal, Lucane cerf-volant, Chouette hulotte | Les trois autres défis (§7.3) |
+
+- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (18 espèces) multiplie toute la biodiversité par 1,5.
+- **Écran.** « Herbier » s'ouvre du menu dès la première espèce (ou après la 1ʳᵉ Saison). Une planche par espèce : le dessin en couleur dans un médaillon doré une fois revenue, une silhouette pâle avant ; sous chaque nom, ce qui la ramène. Aucun texte narratif.
+- **Retour.** Une notification « De retour dans le quartier : Hérisson » et l'apparition en douceur du médaillon sur la carte (sans animation au chargement, ni avec les animations réduites).
+
 ---
 
 ## 10. Écrans et interface
@@ -538,8 +574,9 @@ Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fle
 | Écran | Contenu | Dès |
 |---|---|---|
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
-| **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
+| **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, choix d'une Saison à défi (§7.3, dès la 2ᵉ Saison), bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi (§7.1) | 1ʳᵉ Graine |
+| **Herbier** | Une planche par espèce, dessinée une fois revenue, silhouette avant, avec ce qui la ramène (§9.5) | 1ʳᵉ espèce ou 2ᵉ Saison |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
 | **Options** | Langue (français ou anglais), notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
 | **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
@@ -675,7 +712,7 @@ Idées à reprendre quand le MVP est stable, par ordre de priorité proposé :
 2. ~~**Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.~~ *Livré en M7 (§7.1), avec les Coopératives (§7.2).*
 3. **Cycle jour / nuit et batteries.** La production solaire varie au fil d'une journée de jeu ; des batteries stockent le surplus. À tester avec prudence : ne doit jamais punir le joueur absent.
 4. **Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.
-5. **Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.
+5. ~~**Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.~~ *Livré en M8 (§7.3), avec l'Herbier (§9.5).*
 6. ~~**Sons discrets** (§1) et leur réglage de volume dans les Options.~~ *Livré en M6 (§6.3).*
 
 ---

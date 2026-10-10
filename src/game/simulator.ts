@@ -5,7 +5,7 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { availableUpgrades, clickValue, generatorCost, lightPerSecond } from './production';
 import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
-import { buyGenerator, buyUpgrade, earnLight, tick } from './tick';
+import { buyGenerator, buyUpgrade, canBuyGenerator, earnLight, tick } from './tick';
 import type { UpgradeId } from './upgrades';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
@@ -26,6 +26,8 @@ export interface SimulationOptions {
   state?: GameState;
   /** Stop as soon as the Season total reaches ADVISED_SEASON_LIGHT. */
   stopWhenAdvised?: boolean;
+  /** Stop as soon as the running challenge Season is won (§7.3). */
+  stopWhenWon?: boolean;
   /** Clicks per second of the simulated active player. */
   clicksPerSecond?: number;
   /** Stop after this many seconds of play. */
@@ -41,6 +43,8 @@ export interface SimulationResult {
   firstGenerator: Partial<Record<GeneratorId, number>>;
   /** Seconds of play when the Season total reached ADVISED_SEASON_LIGHT (2e9 Light). */
   advisedSeason?: number;
+  /** Seconds of play when the running challenge Season was won (§7.3), to the nearest step. */
+  challengeWon?: number;
   /** State at the end of the simulation. */
   state: GameState;
   seconds: number;
@@ -89,7 +93,7 @@ function cost(state: GameState, option: Option): number {
 function bestOption(state: GameState, clicksPerSecond: number): Option {
   // A curious player tries each new generator as soon as it is affordable.
   const novelty = GENERATOR_IDS.find(
-    (id) => state.generators[id] === 0 && state.resources.light >= generatorCost(state, id),
+    (id) => state.generators[id] === 0 && canBuyGenerator(state, id),
   );
   if (novelty) return { kind: 'generator', id: novelty };
   const current = income(state, clicksPerSecond);
@@ -122,6 +126,7 @@ function bestOption(state: GameState, clicksPerSecond: number): Option {
 export function simulate({
   state: start = createInitialState(0),
   stopWhenAdvised = false,
+  stopWhenWon = false,
   clicksPerSecond = REFERENCE_CLICKS_PER_SECOND,
   maxSeconds = 5 * 3600,
   maxStepSeconds = 10,
@@ -149,7 +154,16 @@ export function simulate({
   const firstGenerator: SimulationResult['firstGenerator'] = {};
   let advisedSeason: number | undefined;
 
-  while (seconds < maxSeconds && !(stopWhenAdvised && advisedSeason !== undefined)) {
+  let challengeWon: number | undefined;
+  while (
+    seconds < maxSeconds &&
+    !(stopWhenAdvised && advisedSeason !== undefined) &&
+    !(stopWhenWon && challengeWon !== undefined)
+  ) {
+    if (challengeWon === undefined && state.challenges.length > start.challenges.length) {
+      challengeWon = seconds;
+      if (stopWhenWon) break;
+    }
     const option = bestOption(state, clicksPerSecond);
     const price = cost(state, option);
     const rate = income(state, clicksPerSecond);
@@ -170,7 +184,20 @@ export function simulate({
       }
       state = earnLight(state, Math.max(0, price - state.resources.light));
     }
-    state = apply(state, option);
+    const bought = apply(state, option);
+    if (bought === state) {
+      // Nothing left worth buying (a challenge Season's limits, §7.3): keep playing.
+      const dt = Math.min(maxStepSeconds, maxSeconds - seconds);
+      state = earnLight(tick(state, dt), clicksPerSecond * dt * clickValue(state));
+      state = { ...state, clicks: state.clicks + clicksPerSecond * dt };
+      seconds += dt;
+      watchButterfly();
+      if (advisedSeason === undefined && state.totalLight >= ADVISED_SEASON_LIGHT) {
+        advisedSeason = seconds;
+      }
+      continue;
+    }
+    state = bought;
     if (option.kind === 'generator' && firstGenerator[option.id] === undefined) {
       firstGenerator[option.id] = seconds;
     }
@@ -178,7 +205,7 @@ export function simulate({
       advisedSeason = seconds;
     }
   }
-  return { firstGenerator, advisedSeason, state, seconds };
+  return { firstGenerator, advisedSeason, challengeWon, state, seconds };
 }
 
 /**

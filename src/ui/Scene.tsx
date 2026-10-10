@@ -23,6 +23,7 @@ import {
   VIEWS,
   type View,
 } from './neighbourhood';
+import { SpeciesLife } from './SpeciesLife';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
@@ -104,7 +105,8 @@ const CAPTION_ROOM = 52;
  * home courtyard at its heart. The player switches between the views opened so far: the courtyard, the neighbourhood,
  * the city; each one keeps its part of the city whole and as large as the screen allows. The
  * light and the shadows follow the phase (dawn, noon, late afternoon) and, after the first
- * Season, the season's tint. The Golden Butterfly flies across it.
+ * Season, the season's tint; a challenge Season (§7.3) changes it again. The species of the
+ * Herbier (§9.5) live on it and the Golden Butterfly flies across it.
  */
 export function Scene({
   onCatch,
@@ -127,7 +129,7 @@ export function Scene({
     .filter((p) => canRestoreParcel(state, p.id))
     .map((p) => p.id)
     .join();
-  const { parcels, projects } = state;
+  const { parcels, projects, species } = state;
   // Encoded as one string so the bikes only redraw when a cooperative starts, stops or buys.
   const bikes = unlockedCooperatives(state)
     .map(
@@ -140,6 +142,7 @@ export function Scene({
     () => (
       <>
         <ProjectMarks projects={projects} />
+        <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <ParcelOffers
           offered={split(offered)}
@@ -149,7 +152,7 @@ export function Scene({
         />
       </>
     ),
-    [projects, bikes, reduced, offered, affordable, highlight, restore],
+    [projects, species, bikes, reduced, offered, affordable, highlight, restore],
   );
   const phase = phaseOf(state);
   const furthest = furthestView(phase, state.generators);
@@ -177,7 +180,12 @@ export function Scene({
   const greenness = Math.round(Math.min(1, Math.log10(1 + lightPerSecond(state)) / 5) * 20) / 20;
 
   return (
-    <figure className="panel scene" data-phase={phase} data-season={season ?? 'none'}>
+    <figure
+      className="panel scene"
+      data-phase={phase}
+      data-season={season ?? 'none'}
+      data-challenge={state.challenge ?? undefined}
+    >
       <div className="scene-map" ref={mapRef}>
         <Neighbourhood
           generators={state.generators}

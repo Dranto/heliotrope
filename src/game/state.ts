@@ -1,4 +1,5 @@
 import type { AchievementId } from './achievements';
+import type { ChallengeId } from './challenges';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
 import type { Language, Notation } from './format';
@@ -7,11 +8,12 @@ import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
 import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
+import type { SpeciesId } from './species';
 import type { TalentId } from './talents';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 9;
+export const STATE_VERSION = 10;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -71,6 +73,12 @@ export interface GameState {
   talents: TalentId[];
   /** Cooperatives' settings and purchases (§7.2). Kept across Seasons. */
   cooperatives: CooperativesState;
+  /** Challenge running this Season (§7.3), null once won or without one. */
+  challenge: ChallengeId | null;
+  /** Challenge Seasons won, in order (§7.3). Kept across Seasons. */
+  challenges: ChallengeId[];
+  /** Species of the Herbier back in the neighbourhood, in order (§9.5). Kept across Seasons. */
+  species: SpeciesId[];
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -120,6 +128,9 @@ export function createInitialState(now: number): GameState {
     projects: [],
     talents: [],
     cooperatives: createCooperativesState(),
+    challenge: null,
+    challenges: [],
+    species: [],
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     effects: [],

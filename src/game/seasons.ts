@@ -1,6 +1,7 @@
 // Prestige: the Seasons (docs/game-design.md §7). Pure formulas and the new Season transition.
 import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './achievements';
 import { keptGeneratorShare } from './bonuses';
+import { generatorLimit, offeredChallenges, type ChallengeId } from './challenges';
 import { GENERATOR_IDS } from './generators';
 import { createInitialState, type GameState } from './state';
 
@@ -56,18 +57,25 @@ export function isSeasonsScreenUnlocked(state: GameState): boolean {
 }
 
 /**
- * Player action: start a new Season (§7). Resets Light, generators, upgrades, projects, the
- * Season total and running butterfly effects; keeps Seeds (plus the ones gained), Milestones,
- * restored parcels, the Tree of Seasons and its Cooperatives, all-time statistics, options and
- * the clock. With the Boutures talent, a share of each generator is kept too (§7.1).
- * Returns the same state when no Seed would be gained.
+ * Player action: start a new Season (§7), optionally as a challenge Season (§7.3). Resets Light,
+ * generators, upgrades, projects, the Season total and running butterfly effects; keeps Seeds
+ * (plus the ones gained), Milestones, restored parcels, the Tree of Seasons and its Cooperatives,
+ * challenges won, the Herbier, all-time statistics, options and the clock. With the Boutures
+ * talent, a share of each generator is kept too (§7.1), within the challenge's limits.
+ * Returns the same state when no Seed would be gained or the challenge is not offered.
  */
-export function startNewSeason(state: GameState): GameState {
+export function startNewSeason(state: GameState, challenge: ChallengeId | null = null): GameState {
   if (!canStartNewSeason(state)) return state;
+  if (challenge && !offeredChallenges(state).some((c) => c.id === challenge)) return state;
   const fresh = createInitialState(state.lastUpdate);
   const kept = keptGeneratorShare(state);
   const generators = { ...fresh.generators };
-  for (const id of GENERATOR_IDS) generators[id] = Math.floor(state.generators[id] * kept);
+  for (const id of GENERATOR_IDS) {
+    generators[id] = Math.min(
+      Math.floor(state.generators[id] * kept),
+      generatorLimit({ challenge }, id),
+    );
+  }
   let next: GameState = {
     ...fresh,
     generators,
@@ -80,6 +88,9 @@ export function startNewSeason(state: GameState): GameState {
     parcels: state.parcels,
     talents: state.talents,
     cooperatives: state.cooperatives,
+    challenge,
+    challenges: state.challenges,
+    species: state.species,
     butterflies: state.butterflies,
     butterfly: { nextIn: state.butterfly.nextIn || fresh.butterfly.nextIn, visible: 0 },
     rngSeed: state.rngSeed,

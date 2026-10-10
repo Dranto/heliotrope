@@ -1,6 +1,8 @@
 import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
-import { PACING_TARGETS, simulate, simulateTwoSeasons } from './simulator';
+import { CHALLENGE_IDS, type ChallengeId } from './challenges';
+import { startNewSeason } from './seasons';
+import { learnReferenceTalents, PACING_TARGETS, simulate, simulateTwoSeasons } from './simulator';
 
 describe('balancing simulator', () => {
   // Milestone 2 exit criterion (docs/game-design.md §12): the simulator reproduces the §8 pacing
@@ -50,4 +52,21 @@ describe('two Seasons in a row', () => {
   it('makes the next Season advisable sooner', () => {
     expect(second.advisedSeason!).toBeLessThan(first.advisedSeason!);
   });
+});
+
+describe('challenge Seasons (§7.3)', () => {
+  // Third Season of the reference player, as a challenge: each one should take a little longer
+  // than a free Season (about 30 min at this point), and stay winnable within the hour.
+  const { second } = simulateTwoSeasons();
+  const start = (id: ChallengeId) => learnReferenceTalents(startNewSeason(second.state, id));
+
+  it.each(CHALLENGE_IDS)(
+    'wins %s between 20 minutes and an hour',
+    (id) => {
+      const { challengeWon } = simulate({ state: start(id), maxSeconds: 3600, stopWhenWon: true });
+      expect(challengeWon).toBeGreaterThan(20 * 60);
+      expect(challengeWon).toBeLessThan(60 * 60);
+    },
+    30_000,
+  );
 });

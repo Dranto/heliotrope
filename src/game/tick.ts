@@ -7,9 +7,11 @@ import {
 } from './production';
 import { unlockAchievement, unlockAchievements } from './achievements';
 import { advanceButterfly } from './butterfly';
+import { completeChallenge, generatorLimit } from './challenges';
 import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
 import { earnLight } from './light';
+import { unlockSpecies } from './species';
 import type { GameState } from './state';
 import { UPGRADES, type UpgradeId } from './upgrades';
 
@@ -36,9 +38,12 @@ function produce(state: GameState, dtSeconds: number): GameState {
   return next;
 }
 
-/** Unlock the Milestones the state now qualifies for. */
+/**
+ * Unlock the Milestones the state now qualifies for, win the running challenge Season once its
+ * goal is reached (§7.3), and bring back the species now deserved (§9.5).
+ */
 export function unlockProgress(state: GameState): GameState {
-  return unlockAchievements(state);
+  return unlockSpecies(completeChallenge(unlockAchievements(state)));
 }
 
 /**
@@ -66,7 +71,11 @@ export function clickHeliotrope(state: GameState): GameState {
 }
 
 export function canBuyGenerator(state: GameState, id: GeneratorId, count = 1): boolean {
-  return count > 0 && state.resources.light >= generatorCost(state, id, count);
+  return (
+    count > 0 &&
+    state.generators[id] + count <= generatorLimit(state, id) &&
+    state.resources.light >= generatorCost(state, id, count)
+  );
 }
 
 /**
