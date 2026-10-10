@@ -4,7 +4,7 @@ import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restora
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import {
   isCooperativeActive,
   unlockedCooperatives,
@@ -14,7 +14,15 @@ import { CooperativeBikes } from './CooperativeArt';
 import { Neighbourhood } from './Neighbourhood';
 import { Flower } from './Flower';
 import { useLayoutPref } from './layoutPrefs';
-import { WORLD, fitCamera, furthestView, VIEWS, type Insets, type View } from './neighbourhood';
+import {
+  PLANTER,
+  WORLD,
+  fitCamera,
+  flowerFrame,
+  furthestView,
+  VIEWS,
+  type View,
+} from './neighbourhood';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
@@ -87,15 +95,13 @@ function useSize<T extends HTMLElement>(fallback: Size): [RefObject<T | null>, S
   return [ref, size];
 }
 
-/** Gap kept between the flower and the part of the city in view. */
-const FLOWER_GAP = 12;
 /** Room kept free under the view switch at the top of the map. */
 const CAPTION_ROOM = 52;
 
 /**
  * The neighbourhood scene (docs/game-design.md §6, §10.4): the city seen from above, where each
- * purchase builds something with a soft entrance, with the clickable heliotrope standing in front
- * of it. The player switches between the views opened so far: the courtyard, the neighbourhood,
+ * purchase builds something with a soft entrance, with the clickable heliotrope rising from the
+ * home courtyard at its heart. The player switches between the views opened so far: the courtyard, the neighbourhood,
  * the city; each one keeps its part of the city whole and as large as the screen allows. The
  * light and the shadows follow the phase (dawn, noon, late afternoon) and, after the first
  * Season, the season's tint. The Golden Butterfly flies across it.
@@ -157,16 +163,14 @@ export function Scene({
   }, [furthest, choose]);
   const view = Math.min(chosen ?? furthest, furthest) as View;
   const [mapRef, size] = useSize<HTMLDivElement>(WORLD);
-  const [flowerRef, flower] = useSize<HTMLDivElement>({ width: 0, height: 0 });
   const { width, height } = size;
   // Kept as one object while nothing moves, so the map does not redraw at every tick.
   const camera = useMemo(() => {
-    const insets: Insets =
-      width >= height
-        ? { top: 0, left: flower.width + FLOWER_GAP, bottom: 0 }
-        : { top: CAPTION_ROOM, left: 0, bottom: flower.height + FLOWER_GAP };
-    return fitCamera(view, width, height, insets);
-  }, [view, width, height, flower.width, flower.height]);
+    const top = width >= height ? 0 : CAPTION_ROOM;
+    return fitCamera(view, width, height, { top, left: 0, bottom: 0 });
+  }, [view, width, height]);
+  // The heliotrope stands in the home courtyard, at the heart of the city, and follows the camera.
+  const flower = flowerFrame(camera, width, height, PLANTER);
   const season = visualSeason(state);
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
   // map only redraws when the colour visibly changes.
@@ -187,10 +191,10 @@ export function Scene({
           ground={ground}
           overlay={overlay}
         />
-        <Butterfly onCatch={onCatch} />
-        <div className="map-flower" ref={flowerRef}>
+        <div className="map-flower" style={{ left: flower.x, top: flower.y, width: flower.width }}>
           <Flower />
         </div>
+        <Butterfly onCatch={onCatch} />
       </div>
       <figcaption className="scene-caption">
         {furthest > 1 && (

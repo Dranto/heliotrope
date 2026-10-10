@@ -11,7 +11,7 @@ import {
 import type { GeneratorId } from '../game/generators';
 import type { Phase } from '../game/phases';
 import type { UpgradeId } from '../game/upgrades';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import {
   ARCOLOGY_SITE,
   BLOCKS,
@@ -558,27 +558,34 @@ function Arcology({ rings, level }: { rings: number; level: number }) {
   );
 }
 
+/**
+ * The heliotrope's bed in the courtyard: a warm glow where the flower stands, and a ring of
+ * blooms around its pot that fills in with each click upgrade.
+ */
 function Planter({ blooms }: { blooms: number }) {
-  const petals = 5 + blooms * 2;
-  const radius = 2.6 + blooms * 0.7;
+  const petals = 6 + blooms * 3;
   return (
     <g className="planter">
-      <circle cx={PLANTER.x} cy={PLANTER.y} r="10" className="planter-ring" />
+      <ellipse cx={PLANTER.x} cy={PLANTER.y} rx="30" ry="20" fill="url(#hearth)" />
+      <ellipse cx={PLANTER.x} cy={PLANTER.y} rx="17" ry="10.5" className="planter-ring" />
       {Array.from({ length: petals }, (_, i) => {
         const a = (i / petals) * Math.PI * 2;
         return (
           <circle
             key={`${blooms}-${i}`}
-            cx={PLANTER.x + Math.cos(a) * radius}
-            cy={PLANTER.y + Math.sin(a) * radius}
-            r={1.8 + blooms * 0.15}
-            className="petal"
+            cx={round1(PLANTER.x + Math.cos(a) * 14)}
+            cy={round1(PLANTER.y + Math.sin(a) * 8)}
+            r={1.5 + blooms * 0.12}
+            className={i % 3 === 2 ? 'heart' : 'petal'}
           />
         );
       })}
-      <circle cx={PLANTER.x} cy={PLANTER.y} r="1.4" className="heart" />
     </g>
   );
+}
+
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
 }
 
 /** Zebra crossings on the four sides of every crossroads. */

@@ -12,7 +12,10 @@ import {
   TREES,
   WORLD,
   VIEW_FRAMES,
+  FLOWER_SIZE,
+  PLANTER,
   fitCamera,
+  flowerFrame,
   furthestView,
   cameraTransform,
   clickLevel,
@@ -117,13 +120,26 @@ describe('views', () => {
     }
   });
 
-  it('keeps the flower clear of the part of the city in view', () => {
+  it('keeps the insets clear of the part of the city in view', () => {
     const box = onScreen(2, 1200, 700, 260, 0);
     expect(box.x).toBeGreaterThanOrEqual(259.5);
     expect(box.right).toBeLessThanOrEqual(1200.5);
     const tall = onScreen(3, 390, 520, 0, 150, 48);
     expect(tall.bottom).toBeLessThanOrEqual(370.5);
     expect(tall.y).toBeGreaterThanOrEqual(47.5);
+  });
+
+  it('stands the flower on the courtyard planter, sized with the zoom', () => {
+    const near = fitCamera(1, 1200, 800);
+    const far = fitCamera(3, 1200, 800);
+    const close = flowerFrame(near, 1200, 800, PLANTER);
+    const wide = flowerFrame(far, 1200, 800, PLANTER);
+    // The planter is at the centre of the courtyard view: the pot sits there.
+    expect(close.x + close.width / 2).toBeCloseTo(600, 0);
+    expect(close.y).toBeLessThan(400);
+    expect(close.width).toBeGreaterThan(wide.width);
+    expect(wide.width).toBeGreaterThanOrEqual(FLOWER_SIZE.min);
+    expect(close.width).toBeLessThanOrEqual(FLOWER_SIZE.max);
   });
 
   it('zooms closer on the courtyard than on the city', () => {

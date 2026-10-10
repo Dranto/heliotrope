@@ -6,7 +6,7 @@ import {
   unlockedCooperatives,
   type CooperativeId,
 } from '../game/cooperatives';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { cooperativeBuysText } from '../i18n/talents';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';

@@ -12,7 +12,7 @@ import {
 } from '../game/production';
 import type { GameState } from '../game/state';
 import { buyGenerator, canBuyGenerator } from '../game/tick';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';

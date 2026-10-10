@@ -42,12 +42,14 @@ a design decision changes, update that document in the same PR.
     targets within ±30%
   - `store.ts`: `GameStore`, which owns live state, the tick interval and autosave
   - `format.ts`: number formatting for display (French notation, design doc §8)
-- `src/i18n/fr.ts`: every player-facing text (UI strings, generator, upgrade and Milestone names,
-  flavour lines).
+- `src/i18n/`: every player-facing text (UI strings, generator, upgrade and Milestone names,
+  flavour lines). `fr.ts` is the reference and defines `Texts`; `en.ts` has the same shape. Read
+  texts through `t` from `src/i18n/index.ts`, which follows the language chosen in the Options;
+  add a key to both files.
 - `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
   rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
   the restored parcels and project marks, `Restoration.tsx` is their panel in the side menu.
-  `Scene.tsx` frames the map with the view switch (`fitCamera`) and holds the clickable `Flower.tsx`;
+  `Scene.tsx` frames the map with the view switch (`fitCamera`) and stands the clickable `Flower.tsx` in the courtyard (`flowerFrame`);
   `PanelTitle.tsx` and `layoutPrefs.ts` fold the panels and remember layout choices per browser.
   `SeasonTree.tsx` and `seasonTree.ts` draw the Tree of Seasons screen; `Cooperatives.tsx` is their
   panel, `CooperativeArt.tsx` and `cooperativeMap.ts` their cargo bikes on the map.

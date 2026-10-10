@@ -1,7 +1,7 @@
 import type { AchievementId } from './achievements';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
-import type { Notation } from './format';
+import type { Language, Notation } from './format';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
@@ -11,7 +11,7 @@ import type { TalentId } from './talents';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 8;
+export const STATE_VERSION = 9;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -33,6 +33,8 @@ export interface Settings {
   volume: number;
   /** §10.2: silence every sound without losing the volume. */
   muted: boolean;
+  /** §14 Q1: language of the interface, French by default. */
+  language: Language;
 }
 
 export interface GameState {
@@ -95,6 +97,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: false,
   volume: 0.5,
   muted: false,
+  language: 'fr',
 };
 
 export function createInitialState(now: number): GameState {

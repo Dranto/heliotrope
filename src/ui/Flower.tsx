@@ -12,7 +12,7 @@ import { formatNumber } from '../game/format';
 import { visualSeason } from '../game/phases';
 import { clickValue } from '../game/production';
 import { clickHeliotrope } from '../game/tick';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import {
   ARCH_ORNAMENTS,
   MAX_POT_BANDS,
@@ -245,7 +245,7 @@ const Plant = memo(function Plant({ stage, ornaments, bands, plantRef, headsRef 
 });
 
 /**
- * The clickable heliotrope, framed by an Art nouveau arch (docs/game-design.md §10.1, §10.4). It
+ * The clickable heliotrope, framed by an Art nouveau arch, standing in the home courtyard of the map (docs/game-design.md §10.1, §10.4). It
  * grows through seven stages with the Light earned this Season, each click upgrade gilds the
  * arch with a sprig, and each Season completed leaves a golden seed on the pot.
  */
@@ -388,6 +388,8 @@ export function Flower() {
             d="M27 256 V101 C27 46 64 15 100 15 C136 15 173 46 173 101 V256"
             fill="none"
           />
+          {/* A generous touch target around the plant, so a tap between two leaves still counts. */}
+          <ellipse cx="100" cy="170" rx="62" ry="88" fill="transparent" className="flower-hit" />
           <g className="flower-sway" style={{ transform: `rotate(${tilt}deg)` }}>
             <Plant
               stage={stage}

@@ -119,6 +119,36 @@ export function fitCamera(
   };
 }
 
+/** Width of the clickable heliotrope on screen, whatever the view: never too small to touch. */
+export const FLOWER_SIZE = { min: 136, perScale: 75, max: 290, share: 0.24 } as const;
+/** Height of the flower drawing for its width (its arch is 200 × 260). */
+const FLOWER_RATIO = 260 / 200;
+/** Part of the drawing's height above the bottom of its pot. */
+const POT_BASE = 0.96;
+
+/**
+ * Where the flower stands on screen: its pot on the courtyard planter, its arch rising above the
+ * home block, sized with the zoom so its sprigs and glow keep room to show. `x`, `y` is the
+ * drawing's top-left corner in screen units.
+ */
+export function flowerFrame(
+  camera: Camera,
+  width: number,
+  height: number,
+  at: { x: number; y: number },
+): { x: number; y: number; width: number } {
+  // On a narrow map the smallest flower still leaves most of the city in sight.
+  const min = Math.min(FLOWER_SIZE.min, width * FLOWER_SIZE.share);
+  const size = Math.min(FLOWER_SIZE.max, Math.max(min, camera.scale * FLOWER_SIZE.perScale));
+  const sx = width / 2 + (at.x - camera.x) * camera.scale;
+  const sy = height / 2 + (at.y - camera.y) * camera.scale;
+  return {
+    x: round(sx - size / 2),
+    y: round(sy - size * FLOWER_RATIO * POT_BASE),
+    width: Math.round(size),
+  };
+}
+
 /** SVG transform that frames `camera` in a `width` × `height` view. */
 export function cameraTransform(
   { x, y, scale }: Camera,
@@ -244,8 +274,8 @@ export const PANEL_SPOTS: [number, number][] = [
   [548, 28],
 ];
 
-/** Potted heliotropes (§4, generator 1) around the courtyard. */
-export const POT_SPOTS: [number, number][] = [268, 285, 302, 320, 337, 354].flatMap((x) => [
+/** Potted heliotropes (§4, generator 1) around the courtyard, clear of the heliotrope's bed. */
+export const POT_SPOTS: [number, number][] = [266, 278, 290, 332, 344, 356].flatMap((x) => [
   [x, 220] as [number, number],
   [x, 252] as [number, number],
 ]);

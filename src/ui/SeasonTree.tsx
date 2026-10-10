@@ -13,7 +13,7 @@ import {
   type TalentId,
 } from '../game/talents';
 import type { GameState } from '../game/state';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { talentEffectText, talentName } from '../i18n/talents';
 import { Dialog } from './Dialog';
 import {

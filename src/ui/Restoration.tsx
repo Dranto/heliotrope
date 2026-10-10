@@ -9,7 +9,7 @@ import {
   offeredProjects,
   restoreParcel,
 } from '../game/restoration';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { bonusesText } from '../i18n/restoration';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';

@@ -229,7 +229,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 - **Chaque générateur a ses places.** Pots autour de la cour, panneaux sur les toits voisins, potagers qui remplacent les toits gris (du plus proche au plus lointain), serres sur les friches, fermes verticales à la place de trois tours, champ de miroirs sur le parking du sud-est, arbres le long des rues (la canopée part de la cour et gagne la ville), arcologie en rosace de terrasses sur la grande friche du nord-ouest.
 - **Chaque achat se voit.** Chacun des premiers exemplaires ajoute un élément ; ensuite les éléments arrivent à des paliers de plus en plus espacés (12, 14, 16, 18, 20, 23… jusqu'à 500), pour qu'un achat tardif change encore l'image. Les arbres arrivent par bosquets de quatre et les miroirs par deux. Un nouvel élément pousse en place en 1,2 s, accompagné d'un anneau doré qui s'élargit ; ce qui existait déjà au chargement s'affiche sans animation.
 - **Les améliorations aussi.** Chaque amélioration ×2 (§5.1) fait scintiller une fois tous les éléments du générateur et les enrichit : plus de pétales dans les pots, cadre doré des panneaux, tomates puis fleurs dans les potagers, serres plus nervurées puis chauffées, terrasses supplémentaires sur les fermes, miroirs dorés puis rayons vers la tour, arbres en fleurs, arcologie fleurie. Les améliorations de clic font fleurir l'héliotrope de la cour, et chaque synergie (§5.3) trace un fil doré entre les deux générateurs qu'elle relie.
-- **Trois vues, au choix du joueur (2026-10-10).** Demande d'Antoine : la carte ne se dézoome plus d'elle-même, le joueur passe d'une vue à l'autre avec un sélecteur en haut à gauche de la carte. « Le Balcon » cadre la cour et l'immeuble du joueur, « Le Quartier » les îlots autour, « La Ville » la ville entière. Chaque vue s'ouvre avec sa phase, ou plus tôt si le joueur achète un générateur dont la place est hors de la dernière vue ouverte. Quand une vue s'ouvre en jeu, la carte y glisse une fois (1,1 s) pour qu'on voie le nouveau bâtiment pousser ; le joueur peut ensuite revenir plus près. Le choix est gardé dans le navigateur, hors sauvegarde. Chaque vue garde son cadre entier et aussi grand que l'écran le permet, quelle que soit sa forme, sans empiéter sur la fleur ; le reste de l'écran montre la périphérie grise, des îlots jamais restaurés sur la même grille de rues, voilés de lumière pour que la partie du joueur ressorte.
+- **Trois vues, au choix du joueur (2026-10-10).** Demande d'Antoine : la carte ne se dézoome plus d'elle-même, le joueur passe d'une vue à l'autre avec un sélecteur en haut à gauche de la carte. « Le Balcon » cadre la cour et l'immeuble du joueur, « Le Quartier » les îlots autour, « La Ville » la ville entière. Chaque vue s'ouvre avec sa phase, ou plus tôt si le joueur achète un générateur dont la place est hors de la dernière vue ouverte. Quand une vue s'ouvre en jeu, la carte y glisse une fois (1,1 s) pour qu'on voie le nouveau bâtiment pousser ; le joueur peut ensuite revenir plus près. Le choix est gardé dans le navigateur, hors sauvegarde. Chaque vue garde son cadre entier et aussi grand que l'écran le permet, quelle que soit sa forme ; le reste de l'écran montre la périphérie grise, des îlots jamais restaurés sur la même grille de rues, voilés de lumière pour que la partie du joueur ressorte.
 - **La lumière suit la phase.** Les ombres des bâtiments tournent et changent de longueur (aube : longues vers l'ouest ; midi : courtes ; fin d'après-midi : longues vers l'est), un voile de lumière teinte la scène, des ombres de nuages la traversent lentement. Le quartier reverdit avec la production, et les teintes de saison (phase 4) s'appliquent au feuillage et à la lumière.
 - **Animations réduites.** Avec le réglage des Options ou `prefers-reduced-motion`, rien ne bouge : les éléments apparaissent directement, la caméra change de cadre sans transition, pas de scintillement.
 
@@ -437,6 +437,7 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 - Jusqu'à 999 999 : chiffres complets avec séparateur de milliers (« 12 345 »).
 - Au-delà : suffixes courts de l'échelle longue avec 3 chiffres significatifs (« 1,23 M », « 45,6 Md », « 7,89 Bn »…) : M (million, 1e6), Md (milliard), Bn (billion), Bd (billiard), Tn (trillion), Td (trilliard), Qn (quadrillion), Qd (quadrilliard, 1e27), puis notation scientifique (« 1,23e30 ») au-delà du dernier suffixe.
 - Option pour forcer la notation scientifique partout.
+- En anglais (M8, §14 Q1) : mêmes règles avec le point décimal, la virgule comme séparateur de milliers et les suffixes de l'échelle courte (« 12,345 », « 1.23 M », « 45.6 B », « 7.89 T » ; puis Qa, Qi, Sx, Sp, Oc).
 
 ---
 
@@ -504,25 +505,25 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 
 ### 10.1 Écran principal (bureau)
 
-Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fleur est dans la carte, le menu latéral s'élargit et se replie.
+Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fleur pousse au centre de la ville, le menu latéral s'élargit et se replie.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
 │ HELIOTROPE        ☀ 1,23 M Lumière  +4 560 /s       [Jalons] [Options]│
 ├────────────────────────────────────────────────────┬─┬────────────────┤
 │ [Balcon|Quartier|Ville]                            │›│ Améliorer ⌄    │
-│                                                    │ │ [▣][▣][▣][▢]   │
-│              Scène du quartier                     │ │ Bâtir ⌄ ×1 ×10 │
-│        (toute la hauteur de la fenêtre)            │ │ Héliotrope  42 │
-│  ╭──╮                                              │ │ Panneau     18 │
-│  │✿ │ fleur cliquable                              │ │ Le quartier ⌄  │
-│  ╰──╯                                              │ │ Coopératives ⌄ │
+│                       ╭──╮                         │ │ [▣][▣][▣][▢]   │
+│                       │✿ │ fleur dans la cour      │ │ Bâtir ⌄ ×1 ×10 │
+│                       ╰──╯                         │ │ Héliotrope  42 │
+│              Scène du quartier                     │ │ Panneau     18 │
+│        (toute la hauteur de la fenêtre)            │ │ Le quartier ⌄  │
+│                                                    │ │ Coopératives ⌄ │
 └────────────────────────────────────────────────────┴─┴────────────────┘
 ```
 
 - **Haut :** une barre fine : titre, compteur de Lumière et production/s, menu. Aucun texte sous le titre.
 - **Carte :** la scène du quartier vue du dessus (§6) occupe toute la hauteur restante et toute la largeur que laisse le menu. Le sélecteur de vue est en haut à gauche, avec la teinte de saison. Le Papillon doré la traverse.
-- **Fleur :** l'héliotrope cliquable se dresse dans son arche en bas à gauche de la carte, au premier plan, comme une jardinière devant la ville. Sa taille suit celle de la carte. Aucun texte sous la fleur : chaque clic fait flotter sa valeur.
+- **Fleur :** l'héliotrope cliquable pousse au centre de la ville, dans la cour de l'immeuble du joueur : son pot repose sur un massif entouré d'une lueur dorée, dont la couronne de fleurs s'étoffe avec les améliorations de clic, et son arche dorée, voilée pour laisser voir la ville derrière, se dresse au-dessus de l'immeuble. Elle suit la caméra d'une vue à l'autre et grandit avec le zoom (136 à 290 px de large, au plus un quart de la largeur de la carte quand elle est étroite), pour garder la place de ses brins dorés, de son halo et de ses animations ; les pots du quartier se rangent de part et d'autre du massif. Seule la plante capte le clic, le reste de la carte sous l'arche reste cliquable. Aucun texte sous la fleur : chaque clic fait flotter sa valeur.
 - **Menu latéral :** Améliorer, Bâtir, Le quartier (parcelles et projets, §6.1, §6.2) et les Coopératives (§7.2), dans cet ordre ; il défile seul et la page ne défile pas. Large d'environ un tiers de l'écran, il passe à deux colonnes sur les très grands écrans (dès 1760 px) pour tout montrer d'un coup. Le titre de chaque panneau le replie ou le déplie, et la poignée entre la carte et le menu replie tout le menu pour donner toute la largeur à la carte. Ces choix sont gardés dans le navigateur.
 - **Tablette :** la carte en haut (environ 60 % de la hauteur), les panneaux en deux colonnes dessous.
 
@@ -534,7 +535,7 @@ Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fle
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi (§7.1) | 1ʳᵉ Graine |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
-| **Options** | Notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
+| **Options** | Langue (français ou anglais), notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
 | **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
 
 Les Options proposent aussi de réduire les animations, en plus du réglage `prefers-reduced-motion` de l'appareil (§10.4), et, depuis M6, de régler le volume des sons ou de les couper (§6.3).
@@ -679,7 +680,7 @@ Décisions qui appartiennent à Antoine. En attendant sa réponse, le document a
 
 | # | Question | Choix recommandé (appliqué par défaut) |
 |---|---|---|
-| Q1 | Langue de l'interface du jeu ? | Français d'abord, textes externalisés pour ajouter l'anglais ensuite |
+| Q1 | Langue de l'interface du jeu ? | Français d'abord. *Livré en M8 :* version anglaise complète, choisie dans les Options (le français reste la langue par défaut). Tous les textes sont dans `src/i18n/` (`fr.ts` fait référence, `en.ts` a la même forme). |
 | Q2 | Plateforme visée ? | Navigateur, bureau d'abord, mais jouable sur mobile (responsive) |
 | Q3 | Production hors ligne : 100 % plafonnée à 8 h ? | Oui |
 | Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP : livrée en M6 (parcelles, §6.1) |

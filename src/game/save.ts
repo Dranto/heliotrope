@@ -1,5 +1,6 @@
 import { isAchievementId, type AchievementId } from './achievements';
 import type { ActiveEffect } from './effects';
+import { LANGUAGES, type Language } from './format';
 import { GENERATOR_IDS } from './generators';
 import { RESOURCE_IDS } from './resources';
 import { isUpgradeId, type UpgradeId } from './upgrades';
@@ -43,7 +44,13 @@ const migrations: Record<number, Migration> = {
   // v8 adds the Tree of Seasons and the Cooperatives (§7.1, §7.2). Defaults from the fresh
   // state: no talent learnt, every Seed still to spend.
   7: (raw) => ({ ...raw, version: 8 }),
+  // v9 adds the language setting (§14 Q1); older saves keep the French interface.
+  8: (raw) => ({ ...raw, version: 9 }),
 };
+
+function isLanguage(value: string): value is Language {
+  return (LANGUAGES as readonly string[]).includes(value);
+}
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
@@ -174,6 +181,9 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (typeof settings?.muted === 'boolean') {
     state.settings = { ...state.settings, muted: settings.muted };
+  }
+  if (typeof settings?.language === 'string' && isLanguage(settings.language)) {
+    state.settings = { ...state.settings, language: settings.language };
   }
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
   return state;

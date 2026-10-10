@@ -3,7 +3,7 @@
 // spreads from the bike, and the building it bought appears on the map as usual.
 import { memo } from 'react';
 import type { CooperativeId } from '../game/cooperatives';
-import { t } from '../i18n/fr';
+import { t } from '../i18n';
 import { COOPERATIVE_ROUTES } from './cooperativeMap';
 
 interface BikeProps {
