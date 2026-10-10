@@ -7,6 +7,7 @@ import {
 } from './production';
 import { unlockAchievements } from './achievements';
 import { advanceButterfly } from './butterfly';
+import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
 import { earnLight } from './light';
 import type { GameState } from './state';
@@ -40,10 +41,13 @@ export function unlockProgress(state: GameState): GameState {
   return unlockAchievements(state);
 }
 
-/** Advance the simulation by dtSeconds of online play. Pure: returns a new state. */
+/**
+ * Advance the simulation by dtSeconds of play. Pure: returns a new state. The Cooperatives (§7.2)
+ * then buy what the Light earned affords.
+ */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const next = advanceButterfly(produce(state, dtSeconds), dtSeconds);
+  const next = runCooperatives(advanceButterfly(produce(state, dtSeconds), dtSeconds));
   return unlockProgress({
     ...next,
     playSeconds: state.playSeconds + dtSeconds,

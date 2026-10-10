@@ -10,6 +10,7 @@ import type { UpgradeId } from './upgrades';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { carryOutProject, offeredParcels, offeredProjects, restoreParcel } from './restoration';
+import { learnTalent, type TalentId } from './talents';
 
 /** Light earned in a Season that makes the first Season advisable: 10 Seeds (§7), 2e9. */
 export const ADVISED_SEASON_LIGHT = lightForSeeds(ADVISED_FIRST_SEASON_SEEDS);
@@ -181,6 +182,35 @@ export function simulate({
 }
 
 /**
+ * Talents the reference player learns at the start of a Season, in this order, as far as the
+ * Seeds go (§7.1): the gardeners and roofers first, then a little of each branch.
+ */
+export const REFERENCE_TALENTS: readonly TalentId[] = [
+  'gardenersCoop',
+  'nectarFlowers',
+  'mycorrhiza',
+  'roofersCoop',
+  'hedgerows',
+  'cuttings',
+  'earlyDiversity',
+  'nightWatch',
+  'farmersCoop',
+  'neighbourhoodCouncil',
+  'longBloom',
+  'livingSoil',
+  'greatSwarm',
+  'forestersCoop',
+  'motherForest',
+  'beeDance',
+  'longMemory',
+];
+
+/** Learn the reference talents the Seeds left in the tree can pay for. */
+export function learnReferenceTalents(state: GameState): GameState {
+  return REFERENCE_TALENTS.reduce(learnTalent, state);
+}
+
+/**
  * Milestone 3 exit criterion (§12): play the first Season until it is advisable, start a new
  * Season, then play the second one for as long. Each pacing event should come sooner.
  */
@@ -191,7 +221,7 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
   const first = simulate({ ...options, stopWhenAdvised: true });
   const second = simulate({
     ...options,
-    state: startNewSeason(first.state),
+    state: learnReferenceTalents(startNewSeason(first.state)),
     stopWhenAdvised: true,
   });
   return { first, second };

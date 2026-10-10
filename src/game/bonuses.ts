@@ -1,10 +1,12 @@
-// Effects of restored parcels and neighbourhood projects (docs/game-design.md §6.1, §6.2). Both
-// tables describe their effect with the same `Bonus` shape; the formulas in production.ts,
+// Effects of restored parcels, neighbourhood projects and talents of the Tree of Seasons
+// (docs/game-design.md §6.1, §6.2, §7.1). The three tables describe their effect with the same
+// `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
+import { TALENTS, type TalentId } from './talents';
 
 export type Bonus =
   /** Multiplies one generator's production. */
@@ -36,22 +38,35 @@ export type Bonus =
   /** Multiplies the Light of a Récolte. */
   | { kind: 'harvestFactor'; factor: number }
   /** Adds `seconds` to the offline progress cap. */
-  | { kind: 'offlineCap'; seconds: number };
+  | { kind: 'offlineCap'; seconds: number }
+  /** A new Season starts with `fraction` of each generator owned (rounded down). */
+  | { kind: 'keepGenerators'; fraction: number }
+  /** Adds `bonus` to global production per Season completed. */
+  | { kind: 'perSeason'; bonus: number }
+  /** Adds `bonus` to global production per generator type owned. */
+  | { kind: 'globalPerType'; bonus: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
 
-/** What the bonus helpers read: restored parcels and projects carried out this Season. */
+/**
+ * What the bonus helpers read: restored parcels, projects carried out this Season, talents
+ * learnt, and the counts some bonuses grow with.
+ */
 export interface BonusSource {
   parcels: readonly ParcelId[];
   projects: readonly ProjectId[];
+  talents: readonly TalentId[];
+  seasons: number;
+  generators: Readonly<Record<string, number>>;
 }
 
-/** Every bonus in force, parcels first. */
-export function activeBonuses({ parcels, projects }: BonusSource): Bonus[] {
+/** Every bonus in force: parcels, then projects, then talents. */
+export function activeBonuses({ parcels, projects, talents }: BonusSource): Bonus[] {
   return [
     ...parcels.flatMap((id) => PARCELS[id].bonuses),
     ...projects.flatMap((id) => PROJECTS[id].bonuses),
+    ...talents.flatMap((id) => TALENTS[id].bonuses),
   ];
 }
 
@@ -77,12 +92,23 @@ export function costFactor(source: BonusSource): number {
   return bonusesOf(source, 'discount').reduce((product, b) => product * (1 - b.fraction), 1);
 }
 
-/** Additive global production bonus: flat bonuses plus the per-parcel ones. */
+/**
+ * Additive global production bonus: flat bonuses, plus the ones per parcel restored, per
+ * Season completed and per generator type owned.
+ */
 export function globalBonus(source: BonusSource): number {
   let bonus = 0;
   for (const b of bonusesOf(source, 'global')) bonus += b.bonus;
   for (const b of bonusesOf(source, 'perParcel')) bonus += b.bonus * source.parcels.length;
+  for (const b of bonusesOf(source, 'perSeason')) bonus += b.bonus * source.seasons;
+  const types = Object.values(source.generators).filter((owned) => owned > 0).length;
+  for (const b of bonusesOf(source, 'globalPerType')) bonus += b.bonus * types;
   return bonus;
+}
+
+/** Share of each generator a new Season keeps (the best one in force, 0 with none). */
+export function keptGeneratorShare(source: BonusSource): number {
+  return Math.max(0, ...bonusesOf(source, 'keepGenerators').map((b) => b.fraction));
 }
 
 /** How long a Golden Butterfly effect lasts with the bonuses in force. */

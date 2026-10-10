@@ -25,6 +25,8 @@ a design decision changes, update that document in the same PR.
   - `production.ts`: pure formulas: production, multipliers, biodiversity, click value, costs,
     upgrade availability
   - `seasons.ts`: prestige (design doc §7): Seeds formula, bonus, `startNewSeason`
+  - `talents.ts`: the Tree of Seasons (§7.1), talents bought with Seeds, kept across Seasons;
+    `cooperatives.ts`: the Cooperatives (§7.2) that buy for the player, run by every tick
   - `achievements.ts`: Milestones ("Jalons", §9.3) data table, +1% bonus, unlock checks
   - `butterfly.ts`, `effects.ts`: the Golden Butterfly (§9.2), its schedule and timed effects
   - `parcels.ts`, `projects.ts`: parcels to restore (kept across Seasons) and neighbourhood
@@ -45,6 +47,8 @@ a design decision changes, update that document in the same PR.
 - `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
   rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
   the restored parcels and project marks, `Restoration.tsx` is the panel under the map.
+  `SeasonTree.tsx` and `seasonTree.ts` draw the Tree of Seasons screen; `Cooperatives.tsx` is their
+  panel, `CooperativeArt.tsx` and `cooperativeMap.ts` their cargo bikes on the map.
   `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes. Read state with `useGameState()`, change it with
   `store.dispatch((s) => action(s))`.
 

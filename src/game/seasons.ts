@@ -1,5 +1,7 @@
 // Prestige: the Seasons (docs/game-design.md §7). Pure formulas and the new Season transition.
 import { unlockAchievement, unlockAchievements } from './achievements';
+import { keptGeneratorShare } from './bonuses';
+import { GENERATOR_IDS } from './generators';
 import { createInitialState, type GameState } from './state';
 
 /** §7: Seeds earned in total = floor(sqrt(Light earned over all Seasons / SEED_LIGHT_DIVISOR)). */
@@ -56,14 +58,19 @@ export function isSeasonsScreenUnlocked(state: GameState): boolean {
 /**
  * Player action: start a new Season (§7). Resets Light, generators, upgrades, projects, the
  * Season total and running butterfly effects; keeps Seeds (plus the ones gained), Milestones,
- * restored parcels, all-time statistics, options and the clock.
+ * restored parcels, the Tree of Seasons and its Cooperatives, all-time statistics, options and
+ * the clock. With the Boutures talent, a share of each generator is kept too (§7.1).
  * Returns the same state when no Seed would be gained.
  */
 export function startNewSeason(state: GameState): GameState {
   if (!canStartNewSeason(state)) return state;
   const fresh = createInitialState(state.lastUpdate);
+  const kept = keptGeneratorShare(state);
+  const generators = { ...fresh.generators };
+  for (const id of GENERATOR_IDS) generators[id] = Math.floor(state.generators[id] * kept);
   let next: GameState = {
     ...fresh,
+    generators,
     allTimeLight: state.allTimeLight,
     seeds: state.seeds + seedsToGain(state),
     seasons: state.seasons + 1,
@@ -71,6 +78,8 @@ export function startNewSeason(state: GameState): GameState {
     playSeconds: state.playSeconds,
     achievements: state.achievements,
     parcels: state.parcels,
+    talents: state.talents,
+    cooperatives: state.cooperatives,
     butterflies: state.butterflies,
     butterfly: { nextIn: state.butterfly.nextIn || fresh.butterfly.nextIn, visible: 0 },
     rngSeed: state.rngSeed,

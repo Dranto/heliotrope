@@ -1,4 +1,5 @@
 import type { AchievementId } from './achievements';
+import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
 import type { Notation } from './format';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
@@ -6,10 +7,11 @@ import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
 import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
+import type { TalentId } from './talents';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 7;
+export const STATE_VERSION = 8;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -63,6 +65,10 @@ export interface GameState {
   parcels: ParcelId[];
   /** Neighbourhood projects carried out this Season, in order (§6.2). */
   projects: ProjectId[];
+  /** Talents of the Tree of Seasons learnt, in order (§7.1). Kept across Seasons. */
+  talents: TalentId[];
+  /** Cooperatives' settings and purchases (§7.2). Kept across Seasons. */
+  cooperatives: CooperativesState;
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -109,6 +115,8 @@ export function createInitialState(now: number): GameState {
     achievements: [],
     parcels: [],
     projects: [],
+    talents: [],
+    cooperatives: createCooperativesState(),
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     effects: [],

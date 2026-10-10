@@ -7,6 +7,8 @@ import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameSta
 import { BUTTERFLY_VISIBLE_SECONDS, effectSeconds } from './butterfly';
 import { isParcelId, type ParcelId } from './parcels';
 import { isProjectId, type ProjectId } from './projects';
+import { validTalents } from './talents';
+import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
 
 export const SAVE_KEY = 'heliotrope.save';
 
@@ -38,6 +40,9 @@ const migrations: Record<number, Migration> = {
   // v7 adds restored parcels, neighbourhood projects and the sound settings (§6.1, §6.2,
   // §10.2). Their defaults come from the fresh state: nothing restored, sound on.
   6: (raw) => ({ ...raw, version: 7 }),
+  // v8 adds the Tree of Seasons and the Cooperatives (§7.1, §7.2). Defaults from the fresh
+  // state: no talent learnt, every Seed still to spend.
+  7: (raw) => ({ ...raw, version: 8 }),
 };
 
 function isFiniteNumber(value: unknown): value is number {
@@ -125,6 +130,17 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (Array.isArray(data.projects)) {
     state.projects = [...new Set<ProjectId>(data.projects.filter(isProjectId))];
+  }
+  if (Array.isArray(data.talents)) state.talents = validTalents(data.talents, state.seeds);
+  const cooperatives = data.cooperatives as Record<string, unknown> | undefined;
+  if (Array.isArray(cooperatives?.paused)) {
+    state.cooperatives.paused = [...new Set(cooperatives.paused.filter(isCooperativeId))];
+  }
+  if (typeof cooperatives?.thrifty === 'boolean') state.cooperatives.thrifty = cooperatives.thrifty;
+  const purchases = cooperatives?.purchases as Record<string, unknown> | undefined;
+  for (const id of COOPERATIVE_IDS) {
+    const value = purchases?.[id];
+    if (isCount(value)) state.cooperatives.purchases[id] = value;
   }
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;

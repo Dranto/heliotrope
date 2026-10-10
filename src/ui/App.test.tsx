@@ -354,4 +354,40 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Bâtir' }));
     expect(screen.getByRole('button', { name: 'Bâtir' })).toHaveAttribute('aria-current', 'page');
   });
+
+  it('spends Seeds in the Tree of Seasons and brings in a cooperative (§7.1, §7.2)', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, seeds: 3, seasons: 1, allTimeLight: 2e8 });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    expect(screen.queryByRole('region', { name: 'Coopératives' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Arbre des Saisons, 3 Graines à semer' }));
+    const tree = screen.getByRole('dialog', { name: 'L’Arbre des Saisons' });
+    expect(screen.getByTestId('seeds-available')).toHaveTextContent('3');
+    fireEvent.click(screen.getByRole('button', { name: 'Les jardiniers, à semer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Apprendre Les jardiniers pour 1 Graine' }));
+    expect(store.getState().talents).toEqual(['gardenersCoop']);
+    expect(store.getState().seeds).toBe(3);
+    expect(screen.getByTestId('seeds-available')).toHaveTextContent('2');
+    // Its children open: the roofers cost 2 Seeds, still affordable.
+    expect(screen.getByRole('button', { name: 'Les maraîchers, à semer' })).toBeInTheDocument();
+    expect(tree.querySelector('.tree-node.fresh')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Fermer l’Arbre des Saisons' }));
+
+    const panel = screen.getByRole('region', { name: 'Coopératives' });
+    const toggle = screen.getByRole('switch', { name: 'Les jardiniers en marche' });
+    expect(toggle).toBeChecked();
+    fireEvent.click(toggle);
+    expect(store.getState().cooperatives.paused).toEqual(['gardeners']);
+    expect(panel.querySelector('[data-cooperative="gardeners"]')).toHaveAttribute(
+      'data-working',
+      'false',
+    );
+    fireEvent.click(screen.getByLabelText(/Garder une réserve/));
+    expect(store.getState().cooperatives.thrifty).toBe(true);
+    // The bike waits on the map while its cooperative is paused.
+    expect(document.querySelector('.coop-bike[data-cooperative="gardeners"]')).toHaveAttribute(
+      'data-working',
+      'false',
+    );
+  });
 });

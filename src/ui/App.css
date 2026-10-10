@@ -2096,7 +2096,7 @@ button {
 
   /* §10.3: one section at a time, picked in the tab bar. */
   .app[data-tab='harvest'] .column,
-  .app[data-tab='build'] :is(.flower-panel, .scene, .upgrades),
+  .app[data-tab='build'] :is(.flower-panel, .scene, .upgrades, .cooperatives),
   .app[data-tab='improve'] :is(.flower-panel, .scene, .generators),
   .app[data-tab='more'] .layout {
     display: none;

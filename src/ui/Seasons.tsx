@@ -9,6 +9,7 @@ import {
   seedsToGain,
   startNewSeason,
 } from '../game/seasons';
+import { canLearnTalent, TALENT_LIST } from '../game/talents';
 import { t } from '../i18n/fr';
 import { Dialog } from './Dialog';
 import { useGameState, useGameStore } from './useGame';
@@ -40,7 +41,7 @@ function SeasonsOrnament() {
 }
 
 /** Seasons screen (docs/game-design.md §7, §10.2): Seeds, bonus before/after, new Season. */
-export function Seasons({ onClose }: { onClose: () => void }) {
+export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTree: () => void }) {
   const store = useGameStore();
   const state = useGameState();
   const [confirming, setConfirming] = useState(false);
@@ -126,6 +127,12 @@ export function Seasons({ onClose }: { onClose: () => void }) {
       <p className="options-message" role="status">
         {message}
       </p>
+
+      {TALENT_LIST.some((talent) => canLearnTalent(state, talent.id)) && (
+        <button type="button" className="tree-link" onClick={onOpenTree}>
+          {t.tree.fromSeasons}
+        </button>
+      )}
 
       {!available && <p className="hint">{t.seeds.noSeedYet}</p>}
       {confirming && available ? (

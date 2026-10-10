@@ -28,6 +28,12 @@ function playedState(): GameState {
     achievements: ['light.3', 'pot.1'],
     parcels: ['gardenStreet', 'river'],
     projects: ['seedSwap'],
+    talents: ['gardenersCoop', 'roofersCoop', 'nectarFlowers'],
+    cooperatives: {
+      paused: ['roofers'],
+      thrifty: true,
+      purchases: { gardeners: 40, roofers: 7, farmers: 0, foresters: 0, council: 0 },
+    },
     butterflies: 3,
     butterfly: { nextIn: 0, visible: 4.5 },
     effects: [{ kind: 'bloom', remaining: 20 }],
@@ -251,5 +257,53 @@ describe('export and import', () => {
       });
     expect(deserialize(json(85), 0)!.effects).toEqual([{ kind: 'bloom', remaining: 85 }]);
     expect(deserialize(json(95), 0)!.effects).toEqual([]);
+  });
+
+  it('migrates a v7 save with no talent learnt and every Seed to spend', () => {
+    const v7 = JSON.stringify({ version: 7, seeds: 10, seasons: 1, parcels: ['river'] });
+    const state = deserialize(v7, 0)!;
+    expect(state.version).toBe(STATE_VERSION);
+    expect(state.seeds).toBe(10);
+    expect(state.parcels).toEqual(['river']);
+    expect(state.talents).toEqual([]);
+    expect(state.cooperatives).toEqual(createInitialState(0).cooperatives);
+  });
+
+  it('keeps only talents learnt after their parent and paid for by the Seeds', () => {
+    const json = (seeds: number, talents: unknown[]) =>
+      JSON.stringify({ version: STATE_VERSION, seeds, talents });
+    // roofersCoop needs gardenersCoop; farmersCoop then needs roofersCoop.
+    expect(deserialize(json(10, ['roofersCoop', 'farmersCoop', 'oak']), 0)!.talents).toEqual([]);
+    expect(
+      deserialize(json(10, ['gardenersCoop', 'roofersCoop', 'gardenersCoop']), 0)!.talents,
+    ).toEqual(['gardenersCoop', 'roofersCoop']);
+    // 1 + 2 Seeds spent; the 3-Seed farmers do not fit in 4 Seeds.
+    expect(
+      deserialize(json(4, ['gardenersCoop', 'roofersCoop', 'farmersCoop', 'nightWatch']), 0)!
+        .talents,
+    ).toEqual(['gardenersCoop', 'roofersCoop', 'nightWatch']);
+  });
+
+  it('drops unknown cooperatives and invalid purchase counts', () => {
+    const state = deserialize(
+      JSON.stringify({
+        version: STATE_VERSION,
+        cooperatives: {
+          paused: ['council', 'robots', 'council'],
+          thrifty: 'yes',
+          purchases: { gardeners: 12, roofers: -3, farmers: 1.5 },
+        },
+      }),
+      0,
+    )!;
+    expect(state.cooperatives.paused).toEqual(['council']);
+    expect(state.cooperatives.thrifty).toBe(false);
+    expect(state.cooperatives.purchases).toEqual({
+      gardeners: 12,
+      roofers: 0,
+      farmers: 0,
+      foresters: 0,
+      council: 0,
+    });
   });
 });

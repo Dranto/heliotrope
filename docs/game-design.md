@@ -290,7 +290,7 @@ Le pilier « Élégant et lumineux » (§1) promettait des sons discrets. Ils so
 Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Thématiquement : l'hiver passe, on replante tout, mais la terre garde la mémoire de ce qui a poussé.
 
 **Remis à zéro :** Lumière, générateurs, améliorations, projets du quartier (§6.2), phase visuelle.
-**Conservé :** Graines d'Héliotrope, Jalons, parcelles restaurées (§6.1), statistiques globales, options.
+**Conservé :** Graines d'Héliotrope, Jalons, parcelles restaurées (§6.1), talents de l'Arbre des Saisons et réglages des Coopératives (§7.1, §7.2), statistiques globales, options.
 
 ### Formule
 
@@ -324,9 +324,46 @@ Points de repère *(à valider)* :
 - La Lumière totale cumulée, les clics, le temps de jeu, le nombre de Saisons et les Graines sont conservés ; la durée et la Lumière de la Saison en cours repartent de zéro. Le temps de jeu compte aussi la progression hors ligne.
 - La nouvelle Saison est sauvegardée immédiatement.
 
-### Arbre des Saisons (post-MVP)
+### 7.1 Arbre des Saisons (M7)
 
-Les Graines servent aussi de monnaie pour un arbre de talents permanents (garder 10 % des générateurs, Papillon doré plus fréquent, production hors ligne plus longue…). Dépenser une Graine **ne réduit pas** le bonus de +5 % : le bonus dépend des Graines obtenues au total, la monnaie dépensable est un compteur séparé. C'est le modèle de Cookie Clicker (niveau de prestige vs. puces célestes) : le joueur n'est jamais puni pour avoir dépensé.
+Les Graines servent aussi de monnaie pour un arbre de talents permanents. Dépenser une Graine **ne réduit pas** le bonus de +5 % : le bonus dépend des Graines obtenues au total, la monnaie dépensable est un compteur séparé (`Graines à semer = Graines obtenues − Graines dépensées`). C'est le modèle de Cookie Clicker (niveau de prestige vs. puces célestes) : le joueur n'est jamais puni pour avoir dépensé. Les talents appris restent acquis d'une Saison à l'autre, et l'Arbre n'est accessible qu'avec une première Graine, donc dès la 2ᵉ Saison : la 1ʳᵉ Saison garde toutes ses décisions (décision D3).
+
+L'arbre compte **17 talents en trois branches**. Chaque talent demande son parent (le talent d'où part sa branche), sauf le premier de chaque branche. Les effets réutilisent la forme des bonus des parcelles et des projets (§6.1, §6.2), et chacun se lie à une mécanique existante plutôt que d'ajouter un multiplicateur isolé (synergies, biodiversité, Papillon doré, Saisons, hors ligne).
+
+| Branche | Talent | Coût | Après | Effet |
+|---|---|---|---|---|
+| **Racines** (production) | Mycorhizes | 1 | — | Synergies entre bâtiments ×1,25 |
+| | Sous-bois | 1 | Mycorhizes | La biodiversité compte aussi chaque bâtiment à 5 exemplaires |
+| | Boutures | 2 | Mycorhizes | Chaque nouvelle Saison garde 10 % de chaque bâtiment (arrondi en dessous) |
+| | Sol vivant | 3 | Boutures | +5 % de production par Saison accomplie |
+| | Arbre-mère | 5 | Sous-bois | +3 % de production par type de bâtiment possédé |
+| **Pollinisateurs** (jeu actif) | Fleurs nectarifères | 1 | — | Clic ×2 |
+| | Haies fleuries | 1 | Fleurs nectarifères | Le Papillon doré revient 15 % plus vite |
+| | Longue floraison | 2 | Haies fleuries | La Floraison dure ×1,5 |
+| | Grand essaim | 3 | Haies fleuries | Récolte ×2, la Pollinisation dure ×1,5 |
+| | Danse des abeilles | 5 | Longue floraison | Clic ×3 |
+| **Mémoire** (confort) | Les jardiniers | 1 | — | Coopérative : pots et panneaux (§7.2) |
+| | Veilleurs de nuit | 1 | Les jardiniers | +4 h de plafond hors ligne |
+| | Les maraîchers | 2 | Les jardiniers | Coopérative : potagers et serres |
+| | Les ingénieurs du soleil | 3 | Les maraîchers | Coopérative : fermes verticales et centrales à miroirs |
+| | Le conseil de quartier | 3 | Les maraîchers | Coopérative : les améliorations |
+| | Les forestiers | 5 | Les ingénieurs du soleil | Coopérative : canopées et arcologies |
+| | Longue mémoire | 5 | Veilleurs de nuit | +12 h de plafond hors ligne (24 h avec les Veilleurs) |
+
+L'arbre complet coûte 44 Graines : un joueur en a 10 après sa 1ʳᵉ Saison conseillée, puis de plus en plus à chaque Saison. Les premières Graines suffisent pour un premier talent dans chaque branche et les deux premières coopératives.
+
+**Écran.** Un écran « L'Arbre des Saisons » s'ouvre du menu dès la première Graine, avec un badge quand une Graine peut être semée, et depuis l'écran des Saisons. Il dessine l'arbre (§10.4) : le tronc sort du sol, les Racines s'étendent sous terre, les Pollinisateurs (à gauche) et la Mémoire (à droite) se partagent la ramure. Un talent appris est une fleur ouverte, un talent qu'on peut semer est un bourgeon qui respire, les autres restent des bourgeons pâles. En semant, une sève dorée monte le long de la branche puis la fleur s'ouvre ; le tronc s'épaissit et le feuillage s'étoffe à mesure que l'arbre se remplit. Aucun texte narratif : seuls le nom et l'effet de chaque talent sont écrits.
+
+### 7.2 Coopératives (M7)
+
+Des voisins achètent à la place du joueur : ce sont les talents de la branche Mémoire qui les font venir. Chaque coopérative s'occupe de deux bâtiments, le conseil de quartier des améliorations.
+
+- **Ce qu'elles achètent.** Les coopératives de bâtiments choisissent ensemble, parmi leurs bâtiments déjà révélés, celui qui rembourse le plus vite son prix (`coût / gain de production d'un exemplaire`). Si c'est aussi une bonne affaire comparé à tous les bâtiments révélés (au plus 1,25 fois moins rentable que le meilleur), elles l'achètent dès qu'elles peuvent ; sinon le joueur économise sans doute pour mieux, et elles ne l'achètent qu'avec au plus 10 % de la réserve. Le conseil achète l'amélioration la moins chère, et les autres attendent qu'il l'ait achetée tant qu'elle ne coûte pas plus de 30 fois leur prochain bâtiment.
+- **Réglages.** Chaque coopérative peut être mise à l'arrêt, et l'option « Garder une réserve » limite chaque achat à 10 % de la Lumière en réserve. Les réglages restent d'une Saison à l'autre.
+- **Temps.** Elles achètent à chaque pas de simulation, en ligne comme hors ligne (par tranches de 60 s, §9.1) : seule la Lumière disponible compte, jamais un nombre de pas.
+- **Elles ne sont pas le joueur.** Leurs achats ne remettent pas à zéro le temps sans achat du Jalon caché « Photosynthèse lente » (§9.3).
+- **Panneau.** Un panneau « Coopératives » sous les bâtiments liste celles qui sont venues, ce qu'elles achètent, leur nombre d'achats et un interrupteur « En marche / À l'arrêt ». Sur mobile, il est dans l'onglet Améliorer.
+- **Sur la carte.** Chaque coopérative est un vélo-cargo à sa couleur qui fait sa tournée dans les rues du quartier tant qu'elle travaille ; à chaque achat, un anneau doré part du vélo, et le bâtiment acheté apparaît sur la carte comme d'habitude. Une coopérative à l'arrêt gare son vélo. Avec les animations réduites (option ou réglage de l'appareil), les vélos restent garés.
 
 ---
 
@@ -392,6 +429,8 @@ Sortie actuelle (améliorations de clic, parcelles et projets) :
 Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, chaque événement reste entre −14 % et +9 % de sa cible. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 > Restaurer le quartier (M6) : le joueur de référence considère aussi les parcelles et les projets, avec la même règle (attente + coût / gain de revenu). Ceux dont l'effet ne touche pas le revenu (Papillon, plafond hors ligne, remises) ne lui rapportent rien de mesurable et ne sont achetés que lorsqu'un autre effet les rend rentables (les Pistes cyclables, par exemple, donnent du prix à chaque parcelle). Dans sa 1ʳᵉ Saison, il restaure cinq parcelles et mène cinq projets, et le rythme s'accélère encore : Ferme verticale à 15,0 min (0 %), Centrale à 31,6 min (−10 %), Canopée à 55,2 min (−15 %), Arcologie à 1 h 28 (−16 %), Saison conseillée à 1 h 46 (−21 %, la marge la plus faible). Les effets ont été réduits pour rester dans les ±30 % (Batteries partagées +5 % par type au lieu de +25 %, Verger ×1,5 au lieu de ×2, Eau de pluie ×1,25, Pistes cyclables +2 % par parcelle). Comme les parcelles restent acquises, la 2ᵉ Saison est bien plus rapide : Saison conseillée en 1 h au lieu de 1 h 22.
+
+> La terre se souvient (M7) : la 1ʳᵉ Saison ne change pas (pas encore de Graine à semer). Au début de la 2ᵉ, le joueur de référence sème ses 10 Graines dans cet ordre, tant qu'elles suffisent : les jardiniers, Fleurs nectarifères, Mycorhizes, les maraîchers, Haies fleuries, Boutures, Sous-bois, Veilleurs de nuit (ordre complet dans `REFERENCE_TALENTS`). Les deux coopératives achètent pour lui pendant qu'il joue sa stratégie habituelle (environ 45 et 95 achats). Sa 2ᵉ Saison conseillée passe de 52 min à 43 min (Arcologie à 36 min au lieu de 41), sans toucher aux cibles de la 1ʳᵉ.
 
 ### Affichage des nombres
 
@@ -491,6 +530,7 @@ Les jalons sont conservés d'une Saison à l'autre. Un message discret annonce c
 |---|---|---|
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
+| **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi (§7.1) | 1ʳᵉ Graine |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
 | **Options** | Notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
 | **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
@@ -623,7 +663,7 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 Idées à reprendre quand le MVP est stable, par ordre de priorité proposé :
 
 1. ~~**Carte du quartier.**~~ *Livré en M6 (§6.1).* Une grille de parcelles grises (friches, parkings, toits nus) à restaurer contre de la Lumière. Chaque parcelle restaurée apporte un bonus ciblé (un parc : +clic ; une rivière dépolluée : +1 h de plafond hors ligne ; un verger : +% à un générateur). Rend la restauration du monde concrète et visuelle.
-2. **Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.
+2. ~~**Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.~~ *Livré en M7 (§7.1), avec les Coopératives (§7.2).*
 3. **Cycle jour / nuit et batteries.** La production solaire varie au fil d'une journée de jeu ; des batteries stockent le surplus. À tester avec prudence : ne doit jamais punir le joueur absent.
 4. **Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.
 5. **Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.
