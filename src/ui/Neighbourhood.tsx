@@ -151,34 +151,140 @@ function Shadow({ box: [x, y, w, h], storeys }: { box: Box; storeys: number }) {
   );
 }
 
-function Roof({ box: [x, y, w, h], fill }: { box: Box; fill: string }) {
+/** A small stable number for a place on the map, so roofs and car parks vary without randomness. */
+function hash(x: number, y: number): number {
+  return Math.abs(Math.round(x * 73 + y * 151)) % 97;
+}
+
+/**
+ * A building seen from above with a hint of its south facade, so its height reads at a glance:
+ * a strip of windows under the roof edge, then the roof with its parapet and equipment.
+ */
+function Roof({
+  box: [x, y, w, h],
+  storeys,
+  fill,
+  bare = false,
+}: {
+  box: Box;
+  storeys: number;
+  fill: string;
+  /** Roofs that carry a garden keep their edge and facade, without equipment. */
+  bare?: boolean;
+}) {
+  const facade = Math.min(storeys * 1.3 + 1.5, h * 0.24);
+  const top = h - facade;
+  const seed = hash(x, y);
+  const wide = w >= h;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx="2" fill={fill} />
-      <rect className="parapet" x={x + 2} y={y + 2} width={w - 4} height={h - 4} rx="1" />
-      <rect className="vent" x={x + w - 11} y={y + h - 10} width="6" height="5" rx="1" />
+      <rect x={x} y={y} width={w} height={h} rx="2" className="facade" />
+      <path
+        className="windows"
+        d={`M${x + 3} ${y + top + facade * 0.55} H${x + w - 3}`}
+        style={{ strokeWidth: Math.max(0.8, facade * 0.32) }}
+      />
+      <rect x={x} y={y} width={w} height={top} rx="2" fill={fill} />
+      <rect x={x} y={y} width={w} height={top} rx="2" fill="url(#roof-sheen)" />
+      {!bare && (
+        <>
+          <rect className="parapet" x={x + 2} y={y + 2} width={w - 4} height={top - 4} rx="1" />
+          {seed % 3 === 0 && w > 30 && (
+            <path
+              className="skylights"
+              d={
+                wide
+                  ? `M${x + w * 0.18} ${y + top / 2} H${x + w * 0.52}`
+                  : `M${x + w / 2} ${y + top * 0.2} V${y + top * 0.6}`
+              }
+            />
+          )}
+          {seed % 3 === 1 && w > 24 && top > 16 && (
+            <g className="tank">
+              <circle cx={x + w * 0.28} cy={y + top * 0.42} r="3.6" />
+              <circle cx={x + w * 0.28} cy={y + top * 0.42} r="1.6" className="tank-lid" />
+            </g>
+          )}
+          {seed % 2 === 0 && w > 40 && (
+            <g className="units">
+              <rect x={x + w * 0.6} y={y + 5} width="5" height="4" rx="0.6" />
+              <rect x={x + w * 0.6 + 7} y={y + 5} width="5" height="4" rx="0.6" />
+            </g>
+          )}
+          <rect className="vent" x={x + w - 11} y={y + top - 10} width="6" height="5" rx="1" />
+        </>
+      )}
     </g>
   );
 }
 
 function Wasteland({ box: [x, y, w, h] }: { box: Box }) {
+  const seed = hash(x, y);
   return (
     <g className="wasteland">
       <rect x={x} y={y} width={w} height={h} rx="3" />
-      {[0.2, 0.45, 0.7, 0.85].map((fx, i) => (
-        <circle key={fx} cx={x + w * fx} cy={y + h * [0.3, 0.7, 0.4, 0.75][i]!} r="1.6" />
+      <path
+        className="crack"
+        d={`M${x + w * 0.1} ${y + h * 0.35} l${w * 0.18} ${h * 0.12} l${w * 0.12} ${-h * 0.08} l${w * 0.2} ${h * 0.22}`}
+      />
+      {[0.2, 0.45, 0.7, 0.85, 0.32, 0.6].map((fx, i) => (
+        <circle
+          key={fx}
+          className="rubble"
+          cx={x + w * fx}
+          cy={y + h * [0.3, 0.7, 0.4, 0.75, 0.82, 0.2][i]!}
+          r={1.2 + ((seed + i) % 3) * 0.5}
+        />
       ))}
+      {[0.14, 0.52, 0.78].map((fx, i) => {
+        const tx = x + w * fx;
+        const ty = y + h * [0.62, 0.48, 0.24][i]!;
+        return (
+          <path
+            key={fx}
+            className="weeds"
+            d={`M${tx} ${ty} l-2 -3 M${tx} ${ty} l0 -3.6 M${tx} ${ty} l2 -3`}
+          />
+        );
+      })}
     </g>
   );
 }
 
+/** Muted car colours: the grey city before it changes. */
+const CAR_COLOURS = ['#8c8f94', '#6f7a86', '#b9b4aa', '#9a6b5a', '#5f6f66', '#d6d1c6'];
+
 function CarPark({ box: [x, y, w, h] }: { box: Box }) {
+  const bays = Math.floor((w - 8) / 10);
   return (
     <g className="carpark">
       <rect x={x} y={y} width={w} height={h} rx="3" />
-      {Array.from({ length: Math.floor((w - 8) / 10) }, (_, i) => (
+      {Array.from({ length: bays }, (_, i) => (
         <path key={i} d={`M${x + 8 + i * 10} ${y + 4} v14 M${x + 8 + i * 10} ${y + h - 18} v14`} />
       ))}
+      {Array.from({ length: bays - 1 }, (_, i) =>
+        [y + 5, y + h - 17].map((cy, row) => {
+          const seed = hash(x + i * 10, cy);
+          if (seed % 4 === 0) return null;
+          return (
+            <g
+              key={`${i},${row}`}
+              transform={`translate(${x + 9.5 + i * 10} ${cy})`}
+              className="car"
+            >
+              <rect width="7" height="12" rx="2" fill={CAR_COLOURS[seed % CAR_COLOURS.length]} />
+              <rect
+                x="1"
+                y={row ? 7.5 : 1.5}
+                width="5"
+                height="3"
+                rx="0.8"
+                className="windscreen"
+              />
+            </g>
+          );
+        }),
+      )}
     </g>
   );
 }
@@ -225,6 +331,7 @@ function Pot({ x, y, level }: { x: number; y: number; level: number }) {
   return (
     <g>
       <circle cx={x} cy={y} r="3.4" className="pot" />
+      <circle cx={x} cy={y} r="2.5" className="foliage" />
       {Array.from({ length: petals }, (_, i) => {
         const a = (i / petals) * Math.PI * 2;
         return (
@@ -271,6 +378,10 @@ function Greenhouse({ box: [x, y, w, h], level }: { box: Box; level: number }) {
           className="warmth"
         />
       )}
+      <path
+        className="sheen"
+        d={`M${inner[0] + inner[2] * 0.15} ${inner[1] + inner[3] - 4} L${inner[0] + inner[2] * 0.45} ${inner[1] + 4}`}
+      />
       {Array.from({ length: ribs }, (_, i) => {
         const rx = inner[0] + (inner[2] / (ribs + 1)) * (i + 1);
         return <path key={i} className="rib" d={`M${rx} ${inner[1]} V${inner[1] + inner[3]}`} />;
@@ -362,25 +473,39 @@ function MirrorField({ count, level }: { count: number; level: number }) {
   );
 }
 
+/**
+ * A street tree seen from above: a lobed crown lit from the sun's side, with its shadow on the
+ * ground. Three kinds alternate along the streets (lime, plane, flowering cherry) so the canopy
+ * never looks stamped.
+ */
 function TreeArt({ x, y, r, level }: { x: number; y: number; r: number; level: number }) {
+  const kind = hash(x, y) % 3;
+  const lobes = kind === 1 ? 7 : 5;
+  const flowering = kind === 2 ? level >= 1 : level >= 2;
   return (
-    <g>
-      <circle cx={x + r * 0.35} cy={y + r * 0.35} r={r} className="tree-shadow" />
-      <circle cx={x} cy={y} r={r} className="foliage" opacity="0.88" />
-      <circle
-        cx={x - r * 0.28}
-        cy={y - r * 0.28}
-        r={r * 0.62}
-        className="foliage-light"
-        opacity="0.9"
-      />
-      {level >= 2 &&
-        [0, 2.1, 4.2].map((a) => (
+    <g className={`tree tree-${kind}`}>
+      <circle cx={x} cy={y} r={r * 0.95} className="tree-shadow" />
+      {Array.from({ length: lobes }, (_, i) => {
+        const a = (i / lobes) * Math.PI * 2 + kind;
+        return (
+          <circle
+            key={i}
+            cx={x + Math.cos(a) * r * 0.4}
+            cy={y + Math.sin(a) * r * 0.4}
+            r={r * (kind === 1 ? 0.56 : 0.64)}
+            className="foliage"
+          />
+        );
+      })}
+      <circle cx={x - r * 0.2} cy={y - r * 0.24} r={r * 0.55} className="foliage-light" />
+      <circle cx={x - r * 0.36} cy={y - r * 0.4} r={r * 0.2} className="canopy-glint" />
+      {flowering &&
+        [0, 1.3, 2.5, 3.8, 5].map((a) => (
           <circle
             key={a}
-            cx={x + Math.cos(a) * r * 0.55}
-            cy={y + Math.sin(a) * r * 0.55}
-            r="1.3"
+            cx={x + Math.cos(a + kind) * r * 0.58}
+            cy={y + Math.sin(a + kind) * r * 0.58}
+            r="1.2"
             className="blossom"
           />
         ))}
@@ -457,6 +582,19 @@ function Planter({ blooms }: { blooms: number }) {
   );
 }
 
+/** Zebra crossings on the four sides of every crossroads. */
+const CROSSINGS: string[] = STREETS.vertical.flatMap((vx) =>
+  STREETS.horizontal.flatMap((hy) => {
+    const w = STREETS.width;
+    return [
+      `M${vx + 2} ${hy - 4} H${vx + w - 2}`,
+      `M${vx + 2} ${hy + w + 4} H${vx + w - 2}`,
+      `M${vx - 4} ${hy + 2} V${hy + w - 2}`,
+      `M${vx + w + 4} ${hy + 2} V${hy + w - 2}`,
+    ];
+  }),
+);
+
 /** Synergies (§5.3) draw a golden flow between the two generators they link. */
 const FLOWS: Record<string, string> = {
   sharedCompost: 'M273 111 C273 150 268 160 268 195',
@@ -527,6 +665,25 @@ export const Neighbourhood = memo(function Neighbourhood({
             <stop offset="0%" className="light-a" />
             <stop offset="100%" className="light-b" />
           </linearGradient>
+          <linearGradient id="roof-sheen" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.32" />
+            <stop offset="55%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="100%" stopColor="#3b3328" stopOpacity="0.08" />
+          </linearGradient>
+          <pattern id="grass" width="14" height="12" patternUnits="userSpaceOnUse">
+            <path
+              className="grass-tuft"
+              d="M3 9 l-1 -3 M3 9 l0.6 -3.4 M3 9 l2 -2.4 M10 4 l-1 -2.6 M10 4 l1.2 -2.6"
+            />
+            <circle cx="8" cy="10" r="0.7" className="grass-flower" />
+          </pattern>
+          <pattern id="paving" width="6" height="6" patternUnits="userSpaceOnUse">
+            <path className="paving-joint" d="M0 0 H6 M0 3 H6 M3 0 V3 M0 3 V6" />
+          </pattern>
+          <pattern id="asphalt-grain" width="9" height="9" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="3" r="0.45" className="grain" />
+            <circle cx="6.5" cy="7" r="0.35" className="grain" />
+          </pattern>
           <radialGradient id="vignette" r="75%">
             <stop offset="70%" stopColor="#fbf6ec" stopOpacity="0" />
             <stop offset="100%" stopColor="#fbf6ec" stopOpacity="0.6" />
@@ -535,6 +692,7 @@ export const Neighbourhood = memo(function Neighbourhood({
 
         <g className="camera" style={{ transform: cameraTransform(camera) }}>
           <rect width={WORLD.width} height={WORLD.height} className="asphalt" />
+          <rect width={WORLD.width} height={WORLD.height} fill="url(#asphalt-grain)" />
           {STREETS.horizontal.map((y) => (
             <path key={y} className="lane" d={`M0 ${y + STREETS.width / 2} H${WORLD.width}`} />
           ))}
@@ -553,6 +711,22 @@ export const Neighbourhood = memo(function Neighbourhood({
               className="block"
             />
           ))}
+          {greenness > 0 &&
+            BLOCKS.map(([x, y, w, h]) => (
+              <rect
+                key={`grass-${x},${y}`}
+                x={x + 4}
+                y={y + 4}
+                width={w - 8}
+                height={h - 8}
+                rx="5"
+                fill="url(#grass)"
+                opacity={greenness}
+              />
+            ))}
+          {CROSSINGS.map((d) => (
+            <path key={d} className="crossing" d={d} />
+          ))}
           <rect
             x={COURTYARD[0]}
             y={COURTYARD[1]}
@@ -560,6 +734,14 @@ export const Neighbourhood = memo(function Neighbourhood({
             height={COURTYARD[3]}
             rx="4"
             fill={mix(PAVING, MEADOW, Math.min(1, pots / POT_SPOTS.length))}
+          />
+          <rect
+            x={COURTYARD[0]}
+            y={COURTYARD[1]}
+            width={courtW}
+            height={COURTYARD[3]}
+            rx="4"
+            fill="url(#paving)"
           />
 
           {CAR_PARKS.map((box, i) =>
@@ -573,20 +755,12 @@ export const Neighbourhood = memo(function Neighbourhood({
           {[...BUILDINGS, ...greyFarms].map(({ box, storeys }) => (
             <Shadow key={box.join()} box={box} storeys={storeys} />
           ))}
-          {[...greyRoofs, ...greyFarms].map(({ box }) => (
-            <Roof key={box.join()} box={box} fill={roofFill} />
+          {[...greyRoofs, ...greyFarms].map(({ box, storeys }) => (
+            <Roof key={box.join()} box={box} storeys={storeys} fill={roofFill} />
           ))}
-          {/* Roofs that carry a garden keep their grey edge under the beds. */}
-          {BUILDINGS.filter((b) => !greyRoofs.includes(b)).map(({ box }) => (
-            <rect
-              key={box.join()}
-              x={box[0]}
-              y={box[1]}
-              width={box[2]}
-              height={box[3]}
-              rx="2"
-              fill={roofFill}
-            />
+          {/* Roofs that carry a garden keep their grey edge and facade under the beds. */}
+          {BUILDINGS.filter((b) => !greyRoofs.includes(b)).map(({ box, storeys }) => (
+            <Roof key={box.join()} box={box} storeys={storeys} fill={roofFill} bare />
           ))}
 
           <Layer

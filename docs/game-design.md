@@ -434,6 +434,22 @@ L'or et le lilas (la couleur de la fleur d'héliotrope) forment le duo signature
 
 **Mouvement.** Animations lentes et fluides : l'héliotrope pivote doucement vers le curseur ou le soleil, les pétales s'ouvrent au clic, des particules de pollen dorées flottent. Rien de clignotant.
 
+**La fleur grandit (2026-10-10).** Demande d'Antoine : une fleur cliquable plus travaillée, qui évolue avec la progression. Elle pousse dans un pot en terre cuite sous l'arche, et passe par sept stades selon la Lumière gagnée pendant la Saison en cours (`src/ui/flower.ts`) :
+
+| Stade | Lumière de la Saison | La fleur montre |
+|---|---|---|
+| 0 Pousse | 0 | Deux cotylédons et un bourgeon vert |
+| 1 Bouton | 100 | Une tige, une paire de feuilles, une tête de boutons violets |
+| 2 Premières fleurs | 2 000 | Le cœur de la tête s'ouvre, les boutons restent au bord |
+| 3 Floraison | 10 000 (phase 2) | Une tête pleine, trois paires de feuilles nervurées |
+| 4 Bouquet | 1 M | Une tête latérale sur une ramification |
+| 5 Couronne | 10 M (phase 3) | Deux têtes latérales, du pollen doré flotte |
+| 6 Héliotrope solaire | 1 Md | Toutes les fleurs ouvertes, cœurs dorés, rayons qui tournent lentement |
+
+Les têtes sont des dômes de fleurettes à cinq lobes, disposées selon l'angle d'or, ouvertes du centre vers le bord comme les vraies cymes d'héliotrope. Le halo grandit et se teinte selon la saison visuelle. Chaque amélioration de clic (§5.2) dore un rameau sur l'arche, et chaque Saison accomplie laisse une graine dorée sur le bord du pot (jusqu'à six). Une Nouvelle Saison replante la fleur : elle repart en pousse. Au passage d'un stade, la plante s'étire et s'illumine une fois ; à chaque clic, les fleurettes s'ouvrent un peu plus ; au repos, la plante se balance très lentement. Aucun texte n'annonce les stades : seule l'image raconte.
+
+**Détails de la scène (2026-10-10).** Les bâtiments montrent leur façade sud (une bande de fenêtres dont la hauteur suit le nombre d'étages) et un toit éclairé du côté du soleil, avec ses équipements (verrières, citernes, climatiseurs). Les rues ont trottoirs et passages piétons, l'asphalte un léger grain, la cour un dallage. Les parkings ont des voitures aux teintes éteintes, les friches des fissures, des gravats et des herbes folles. Les arbres alternent trois essences (tilleul, platane, cerisier en fleur) à houppier lobé, avec une ombre qui suit le soleil. Quand le quartier reverdit, des touffes d'herbe et de petites fleurs gagnent les îlots.
+
 **Accessibilité.** Contraste AA sur tout le texte (l'or et le lilas servent d'accents, pas de couleur de texte sur fond clair), animations réduites si `prefers-reduced-motion`, aucune information portée par la couleur seule.
 
 ---

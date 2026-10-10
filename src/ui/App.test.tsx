@@ -39,6 +39,14 @@ describe('App', () => {
     expect(screen.getByLabelText('Encore à découvrir')).toHaveTextContent('100');
   });
 
+  it('grows the heliotrope from a sprout as Light is harvested', () => {
+    renderApp();
+    const panel = () => flower().closest('section')!;
+    expect(panel()).toHaveAttribute('data-stage', '0');
+    for (let i = 0; i < 100; i++) fireEvent.click(flower());
+    expect(panel()).toHaveAttribute('data-stage', '1');
+  });
+
   it('buys a generator once affordable and starts producing', () => {
     const store = renderApp();
     for (let i = 0; i < 15; i++) fireEvent.click(flower());
