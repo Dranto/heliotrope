@@ -4,17 +4,19 @@ import { exportSave } from '../game/save';
 import type { Settings } from '../game/state';
 import { t } from '../i18n';
 import { Dialog } from './Dialog';
+import { setMapRenderer, useMapRenderer } from './rendererPref';
 import { useGameState, useGameStore } from './useGame';
 
 type ResetStep = 'idle' | 'confirm' | 'final';
 
 /**
- * Options panel (docs/game-design.md §8, §9.4, §10.2, §14 Q1): language, number notation, reduced motion, sound, manual
+ * Options panel (docs/game-design.md §8, §9.4, §10.2, §10.4, §14 Q1): language, number notation, reduced motion, enhanced map, sound, manual
  * save, export, import, full reset.
  */
 export function Options({ onClose }: { onClose: () => void }) {
   const store = useGameStore();
   const { settings } = useGameState();
+  const renderer = useMapRenderer();
   const [exported] = useState(() => exportSave(store.getState()));
   const [importText, setImportText] = useState('');
   const [message, setMessage] = useState('');
@@ -99,6 +101,15 @@ export function Options({ onClose }: { onClose: () => void }) {
           {t.options.reducedMotion}
         </label>
         <p className="hint">{t.options.reducedMotionHint}</p>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={renderer === 'pixi'}
+            onChange={(event) => setMapRenderer(event.target.checked ? 'pixi' : 'svg')}
+          />
+          {t.options.enhancedMap}
+        </label>
+        <p className="hint">{t.options.enhancedMapHint}</p>
       </section>
 
       <section>
