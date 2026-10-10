@@ -207,6 +207,53 @@ describe('export and import', () => {
     expect(state).not.toHaveProperty('journal');
   });
 
+  it('migrates a v10 save into the first Cycle, with no Water yet (§7.4)', () => {
+    const v10 = JSON.stringify({
+      version: 10,
+      allTimeLight: 5e9,
+      totalLight: 1e9,
+      seeds: 15,
+      seasons: 3,
+      resources: { light: 200 },
+    });
+    const state = deserialize(v10, 0)!;
+    expect(state.version).toBe(STATE_VERSION);
+    expect(state.resources).toEqual({ light: 200, water: 0 });
+    expect(state.lightBeforeCycle).toBe(0);
+    expect(state.collectors).toEqual({ roofTanks: 0, swales: 0, ponds: 0, streams: 0 });
+    expect(state.sources).toBe(0);
+    expect(state.cycles).toBe(0);
+  });
+
+  it('keeps the Bioregion and Cycle totals consistent', () => {
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      allTimeLight: 1e9,
+      totalLight: 1e8,
+      lightBeforeCycle: 2e9,
+      resources: { light: 0, water: 50 },
+      allTimeWater: 10,
+      waterBeforeCycle: 5,
+      collectors: { roofTanks: 2, swales: -1, ponds: 1.5 },
+      sites: { wetlands: 3, cheat: 9 },
+      sources: 4,
+      cycles: 1,
+      rootedSeeds: 6,
+      seeds: 2,
+      talents: ['gardenersCoop', 'nightWatch', 'roofersCoop', 'mycorrhiza'],
+    });
+    const state = deserialize(json, 0)!;
+    expect(state.lightBeforeCycle).toBe(0);
+    expect(state.allTimeWater).toBe(50);
+    expect(state.waterBeforeCycle).toBe(0);
+    expect(state.collectors).toEqual({ roofTanks: 2, swales: 0, ponds: 0, streams: 0 });
+    expect(state.sites).toEqual({ wetlands: 3, meadows: 0, foodForests: 0, oldForest: 0 });
+    expect(state.sources).toBe(4);
+    expect(state.cycles).toBe(1);
+    // The rooted Seeds still pay for the talents learnt before the Cycle.
+    expect(state.talents).toEqual(['gardenersCoop', 'nightWatch', 'roofersCoop', 'mycorrhiza']);
+  });
+
   it('drops invalid Milestones, effects and settings', () => {
     const json = JSON.stringify({
       version: STATE_VERSION,

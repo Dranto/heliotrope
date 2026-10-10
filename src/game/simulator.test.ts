@@ -2,7 +2,17 @@ import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
 import { CHALLENGE_IDS, type ChallengeId } from './challenges';
 import { startNewSeason } from './seasons';
-import { learnReferenceTalents, PACING_TARGETS, simulate, simulateTwoSeasons } from './simulator';
+import {
+  ADVISED_CYCLE_TARGET,
+  learnReferenceTalents,
+  PACING_TARGETS,
+  simulate,
+  simulateFirstCycle,
+  simulateTwoSeasons,
+} from './simulator';
+
+// Shared by the describes below: playing two Seasons is the slow part.
+const twoSeasons = simulateTwoSeasons();
 
 describe('balancing simulator', () => {
   // Milestone 2 exit criterion (docs/game-design.md §12): the simulator reproduces the §8 pacing
@@ -32,7 +42,7 @@ describe('balancing simulator', () => {
 describe('two Seasons in a row', () => {
   // Milestone 3 exit criterion (docs/game-design.md §12): the second Season reaches every
   // pacing event sooner than the first.
-  const { first, second } = simulateTwoSeasons();
+  const { first, second } = twoSeasons;
 
   it('starts the second Season with the 10 advised Seeds', () => {
     expect(second.state.seasons).toBe(1);
@@ -57,7 +67,7 @@ describe('two Seasons in a row', () => {
 describe('challenge Seasons (§7.3)', () => {
   // Third Season of the reference player, as a challenge: each one should take a little longer
   // than a free Season (about 30 min at this point), and stay winnable within the hour.
-  const { second } = simulateTwoSeasons();
+  const { second } = twoSeasons;
   const start = (id: ChallengeId) => learnReferenceTalents(startNewSeason(second.state, id));
 
   it.each(CHALLENGE_IDS)(
@@ -69,4 +79,27 @@ describe('challenge Seasons (§7.3)', () => {
     },
     30_000,
   );
+});
+
+describe('the Bioregion and the first Cycle of water (§7.4)', () => {
+  // The reference player goes on from the second Season, each Season played until it doubles
+  // its Seeds, with the Bioregion from the third one.
+  const { first, second } = twoSeasons;
+  const run = simulateFirstCycle({ from: second.state, elapsed: first.seconds + second.seconds });
+
+  it('opens the Bioregion with the third Season, after two hours or so', () => {
+    expect(run.bioregionOpened).toBeGreaterThan(90 * 60);
+    expect(run.bioregionOpened).toBeLessThan(3 * 3600);
+  });
+
+  it('builds collectors and raises every site before the first Cycle', () => {
+    expect(Object.values(run.state.collectors).every((n) => n > 0)).toBe(true);
+    expect(Object.values(run.state.sites).every((n) => n > 0)).toBe(true);
+  });
+
+  it('makes the first Cycle advisable within ±30% of its target', () => {
+    const ratio = run.advisedCycle! / ADVISED_CYCLE_TARGET;
+    expect(ratio).toBeGreaterThanOrEqual(0.7);
+    expect(ratio).toBeLessThanOrEqual(1.3);
+  });
 });

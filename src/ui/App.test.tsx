@@ -500,4 +500,36 @@ describe('App', () => {
       'false',
     );
   });
+  it('gathers Water in the Bioregion, raises a site and opens the Water Cycle (§7.4)', () => {
+    saveGame({
+      ...createInitialState(0),
+      seasons: 2,
+      seeds: 10,
+      totalLight: 2e7,
+      allTimeLight: 2e9,
+      resources: { light: 2e6, water: 0 },
+      allTimeWater: 4e5,
+    });
+    const store = renderApp();
+    const panel = screen.getByRole('region', { name: 'La Biorégion' });
+    fireEvent.click(within(panel).getByRole('button', { name: /bâtir citernes de toit/i }));
+    expect(store.getState().collectors.roofTanks).toBe(1);
+    expect(screen.getByTestId('water-chip')).toHaveTextContent('0');
+    act(() => store.dispatch((s) => tick(s, 60)));
+    expect(store.getState().resources.water).toBeCloseTo(60);
+    fireEvent.click(within(panel).getByRole('button', { name: /étendre zones humides/i }));
+    expect(store.getState().sites.wetlands).toBe(1);
+    // The land of the Bioregion is on the map, with its first wetland.
+    expect(screen.getByRole('radio', { name: 'La Biorégion' })).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-site="wetlands"] .marsh').length).toBeGreaterThan(0);
+    // One Source is already in reach.
+    fireEvent.click(screen.getByRole('button', { name: /Cycle de l’eau, 1 Sources à gagner/ }));
+    expect(screen.getByTestId('sources-gain')).toHaveTextContent('+1');
+    expect(screen.getByText('La rivière n’est pas encore prête')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer un nouveau Cycle' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Oui, recommencer le Cycle' }));
+    expect(store.getState().sources).toBe(1);
+    expect(store.getState().collectors.roofTanks).toBe(0);
+    expect(screen.getByTestId('sources-chip')).toHaveTextContent('1');
+  });
 });

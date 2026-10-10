@@ -75,8 +75,10 @@
 | **Lumière** ☀ | Monnaie principale, sert à tout acheter | Clic, générateurs, Papillon doré | Oui |
 | **Graines d'Héliotrope** 🌱 | Monnaie de prestige, bonus permanent | Nouvelle Saison | Non |
 | **Jalons** 🏅 | Succès, petit bonus global | Objectifs atteints | Non |
+| **Eau** 💧 *(M9)* | Deuxième ressource, étend les sites de la biorégion (§7.4) | Collecteurs d'eau, dès la 3ᵉ Saison | Non, seulement au Cycle de l'eau |
+| **Sources** *(M9)* | Deuxième monnaie de prestige, bonus permanent | Nouveau Cycle de l'eau (§7.4) | Jamais |
 
-Le MVP se limite volontairement à **une seule monnaie de jeu** (la Lumière). Une deuxième couche de ressources (eau, biodiversité, habitants) est prévue après le MVP (§13) : elle n'a de sens qu'une fois la boucle de base solide.
+Le MVP se limite volontairement à **une seule monnaie de jeu** (la Lumière). La deuxième couche, l'**Eau** de la Biorégion, arrive avec M9 (§7.4), une fois la boucle des Saisons riche.
 
 ---
 
@@ -380,6 +382,62 @@ Des voisins achètent à la place du joueur : ce sont les talents de la branche 
 - **Pendant le défi.** Une pastille sous le compteur montre l'espèce à gagner, le nom du défi et une jauge qui se remplit avec la Lumière de la Saison. À la victoire, la contrainte se lève, la scène retrouve sa lumière et l'espèce apparaît sur la carte.
 - **Rythme.** Le joueur de référence (§8) les gagne en 3ᵉ Saison en 33 à 40 min, contre une demi-heure environ pour une Saison libre : un peu plus long, jamais une punition. Le test du simulateur garde chaque défi entre 20 min et 1 h.
 
+
+### 7.4 La Biorégion et le Cycle de l'eau (M9)
+
+Le quartier s'ouvre sur sa biorégion : une plaine de champs entre quatre collines, traversée par la rivière qui passe sous la ville. Une deuxième ressource, l'**Eau**, et un deuxième prestige, le **Cycle de l'eau**, au-dessus des Saisons (décision D4 de la feuille de route). `src/game/bioregion.ts` et `src/game/cycles.ts`.
+
+**Ouverture.** Dès la 3ᵉ Saison (deux Saisons accomplies), puis pour toujours. La 1ʳᵉ et la 2ᵉ Saison gardent leurs décisions.
+
+**Collecteurs d'eau.** Bâtis avec de la Lumière, ils recueillent de l'Eau chaque seconde, en ligne comme hors ligne. Chacun coûte **4 fois** le précédent (contre +15 % pour un bâtiment) : l'Eau suit le temps passé plus que la Lumière, qui s'emballe en fin de Saison. Chaque collecteur se lie à un bâtiment du quartier (**+1 % d'Eau par exemplaire** du bâtiment), comme une synergie.
+
+| Collecteur | 1ᵉʳ prix (Lumière) | Eau / s | +1 % par |
+|---|---|---|---|
+| Citernes de toit | 1 M | 1 | Potager sur le toit |
+| Noues | 50 M | 8 | Héliotrope en pot |
+| Mares | 2 Md | 50 | Serre communautaire |
+| Ruisseaux rouverts | 100 Md | 400 | Canopée urbaine |
+
+L'Eau est multipliée par les Sources (+10 % chacune) et par le quartier déjà restauré : Jardins de pluie ×1,25, Rivière retrouvée ×1,5, projet Récupération de l'eau de pluie ×1,25 (nouveau bonus `water`, forme commune `Bonus`).
+
+**Sites de la biorégion.** Étendus avec l'Eau, niveau après niveau (×2,5 le prix à chaque niveau). Chaque niveau ajoute **+25 %** (additif dans le site) à la production de deux bâtiments du quartier : la biorégion nourrit la ville, plutôt qu'un multiplicateur isolé.
+
+| Site | 1ᵉʳ niveau (Eau) | Bâtiments relevés |
+|---|---|---|
+| Zones humides | 60 | Héliotrope en pot, Potager sur le toit |
+| Prairies agrivoltaïques | 600 | Panneau de balcon, Centrale à miroirs |
+| Forêts-jardins | 6 000 | Serre communautaire, Ferme verticale |
+| Forêt ancienne | 60 000 | Canopée urbaine, Arcologie vivante |
+
+Un collecteur apparaît quand la Saison a gagné la moitié de son premier prix, un site quand le Cycle a recueilli la moitié du sien ; le suivant reste une silhouette avec son prix. L'Eau, les collecteurs et les sites **restent d'une Saison à l'autre**.
+
+**Le Cycle de l'eau (deuxième prestige).**
+
+```
+sourcesTotalesMéritées = floor( sqrt( eauTotaleTousCycles / 4e5 ) )
+sourcesGagnées         = sourcesTotalesMéritées − sourcesDéjàObtenues
+bonusSources           = +10 % de production par Source (multiplicateur à part)
+                         +10 % d'Eau par Source
+                         chaque Graine vaut +1 % de plus par Source (5 % → 6 % avec une Source)
+```
+
+- **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
+- **Conservé :** les Sources, les **talents de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
+- Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
+- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 50** ; le test du simulateur le garde entre 2 h et 4 h. Les Saisons qui suivent la 3ᵉ deviennent très courtes pour ce joueur, avec ou sans Biorégion : c'est l'emballement déjà présent des Graines (+5 % chacune) et des talents, que les routines d'équilibrage pourront adoucir.
+
+**Écrans.** Un panneau **« La Biorégion »** sous « Bâtir » (onglet Bâtir sur mobile) liste les collecteurs (Bâtir ☀) puis les sites (Étendre 💧), avec l'Eau en réserve et par seconde. Une pastille d'Eau rejoint le compteur, puis une pastille des Sources. L'écran **« Le Cycle de l'eau »** (menu, dès qu'une Source est à gagner) reprend celui des Saisons : Sources, à faire jaillir, bonus avant/après, ce qui repart de zéro et ce qui reste, confirmation ; son ornement est une goutte qui tombe sous l'arche et ses ronds dans l'eau.
+
+**Sur la carte.** Une quatrième vue, **« La Biorégion »**, s'ouvre avec la 3ᵉ Saison (la carte y glisse une fois) : la ville et ses faubourgs au centre, puis la plaine. Sans texte, la carte raconte la biorégion qui revit :
+
+- la rivière descend des collines, passe en canal sous les faubourgs et rejoint celle de la ville ; des reflets glissent au fil de l'eau ;
+- chaque niveau de site transforme des champs : roselières et mares le long de la rivière (zones humides), prairies fleuries sous des rangées de panneaux avec quelques moutons (prairies agrivoltaïques), bosquets fruitiers à plusieurs étages (forêts-jardins), et la forêt ancienne qui gravit les collines anneau par anneau ;
+- les collecteurs se voient aussi : citernes rondes sur les toits et noues plantées le long des trottoirs dans la ville, mares au bord des faubourgs, ruisseaux qui descendent des collines vers la rivière ;
+- la plaine verdit à mesure que les sites grandissent, et une averse traverse lentement la région tant que l'Eau coule ;
+- chaque nouvel élément pousse avec l'entrée habituelle de la carte (anneau doré). Avec les animations réduites, ni averse ni reflets.
+
+**Jalons (12 de plus, famille « La Biorégion »).** Recueillir 1 000, 1 M, 1 Md Eau au total ; 10 et 50 collecteurs ; 1, 10 et 25 niveaux de sites ; « Bassin versant » (chacun des quatre sites étendu) ; 1 et 3 Cycles de l'eau ; caché : « Grandes eaux » (faire jaillir 25 Sources d'un coup).
+
 ---
 
 ## 8. Équilibrage
@@ -501,7 +559,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -574,6 +632,7 @@ Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fle
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, choix d'une Saison à défi (§7.3, dès la 2ᵉ Saison), bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi (§7.1) | 1ʳᵉ Graine |
+| **Cycle de l'eau** | Sources actuelles et à gagner, bonus avant/après, ce qui repart et ce qui reste, bouton Nouveau Cycle avec confirmation (§7.4) | 1ʳᵉ Source à gagner |
 | **Herbier** | Une planche par espèce, dessinée une fois revenue, silhouette avant, avec ce qui la ramène (§9.5) | 1ʳᵉ espèce ou 2ᵉ Saison |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons | Toujours |
 | **Options** | Langue (français ou anglais), notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
@@ -709,7 +768,7 @@ Idées à reprendre quand le MVP est stable, par ordre de priorité proposé :
 1. ~~**Carte du quartier.**~~ *Livré en M6 (§6.1).* Une grille de parcelles grises (friches, parkings, toits nus) à restaurer contre de la Lumière. Chaque parcelle restaurée apporte un bonus ciblé (un parc : +clic ; une rivière dépolluée : +1 h de plafond hors ligne ; un verger : +% à un générateur). Rend la restauration du monde concrète et visuelle.
 2. ~~**Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.~~ *Livré en M7 (§7.1), avec les Coopératives (§7.2).*
 3. **Cycle jour / nuit et batteries.** La production solaire varie au fil d'une journée de jeu ; des batteries stockent le surplus. À tester avec prudence : ne doit jamais punir le joueur absent.
-4. **Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.
+4. ~~**Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.~~ *Livré en M9 (§7.4).*
 5. ~~**Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.~~ *Livré en M8 (§7.3), avec l'Herbier (§9.5).*
 6. ~~**Sons discrets** (§1) et leur réglage de volume dans les Options.~~ *Livré en M6 (§6.3).*
 

@@ -300,6 +300,9 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
   return { first, second };
 }
 
+/** §7.4 pacing target: the first Cycle of water advisable, in seconds of play. */
+export const ADVISED_CYCLE_TARGET = 2.75 * 3600;
+
 /** §8 pacing targets for a first active playthrough, in seconds. */
 export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   pot: 15,
@@ -332,13 +335,19 @@ export interface CycleSimulation {
 /**
  * §7.4 pacing: play Season after Season, with the Bioregion from the third one, until the first
  * Cycle of water is advisable (ADVISED_FIRST_CYCLE_SOURCES Sources) or `maxSeconds` have passed.
+ * `from` resumes a run already `elapsed` seconds in, e.g. after simulateTwoSeasons.
  */
 export function simulateFirstCycle({
   maxSeconds = 12 * 3600,
+  from = createInitialState(0),
+  elapsed = 0,
   ...options
-}: Omit<SimulationOptions, 'state' | 'stopAtSeeds'> = {}): CycleSimulation {
-  let state = createInitialState(0);
-  let total = 0;
+}: Omit<SimulationOptions, 'state' | 'stopAtSeeds'> & {
+  from?: GameState;
+  elapsed?: number;
+} = {}): CycleSimulation {
+  let state = from;
+  let total = elapsed;
   const seasons: number[] = [];
   let bioregionOpened: number | undefined;
   while (total < maxSeconds && sourcesToGain(state) < ADVISED_FIRST_CYCLE_SOURCES) {

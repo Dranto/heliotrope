@@ -8,7 +8,9 @@ import {
   learnReferenceTalents,
   PACING_TARGETS,
   REFERENCE_CLICKS_PER_SECOND,
+  ADVISED_CYCLE_TARGET,
   simulate,
+  simulateFirstCycle,
   simulateTwoSeasons,
 } from '../src/game/simulator';
 
@@ -79,3 +81,19 @@ for (const id of CHALLENGE_IDS) {
   console.log(id.padEnd(16), minutes(challengeWon).padStart(12));
 }
 console.log('Species back after two Seasons:', second.state.species.join(', ') || 'none');
+
+// The Bioregion and the first Cycle of water (§7.4): each later Season doubles the Seeds.
+const cycle = simulateFirstCycle({
+  clicksPerSecond,
+  from: second.state,
+  elapsed: first.seconds + second.seconds,
+});
+console.log('\nBioregion opened at:', minutes(cycle.bioregionOpened));
+console.log('Later Seasons:', cycle.seasons.map((s) => minutes(s)).join(' · '));
+console.log(
+  'First Cycle advisable at:',
+  minutes(cycle.advisedCycle),
+  `(target ${minutes(ADVISED_CYCLE_TARGET)})`,
+);
+console.log('Collectors:', JSON.stringify(cycle.state.collectors));
+console.log('Sites:', JSON.stringify(cycle.state.sites));

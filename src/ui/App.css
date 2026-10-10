@@ -1684,7 +1684,7 @@ button {
   opacity: 0.55;
 }
 
-.cycle-button {
+.season-button.cycle-button {
   background: linear-gradient(135deg, var(--water-deep), var(--water));
   color: #fff;
 }
