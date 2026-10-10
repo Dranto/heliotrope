@@ -272,18 +272,6 @@ describe('App', () => {
     expect(screen.getByText('Jalon atteint : Main tendue')).toBeInTheDocument();
   });
 
-  it('writes the neighbourhood journal as the game goes', () => {
-    let now = 0;
-    const store = renderApp(new GameStore(localStorage, () => now));
-    now = 100;
-    expect(screen.getByText('Le carnet est encore vierge. Touchez la fleur.')).toBeInTheDocument();
-    fireEvent.click(flower());
-    act(() => store.step());
-    expect(screen.getByText(/l’héliotrope s’est tournée vers nous/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /journal du quartier/i }));
-    expect(screen.getByRole('dialog', { name: 'Journal du quartier' })).toBeInTheDocument();
-  });
-
   it('switches to scientific notation from the options and keeps the choice', () => {
     const base = createInitialState(0);
     saveGame({ ...base, resources: { light: 2e6 }, totalLight: 2e6 });

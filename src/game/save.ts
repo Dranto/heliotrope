@@ -1,7 +1,6 @@
 import { isAchievementId, type AchievementId } from './achievements';
 import { EFFECTS, type ActiveEffect } from './effects';
 import { GENERATOR_IDS } from './generators';
-import { isJournalId, type JournalId } from './journal';
 import { RESOURCE_IDS } from './resources';
 import { isUpgradeId, type UpgradeId } from './upgrades';
 import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameState } from './state';
@@ -32,6 +31,8 @@ const migrations: Record<number, Migration> = {
   // defaults come from the fresh state in deserialize; Milestones already earned unlock on the
   // first tick.
   4: (raw) => ({ ...raw, version: 5 }),
+  // v6 removes the neighbourhood journal: the story is told through gameplay only (§6).
+  5: ({ journal: _journal, ...rest }) => ({ ...rest, version: 6 }),
 };
 
 function isFiniteNumber(value: unknown): value is number {
@@ -112,9 +113,6 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (Array.isArray(data.achievements)) {
     state.achievements = [...new Set<AchievementId>(data.achievements.filter(isAchievementId))];
-  }
-  if (Array.isArray(data.journal)) {
-    state.journal = [...new Set<JournalId>(data.journal.filter(isJournalId))];
   }
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;

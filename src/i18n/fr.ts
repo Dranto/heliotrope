@@ -2,7 +2,6 @@
 // English translation can be added later).
 import type { AchievementId } from '../game/achievements';
 import type { GeneratorId } from '../game/generators';
-import type { JournalId } from '../game/journal';
 import type { VisualSeason } from '../game/phases';
 import type { ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
@@ -161,35 +160,6 @@ export const fr = {
       idle: 'Ne rien acheter pendant 10 minutes',
       earlySowing: 'Commencer une Saison avant que la terre soit prête',
     },
-  },
-  journal: {
-    title: 'Journal du quartier',
-    open: 'Lire le journal',
-    close: 'Fermer le journal',
-    empty: 'Le carnet est encore vierge. Touchez la fleur.',
-    entries: {
-      firstLight: 'Sur le balcon, l’héliotrope s’est tournée vers nous.',
-      firstPot: 'Un deuxième pot a rejoint le premier. La rambarde sent la vanille.',
-      firstPanel: 'Le panneau est branché. La lampe de la cuisine s’allume au soleil.',
-      neighbourAsks: 'Mme Okafor a ramené des boutures de sa sœur.',
-      firstGarden: 'Sur le toit, les premières tomates rougissent. Karim a monté du terreau.',
-      quarterWakes:
-        'Les voisins du troisième ont repeint leur balcon en vert. Le quartier se réveille.',
-      firstGreenhouse:
-        'La serre communautaire ouvre le samedi matin. Il y a du café pour tout le monde.',
-      firstButterfly:
-        'Un papillon doré s’est posé sur la rambarde. Les enfants l’ont suivi jusqu’au parc.',
-      firstFarm: 'La vieille tour de bureaux cultive maintenant des laitues sur douze étages.',
-      streetVote: 'La rue des Tilleuls a voté pour un jardin partagé.',
-      cityWakes: 'Depuis le toit, on voit d’autres quartiers verdir. Nous ne sommes plus seuls.',
-      firstMirrors: 'Au bord de la ville, mille miroirs suivent le soleil entre les pommiers.',
-      firstCanopy: 'Les platanes se rejoignent au-dessus de l’avenue. On y marche à l’ombre.',
-      tenMilestones: 'Le journal tient maintenant sur un carnet entier. Lucie veut l’imprimer.',
-      firstArcology: 'L’arcologie respire. Ses terrasses fleurissent jusqu’au ciel.',
-      firstSeason: 'L’hiver est passé. Nous avons replanté, et la terre se souvient.',
-      secondSeason: 'Nouveau printemps. Les boutures de Mme Okafor ont fait le tour de la ville.',
-      fourSeasons: 'Quatre saisons ont passé. Le béton gris n’est plus qu’un souvenir.',
-    } satisfies Record<JournalId, string>,
   },
   welcomeTitle: 'Pendant votre absence…',
   welcomeBack: (light: string, duration: string) =>

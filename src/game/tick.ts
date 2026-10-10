@@ -8,7 +8,6 @@ import {
 import { unlockAchievements } from './achievements';
 import { advanceButterfly } from './butterfly';
 import type { GeneratorId } from './generators';
-import { unlockJournal } from './journal';
 import { earnLight } from './light';
 import type { GameState } from './state';
 import { UPGRADES, type UpgradeId } from './upgrades';
@@ -36,9 +35,9 @@ function produce(state: GameState, dtSeconds: number): GameState {
   return next;
 }
 
-/** Unlock the Milestones and journal entries the state now qualifies for. */
+/** Unlock the Milestones the state now qualifies for. */
 export function unlockProgress(state: GameState): GameState {
-  return unlockJournal(unlockAchievements(state));
+  return unlockAchievements(state);
 }
 
 /** Advance the simulation by dtSeconds of online play. Pure: returns a new state. */

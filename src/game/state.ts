@@ -2,13 +2,12 @@ import type { AchievementId } from './achievements';
 import type { ActiveEffect } from './effects';
 import type { Notation } from './format';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
-import type { JournalId } from './journal';
 import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -54,8 +53,6 @@ export interface GameState {
   idleSeconds: number;
   /** Milestones unlocked over all Seasons, in unlock order (§9.3): each adds +1% production. */
   achievements: AchievementId[];
-  /** Neighbourhood journal entries unlocked over all Seasons, in order (§6). */
-  journal: JournalId[];
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -95,7 +92,6 @@ export function createInitialState(now: number): GameState {
     seasonSeconds: 0,
     idleSeconds: 0,
     achievements: [],
-    journal: [],
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     effects: [],
