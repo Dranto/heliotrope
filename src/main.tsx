@@ -1,3 +1,5 @@
+import '@fontsource-variable/fraunces/full.css';
+import '@fontsource-variable/manrope';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GameStore } from './game/store';

@@ -1,13 +1,50 @@
-const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+// Number display rules from docs/game-design.md §8, in French notation:
+// full digits with a thin-space separator up to 999 999, then short long-scale suffixes
+// with 3 significant digits ("1,23 M", "45,6 Md"), then scientific notation.
 
-/** Short human-readable number: 1234 -> "1.23K". Falls back to exponent past the suffix list. */
+/** Narrow no-break space: the French thousands separator, and the space before a suffix. */
+const SPACE = ' ';
+
+/** Long-scale French suffixes, one per power of 1000 starting at 1e6. */
+const SUFFIXES = ['M', 'Md', 'Bn', 'Bd', 'Tn', 'Td', 'Qn', 'Qd'];
+
+const FIRST_SUFFIX_EXPONENT = 6;
+
+function groupThousands(integer: string): string {
+  return integer.replace(/\B(?=(\d{3})+(?!\d))/g, SPACE);
+}
+
+/** 3 significant digits for a value in [1, 1000), French decimal comma. */
+function threeDigits(value: number): string {
+  return value.toFixed(value < 10 ? 2 : value < 100 ? 1 : 0).replace('.', ',');
+}
+
+function formatAbs(abs: number): string {
+  if (abs < 1e6) {
+    // Small fractional values (rates such as 0,1/s) keep one decimal; the rest is whole.
+    const text = abs < 100 && !Number.isInteger(abs) ? abs.toFixed(1) : Math.round(abs).toFixed(0);
+    if (text === '1000000') return formatAbs(1e6);
+    const [integer = '', decimals] = text.split('.');
+    const grouped = groupThousands(integer);
+    return decimals === undefined || decimals === '0' ? grouped : `${grouped},${decimals}`;
+  }
+  let exponent = Math.floor(Math.log10(abs));
+  let mantissa = abs / 10 ** exponent;
+  // Rounding to 3 significant digits can carry over, e.g. 9,996 -> 10,0.
+  if (Number(mantissa.toFixed(2)) >= 10) {
+    exponent += 1;
+    mantissa /= 10;
+  }
+  const tier = Math.floor((exponent - FIRST_SUFFIX_EXPONENT) / 3);
+  const suffix = SUFFIXES[tier];
+  if (suffix === undefined) return `${threeDigits(mantissa)}e${exponent}`;
+  const scaled = mantissa * 10 ** ((exponent - FIRST_SUFFIX_EXPONENT) % 3);
+  return `${threeDigits(scaled)}${SPACE}${suffix}`;
+}
+
+/** Human-readable number for display: 12345 -> "12 345", 1.234e6 -> "1,23 M". */
 export function formatNumber(value: number): string {
   if (!Number.isFinite(value)) return String(value);
   const sign = value < 0 ? '-' : '';
-  const abs = Math.abs(value);
-  if (abs < 1000) return sign + (Number.isInteger(abs) ? String(abs) : abs.toFixed(1));
-  const tier = Math.floor(Math.log10(abs) / 3);
-  if (tier >= SUFFIXES.length) return sign + abs.toExponential(2).replace('+', '');
-  const scaled = abs / 1000 ** tier;
-  return sign + scaled.toFixed(scaled < 10 ? 2 : scaled < 100 ? 1 : 0) + SUFFIXES[tier];
+  return sign + formatAbs(Math.abs(value));
 }

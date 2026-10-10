@@ -18,13 +18,15 @@ a design decision changes, update that document in the same PR.
 ## Layout
 
 - `src/game/`: the simulation, framework-free and pure. No React or DOM imports here.
-  - `resources.ts`: resource catalogue (ids, names, base rates)
+  - `resources.ts`: resource ids (the MVP has one currency, Light)
+  - `generators.ts`: generator data table (base cost and production); add generators here
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
   - `tick.ts`: `tick(state, dtSeconds)` and player actions; pure functions returning new state
   - `offline.ts`: offline progress on load, capped by `MAX_OFFLINE_SECONDS`, simulated in chunks
   - `save.ts`: localStorage save/load with versioned migrations
   - `store.ts`: `GameStore`, which owns live state, the tick interval and autosave
-  - `format.ts`: number formatting for display
+  - `format.ts`: number formatting for display (French notation, design doc §8)
+- `src/i18n/fr.ts`: every player-facing text (UI strings, generator names and flavour lines).
 - `src/ui/`: React components. Read state with `useGameState()`, change it with
   `store.dispatch((s) => action(s))`.
 
