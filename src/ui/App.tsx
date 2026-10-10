@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ACHIEVEMENTS } from '../game/achievements';
+import { useCallback, useEffect, useState } from 'react';
 import type { CatchResult } from '../game/butterfly';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { phaseOf } from '../game/phases';
@@ -13,12 +12,12 @@ import {
 import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
 import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
-import { achievementName } from '../i18n/achievements';
 import { setLanguage, t } from '../i18n';
 import { Achievements } from './Achievements';
 import { Cooperatives } from './Cooperatives';
 import { Generators } from './Generators';
 import { useLayoutPref } from './layoutPrefs';
+import { MilestoneBloom } from './MilestoneBloom';
 import { Options } from './Options';
 import { Restoration } from './Restoration';
 import { Scene } from './Scene';
@@ -117,15 +116,6 @@ export function App() {
     setTimeout(() => setToasts((list) => list.filter((toast) => toast.id !== id)), TOAST_MS);
   }, []);
 
-  // Announce Milestones as they unlock, but not the ones already earned when the game loads.
-  const seenAchievements = useRef(state.achievements.length);
-  useEffect(() => {
-    const fresh = state.achievements.slice(seenAchievements.current);
-    seenAchievements.current = state.achievements.length;
-    if (fresh.length > 3) notify(t.achievements.unlockedMany(formatNumber(fresh.length)));
-    else for (const id of fresh) notify(t.achievements.unlocked(achievementName(ACHIEVEMENTS[id])));
-  }, [state.achievements, notify]);
-
   const onCatch = useCallback(
     ({ outcome, light }: CatchResult) => {
       notify(
@@ -155,7 +145,8 @@ export function App() {
             <path d="M9 15.5 8 21l4-2 4 2-1-5.5" />
           </svg>
           {t.achievements.open}
-          <span className="menu-count" aria-hidden="true">
+          {/* Re-mounted on each new Milestone, so the count glints once (§9.3). */}
+          <span key={state.achievements.length} className="menu-count" aria-hidden="true">
             {state.achievements.length}
           </span>
         </button>
@@ -342,6 +333,8 @@ export function App() {
           <span className="visually-hidden">{t.butterfly.arrives}</span>
         )}
       </div>
+
+      <MilestoneBloom />
 
       {screen === 'achievements' && <Achievements onClose={closeScreen} />}
       {screen === 'seasons' && (

@@ -2,76 +2,252 @@
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
 import { bonusesOf } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
+import { clickValue, lightPerSecond } from './production';
+import { lightForSeeds } from './seasons';
 import type { GameState } from './state';
+import { CLICK_UPGRADE_IDS, SYNERGY_IDS, type UpgradeId } from './upgrades';
 
 /** §9.3: each Milestone unlocked adds +1% to global production (additive). */
 export const ACHIEVEMENT_BONUS = 0.01;
 
+/** Upgrade groups a Milestone can ask to complete within one Season. */
+export const UPGRADE_SETS = {
+  synergies: SYNERGY_IDS,
+  clicks: CLICK_UPGRADE_IDS,
+} as const satisfies Record<string, readonly UpgradeId[]>;
+export type UpgradeSet = keyof typeof UPGRADE_SETS;
+
 export type AchievementCondition =
   | { kind: 'allTimeLight'; amount: number }
+  /** Light per second right now. */
+  | { kind: 'lightPerSecond'; amount: number }
+  /** Light of a single click right now, Pollinisation included. */
+  | { kind: 'clickValue'; amount: number }
   | { kind: 'owned'; generator: GeneratorId; count: number }
+  /** `count` units of `generator` and no other building. */
+  | { kind: 'onlyGenerator'; generator: GeneratorId; count: number }
+  /** `amount` Light earned this Season without owning any building. */
+  | { kind: 'noBuildings'; amount: number }
   | { kind: 'clicks'; count: number }
   | { kind: 'butterflies'; count: number }
   | { kind: 'seasons'; count: number }
   /** Every generator type owned at least `count` times. */
   | { kind: 'everyGenerator'; count: number }
+  /** Upgrades bought this Season. */
+  | { kind: 'upgrades'; count: number }
+  /** At least `count` upgrades of a group bought this Season. */
+  | { kind: 'upgradeSet'; set: UpgradeSet; count: number }
+  /** Parcels restored, kept across Seasons (§6.1). */
+  | { kind: 'parcels'; count: number }
+  /** Neighbourhood projects carried out this Season (§6.2). */
+  | { kind: 'projects'; count: number }
+  /** Talents learnt in the Tree of Seasons (§7.1). */
+  | { kind: 'talents'; count: number }
+  /** Purchases of every Cooperative together, over all Seasons (§7.2). */
+  | { kind: 'cooperativePurchases'; count: number }
+  /** Seconds of play over all Seasons. */
+  | { kind: 'playSeconds'; seconds: number }
+  /** Seconds of play in the current Season. */
+  | { kind: 'seasonSeconds'; seconds: number }
+  /** The Season earns the Light of `seeds` Seeds (§7) within `seconds` of play. */
+  | { kind: 'swiftSeason'; seeds: number; seconds: number }
   /** Seconds without buying anything, with at least one generator owned. */
   | { kind: 'idle'; seconds: number }
   /** Unlocked by an action rather than by the state, see `unlockAchievement`. */
   | { kind: 'action' };
 
-const LIGHT_EXPONENTS = [3, 6, 9, 12, 15, 18] as const;
-const OWNED_STEPS = [1, 50, 100] as const;
-const CLICK_STEPS = [100, 1_000, 10_000] as const;
-const BUTTERFLY_STEPS = [1, 10, 50] as const;
-const SEASON_STEPS = [1, 5, 10] as const;
+/** Display families of the Milestones screen, in order. */
+export const ACHIEVEMENT_FAMILIES = [
+  'light',
+  'buildings',
+  'upgrades',
+  'clicks',
+  'butterflies',
+  'neighbourhood',
+  'seasons',
+] as const;
+export type AchievementFamily = (typeof ACHIEVEMENT_FAMILIES)[number];
+
+const LIGHT_EXPONENTS = [3, 6, 9, 12, 15, 18, 21, 24] as const;
+const RATE_EXPONENTS = [3, 6, 9] as const;
+const OWNED_STEPS = [1, 50, 100, 200] as const;
+const UPGRADE_STEPS = [10, 25, 50, 75] as const;
+const CLICK_STEPS = [10, 100, 1_000, 10_000, 100_000] as const;
+const CLICK_VALUE_EXPONENTS = [3, 6] as const;
+const BUTTERFLY_STEPS = [1, 10, 25, 50, 100] as const;
+const PARCEL_STEPS = [1, 4, 8] as const;
+const PROJECT_STEPS = [1, 8, 15] as const;
+const TALENT_STEPS = [1, 9, 17] as const;
+const COOPERATIVE_STEPS = [100, 1_000] as const;
+const SEASON_STEPS = [1, 3, 5, 10, 25] as const;
+const PLAY_HOURS = [1, 24] as const;
 
 export type AchievementId =
   | `light.${(typeof LIGHT_EXPONENTS)[number]}`
+  | `rate.${(typeof RATE_EXPONENTS)[number]}`
   | `${GeneratorId}.${(typeof OWNED_STEPS)[number]}`
+  | `upgrades.${(typeof UPGRADE_STEPS)[number]}`
   | `clicks.${(typeof CLICK_STEPS)[number]}`
+  | `clickValue.${(typeof CLICK_VALUE_EXPONENTS)[number]}`
   | `butterflies.${(typeof BUTTERFLY_STEPS)[number]}`
+  | `parcels.${(typeof PARCEL_STEPS)[number]}`
+  | `projects.${(typeof PROJECT_STEPS)[number]}`
+  | `talents.${(typeof TALENT_STEPS)[number]}`
+  | `cooperatives.${(typeof COOPERATIVE_STEPS)[number]}`
   | `seasons.${(typeof SEASON_STEPS)[number]}`
+  | `playHours.${(typeof PLAY_HOURS)[number]}`
   | 'mosaic'
+  | 'patchwork'
+  | 'wildGarden'
+  | 'onlyPots'
+  | 'sleepingSeed'
+  | 'firstThread'
+  | 'goldenWeb'
+  | 'goldenHands'
+  | 'goldenPollen'
+  | 'justInTime'
+  | 'swiftSeason'
+  | 'longSeason'
+  | 'lateHarvest'
   | 'slowPhotosynthesis'
-  | 'earlySowing'
-  | 'wildGarden';
+  | 'earlySowing';
 
 export interface AchievementDef {
   id: AchievementId;
+  family: AchievementFamily;
   condition: AchievementCondition;
   /** Hidden Milestones show as "?" until unlocked. */
   hidden?: boolean;
 }
 
-/** Display order: Light, buildings, clicks, butterflies, Seasons, then the special ones. */
+/** Display order: by family, each one from the easiest to the farthest goal. */
 export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
+  // Light.
   ...LIGHT_EXPONENTS.map((exponent) => ({
     id: `light.${exponent}` as const,
+    family: 'light' as const,
     condition: { kind: 'allTimeLight', amount: 10 ** exponent } as const,
   })),
+  ...RATE_EXPONENTS.map((exponent) => ({
+    id: `rate.${exponent}` as const,
+    family: 'light' as const,
+    condition: { kind: 'lightPerSecond', amount: 10 ** exponent } as const,
+  })),
+  // Buildings.
   ...GENERATOR_IDS.flatMap((generator) =>
     OWNED_STEPS.map((count) => ({
       id: `${generator}.${count}` as const,
+      family: 'buildings' as const,
       condition: { kind: 'owned', generator, count } as const,
     })),
   ),
+  { id: 'mosaic', family: 'buildings', condition: { kind: 'everyGenerator', count: 10 } },
+  { id: 'patchwork', family: 'buildings', condition: { kind: 'everyGenerator', count: 50 } },
+  {
+    id: 'wildGarden',
+    family: 'buildings',
+    condition: { kind: 'everyGenerator', count: 100 },
+    hidden: true,
+  },
+  {
+    id: 'onlyPots',
+    family: 'buildings',
+    condition: { kind: 'onlyGenerator', generator: 'pot', count: 50 },
+    hidden: true,
+  },
+  // Upgrades.
+  ...UPGRADE_STEPS.map((count) => ({
+    id: `upgrades.${count}` as const,
+    family: 'upgrades' as const,
+    condition: { kind: 'upgrades', count } as const,
+  })),
+  {
+    id: 'firstThread',
+    family: 'upgrades',
+    condition: { kind: 'upgradeSet', set: 'synergies', count: 1 },
+  },
+  {
+    id: 'goldenWeb',
+    family: 'upgrades',
+    condition: { kind: 'upgradeSet', set: 'synergies', count: SYNERGY_IDS.length },
+  },
+  {
+    id: 'goldenHands',
+    family: 'upgrades',
+    condition: { kind: 'upgradeSet', set: 'clicks', count: CLICK_UPGRADE_IDS.length },
+  },
+  // Clicks.
   ...CLICK_STEPS.map((count) => ({
     id: `clicks.${count}` as const,
+    family: 'clicks' as const,
     condition: { kind: 'clicks', count } as const,
   })),
+  ...CLICK_VALUE_EXPONENTS.map((exponent) => ({
+    id: `clickValue.${exponent}` as const,
+    family: 'clicks' as const,
+    condition: { kind: 'clickValue', amount: 10 ** exponent } as const,
+  })),
+  {
+    id: 'sleepingSeed',
+    family: 'clicks',
+    condition: { kind: 'noBuildings', amount: 1_000 },
+    hidden: true,
+  },
+  // Golden Butterfly.
   ...BUTTERFLY_STEPS.map((count) => ({
     id: `butterflies.${count}` as const,
+    family: 'butterflies' as const,
     condition: { kind: 'butterflies', count } as const,
   })),
+  { id: 'goldenPollen', family: 'butterflies', condition: { kind: 'action' } },
+  { id: 'justInTime', family: 'butterflies', condition: { kind: 'action' }, hidden: true },
+  // Neighbourhood: parcels, projects, Tree of Seasons and Cooperatives.
+  ...PARCEL_STEPS.map((count) => ({
+    id: `parcels.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'parcels', count } as const,
+  })),
+  ...PROJECT_STEPS.map((count) => ({
+    id: `projects.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'projects', count } as const,
+  })),
+  ...TALENT_STEPS.map((count) => ({
+    id: `talents.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'talents', count } as const,
+  })),
+  ...COOPERATIVE_STEPS.map((count) => ({
+    id: `cooperatives.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'cooperativePurchases', count } as const,
+  })),
+  // Seasons and time.
   ...SEASON_STEPS.map((count) => ({
     id: `seasons.${count}` as const,
+    family: 'seasons' as const,
     condition: { kind: 'seasons', count } as const,
   })),
-  { id: 'mosaic', condition: { kind: 'everyGenerator', count: 10 } },
-  { id: 'slowPhotosynthesis', condition: { kind: 'idle', seconds: 600 }, hidden: true },
-  { id: 'earlySowing', condition: { kind: 'action' }, hidden: true },
-  { id: 'wildGarden', condition: { kind: 'everyGenerator', count: 100 }, hidden: true },
+  ...PLAY_HOURS.map((hours) => ({
+    id: `playHours.${hours}` as const,
+    family: 'seasons' as const,
+    condition: { kind: 'playSeconds', seconds: hours * 3600 } as const,
+  })),
+  {
+    id: 'swiftSeason',
+    family: 'seasons',
+    // The 10 Seeds advised for the first Season (§7), as a literal: seasons.ts imports this module.
+    condition: { kind: 'swiftSeason', seeds: 10, seconds: 30 * 60 },
+  },
+  { id: 'longSeason', family: 'seasons', condition: { kind: 'seasonSeconds', seconds: 4 * 3600 } },
+  { id: 'lateHarvest', family: 'seasons', condition: { kind: 'action' } },
+  {
+    id: 'slowPhotosynthesis',
+    family: 'seasons',
+    condition: { kind: 'idle', seconds: 600 },
+    hidden: true,
+  },
+  { id: 'earlySowing', family: 'seasons', condition: { kind: 'action' }, hidden: true },
 ];
 
 export const ACHIEVEMENTS = Object.fromEntries(ACHIEVEMENT_LIST.map((a) => [a.id, a])) as Record<
@@ -79,22 +255,46 @@ export const ACHIEVEMENTS = Object.fromEntries(ACHIEVEMENT_LIST.map((a) => [a.id
   AchievementDef
 >;
 
+/** Seeds gained at once by a new Season that unlocks "Moisson tardive". */
+export const LATE_HARVEST_SEEDS = 50;
+/** Seconds left on screen under which catching the butterfly unlocks "De justesse". */
+export const JUST_IN_TIME_SECONDS = 2;
+
 export function isAchievementId(value: unknown): value is AchievementId {
   return typeof value === 'string' && Object.hasOwn(ACHIEVEMENTS, value);
 }
 
-/** Additive production bonus from the Milestones unlocked, raised by parcels and projects. */
+/** Production bonus of one Milestone, raised by parcels and projects (§6.1, §6.2). */
+export function bonusPerAchievement(state: GameState): number {
+  return bonusesOf(state, 'perAchievement').reduce((sum, b) => sum + b.bonus, ACHIEVEMENT_BONUS);
+}
+
+/** Additive production bonus from the Milestones unlocked. */
 export function achievementBonus(state: GameState): number {
-  const extra = bonusesOf(state, 'perAchievement').reduce((sum, b) => sum + b.bonus, 0);
-  return state.achievements.length * (ACHIEVEMENT_BONUS + extra);
+  return state.achievements.length * bonusPerAchievement(state);
+}
+
+function buildingsOwned(state: GameState): number {
+  return GENERATOR_IDS.reduce((sum, id) => sum + state.generators[id], 0);
 }
 
 function isMet(state: GameState, condition: AchievementCondition): boolean {
   switch (condition.kind) {
     case 'allTimeLight':
       return state.allTimeLight >= condition.amount;
+    case 'lightPerSecond':
+      return lightPerSecond(state) >= condition.amount;
+    case 'clickValue':
+      return clickValue(state) >= condition.amount;
     case 'owned':
       return state.generators[condition.generator] >= condition.count;
+    case 'onlyGenerator':
+      return (
+        state.generators[condition.generator] >= condition.count &&
+        buildingsOwned(state) === state.generators[condition.generator]
+      );
+    case 'noBuildings':
+      return state.totalLight >= condition.amount && buildingsOwned(state) === 0;
     case 'clicks':
       return state.clicks >= condition.count;
     case 'butterflies':
@@ -103,6 +303,32 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.seasons >= condition.count;
     case 'everyGenerator':
       return GENERATOR_IDS.every((id) => state.generators[id] >= condition.count);
+    case 'upgrades':
+      return state.upgrades.length >= condition.count;
+    case 'upgradeSet': {
+      const set: readonly UpgradeId[] = UPGRADE_SETS[condition.set];
+      return state.upgrades.filter((id) => set.includes(id)).length >= condition.count;
+    }
+    case 'parcels':
+      return state.parcels.length >= condition.count;
+    case 'projects':
+      return state.projects.length >= condition.count;
+    case 'talents':
+      return state.talents.length >= condition.count;
+    case 'cooperativePurchases':
+      return (
+        Object.values(state.cooperatives.purchases).reduce((sum, n) => sum + n, 0) >=
+        condition.count
+      );
+    case 'playSeconds':
+      return state.playSeconds >= condition.seconds;
+    case 'seasonSeconds':
+      return state.seasonSeconds >= condition.seconds;
+    case 'swiftSeason':
+      return (
+        state.seasonSeconds <= condition.seconds &&
+        state.totalLight >= lightForSeeds(condition.seeds)
+      );
     case 'idle':
       return (
         state.idleSeconds >= condition.seconds && GENERATOR_IDS.some((id) => state.generators[id])

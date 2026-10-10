@@ -1,5 +1,5 @@
 // Prestige: the Seasons (docs/game-design.md §7). Pure formulas and the new Season transition.
-import { unlockAchievement, unlockAchievements } from './achievements';
+import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './achievements';
 import { keptGeneratorShare } from './bonuses';
 import { GENERATOR_IDS } from './generators';
 import { createInitialState, type GameState } from './state';
@@ -87,5 +87,7 @@ export function startNewSeason(state: GameState): GameState {
   };
   // Hidden Milestone (§9.3): sowing before the soil is ready.
   if (isSeasonPremature(state)) next = unlockAchievement(next, 'earlySowing');
+  // Milestone "Moisson tardive": a single Season that brings many Seeds at once.
+  if (seedsToGain(state) >= LATE_HARVEST_SEEDS) next = unlockAchievement(next, 'lateHarvest');
   return unlockAchievements(next);
 }

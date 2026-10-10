@@ -1,5 +1,6 @@
 // The Golden Butterfly (docs/game-design.md §9.2): a random visitor that grants a temporary
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
+import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
 import { effectDurationFactor, factorOf } from './bonuses';
 import { EFFECTS, type ActiveEffect, type EffectKind } from './effects';
 import { earnLight } from './light';
@@ -98,5 +99,7 @@ export function catchButterfly(state: GameState): CatchResult | null {
   } else {
     next = { ...next, effects: startEffect(state, outcome) };
   }
+  // Hidden Milestone "De justesse" (§9.3): caught in its last seconds on screen.
+  if (state.butterfly.visible <= JUST_IN_TIME_SECONDS) next = unlockAchievement(next, 'justInTime');
   return { state: scheduleNext(next), outcome, light };
 }

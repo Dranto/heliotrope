@@ -2079,6 +2079,207 @@ button {
 
 /* Milestones (§9.3) ----------------------------------------------------- */
 
+.menu-count {
+  animation: count-glint 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes count-glint {
+  30% {
+    background: var(--gold-soft);
+    box-shadow: 0 0 0 0.3rem rgb(233 169 59 / 0.25);
+    transform: scale(1.18);
+  }
+}
+
+/* A Milestone reached blooms as a laurel medallion under the top bar, then fades. */
+.milestone-bloom-area {
+  position: fixed;
+  top: 5.25rem;
+  left: 50%;
+  z-index: 25;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.milestone-bloom {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: max-content;
+  max-width: min(26rem, calc(100vw - 2rem));
+  padding: 0.55rem 1.4rem 0.55rem 0.6rem;
+  border: 1px solid rgb(233 169 59 / 0.45);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 2.5rem 50%, rgb(246 213 143 / 0.55), transparent 7rem),
+    linear-gradient(135deg, rgb(255 250 238 / 0.96), rgb(240 232 248 / 0.94));
+  box-shadow:
+    0 1px 2px rgb(47 107 79 / 0.08),
+    0 18px 40px -14px rgb(200 115 79 / 0.35);
+  backdrop-filter: blur(6px);
+  animation: bloom-life 4.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bloom-life {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.9rem) scale(0.92);
+  }
+  12%,
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.4rem) scale(0.98);
+  }
+}
+
+.bloom-medallion {
+  flex: none;
+  width: 3.6rem;
+  height: 3.6rem;
+  overflow: visible;
+}
+
+.bloom-halo {
+  fill: rgb(246 213 143 / 0.5);
+  transform-origin: 40px 40px;
+  animation: bloom-halo 1.4s ease-out 0.15s both;
+}
+
+@keyframes bloom-halo {
+  from {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+.bloom-disc {
+  fill: #fff7e2;
+}
+
+.bloom-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 40px 40px;
+  animation: bloom-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.bloom-stem {
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: bloom-draw 0.6s ease-out 0.35s both;
+}
+
+@keyframes bloom-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.bloom-leaf {
+  fill: var(--sage);
+  stroke: var(--leaf);
+  stroke-width: 0.6;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bloom-leaf 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes bloom-leaf {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+}
+
+.bloom-bud {
+  fill: var(--gold);
+  transform-origin: 40px 40px;
+  animation: bloom-bud 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.05s both;
+}
+
+@keyframes bloom-bud {
+  from {
+    transform: scale(0);
+  }
+}
+
+.bloom-petals ellipse {
+  fill: var(--lilac);
+  transform-origin: 40px 40px;
+}
+
+.bloom-petals {
+  transform-origin: 40px 40px;
+  animation: bloom-petals 1.6s ease-out 0.7s both;
+}
+
+@keyframes bloom-petals {
+  from {
+    opacity: 0;
+    scale: 0.55;
+    rotate: -20deg;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    scale: 1.35;
+    rotate: 15deg;
+  }
+}
+
+.bloom-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.bloom-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a5aa6;
+}
+
+.bloom-name {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.bloom-condition {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.bloom-bonus {
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--leaf);
+}
+
 .dialog.achievements {
   width: min(48rem, 100%);
 }
@@ -2089,11 +2290,32 @@ button {
   color: var(--leaf);
 }
 
+.achievement-family {
+  margin-top: 1.25rem;
+}
+
+.achievement-family-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--leaf);
+}
+
+.achievement-family-count {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
 .achievement-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   gap: 0.6rem;
-  margin: 1rem 0 0;
+  margin: 0.5rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -2110,7 +2332,8 @@ button {
   color: var(--ink-soft);
 }
 
-.achievement h3 {
+.achievement h4 {
+  margin: 0;
   font-size: 0.95rem;
 }
 
@@ -2391,6 +2614,10 @@ button {
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  .milestone-bloom-area {
+    top: 0.75rem;
   }
 
   .toasts {
