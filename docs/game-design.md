@@ -246,7 +246,7 @@ valeurClic          = 1 × multClic + pctClic × productionGlobale/s
 
 L'équilibrage doit être vérifié par un **simulateur sans interface** qui rejoue une stratégie simple (acheter à chaque instant l'option au meilleur ratio coût / gain de production) et sort le moment de chaque événement du tableau ci-dessus. Il réutilise exactement les mêmes fonctions de calcul et les mêmes données que le jeu. Tout changement de chiffre dans ce document devrait être accompagné d'une sortie du simulateur.
 
-**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Les Jalons et le Papillon doré (jalon 4) ne sont pas encore simulés : ils accéléreront la partie et demanderont une nouvelle passe.
+**Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison, le 1ᵉʳ Héliotrope en pot pas plus tard (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Les Jalons et le Papillon doré (jalon 4) ne sont pas encore simulés : ils accéléreront la partie et demanderont une nouvelle passe.
 
 Sortie actuelle (jalon 3) :
 
@@ -262,7 +262,7 @@ Sortie actuelle (jalon 3) :
 | 1ʳᵉ Arcologie vivante | ~3 h 30 | 3 h 04 | −13 % | 2 h 03 |
 | Saison conseillée (5 Md de Lumière dans la Saison) | ~4 h | 4 h 10 | +4 % | 2 h 48 |
 
-La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+La 2ᵉ Saison atteint les mêmes paliers environ un tiers plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu : le 1ᵉʳ Héliotrope en pot s'achète au mieux à 6 s dans les deux Saisons (15 clics), et l'écart de 10 s à 6 s ne vient que du moment où le simulateur réévalue ses choix. Le test exige donc seulement qu'il n'arrive pas plus tard.
 
 ### Affichage des nombres
 
