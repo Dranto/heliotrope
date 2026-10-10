@@ -289,9 +289,62 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('radio', { name: /scientifique/i }));
     expect(screen.getByTestId('light')).toHaveTextContent('2,00e6');
     fireEvent.click(screen.getByRole('checkbox', { name: 'Réduire les animations' }));
-    expect(store.getState().settings).toEqual({ notation: 'scientific', reducedMotion: true });
+    expect(store.getState().settings).toMatchObject({
+      notation: 'scientific',
+      reducedMotion: true,
+    });
     expect(new GameStore(localStorage, () => 0).getState().settings.notation).toBe('scientific');
     fireEvent.click(screen.getByRole('radio', { name: /suffixes courts/i }));
+  });
+
+  it('sets the volume and mutes the sounds from the options', () => {
+    const store = renderApp();
+    fireEvent.click(screen.getByRole('button', { name: 'Options' }));
+    fireEvent.change(screen.getByRole('slider', { name: /volume/i }), { target: { value: '20' } });
+    expect(store.getState().settings.volume).toBe(0.2);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Couper le son' }));
+    expect(store.getState().settings.muted).toBe(true);
+    expect(screen.getByRole('slider', { name: /volume/i })).toBeDisabled();
+    expect(new GameStore(localStorage, () => 0).getState().settings.muted).toBe(true);
+  });
+
+  it('restores a parcel from the panel under the map, and keeps it on the map', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, resources: { light: 2_000 }, totalLight: 2_000 });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    expect(screen.getByRole('heading', { name: 'Le quartier' })).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('button', { name: /restaurer rue jardin pour 1.500 lumière/i }),
+    );
+    expect(store.getState().parcels).toEqual(['gardenStreet']);
+    expect(document.querySelector('[data-parcel="gardenStreet"]')).not.toBeNull();
+    expect(screen.queryByRole('button', { name: /restaurer rue jardin/i })).toBeNull();
+  });
+
+  it('carries out a neighbourhood project, which leaves its mark on the map', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      resources: { light: 300 },
+      totalLight: 300,
+      generators: { ...base.generators, pot: 5 },
+    });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Lancer le projet Troc de graines pour 250 Lumière' }),
+    );
+    expect(store.getState().projects).toEqual(['seedSwap']);
+    expect(document.querySelector('[data-project="seedSwap"]')).not.toBeNull();
+  });
+
+  it('outlines an offered parcel on the map and restores it from its pin', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, resources: { light: 2_000 }, totalLight: 2_000 });
+    const store = renderApp(new GameStore(localStorage, () => 0));
+    const offer = document.querySelector('[data-offer="gardenStreet"]')!;
+    expect(offer).toHaveAttribute('data-ready', 'true');
+    fireEvent.click(offer.querySelector('.pin')!);
+    expect(store.getState().parcels).toEqual(['gardenStreet']);
   });
 
   it('offers a tab bar for small screens (§10.3)', () => {

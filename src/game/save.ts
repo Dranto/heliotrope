@@ -1,10 +1,12 @@
 import { isAchievementId, type AchievementId } from './achievements';
-import { EFFECTS, type ActiveEffect } from './effects';
+import type { ActiveEffect } from './effects';
 import { GENERATOR_IDS } from './generators';
 import { RESOURCE_IDS } from './resources';
 import { isUpgradeId, type UpgradeId } from './upgrades';
 import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameState } from './state';
-import { BUTTERFLY_VISIBLE_SECONDS } from './butterfly';
+import { BUTTERFLY_VISIBLE_SECONDS, effectSeconds } from './butterfly';
+import { isParcelId, type ParcelId } from './parcels';
+import { isProjectId, type ProjectId } from './projects';
 
 export const SAVE_KEY = 'heliotrope.save';
 
@@ -33,6 +35,9 @@ const migrations: Record<number, Migration> = {
   4: (raw) => ({ ...raw, version: 5 }),
   // v6 removes the neighbourhood journal: the story is told through gameplay only (§6).
   5: ({ journal: _journal, ...rest }) => ({ ...rest, version: 6 }),
+  // v7 adds restored parcels, neighbourhood projects and the sound settings (§6.1, §6.2,
+  // §10.2). Their defaults come from the fresh state: nothing restored, sound on.
+  6: (raw) => ({ ...raw, version: 7 }),
 };
 
 function isFiniteNumber(value: unknown): value is number {
@@ -43,14 +48,15 @@ function isCount(value: unknown): value is number {
   return isFiniteNumber(value) && Number.isInteger(value) && value >= 0;
 }
 
-function isEffect(value: unknown): value is ActiveEffect {
+/** A running effect, no longer than the parcels and projects of `state` allow. */
+function isEffect(value: unknown, state: GameState): value is ActiveEffect {
   if (typeof value !== 'object' || value === null) return false;
   const { kind, remaining } = value as Record<string, unknown>;
   return (
     (kind === 'bloom' || kind === 'pollination') &&
     isFiniteNumber(remaining) &&
     remaining > 0 &&
-    remaining <= EFFECTS[kind].seconds
+    remaining <= effectSeconds(state, kind)
   );
 }
 
@@ -114,6 +120,12 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.achievements)) {
     state.achievements = [...new Set<AchievementId>(data.achievements.filter(isAchievementId))];
   }
+  if (Array.isArray(data.parcels)) {
+    state.parcels = [...new Set<ParcelId>(data.parcels.filter(isParcelId))];
+  }
+  if (Array.isArray(data.projects)) {
+    state.projects = [...new Set<ProjectId>(data.projects.filter(isProjectId))];
+  }
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;
   if (
@@ -130,7 +142,7 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.effects)) {
     // At most one running effect of each kind.
     state.effects = data.effects
-      .filter(isEffect)
+      .filter((effect): effect is ActiveEffect => isEffect(effect, state))
       .filter((effect, i, list) => list.findIndex((e) => e.kind === effect.kind) === i);
   }
   if (isCount(data.rngSeed) && data.rngSeed <= 0xffffffff) state.rngSeed = data.rngSeed;
@@ -140,6 +152,12 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (typeof settings?.reducedMotion === 'boolean') {
     state.settings = { ...state.settings, reducedMotion: settings.reducedMotion };
+  }
+  if (isFiniteNumber(settings?.volume) && settings.volume >= 0 && settings.volume <= 1) {
+    state.settings = { ...state.settings, volume: settings.volume };
+  }
+  if (typeof settings?.muted === 'boolean') {
+    state.settings = { ...state.settings, muted: settings.muted };
   }
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
   return state;

@@ -54,9 +54,9 @@ export function isSeasonsScreenUnlocked(state: GameState): boolean {
 }
 
 /**
- * Player action: start a new Season (§7). Resets Light, generators, upgrades, the Season total
- * and running butterfly effects; keeps Seeds (plus the ones gained), Milestones,
- * all-time statistics, options and the clock.
+ * Player action: start a new Season (§7). Resets Light, generators, upgrades, projects, the
+ * Season total and running butterfly effects; keeps Seeds (plus the ones gained), Milestones,
+ * restored parcels, all-time statistics, options and the clock.
  * Returns the same state when no Seed would be gained.
  */
 export function startNewSeason(state: GameState): GameState {
@@ -70,6 +70,7 @@ export function startNewSeason(state: GameState): GameState {
     clicks: state.clicks,
     playSeconds: state.playSeconds,
     achievements: state.achievements,
+    parcels: state.parcels,
     butterflies: state.butterflies,
     butterfly: { nextIn: state.butterfly.nextIn || fresh.butterfly.nextIn, visible: 0 },
     rngSeed: state.rngSeed,

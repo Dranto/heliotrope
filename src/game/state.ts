@@ -2,12 +2,14 @@ import type { AchievementId } from './achievements';
 import type { ActiveEffect } from './effects';
 import type { Notation } from './format';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
+import type { ParcelId } from './parcels';
+import type { ProjectId } from './projects';
 import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 6;
+export const STATE_VERSION = 7;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -25,6 +27,10 @@ export interface Settings {
   notation: Notation;
   /** §10.4: slow or stop decorative animations, on top of prefers-reduced-motion. */
   reducedMotion: boolean;
+  /** §10.2: volume of the sounds, from 0 to 1. */
+  volume: number;
+  /** §10.2: silence every sound without losing the volume. */
+  muted: boolean;
 }
 
 export interface GameState {
@@ -53,6 +59,10 @@ export interface GameState {
   idleSeconds: number;
   /** Milestones unlocked over all Seasons, in unlock order (§9.3): each adds +1% production. */
   achievements: AchievementId[];
+  /** Parcels restored, in order (§6.1). Kept across Seasons. */
+  parcels: ParcelId[];
+  /** Neighbourhood projects carried out this Season, in order (§6.2). */
+  projects: ProjectId[];
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -74,7 +84,12 @@ export function butterflyDelay(random: number): number {
   return BUTTERFLY_MIN_INTERVAL + random * (BUTTERFLY_MAX_INTERVAL - BUTTERFLY_MIN_INTERVAL);
 }
 
-export const DEFAULT_SETTINGS: Settings = { notation: 'short', reducedMotion: false };
+export const DEFAULT_SETTINGS: Settings = {
+  notation: 'short',
+  reducedMotion: false,
+  volume: 0.5,
+  muted: false,
+};
 
 export function createInitialState(now: number): GameState {
   const [random, rngSeed] = nextRandom(seedFrom(now));
@@ -92,6 +107,8 @@ export function createInitialState(now: number): GameState {
     seasonSeconds: 0,
     idleSeconds: 0,
     achievements: [],
+    parcels: [],
+    projects: [],
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     effects: [],

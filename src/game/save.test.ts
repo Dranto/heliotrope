@@ -8,7 +8,7 @@ import {
   saveGame,
   serialize,
 } from './save';
-import { createInitialState, STATE_VERSION, type GameState } from './state';
+import { createInitialState, DEFAULT_SETTINGS, STATE_VERSION, type GameState } from './state';
 
 function playedState(): GameState {
   const base = createInitialState(1000);
@@ -26,11 +26,13 @@ function playedState(): GameState {
     seasonSeconds: 600,
     idleSeconds: 30,
     achievements: ['light.3', 'pot.1'],
+    parcels: ['gardenStreet', 'river'],
+    projects: ['seedSwap'],
     butterflies: 3,
     butterfly: { nextIn: 0, visible: 4.5 },
     effects: [{ kind: 'bloom', remaining: 20 }],
     rngSeed: 123_456,
-    settings: { notation: 'scientific', reducedMotion: true },
+    settings: { notation: 'scientific', reducedMotion: true, volume: 0.3, muted: true },
   };
 }
 
@@ -174,7 +176,7 @@ describe('export and import', () => {
     expect(state.generators.pot).toBe(2);
     expect(state.achievements).toEqual([]);
     expect(state).not.toHaveProperty('journal');
-    expect(state.settings).toEqual({ notation: 'short', reducedMotion: false });
+    expect(state.settings).toEqual(DEFAULT_SETTINGS);
     expect(state.butterfly.visible).toBe(0);
   });
 
@@ -198,7 +200,7 @@ describe('export and import', () => {
       butterfly: { nextIn: 1e9, visible: 99 },
       effects: [{ kind: 'bloom', remaining: 1e6 }, { kind: 'magic', remaining: 3 }, null],
       rngSeed: -5,
-      settings: { notation: 'roman', reducedMotion: 'yes' },
+      settings: { notation: 'roman', reducedMotion: 'yes', volume: 3, muted: 'no' },
     });
     const state = deserialize(json, 0)!;
     const fresh = createInitialState(0);
@@ -208,5 +210,46 @@ describe('export and import', () => {
     expect(state.effects).toEqual([]);
     expect(state.rngSeed).toBe(fresh.rngSeed);
     expect(state.settings).toEqual(fresh.settings);
+  });
+
+  it('migrates a v6 save with nothing restored and the sound on', () => {
+    const v6 = JSON.stringify({
+      version: 6,
+      generators: { pot: 3 },
+      seeds: 4,
+      settings: { notation: 'scientific', reducedMotion: true },
+    });
+    const state = deserialize(v6, 0)!;
+    expect(state.version).toBe(STATE_VERSION);
+    expect(state.generators.pot).toBe(3);
+    expect(state.parcels).toEqual([]);
+    expect(state.projects).toEqual([]);
+    expect(state.settings).toEqual({
+      ...DEFAULT_SETTINGS,
+      notation: 'scientific',
+      reducedMotion: true,
+    });
+  });
+
+  it('keeps known parcels and projects once and drops unknown ones', () => {
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      parcels: ['river', 'moon', 'river'],
+      projects: ['tram', 42, 'tram'],
+    });
+    const state = deserialize(json, 0)!;
+    expect(state.parcels).toEqual(['river']);
+    expect(state.projects).toEqual(['tram']);
+  });
+
+  it('accepts an effect lengthened by a project, but no longer', () => {
+    const json = (remaining: number) =>
+      JSON.stringify({
+        version: STATE_VERSION,
+        projects: ['festival'],
+        effects: [{ kind: 'bloom', remaining }],
+      });
+    expect(deserialize(json(85), 0)!.effects).toEqual([{ kind: 'bloom', remaining: 85 }]);
+    expect(deserialize(json(95), 0)!.effects).toEqual([]);
   });
 });

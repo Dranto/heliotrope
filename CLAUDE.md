@@ -27,6 +27,9 @@ a design decision changes, update that document in the same PR.
   - `seasons.ts`: prestige (design doc §7): Seeds formula, bonus, `startNewSeason`
   - `achievements.ts`: Milestones ("Jalons", §9.3) data table, +1% bonus, unlock checks
   - `butterfly.ts`, `effects.ts`: the Golden Butterfly (§9.2), its schedule and timed effects
+  - `parcels.ts`, `projects.ts`: parcels to restore (kept across Seasons) and neighbourhood
+    projects (per Season), data tables (§6.1, §6.2); `bonuses.ts` reads their shared effect
+    shape for the formulas; `restoration.ts` holds when they are offered and the buy actions
   - `phases.ts`: progression phases and visual seasons of the scene (§6)
   - `random.ts`: seeded random numbers; the seed lives in `GameState` so random events stay pure
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
@@ -40,7 +43,9 @@ a design decision changes, update that document in the same PR.
 - `src/i18n/fr.ts`: every player-facing text (UI strings, generator, upgrade and Milestone names,
   flavour lines).
 - `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
-  rules in `neighbourhood.ts` (design doc §6). Read state with `useGameState()`, change it with
+  rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
+  the restored parcels and project marks, `Restoration.tsx` is the panel under the map.
+  `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes. Read state with `useGameState()`, change it with
   `store.dispatch((s) => action(s))`.
 
 ## Conventions
