@@ -2,6 +2,7 @@ import { GENERATOR_IDS } from './generators';
 import {
   availableUpgrades,
   biodiversityBonus,
+  clickUpgradeCount,
   clickValue,
   generatorCost,
   generatorMultiplier,
@@ -24,8 +25,8 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 });
 
 describe('upgrade data', () => {
-  it('has 7 ×2 upgrades per generator, 5 click upgrades and 21 synergies (§5)', () => {
-    expect(UPGRADE_LIST).toHaveLength(8 * 7 + 5 + 18 + 3);
+  it('has 7 ×2 upgrades per generator, 10 click upgrades and 24 synergies (§5)', () => {
+    expect(UPGRADE_LIST).toHaveLength(8 * 7 + 10 + 18 + 3 + 3);
     expect(new Set(UPGRADE_LIST.map((u) => u.id)).size).toBe(UPGRADE_LIST.length);
   });
 
@@ -150,6 +151,25 @@ describe('clickValue', () => {
     });
     expect(clickValue(state)).toBeCloseTo(4 + 0.02 * 5);
   });
+
+  it('adds base Light per building owned, before click multipliers (§5.2)', () => {
+    const state = withState({
+      generators: owned({ pot: 10, balconyPanel: 10 }),
+      upgrades: ['warmHands', 'helpingHands'],
+    });
+    expect(clickValue(state)).toBeCloseTo((1 + 0.05 * 20) * 2);
+  });
+});
+
+describe('click synergies', () => {
+  it('boost a building per click upgrade bought (§5.3)', () => {
+    const state = withState({
+      generators: owned({ pot: 10 }),
+      upgrades: ['warmHands', 'gloves', 'pruningShears', 'pot.1', 'tendedPots'],
+    });
+    expect(clickUpgradeCount(state)).toBe(3);
+    expect(generatorMultiplier(state, 'pot')).toBeCloseTo(2 * (1 + 0.05 * 3));
+  });
 });
 
 describe('generatorCost', () => {
@@ -188,8 +208,23 @@ describe('upgrade availability', () => {
   });
 
   it('unlocks click upgrades on Light earned this Season', () => {
-    expect(isUpgradeUnlocked(withState({ totalLight: 999 }), 'gloves')).toBe(false);
-    expect(isUpgradeUnlocked(withState({ totalLight: 1_000 }), 'gloves')).toBe(true);
+    expect(isUpgradeUnlocked(withState({ totalLight: 299 }), 'gloves')).toBe(false);
+    expect(isUpgradeUnlocked(withState({ totalLight: 300 }), 'gloves')).toBe(true);
+  });
+
+  it('unlocks early click upgrades on clicks (§5.2)', () => {
+    const generators = owned({ pot: 1 });
+    expect(isUpgradeUnlocked(withState({ generators, clicks: 14 }), 'warmHands')).toBe(false);
+    expect(isUpgradeUnlocked(withState({ generators, clicks: 15 }), 'warmHands')).toBe(true);
+    expect(isUpgradeUnlocked(withState({ clicks: 15 }), 'warmHands')).toBe(false);
+  });
+
+  it('unlocks click synergies on the click upgrades bought (§5.3)', () => {
+    const generators = owned({ pot: 10 });
+    const two: UpgradeId[] = ['warmHands', 'gloves', 'pot.1'];
+    expect(isUpgradeUnlocked(withState({ generators, upgrades: two }), 'tendedPots')).toBe(false);
+    const three: UpgradeId[] = [...two, 'pruningShears'];
+    expect(isUpgradeUnlocked(withState({ generators, upgrades: three }), 'tendedPots')).toBe(true);
   });
 
   it('unlocks synergies when both generators reach 10', () => {

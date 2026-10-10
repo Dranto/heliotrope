@@ -233,7 +233,7 @@ export function leafPaths(length: number): { blade: string; veins: string } {
 
 /**
  * Gilded sprigs on the arch, one per click upgrade (§5.2): [x, y, rotation in degrees]. The
- * first crowns the arch, the others climb down both sides in pairs.
+ * first crowns the arch, the others climb down both sides in pairs (§5.2 has ten).
  */
 export const ARCH_ORNAMENTS: [number, number, number][] = [
   [100, 8, 0],
@@ -241,6 +241,12 @@ export const ARCH_ORNAMENTS: [number, number, number][] = [
   [155, 31, 52],
   [20, 112, -90],
   [180, 112, 90],
+  [27, 60, -70],
+  [173, 60, 70],
+  [20, 160, -90],
+  [180, 160, 90],
+  [20, 208, -90],
+  [180, 208, 90],
 ];
 
 /** Seasons completed are counted by gold bands on the pot, up to this many. */

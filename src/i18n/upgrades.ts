@@ -1,5 +1,5 @@
 // Display texts of an upgrade, resolved from its id and effect.
-import { formatPercent } from '../game/format';
+import { formatNumber, formatPercent } from '../game/format';
 import type { GeneratorUpgradeTier, UpgradeDef } from '../game/upgrades';
 import { t, type UpgradeText } from './fr';
 
@@ -10,6 +10,9 @@ export function upgradeText(upgrade: UpgradeDef): UpgradeText {
     return t.generatorUpgrades[effect.generator][tier - 1]!;
   }
   if (effect.kind === 'synergy') return t.synergies[id as keyof typeof t.synergies];
+  if (effect.kind === 'clickSynergy') {
+    return t.clickSynergies[id as keyof typeof t.clickSynergies];
+  }
   if (effect.kind === 'upgradeSynergy') {
     return t.upgradeSynergies[id as keyof typeof t.upgradeSynergies];
   }
@@ -30,6 +33,13 @@ export function upgradeEffectText(upgrade: UpgradeDef): string {
         t.generators[effect.generator].name,
         formatPercent(effect.bonusPerUnit),
         t.generators[effect.source].name,
+      );
+    case 'clickPerBuilding':
+      return t.upgradeEffect.clickPerBuilding(formatNumber(effect.perUnit));
+    case 'clickSynergy':
+      return t.upgradeEffect.clickSynergy(
+        t.generators[effect.generator].name,
+        formatPercent(effect.bonusPerUpgrade),
       );
     case 'upgradeSynergy':
       return t.upgradeEffect.upgradeSynergy(formatPercent(effect.bonusPerUpgrade), effect.counts);

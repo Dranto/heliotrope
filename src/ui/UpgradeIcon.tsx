@@ -28,6 +28,7 @@ function pathFor({ effect }: UpgradeDef): string {
       return GENERATOR_PATHS[effect.generator];
     case 'synergy':
     case 'upgradeSynergy':
+    case 'clickSynergy':
       return SYNERGY_PATH;
     default:
       return CLICK_PATH;

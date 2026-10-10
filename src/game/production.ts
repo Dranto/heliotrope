@@ -6,7 +6,7 @@ import { effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import { seedBonus } from './seasons';
 import type { GameState } from './state';
-import { UPGRADES, type UpgradeDef, type UpgradeId } from './upgrades';
+import { CLICK_UPGRADE_IDS, UPGRADES, type UpgradeDef, type UpgradeId } from './upgrades';
 
 /** §5.4: each generator type owned at these counts adds BIODIVERSITY_STEP to global production. */
 export const BIODIVERSITY_THRESHOLDS = [10, 50, 100] as const;
@@ -14,6 +14,13 @@ export const BIODIVERSITY_STEP = 0.02;
 
 function boughtUpgrades(state: GameState): UpgradeDef[] {
   return state.upgrades.map((id) => UPGRADES[id]);
+}
+
+const CLICK_UPGRADE_SET: ReadonlySet<UpgradeId> = new Set(CLICK_UPGRADE_IDS);
+
+/** Number of click upgrades (§5.2) bought this Season. */
+export function clickUpgradeCount(state: GameState): number {
+  return state.upgrades.filter((id) => CLICK_UPGRADE_SET.has(id)).length;
 }
 
 /** Multiplier from ×2 upgrades and synergies for one generator type. */
@@ -28,6 +35,9 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
     if (effect.kind === 'generatorMultiplier' && effect.generator === id) factor *= effect.factor;
     if (effect.kind === 'synergy' && effect.generator === id) {
       synergyBonus += effect.bonusPerUnit * state.generators[effect.source];
+    }
+    if (effect.kind === 'clickSynergy' && effect.generator === id) {
+      synergyBonus += effect.bonusPerUpgrade * clickUpgradeCount(state);
     }
   }
   for (const bonus of bonusesOf(state, 'generatorMultiplier')) {
@@ -104,12 +114,13 @@ export function lightPerSecond(state: GameState): number {
 }
 
 /**
- * §5.2: click = (1 + Light per unit from projects) × click multipliers + share of the production per second, all ×100 during a
+ * §5.2: click = (1 + Light per building from upgrades and projects) × click multipliers + share of the production per second, all ×100 during a
  * Pollinisation (§9.2).
  */
 export function clickValue(state: GameState): number {
   let multiplier = factorOf(state, 'clickMultiplier');
   let fraction = 0;
+  let perBuilding = 0;
   let flat = 1;
   for (const bonus of bonusesOf(state, 'clickPerUnit')) {
     flat += bonus.amount * state.generators[bonus.generator];
@@ -117,7 +128,9 @@ export function clickValue(state: GameState): number {
   for (const { effect } of boughtUpgrades(state)) {
     if (effect.kind === 'clickMultiplier') multiplier *= effect.factor;
     if (effect.kind === 'clickFromProduction') fraction += effect.fraction;
+    if (effect.kind === 'clickPerBuilding') perBuilding += effect.perUnit;
   }
+  if (perBuilding > 0) for (const id of GENERATOR_IDS) flat += perBuilding * state.generators[id];
   const base = flat * multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
   return base * effectFactor(state.effects, 'pollination');
 }
@@ -158,8 +171,10 @@ export function isUpgradeBought(state: GameState, id: UpgradeId): boolean {
 
 /** An upgrade appears when its condition is met; conditions never become false in a Season. */
 export function isUpgradeUnlocked(state: GameState, id: UpgradeId): boolean {
-  const { owned, totalLight, upgrades, synergies } = UPGRADES[id].condition;
+  const { owned, totalLight, upgrades, synergies, clicks, clickUpgrades } = UPGRADES[id].condition;
   if (totalLight !== undefined && state.totalLight < totalLight) return false;
+  if (clicks !== undefined && state.clicks < clicks) return false;
+  if (clickUpgrades !== undefined && clickUpgradeCount(state) < clickUpgrades) return false;
   if (upgrades !== undefined && state.upgrades.length < upgrades) return false;
   if (synergies !== undefined) {
     const bought = boughtUpgrades(state).filter(({ effect }) => effect.kind === 'synergy');

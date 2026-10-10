@@ -5,7 +5,7 @@ import type { GeneratorId } from '../game/generators';
 import type { ParcelId } from '../game/parcels';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
-import type { ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
+import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
 export interface GeneratorText {
   name: string;
@@ -63,6 +63,10 @@ export const fr = {
       `Chaque clic rapporte aussi ${percent}\u00a0% de la production par seconde`,
     synergy: (generator: string, percent: string, source: string) =>
       `${generator}\u00a0: +${percent}\u00a0% par ${source} possédé`,
+    clickPerBuilding: (light: string) =>
+      `Chaque clic rapporte +${light} Lumière par bâtiment possédé`,
+    clickSynergy: (generator: string, percent: string) =>
+      `${generator}\u00a0: +${percent}\u00a0% par amélioration de clic achetée`,
     upgradeSynergy: (percent: string, counted: 'all' | 'synergies') =>
       `Toute la production\u00a0: +${percent}\u00a0% par ${counted === 'all' ? 'amélioration achetée' : 'synergie achetée'}`,
   },
@@ -435,8 +439,13 @@ export const fr = {
     ],
   } satisfies Record<GeneratorId, SevenTexts>,
   clickUpgrades: {
+    warmHands: u('Mains tièdes', 'Le premier geste du matin réveille la fleur.'),
     gloves: u('Gants de jardinage', 'Des mains protégées récoltent plus.'),
+    pruningShears: u('Sécateur', 'Une taille nette, une fleur qui repart.'),
+    helpingHands: u('Coup de main', 'Chaque pot du quartier tend une feuille vers vous.'),
     copperCan: u('Arrosoir en cuivre', 'Le cuivre chante sous la pluie.'),
+    neighbourHands: u('Mains du voisinage', 'Quand vous cueillez, toute la rue cueille avec vous.'),
+    sunHat: u('Chapeau de paille', 'À l’ombre du bord, on cueille toute la journée.'),
     greenHands: u('Mains vertes', 'Tout ce que nous touchons pousse.'),
     sharedGesture: u('Geste partagé', 'Quand l’un récolte, tout le quartier récolte.'),
     solarHarvest: u('Cueillette solaire', 'Cueillir un rayon comme une fraise.'),
@@ -469,6 +478,14 @@ export const fr = {
     seedLibrary: u('Grainothèque', 'On emprunte des graines comme des livres.'),
     commons: u('Les communs', 'Ce qui est à tous pousse mieux.'),
   } satisfies Record<UpgradeSynergyId, UpgradeText>,
+  clickSynergies: {
+    tendedPots: u('Pots choyés', 'Une main attentive vaut tous les engrais.'),
+    gardenerRounds: u(
+      'Tournée du jardinier',
+      'Chaque matin, un tour des toits, sécateur en poche.',
+    ),
+    handPollination: u('Pollinisation à la main', 'Un pinceau, une fleur, une autre fleur.'),
+  } satisfies Record<ClickSynergyId, UpgradeText>,
 };
 
 export const t = fr;

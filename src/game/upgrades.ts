@@ -17,8 +17,13 @@ export type GeneratorUpgradeTier = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type GeneratorUpgradeId = `${GeneratorId}.${GeneratorUpgradeTier}`;
 
 export const CLICK_UPGRADE_IDS = [
+  'warmHands',
   'gloves',
+  'pruningShears',
+  'helpingHands',
   'copperCan',
+  'neighbourHands',
+  'sunHat',
   'greenHands',
   'sharedGesture',
   'solarHarvest',
@@ -54,7 +59,12 @@ export type SynergyId = (typeof SYNERGY_IDS)[number];
 export const UPGRADE_SYNERGY_IDS = ['sharedKnowledge', 'seedLibrary', 'commons'] as const;
 export type UpgradeSynergyId = (typeof UPGRADE_SYNERGY_IDS)[number];
 
-export type UpgradeId = GeneratorUpgradeId | ClickUpgradeId | SynergyId | UpgradeSynergyId;
+/** §5.3: buildings that grow with the click upgrades bought. */
+export const CLICK_SYNERGY_IDS = ['tendedPots', 'gardenerRounds', 'handPollination'] as const;
+export type ClickSynergyId = (typeof CLICK_SYNERGY_IDS)[number];
+
+export type UpgradeId =
+  GeneratorUpgradeId | ClickUpgradeId | SynergyId | UpgradeSynergyId | ClickSynergyId;
 
 export type UpgradeEffect =
   /** Multiplies one generator's production. */
@@ -63,6 +73,10 @@ export type UpgradeEffect =
   | { kind: 'clickMultiplier'; factor: number }
   /** Adds a fraction of the Light per second to each click. */
   | { kind: 'clickFromProduction'; fraction: number }
+  /** Adds `perUnit` base Light to each click per building owned (all types). */
+  | { kind: 'clickPerBuilding'; perUnit: number }
+  /** `generator` gains `bonusPerUpgrade` (additive) per click upgrade bought. */
+  | { kind: 'clickSynergy'; generator: GeneratorId; bonusPerUpgrade: number }
   /** `generator` gains `bonusPerUnit` (additive) per unit of `source` owned. */
   | { kind: 'synergy'; generator: GeneratorId; source: GeneratorId; bonusPerUnit: number }
   /** Global production gains `bonusPerUpgrade` (additive) per upgrade of `counts` bought. */
@@ -77,6 +91,10 @@ export interface UpgradeCondition {
   upgrades?: number;
   /** Minimum number of building synergies bought this Season. */
   synergies?: number;
+  /** Minimum number of clicks on the heliotrope (all Seasons). */
+  clicks?: number;
+  /** Minimum number of click upgrades bought this Season. */
+  clickUpgrades?: number;
 }
 
 export interface UpgradeDef {
@@ -109,16 +127,46 @@ function generatorUpgrades(): UpgradeDef[] {
 
 const CLICK_UPGRADES: UpgradeDef[] = [
   {
+    id: 'warmHands',
+    cost: 15,
+    condition: { clicks: 15, owned: { pot: 1 } },
+    effect: { kind: 'clickMultiplier', factor: 2 },
+  },
+  {
     id: 'gloves',
     cost: 100,
-    condition: { totalLight: 1_000 },
+    condition: { totalLight: 300 },
     effect: { kind: 'clickMultiplier', factor: 2 },
+  },
+  {
+    id: 'pruningShears',
+    cost: 500,
+    condition: { clicks: 200 },
+    effect: { kind: 'clickMultiplier', factor: 2 },
+  },
+  {
+    id: 'helpingHands',
+    cost: 2_000,
+    condition: { owned: { pot: 10 } },
+    effect: { kind: 'clickPerBuilding', perUnit: 0.05 },
   },
   {
     id: 'copperCan',
     cost: 10_000,
-    condition: { totalLight: 100_000 },
+    condition: { totalLight: 50_000 },
     effect: { kind: 'clickMultiplier', factor: 2 },
+  },
+  {
+    id: 'neighbourHands',
+    cost: 50_000,
+    condition: { owned: { balconyPanel: 25 } },
+    effect: { kind: 'clickPerBuilding', perUnit: 0.1 },
+  },
+  {
+    id: 'sunHat',
+    cost: 200_000,
+    condition: { clicks: 2_000 },
+    effect: { kind: 'clickFromProduction', fraction: 0.005 },
   },
   {
     id: 'greenHands',
@@ -195,11 +243,33 @@ const UPGRADE_SYNERGIES: UpgradeDef[] = [
   upgradeSynergy('commons', 500_000_000, { synergies: 6 }, 'synergies', 0.03),
 ];
 
+function clickSynergy(
+  id: ClickSynergyId,
+  cost: number,
+  generator: GeneratorId,
+  clickUpgrades: number,
+  bonusPerUpgrade: number,
+): UpgradeDef {
+  return {
+    id,
+    cost,
+    condition: { owned: { [generator]: SYNERGY_OWNED }, clickUpgrades },
+    effect: { kind: 'clickSynergy', generator, bonusPerUpgrade },
+  };
+}
+
+const CLICK_SYNERGIES: UpgradeDef[] = [
+  clickSynergy('tendedPots', 1_000, 'pot', 3, 0.05),
+  clickSynergy('gardenerRounds', 30_000, 'rooftopGarden', 5, 0.03),
+  clickSynergy('handPollination', 300_000, 'greenhouse', 6, 0.03),
+];
+
 export const UPGRADE_LIST: readonly UpgradeDef[] = [
   ...generatorUpgrades(),
   ...CLICK_UPGRADES,
   ...SYNERGIES,
   ...UPGRADE_SYNERGIES,
+  ...CLICK_SYNERGIES,
 ];
 
 export const UPGRADES = Object.fromEntries(UPGRADE_LIST.map((u) => [u.id, u])) as Record<
