@@ -1,0 +1,92 @@
+:root {
+  --bg: #f6f3e7;
+  --surface: #ffffff;
+  --text: #24352b;
+  --muted: #5e7366;
+  --accent: #4f9d69;
+  --sun: #f2b33d;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14201a;
+    --surface: #1d2c24;
+    --text: #e8efe4;
+    --muted: #9fb3a5;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  margin: 0;
+  color: var(--accent);
+}
+
+.tagline {
+  margin: 0.25rem 0 1.5rem;
+  color: var(--muted);
+}
+
+.notice {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--sun);
+  background: var(--surface);
+}
+
+.resources {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.resource {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+.resource-amount {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.resource-rate {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  font: inherit;
+  font-weight: 600;
+  color: #1c2a12;
+  background: var(--sun);
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.05);
+}

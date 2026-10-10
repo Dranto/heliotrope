@@ -1,0 +1,76 @@
+import { applyOfflineProgress } from './offline';
+import { loadGame, saveGame } from './save';
+import { createInitialState, type GameState } from './state';
+import { tick } from './tick';
+
+export const TICK_MS = 100;
+export const AUTOSAVE_MS = 10_000;
+
+type Listener = () => void;
+
+/**
+ * Holds the live game state, drives the tick loop and autosave.
+ * UI reads it through useSyncExternalStore (see ui/useGame.ts).
+ */
+export class GameStore {
+  private state: GameState;
+  private listeners = new Set<Listener>();
+  private tickTimer: ReturnType<typeof setInterval> | undefined;
+  private saveTimer: ReturnType<typeof setInterval> | undefined;
+  /** Seconds of offline progress applied when the store was created. */
+  readonly offlineSeconds: number;
+
+  constructor(
+    private readonly storage: Storage = localStorage,
+    private readonly now: () => number = Date.now,
+  ) {
+    const loaded = loadGame(this.now(), storage);
+    if (loaded) {
+      const result = applyOfflineProgress(loaded, this.now());
+      this.state = result.state;
+      this.offlineSeconds = result.elapsedSeconds;
+    } else {
+      this.state = createInitialState(this.now());
+      this.offlineSeconds = 0;
+    }
+  }
+
+  getState = (): GameState => this.state;
+
+  subscribe = (listener: Listener): (() => void) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
+
+  /** Apply a pure state transition, e.g. store.dispatch((s) => gather(s, 'sunlight')). */
+  dispatch = (update: (state: GameState) => GameState): void => {
+    this.setState(update(this.state));
+  };
+
+  /** Advance to the current wall-clock time. Uses real elapsed time, so throttled tabs catch up. */
+  step = (): void => {
+    const dt = (this.now() - this.state.lastUpdate) / 1000;
+    if (dt > 0) this.setState(tick(this.state, dt));
+  };
+
+  save = (): void => saveGame(this.state, this.storage);
+
+  start(): void {
+    if (this.tickTimer) return;
+    this.tickTimer = setInterval(this.step, TICK_MS);
+    this.saveTimer = setInterval(this.save, AUTOSAVE_MS);
+  }
+
+  stop(): void {
+    clearInterval(this.tickTimer);
+    clearInterval(this.saveTimer);
+    this.tickTimer = undefined;
+    this.saveTimer = undefined;
+  }
+
+  private setState(next: GameState): void {
+    if (next === this.state) return;
+    this.state = next;
+    for (const listener of this.listeners) listener();
+  }
+}
