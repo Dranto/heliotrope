@@ -44,6 +44,8 @@ export function bonusText(bonus: Bonus): string {
       return b.perSeason(formatPercent(bonus.bonus));
     case 'globalPerType':
       return b.globalPerType(formatPercent(bonus.bonus));
+    case 'water':
+      return b.water(factor(bonus.factor));
   }
 }
 

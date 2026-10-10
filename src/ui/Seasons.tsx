@@ -83,7 +83,7 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
           <dt>{t.seeds.owned}</dt>
           <dd>
             <strong data-testid="seeds-owned">{formatNumber(state.seeds)}</strong>
-            <span>{t.seeds.ownedHint(formatPercent(seedBonus(state.seeds)))}</span>
+            <span>{t.seeds.ownedHint(formatPercent(seedBonus(state.seeds, state.sources)))}</span>
           </dd>
         </div>
         <div className="seed-tile gain">
@@ -97,8 +97,8 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
           <dt>{t.seeds.bonus}</dt>
           <dd>
             <strong data-testid="seeds-bonus">
-              {t.stats.percent(formatPercent(seedBonus(state.seeds)))} →{' '}
-              {t.stats.percent(formatPercent(seedBonus(state.seeds + gain)))}
+              {t.stats.percent(formatPercent(seedBonus(state.seeds, state.sources)))} →{' '}
+              {t.stats.percent(formatPercent(seedBonus(state.seeds + gain, state.sources)))}
             </strong>
             <span>{t.seeds.bonusAfter}</span>
           </dd>

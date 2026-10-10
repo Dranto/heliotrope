@@ -2,6 +2,7 @@ import { isAchievementId, type AchievementId } from './achievements';
 import type { ActiveEffect } from './effects';
 import { LANGUAGES, type Language } from './format';
 import { GENERATOR_IDS } from './generators';
+import { COLLECTOR_IDS, SITE_IDS } from './bioregion';
 import { RESOURCE_IDS } from './resources';
 import { isUpgradeId, type UpgradeId } from './upgrades';
 import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameState } from './state';
@@ -51,6 +52,9 @@ const migrations: Record<number, Migration> = {
   // v10 adds challenge Seasons and the Herbier (§7.3, §9.5). Defaults from the fresh state: no
   // challenge, no species yet; species already deserved return on the first tick.
   9: (raw) => ({ ...raw, version: 10 }),
+  // v11 adds the Bioregion and the Cycle of water (§7.4). Before it, every Season belonged to the
+  // first Cycle: the defaults of the fresh state (no Water, no collector, no Source) fit.
+  10: (raw) => ({ ...raw, version: 11 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -122,7 +126,16 @@ export function deserialize(json: string, now: number): GameState | null {
   } else {
     state.allTimeLight = state.totalLight;
   }
+  // The current Season belongs to the current Cycle.
+  if (
+    isFiniteNumber(data.lightBeforeCycle) &&
+    data.lightBeforeCycle >= 0 &&
+    data.lightBeforeCycle <= state.allTimeLight - state.totalLight
+  ) {
+    state.lightBeforeCycle = data.lightBeforeCycle;
+  }
   if (isCount(data.seeds)) state.seeds = data.seeds;
+  if (isCount(data.rootedSeeds)) state.rootedSeeds = data.rootedSeeds;
   if (isCount(data.seasons)) state.seasons = data.seasons;
   if (isCount(data.clicks)) state.clicks = data.clicks;
   if (isFiniteNumber(data.playSeconds) && data.playSeconds >= 0) {
@@ -143,7 +156,9 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.projects)) {
     state.projects = [...new Set<ProjectId>(data.projects.filter(isProjectId))];
   }
-  if (Array.isArray(data.talents)) state.talents = validTalents(data.talents, state.seeds);
+  if (Array.isArray(data.talents)) {
+    state.talents = validTalents(data.talents, state.seeds + state.rootedSeeds);
+  }
   const cooperatives = data.cooperatives as Record<string, unknown> | undefined;
   if (Array.isArray(cooperatives?.paused)) {
     state.cooperatives.paused = [...new Set(cooperatives.paused.filter(isCooperativeId))];
@@ -163,6 +178,31 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.species)) {
     state.species = [...new Set<SpeciesId>(data.species.filter(isSpeciesId))];
   }
+  const collectors = data.collectors as Record<string, unknown> | undefined;
+  for (const id of COLLECTOR_IDS) {
+    const value = collectors?.[id];
+    if (isCount(value)) state.collectors[id] = value;
+  }
+  const sites = data.sites as Record<string, unknown> | undefined;
+  for (const id of SITE_IDS) {
+    const value = sites?.[id];
+    if (isCount(value)) state.sites[id] = value;
+  }
+  // The all-time Water includes the reserve, which belongs to the current Cycle.
+  if (isFiniteNumber(data.allTimeWater) && data.allTimeWater >= state.resources.water) {
+    state.allTimeWater = data.allTimeWater;
+  } else {
+    state.allTimeWater = state.resources.water;
+  }
+  if (
+    isFiniteNumber(data.waterBeforeCycle) &&
+    data.waterBeforeCycle >= 0 &&
+    data.waterBeforeCycle <= state.allTimeWater - state.resources.water
+  ) {
+    state.waterBeforeCycle = data.waterBeforeCycle;
+  }
+  if (isCount(data.sources)) state.sources = data.sources;
+  if (isCount(data.cycles)) state.cycles = data.cycles;
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;
   if (

@@ -45,7 +45,9 @@ export type Bonus =
   /** Adds `bonus` to global production per Season completed. */
   | { kind: 'perSeason'; bonus: number }
   /** Adds `bonus` to global production per generator type owned. */
-  | { kind: 'globalPerType'; bonus: number };
+  | { kind: 'globalPerType'; bonus: number }
+  /** Multiplies the Water every collector gathers (§7.4). */
+  | { kind: 'water'; factor: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;

@@ -6,6 +6,7 @@ import {
   clickValue,
 } from './production';
 import { unlockAchievement, unlockAchievements } from './achievements';
+import { earnWater, waterPerSecond } from './bioregion';
 import { advanceButterfly } from './butterfly';
 import { completeChallenge, generatorLimit } from './challenges';
 import { runCooperatives } from './cooperatives';
@@ -47,12 +48,13 @@ export function unlockProgress(state: GameState): GameState {
 }
 
 /**
- * Advance the simulation by dtSeconds of play. Pure: returns a new state. The Cooperatives (§7.2)
- * then buy what the Light earned affords.
+ * Advance the simulation by dtSeconds of play. Pure: returns a new state. The collectors of the
+ * Bioregion gather Water (§7.4), then the Cooperatives (§7.2) buy what the Light earned affords.
  */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const next = runCooperatives(advanceButterfly(produce(state, dtSeconds), dtSeconds));
+  const watered = earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds);
+  const next = runCooperatives(advanceButterfly(watered, dtSeconds));
   return unlockProgress({
     ...next,
     playSeconds: state.playSeconds + dtSeconds,

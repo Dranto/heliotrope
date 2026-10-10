@@ -36,7 +36,7 @@ describe('challenge Seasons (§7.3)', () => {
   });
 
   it('blocks panels and mirror plants in the Season of clouds', () => {
-    const s = { ...startNewSeason(veteran(), 'cloudy'), resources: { light: 1e9 } };
+    const s = { ...startNewSeason(veteran(), 'cloudy'), resources: { water: 0, light: 1e9 } };
     expect(generatorLimit(s, 'balconyPanel')).toBe(0);
     expect(canBuyGenerator(s, 'balconyPanel')).toBe(false);
     expect(buyGenerator(s, 'mirrorPlant')).toBe(s);
@@ -47,7 +47,7 @@ describe('challenge Seasons (§7.3)', () => {
     const base = startNewSeason(veteran(), 'frugal');
     const s = {
       ...base,
-      resources: { light: 1e12 },
+      resources: { water: 0, light: 1e12 },
       generators: { ...base.generators, pot: 20 },
       talents: ['gardenersCoop' as const],
     };
@@ -57,7 +57,7 @@ describe('challenge Seasons (§7.3)', () => {
   });
 
   it('offers no upgrade in the wild Season', () => {
-    const base = state({ totalLight: 1e9, resources: { light: 1e9 } });
+    const base = state({ totalLight: 1e9, resources: { water: 0, light: 1e9 } });
     expect(availableUpgrades(base).length).toBeGreaterThan(0);
     expect(availableUpgrades({ ...base, challenge: 'wild' })).toEqual([]);
   });

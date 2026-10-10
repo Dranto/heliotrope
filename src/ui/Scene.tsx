@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } fro
 import type { ParcelId } from '../game/parcels';
 import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restoration';
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
+import { isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
 import { t } from '../i18n';
@@ -10,6 +11,7 @@ import {
   unlockedCooperatives,
   type CooperativeId,
 } from '../game/cooperatives';
+import { BioregionLand, CityWater } from './BioregionArt';
 import { CooperativeBikes } from './CooperativeArt';
 import { Neighbourhood } from './Neighbourhood';
 import { Flower } from './Flower';
@@ -103,7 +105,7 @@ const CAPTION_ROOM = 52;
  * The neighbourhood scene (docs/game-design.md §6, §10.4): the city seen from above, where each
  * purchase builds something with a soft entrance, with the clickable heliotrope rising from the
  * home courtyard at its heart. The player switches between the views opened so far: the courtyard, the neighbourhood,
- * the city; each one keeps its part of the city whole and as large as the screen allows. The
+ * the city, then the Bioregion around it (§7.4); each one keeps its part of the city whole and as large as the screen allows. The
  * light and the shadows follow the phase (dawn, noon, late afternoon) and, after the first
  * Season, the season's tint; a challenge Season (§7.3) changes it again. The species of the
  * Herbier (§9.5) live on it and the Golden Butterfly flies across it.
@@ -138,9 +140,21 @@ export function Scene({
     .join();
   const reduced = state.settings.reducedMotion || prefersReducedMotion();
   const ground = useMemo(() => <ParcelGround parcels={parcels} />, [parcels]);
+  const bioregion = isBioregionOpen(state);
+  const { sites, collectors } = state;
+  const raining = waterPerSecond(state) > 0;
+  const land = useMemo(
+    () =>
+      bioregion ? (
+        <BioregionLand sites={sites} collectors={collectors} raining={raining} reduced={reduced} />
+      ) : null,
+    [bioregion, sites, collectors, raining, reduced],
+  );
+  const { roofTanks, swales } = collectors;
   const overlay = useMemo(
     () => (
       <>
+        <CityWater roofTanks={roofTanks} swales={swales} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
@@ -152,10 +166,10 @@ export function Scene({
         />
       </>
     ),
-    [projects, species, bikes, reduced, offered, affordable, highlight, restore],
+    [roofTanks, swales, projects, species, bikes, reduced, offered, affordable, highlight, restore],
   );
   const phase = phaseOf(state);
-  const furthest = furthestView(phase, state.generators);
+  const furthest = furthestView(phase, state.generators, bioregion);
   const [chosen, choose] = useLayoutPref<View | null>('view', null);
   // When a further view opens during play, the map moves to it once, so the new places are seen
   // being built; the player can go back closer at any time.
@@ -197,6 +211,7 @@ export function Scene({
           greenness={greenness}
           reduced={state.settings.reducedMotion}
           ground={ground}
+          land={land}
           overlay={overlay}
         />
         <div className="map-flower" style={{ left: flower.x, top: flower.y, width: flower.width }}>

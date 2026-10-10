@@ -187,9 +187,12 @@ export function seedsSpent(talents: readonly TalentId[]): number {
   return talents.reduce((sum, id) => sum + TALENTS[id].cost, 0);
 }
 
-/** Seeds left to spend in the tree. The +5% bonus still counts every Seed obtained. */
+/**
+ * Seeds left to spend in the tree. The +5% bonus still counts every Seed obtained. The talents
+ * learnt before a Cycle of water (§7.4) are rooted: their Seeds are not asked for again.
+ */
 export function availableSeeds(state: GameState): number {
-  return Math.max(0, state.seeds - seedsSpent(state.talents));
+  return Math.max(0, state.seeds + state.rootedSeeds - seedsSpent(state.talents));
 }
 
 export function hasTalent(state: GameState, id: TalentId): boolean {

@@ -14,7 +14,7 @@ function playedState(): GameState {
   const base = createInitialState(1000);
   return {
     ...base,
-    resources: { light: 42.5 },
+    resources: { water: 0, light: 42.5 },
     generators: { ...base.generators, pot: 3, balconyPanel: 1 },
     upgrades: ['pot.1', 'gloves'],
     totalLight: 300,
@@ -77,7 +77,7 @@ describe('save', () => {
   it('fills missing or invalid fields with defaults', () => {
     const json = JSON.stringify({
       version: STATE_VERSION,
-      resources: { light: 'lots' },
+      resources: { water: 0, light: 'lots' },
       generators: { pot: -1, balconyPanel: 2.5, rooftopGarden: null },
       totalLight: NaN,
       clicks: 'many',
@@ -102,7 +102,7 @@ describe('save', () => {
   it('migrates a v2 save, keeping its progress and adding no upgrades', () => {
     const v2 = JSON.stringify({
       version: 2,
-      resources: { light: 77 },
+      resources: { water: 0, light: 77 },
       generators: { pot: 4, greenhouse: 1 },
       totalLight: 20_000,
       clicks: 300,
@@ -122,7 +122,7 @@ describe('save', () => {
   it('migrates a v3 save into its first Season, counting its Light as all-time Light', () => {
     const v3 = JSON.stringify({
       version: 3,
-      resources: { light: 10 },
+      resources: { water: 0, light: 10 },
       generators: { pot: 2 },
       upgrades: ['pot.1'],
       totalLight: 6e8,
@@ -173,7 +173,7 @@ describe('export and import', () => {
   it('migrates a v4 save, keeping its progress with no Milestones yet', () => {
     const v4 = JSON.stringify({
       version: 4,
-      resources: { light: 50 },
+      resources: { water: 0, light: 50 },
       generators: { pot: 2 },
       upgrades: ['pot.1'],
       totalLight: 900,

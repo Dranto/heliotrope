@@ -41,9 +41,12 @@ export function clickLevel(upgrades: readonly UpgradeId[]): number {
   return CLICK_UPGRADE_IDS.filter((id) => upgrades.includes(id)).length;
 }
 
-/** The three views of the map (§6): the home courtyard, the neighbourhood, the whole city. */
-export type View = Phase;
-export const VIEWS: readonly View[] = [1, 2, 3];
+/**
+ * The views of the map (§6, §7.4): the home courtyard, the neighbourhood, the whole city, and the
+ * Bioregion around it once it opens.
+ */
+export type View = Phase | 4;
+export const VIEWS: readonly View[] = [1, 2, 3, 4];
 
 /**
  * Part of the world each view keeps fully in sight, whatever the shape of the screen: the home
@@ -53,6 +56,7 @@ export const VIEW_FRAMES: Record<View, Box> = {
   1: [204, 158, 214, 156],
   2: [96, 56, 430, 338],
   3: [0, 0, 600, 450],
+  4: [-720, -560, 2040, 1570],
 };
 
 export interface Camera {
@@ -77,8 +81,14 @@ const GENERATOR_RING: Record<GeneratorId, View> = {
 /**
  * The furthest view the player can switch to. It follows the phase, and opens early when the
  * player owns a generator whose place is further out, so a purchase is never built out of reach.
+ * Once the Bioregion is open (§7.4), every view is.
  */
-export function furthestView(phase: Phase, generators: Record<GeneratorId, number>): View {
+export function furthestView(
+  phase: Phase,
+  generators: Record<GeneratorId, number>,
+  bioregion = false,
+): View {
+  if (bioregion) return 4;
   let level: View = phase;
   for (const id of Object.keys(GENERATOR_RING) as GeneratorId[]) {
     if (generators[id] > 0 && GENERATOR_RING[id] > level) level = GENERATOR_RING[id];

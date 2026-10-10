@@ -1,9 +1,21 @@
 // Headless balancing simulator (docs/game-design.md §8). Replays a simple active strategy with
 // the game's own formulas and data, and reports when each pacing event of §8 happens.
+import {
+  buyCollector,
+  canBuyCollector,
+  canRaiseSite,
+  COLLECTOR_IDS,
+  collectorCost,
+  isBioregionOpen,
+  raiseSite,
+  SITE_IDS,
+  siteCost,
+} from './bioregion';
 import { catchButterfly } from './butterfly';
+import { ADVISED_FIRST_CYCLE_SOURCES, sourcesToGain } from './cycles';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { availableUpgrades, clickValue, generatorCost, lightPerSecond } from './production';
-import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, startNewSeason } from './seasons';
+import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, seedsToGain, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { buyGenerator, buyUpgrade, canBuyGenerator, earnLight, tick } from './tick';
 import type { UpgradeId } from './upgrades';
@@ -36,6 +48,8 @@ export interface SimulationOptions {
   maxStepSeconds?: number;
   /** Share of Golden Butterflies the player catches (§9.2), deterministic: 0.5 = every other. */
   butterflyCatchRate?: number;
+  /** Stop as soon as a new Season would bring this many Seeds. */
+  stopAtSeeds?: number;
 }
 
 export interface SimulationResult {
@@ -131,6 +145,7 @@ export function simulate({
   maxSeconds = 5 * 3600,
   maxStepSeconds = 10,
   butterflyCatchRate = REFERENCE_BUTTERFLY_CATCH_RATE,
+  stopAtSeeds = Infinity,
 }: SimulationOptions = {}): SimulationResult {
   let state = start;
   let butterfliesSeen = 0;
@@ -158,8 +173,10 @@ export function simulate({
   while (
     seconds < maxSeconds &&
     !(stopWhenAdvised && advisedSeason !== undefined) &&
-    !(stopWhenWon && challengeWon !== undefined)
+    !(stopWhenWon && challengeWon !== undefined) &&
+    seedsToGain(state) < stopAtSeeds
   ) {
+    state = tendBioregion(state, income(state, clicksPerSecond));
     if (challengeWon === undefined && state.challenges.length > start.challenges.length) {
       challengeWon = seconds;
       if (stopWhenWon) break;
@@ -206,6 +223,35 @@ export function simulate({
     }
   }
   return { firstGenerator, advisedSeason, challengeWon, state, seconds };
+}
+
+/** The reference player sets aside at most this many seconds of income for a water collector. */
+export const REFERENCE_COLLECTOR_BUDGET = 60;
+
+/**
+ * The reference player's Bioregion (§7.4): Water has a single use, so every site level it affords
+ * is raised, cheapest first; a collector is built whenever it costs no more than a minute of
+ * income and the reserve covers it.
+ */
+export function tendBioregion(state: GameState, income: number): GameState {
+  if (!isBioregionOpen(state)) return state;
+  let next = state;
+  for (;;) {
+    const site = [...SITE_IDS]
+      .sort((a, b) => siteCost(next, a) - siteCost(next, b))
+      .find((id) => canRaiseSite(next, id));
+    if (!site) break;
+    next = raiseSite(next, site);
+  }
+  for (;;) {
+    const collector = COLLECTOR_IDS.find(
+      (id) =>
+        canBuyCollector(next, id) && collectorCost(next, id) <= REFERENCE_COLLECTOR_BUDGET * income,
+    );
+    if (!collector) break;
+    next = buyCollector(next, collector);
+  }
+  return next;
 }
 
 /**
@@ -266,3 +312,57 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   arcology: 80 * 60,
   advisedSeason: 100 * 60,
 };
+
+/**
+ * The reference player's later Seasons: each one is played until it would at least double the
+ * Seeds obtained so far (10 for the first one), then the reference talents are learnt.
+ */
+export const REFERENCE_SEED_GROWTH = 1;
+
+export interface CycleSimulation {
+  /** Seconds of play of each Season, in order. */
+  seasons: number[];
+  /** Seconds of play when the Bioregion opened (§7.4). */
+  bioregionOpened?: number;
+  /** Seconds of play when the first Cycle of water became advisable. */
+  advisedCycle?: number;
+  state: GameState;
+}
+
+/**
+ * §7.4 pacing: play Season after Season, with the Bioregion from the third one, until the first
+ * Cycle of water is advisable (ADVISED_FIRST_CYCLE_SOURCES Sources) or `maxSeconds` have passed.
+ */
+export function simulateFirstCycle({
+  maxSeconds = 12 * 3600,
+  ...options
+}: Omit<SimulationOptions, 'state' | 'stopAtSeeds'> = {}): CycleSimulation {
+  let state = createInitialState(0);
+  let total = 0;
+  const seasons: number[] = [];
+  let bioregionOpened: number | undefined;
+  while (total < maxSeconds && sourcesToGain(state) < ADVISED_FIRST_CYCLE_SOURCES) {
+    if (bioregionOpened === undefined && isBioregionOpen(state)) bioregionOpened = total;
+    const target = Math.max(
+      ADVISED_FIRST_SEASON_SEEDS,
+      Math.ceil(state.seeds * REFERENCE_SEED_GROWTH),
+    );
+    let played = 0;
+    // Check the Sources between short stretches, so the Cycle is caught when it becomes advisable.
+    while (played < 4 * 3600 && total < maxSeconds) {
+      const stretch = Math.min(15 * 60, maxSeconds - total);
+      const result = simulate({ ...options, state, stopAtSeeds: target, maxSeconds: stretch });
+      state = result.state;
+      played += result.seconds;
+      total += result.seconds;
+      if (seedsToGain(state) >= target || sourcesToGain(state) >= ADVISED_FIRST_CYCLE_SOURCES) {
+        break;
+      }
+    }
+    seasons.push(played);
+    if (sourcesToGain(state) >= ADVISED_FIRST_CYCLE_SOURCES) break;
+    state = learnReferenceTalents(startNewSeason(state));
+  }
+  const advisedCycle = sourcesToGain(state) >= ADVISED_FIRST_CYCLE_SOURCES ? total : undefined;
+  return { seasons, bioregionOpened, advisedCycle, state };
+}

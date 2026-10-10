@@ -1,4 +1,5 @@
 import type { AchievementId } from './achievements';
+import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
 import type { ChallengeId } from './challenges';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -13,7 +14,7 @@ import type { TalentId } from './talents';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 10;
+export const STATE_VERSION = 11;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -49,10 +50,14 @@ export interface GameState {
   upgrades: UpgradeId[];
   /** Light earned during the current Season (clicks + production), never decreased by spending. */
   totalLight: number;
-  /** Light earned over every Season, the current one included (§7 Seeds formula). */
+  /** Light earned over every Season, the current one included. */
   allTimeLight: number;
-  /** Heliotrope Seeds obtained over all Seasons (§7): each adds +5% to production. */
+  /** All-time Light when the current Cycle of water began (§7.4): the Seeds count what follows. */
+  lightBeforeCycle: number;
+  /** Heliotrope Seeds obtained in this Cycle (§7): each adds +5% to production. */
   seeds: number;
+  /** Seeds of the talents learnt before the last Cycle (§7.4), not asked for again. */
+  rootedSeeds: number;
   /** Seasons completed, i.e. how many times the player started a new Season. */
   seasons: number;
   /** Number of clicks on the heliotrope, over all Seasons. */
@@ -79,6 +84,18 @@ export interface GameState {
   challenges: ChallengeId[];
   /** Species of the Herbier back in the neighbourhood, in order (§9.5). Kept across Seasons. */
   species: SpeciesId[];
+  /** Water collectors built (§7.4). Kept across Seasons, reset by a Cycle. */
+  collectors: Record<CollectorId, number>;
+  /** Level of each regional site (§7.4). Kept across Seasons, reset by a Cycle. */
+  sites: Record<SiteId, number>;
+  /** All-time Water when the current Cycle began (§7.4). */
+  waterBeforeCycle: number;
+  /** Water gathered over all Cycles (§7.4 Sources formula). */
+  allTimeWater: number;
+  /** Sources obtained over all Cycles of water (§7.4). */
+  sources: number;
+  /** Cycles of water completed (§7.4). */
+  cycles: number;
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -117,7 +134,9 @@ export function createInitialState(now: number): GameState {
     upgrades: [],
     totalLight: 0,
     allTimeLight: 0,
+    lightBeforeCycle: 0,
     seeds: 0,
+    rootedSeeds: 0,
     seasons: 0,
     clicks: 0,
     playSeconds: 0,
@@ -131,6 +150,12 @@ export function createInitialState(now: number): GameState {
     challenge: null,
     challenges: [],
     species: [],
+    collectors: zeroes(COLLECTOR_IDS),
+    sites: zeroes(SITE_IDS),
+    waterBeforeCycle: 0,
+    allTimeWater: 0,
+    sources: 0,
+    cycles: 0,
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     effects: [],

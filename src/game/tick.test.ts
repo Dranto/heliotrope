@@ -97,7 +97,7 @@ describe('generatorCost', () => {
 
 describe('buyGenerator', () => {
   it('spends the cost and adds one unit, leaving total Light untouched', () => {
-    const state = withState({ resources: { light: 120 }, totalLight: 500 });
+    const state = withState({ resources: { water: 0, light: 120 }, totalLight: 500 });
     const next = buyGenerator(state, 'balconyPanel');
     expect(next.resources.light).toBe(20);
     expect(next.generators.balconyPanel).toBe(1);
@@ -106,23 +106,26 @@ describe('buyGenerator', () => {
   });
 
   it('does nothing when the player cannot afford it', () => {
-    const state = withState({ resources: { light: 14.9 } });
+    const state = withState({ resources: { water: 0, light: 14.9 } });
     expect(canBuyGenerator(state, 'pot')).toBe(false);
     expect(buyGenerator(state, 'pot')).toBe(state);
   });
 
   it('buys several units at once for the bulk price', () => {
-    const state = withState({ resources: { light: 1_000 }, generators: owned({ pot: 2 }) });
+    const state = withState({
+      resources: { water: 0, light: 1_000 },
+      generators: owned({ pot: 2 }),
+    });
     const cost = generatorCost(state, 'pot', 10);
     const next = buyGenerator(state, 'pot', 10);
     expect(next.generators.pot).toBe(12);
     expect(next.resources.light).toBeCloseTo(1_000 - cost);
-    const poor = { ...state, resources: { light: cost - 1 } };
+    const poor = { ...state, resources: { water: 0, light: cost - 1 } };
     expect(buyGenerator(poor, 'pot', 10)).toBe(poor);
   });
 
   it('charges the increased price for the next unit', () => {
-    let state = withState({ resources: { light: 15 + 17.25 } });
+    let state = withState({ resources: { water: 0, light: 15 + 17.25 } });
     state = buyGenerator(buyGenerator(state, 'pot'), 'pot');
     expect(state.generators.pot).toBe(2);
     expect(state.resources.light).toBeCloseTo(0);
@@ -144,7 +147,7 @@ describe('isGeneratorRevealed', () => {
 
 describe('buyUpgrade', () => {
   it('spends the cost and records the upgrade once', () => {
-    const state = withState({ resources: { light: 200 }, generators: owned({ pot: 1 }) });
+    const state = withState({ resources: { water: 0, light: 200 }, generators: owned({ pot: 1 }) });
     expect(canBuyUpgrade(state, 'pot.1')).toBe(true);
     const next = buyUpgrade(state, 'pot.1');
     expect(next.resources.light).toBe(50);
@@ -154,9 +157,9 @@ describe('buyUpgrade', () => {
   });
 
   it('refuses locked or unaffordable upgrades', () => {
-    const locked = withState({ resources: { light: 1e6 } });
+    const locked = withState({ resources: { water: 0, light: 1e6 } });
     expect(buyUpgrade(locked, 'pot.1')).toBe(locked);
-    const poor = withState({ resources: { light: 149 }, generators: owned({ pot: 1 }) });
+    const poor = withState({ resources: { water: 0, light: 149 }, generators: owned({ pot: 1 }) });
     expect(buyUpgrade(poor, 'pot.1')).toBe(poor);
   });
 });

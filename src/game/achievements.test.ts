@@ -81,7 +81,7 @@ describe('unlockAchievements', () => {
   });
 
   it('unlocks the hidden slow photosynthesis after 10 minutes without buying', () => {
-    let state = buyGenerator(withState({ resources: { light: 15 } }), 'pot');
+    let state = buyGenerator(withState({ resources: { water: 0, light: 15 } }), 'pot');
     state = tick(state, 599);
     expect(state.achievements).not.toContain('slowPhotosynthesis');
     expect(buyGenerator(tick(state, 0.5), 'pot').idleSeconds).toBe(0);

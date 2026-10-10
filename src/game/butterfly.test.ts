@@ -22,7 +22,7 @@ function quarter(patch: Partial<GameState> = {}): GameState {
   const base = createInitialState(0);
   return {
     ...base,
-    resources: { light: 10_000 },
+    resources: { water: 0, light: 10_000 },
     totalLight: 10_000,
     allTimeLight: 10_000,
     generators: { ...base.generators, balconyPanel: 10 },
@@ -94,7 +94,7 @@ describe('catching the Golden Butterfly', () => {
       expect(result.state.butterfly.visible).toBe(0);
       expect(result.state.butterflies).toBe(state.butterflies + 1);
       counts[result.outcome] += 1;
-      state = { ...result.state, effects: [], resources: { light: 10_000 } };
+      state = { ...result.state, effects: [], resources: { water: 0, light: 10_000 } };
     }
     expect(counts.bloom).toBeGreaterThan(160);
     expect(counts.harvest).toBeGreaterThan(120);
@@ -102,9 +102,9 @@ describe('catching the Golden Butterfly', () => {
   });
 
   it('Récolte gives min(15% of the reserve, 15 minutes of production)', () => {
-    const rich = quarter({ resources: { light: 1e9 } });
+    const rich = quarter({ resources: { water: 0, light: 1e9 } });
     expect(harvestAmount(rich)).toBeCloseTo(lightPerSecond(rich) * 900);
-    const poor = quarter({ resources: { light: 1_000 } });
+    const poor = quarter({ resources: { water: 0, light: 1_000 } });
     expect(harvestAmount(poor)).toBeCloseTo(150);
   });
 
