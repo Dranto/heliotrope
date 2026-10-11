@@ -1890,6 +1890,24 @@ button {
   color: var(--leaf);
 }
 
+.seeds-ripening {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.seeds-ripening .challenge-meter {
+  flex: 0 0 6rem;
+}
+
+.seeds-ripening[data-ripe='true'] {
+  color: var(--leaf);
+  font-weight: 600;
+}
+
 .advice {
   margin: 1rem 0 0;
   padding: 0.8rem 1rem;

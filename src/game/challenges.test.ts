@@ -1,7 +1,7 @@
 import { CHALLENGES, completeChallenge, generatorLimit, offeredChallenges } from './challenges';
 import { runCooperatives } from './cooperatives';
 import { availableUpgrades, globalMultiplier, maxAffordable } from './production';
-import { startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { buyGenerator, canBuyGenerator, tick } from './tick';
 
@@ -10,7 +10,8 @@ function state(patch: Partial<GameState> = {}): GameState {
 }
 
 /** A game ready for its third Season, rich enough to buy anything. */
-const veteran = () => state({ allTimeLight: 1e12, seasons: 2, seeds: 10 });
+const veteran = () =>
+  state({ allTimeLight: 1e12, seasons: 2, seeds: 10, seasonSeconds: SEED_RIPENING_SECONDS });
 
 describe('challenge Seasons (§7.3)', () => {
   it('are offered from the second Season, until each one is won', () => {

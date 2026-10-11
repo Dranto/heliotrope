@@ -11,13 +11,23 @@ export const SOURCE_SEED_BONUS = 0.01;
 
 /**
  * §7: Seeds earned in total = floor(sqrt(Light earned over all Seasons of the Cycle /
- * SEED_LIGHT_DIVISOR)). Before the first Cycle of water (§7.4), that is all the Light ever earned.
+ * SEED_LIGHT_DIVISOR)) up to DEEP_SOIL_SEEDS, then a cube root (the soil deepens). Before the
+ * first Cycle of water (§7.4), that is all the Light ever earned.
  */
 export const SEED_LIGHT_DIVISOR = 2e7;
 /** §7: each Seed owned adds +5% to global production (additive). */
 export const SEED_BONUS = 0.05;
 /** §7: the interface advises waiting for this many Seeds before the first Season. */
 export const ADVISED_FIRST_SEASON_SEEDS = 10;
+/**
+ * §7 "Le sol s'approfondit": past this many Seeds in the Cycle, doubling the Seeds asks for 8
+ * times the Light instead of 4.
+ */
+export const DEEP_SOIL_SEEDS = 100;
+/** Light of the Cycle that deserves DEEP_SOIL_SEEDS: 2e11. */
+const DEEP_SOIL_LIGHT = DEEP_SOIL_SEEDS * DEEP_SOIL_SEEDS * SEED_LIGHT_DIVISOR;
+/** §7 "Les Graines mûrissent": a Season gives its Seeds once it has lasted this long. */
+export const SEED_RIPENING_SECONDS = 15 * 60;
 
 /** Light earned over the Seasons of the current Cycle of water (§7.4). */
 export function cycleLight(state: GameState): number {
@@ -26,17 +36,41 @@ export function cycleLight(state: GameState): number {
 
 /** Seeds deserved by the Light earned in the Cycle. */
 export function seedsForLight(cycleLight: number): number {
-  return Math.floor(Math.sqrt(Math.max(0, cycleLight) / SEED_LIGHT_DIVISOR));
+  const light = Math.max(0, cycleLight);
+  if (light <= DEEP_SOIL_LIGHT) return Math.floor(Math.sqrt(light / SEED_LIGHT_DIVISOR));
+  // The epsilon keeps lightForSeeds(n) worth exactly n Seeds despite rounding in the cube root.
+  return Math.floor(DEEP_SOIL_SEEDS * Math.cbrt(light / DEEP_SOIL_LIGHT) + 1e-9);
 }
 
-/** All-time Light needed to deserve `seeds` Seeds in total. */
+/** Light of the Cycle needed to deserve `seeds` Seeds in total. */
 export function lightForSeeds(seeds: number): number {
-  return seeds * seeds * SEED_LIGHT_DIVISOR;
+  if (seeds <= DEEP_SOIL_SEEDS) return seeds * seeds * SEED_LIGHT_DIVISOR;
+  return DEEP_SOIL_LIGHT * (seeds / DEEP_SOIL_SEEDS) ** 3;
 }
 
-/** Seeds a new Season would add to the ones already obtained. */
-export function seedsToGain(state: GameState): number {
+/** Share of the ripening time the Season has lasted, from 0 to 1 (§7). */
+export function seasonRipeness(state: GameState): number {
+  return Math.min(1, state.seasonSeconds / SEED_RIPENING_SECONDS);
+}
+
+/** The Seeds of the Season are ripe: a new Season can harvest them (§7). */
+export function areSeedsRipe(state: GameState): boolean {
+  return state.seasonSeconds >= SEED_RIPENING_SECONDS;
+}
+
+/** Seconds of Season left before its Seeds are ripe. */
+export function secondsToRipeness(state: GameState): number {
+  return Math.max(0, SEED_RIPENING_SECONDS - state.seasonSeconds);
+}
+
+/** Seeds the Light of the Cycle adds to the ones already obtained, ripe or not. */
+export function seedsGrowing(state: GameState): number {
   return Math.max(0, seedsForLight(cycleLight(state)) - state.seeds);
+}
+
+/** Seeds a new Season would add to the ones already obtained: none until they are ripe. */
+export function seedsToGain(state: GameState): number {
+  return areSeedsRipe(state) ? seedsGrowing(state) : 0;
 }
 
 /** Light of the Cycle still missing before one more Seed would be gained. */
@@ -53,7 +87,7 @@ export function seedBonus(seeds: number, sources = 0): number {
   return seeds * (SEED_BONUS + SOURCE_SEED_BONUS * sources);
 }
 
-/** A new Season is possible as soon as it would bring at least one Seed (§7). */
+/** A new Season is possible as soon as it would bring at least one ripe Seed (§7). */
 export function canStartNewSeason(state: GameState): boolean {
   return seedsToGain(state) >= 1;
 }
@@ -63,12 +97,12 @@ export function canStartNewSeason(state: GameState): boolean {
  * ADVISED_FIRST_SEASON_SEEDS ("La terre n'est pas encore prête").
  */
 export function isSeasonPremature(state: GameState): boolean {
-  return state.seasons === 0 && seedsToGain(state) < ADVISED_FIRST_SEASON_SEEDS;
+  return state.seasons === 0 && seedsGrowing(state) < ADVISED_FIRST_SEASON_SEEDS;
 }
 
 /** The Seasons screen appears once prestige is available, and stays once a Season is done. */
 export function isSeasonsScreenUnlocked(state: GameState): boolean {
-  return state.seasons > 0 || state.seeds > 0 || canStartNewSeason(state);
+  return state.seasons > 0 || state.seeds > 0 || seedsGrowing(state) >= 1;
 }
 
 /**
@@ -107,7 +141,7 @@ export function replant(state: GameState, challenge: ChallengeId | null, kept: n
  * (plus the ones gained), Milestones, restored parcels, the Tree of Seasons and its Cooperatives,
  * challenges won, the Herbier, the Bioregion (§7.4), all-time statistics, options and the clock.
  * With the Boutures talent, a share of each generator is kept too (§7.1), within the challenge's
- * limits. Returns the same state when no Seed would be gained or the challenge is not offered.
+ * limits. Returns the same state when no ripe Seed would be gained or the challenge is not offered.
  */
 export function startNewSeason(state: GameState, challenge: ChallengeId | null = null): GameState {
   if (!canStartNewSeason(state)) return state;

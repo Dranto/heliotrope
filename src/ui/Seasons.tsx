@@ -2,10 +2,16 @@ import { useState } from 'react';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
 import {
   ADVISED_FIRST_SEASON_SEEDS,
+  areSeedsRipe,
   canStartNewSeason,
+  DEEP_SOIL_SEEDS,
   isSeasonPremature,
   lightToNextSeed,
+  SEED_RIPENING_SECONDS,
+  seasonRipeness,
+  secondsToRipeness,
   seedBonus,
+  seedsGrowing,
   seedsToGain,
   startNewSeason,
 } from '../game/seasons';
@@ -57,6 +63,9 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
   const [challenge, setChallenge] = useState<ChallengeId | null>(null);
   const [message, setMessage] = useState('');
   const gain = seedsToGain(state);
+  const growing = seedsGrowing(state);
+  const ripe = areSeedsRipe(state);
+  const ripening = t.duration(Math.ceil(secondsToRipeness(state)));
   const available = canStartNewSeason(state);
   const premature = isSeasonPremature(state);
 
@@ -89,8 +98,8 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
         <div className="seed-tile gain">
           <dt>{t.seeds.toGain}</dt>
           <dd>
-            <strong data-testid="seeds-gain">+{formatNumber(gain)}</strong>
-            <span>{t.seeds.toGainHint}</span>
+            <strong data-testid="seeds-gain">+{formatNumber(growing)}</strong>
+            <span>{ripe ? t.seeds.toGainHint : t.seeds.toGainRipening(ripening)}</span>
           </dd>
         </div>
         <div className="seed-tile">
@@ -105,8 +114,23 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
         </div>
       </dl>
 
+      <p className="seeds-ripening" data-ripe={ripe}>
+        <span
+          className="challenge-meter"
+          role="progressbar"
+          aria-label={t.seeds.ripeness(formatPercent(seasonRipeness(state)))}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.floor(seasonRipeness(state) * 100)}
+        >
+          <span style={{ width: `${seasonRipeness(state) * 100}%` }} />
+        </span>
+        {ripe ? t.seeds.ripe : t.seeds.ripening(ripening)}
+      </p>
+
       <p className="hint">
-        {t.seeds.nextSeed(formatCost(lightToNextSeed(state)))} {t.seeds.formula}
+        {t.seeds.nextSeed(formatCost(lightToNextSeed(state)))}{' '}
+        {t.seeds.formula(t.duration(SEED_RIPENING_SECONDS), formatNumber(DEEP_SOIL_SEEDS))}
       </p>
 
       {premature && available && (
@@ -182,7 +206,7 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
         </fieldset>
       )}
 
-      {!available && <p className="hint">{t.seeds.noSeedYet}</p>}
+      {!available && growing === 0 && <p className="hint">{t.seeds.noSeedYet}</p>}
       {confirming && available ? (
         <div className="confirm-row">
           <span>{t.seeds.confirm(formatNumber(gain))}</span>

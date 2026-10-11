@@ -1,13 +1,14 @@
 import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
 import { CHALLENGE_IDS, type ChallengeId } from './challenges';
-import { startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import {
   ADVISED_CYCLE_TARGET,
   learnReferenceTalents,
   PACING_TARGETS,
   simulate,
   simulateFirstCycle,
+  simulateSeasonsAfterCycle,
   simulateTwoSeasons,
 } from './simulator';
 
@@ -97,9 +98,31 @@ describe('the Bioregion and the first Cycle of water (§7.4)', () => {
     expect(Object.values(run.state.sites).every((n) => n > 0)).toBe(true);
   });
 
+  it('keeps every later Season at least as long as the Seeds take to ripen (§7)', () => {
+    // The first one finishes the second Season, the last one is cut short by the Cycle.
+    for (const seconds of run.seasons.slice(1, -1)) {
+      expect(seconds).toBeGreaterThanOrEqual(SEED_RIPENING_SECONDS);
+    }
+  });
+
   it('makes the first Cycle advisable within ±30% of its target', () => {
     const ratio = run.advisedCycle! / ADVISED_CYCLE_TARGET;
     expect(ratio).toBeGreaterThanOrEqual(0.7);
     expect(ratio).toBeLessThanOrEqual(1.3);
+  });
+});
+
+describe('later Seasons, after the first Cycle (§7)', () => {
+  // Before the ripening Seeds and the deeper soil, these Seasons lasted one to three minutes.
+  const { first, second } = twoSeasons;
+  const cycle = simulateFirstCycle({ from: second.state, elapsed: first.seconds + second.seconds });
+  const { seasons } = simulateSeasonsAfterCycle({ from: cycle.state, count: 5 });
+
+  it('lasts at least the ripening time, Season after Season', () => {
+    for (const seconds of seasons) expect(seconds).toBeGreaterThanOrEqual(SEED_RIPENING_SECONDS);
+  });
+
+  it('grows longer once doubling the Seeds asks for more than the ripening time', () => {
+    expect(seasons.at(-1)!).toBeGreaterThan(20 * 60);
   });
 });

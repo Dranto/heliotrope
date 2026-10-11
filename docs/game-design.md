@@ -211,7 +211,7 @@ Chaque phase change la scène centrale (le décor reverdit) et débloque des él
 | 1 | **Le Balcon** | 0 – 5 min | Clic, générateurs 1 à 3, premières améliorations | Un balcon gris, une fleur, puis des pots et un panneau |
 | 2 | **Le Quartier** | 5 min – 25 min | Générateurs 4 et 5, synergies, Jalons, Papillon doré | Les toits verdissent, une serre apparaît |
 | 3 | **La Ville** | 25 min – 1 h 40 | Générateurs 6 à 8, bonus de biodiversité complet, prestige disponible | Des miroirs au loin, les rues deviennent des sous-bois |
-| 4 | **Les Saisons** | après la 1ʳᵉ Saison | Écran des Saisons, statistiques de prestige | La scène change de teinte selon la saison (printemps, été, automne, hiver) |
+| 4 | **Les Saisons** | après la 1ʳᵉ Saison | Écran des Saisons, statistiques de prestige | La scène suit la maturité des Graines : printemps, été, puis automne quand elles sont mûres (§7) |
 
 Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en cours** (seuils indicatifs : Phase 2 à 10 000, Phase 3 à 10 M).
 
@@ -223,7 +223,7 @@ Les phases se déclenchent sur la **Lumière totale gagnée pendant la Saison en
 **Implémentation (jalon 4).** `src/game/phases.ts`.
 
 - La scène suit la phase : le ciel passe de l'aube (phase 1) au plein midi (phase 2) puis à la fin d'après-midi (phase 3), et le nom de la phase s'affiche en légende.
-- Phase 4 : à partir de la 2ᵉ Saison, la scène prend la teinte d'une saison, en commençant par le printemps puis en suivant le cycle (printemps, été, automne, hiver). La 1ʳᵉ Saison n'a pas de teinte propre. Le feuillage et le ciel changent de couleur ; rien d'autre ne change.
+- Phase 4 : à partir de la 2ᵉ Saison, la scène prend la teinte d'une saison. La 1ʳᵉ Saison n'a pas de teinte propre. Le feuillage et le ciel changent de couleur ; rien d'autre ne change. Depuis les Graines mûres (§7, 2026-10-11), la teinte suit la maturité de la Saison en cours : printemps au début, été à mi-maturité, automne une fois les Graines mûres. L'hiver, c'est la replantation elle-même : il ne reste pas à l'écran. (Avant, la teinte changeait d'une Saison à l'autre, dans l'ordre des saisons.)
 
 **Scène vue du dessus (post-MVP, 2026-10-10).** Demande d'Antoine : une progression plus visuelle, la ville au centre de l'écran, vue du dessus, où les bâtiments apparaissent avec des animations élégantes au fil des achats. `src/ui/Neighbourhood.tsx` dessine la scène, `src/ui/neighbourhood.ts` porte le plan et les règles.
 
@@ -319,8 +319,9 @@ Quand la progression ralentit, le joueur peut lancer une **Nouvelle Saison**. Th
 ### Formule
 
 ```
-grainesTotalesMéritées = floor( sqrt( lumièreTotaleToutesSaisons / 2e7 ) )
-grainesGagnées         = grainesTotalesMéritées − grainesDéjàObtenues
+grainesTotalesMéritées = floor( sqrt( lumièreTotaleToutesSaisons / 2e7 ) )        jusqu'à 100 Graines (2e11)
+                       = floor( 100 × cbrt( lumièreTotaleToutesSaisons / 2e11 ) )   au-delà (le sol s'approfondit)
+grainesGagnées         = grainesTotalesMéritées − grainesDéjàObtenues, une fois mûres (15 min de Saison)
 bonusProduction        = +5 % par Graine possédée (additif)
 ```
 
@@ -331,20 +332,30 @@ Points de repère *(à valider)* :
 | 20 M (2e7) | 1 | +5 % |
 | 2 Md (2e9) | 10 | +50 % |
 | 200 Md (2e11) | 100 | +500 % |
+| 1,6 Bn (1,6e12) | 200 | +1 000 % |
+| 200 Bn (2e14) | 1 000 | +5 000 % |
 
 > Première passe d'équilibrage (jalon 2, 2026-10-10) : le diviseur passe de 1e9 à 5e7. Avec 1e9, le simulateur n'atteignait 10 Graines qu'après plus de 8 h de jeu, ce qui contredisait la cible de ~4 h du §8 alors que le rythme des générateurs, lui, tombait juste. Le diviseur est le seul réglage qui corrige cet écart sans décaler l'arrivée des générateurs.
 
 > Équilibrage adouci (après le MVP) : le diviseur passe de 5e7 à 2e7 pour que les 10 Graines conseillées arrivent vers 2 h 40, au même rythme raccourci d'un tiers que les générateurs (§8).
 
-- Le bouton Nouvelle Saison est disponible dès qu'on gagnerait au moins **1** Graine, mais l'interface conseille d'attendre d'en gagner au moins 10 pour la première (« La terre n'est pas encore prête »). On ne bloque pas, on conseille.
+- Le bouton Nouvelle Saison est disponible dès qu'on gagnerait au moins **1** Graine mûre, mais l'interface conseille d'attendre d'en gagner au moins 10 pour la première (« La terre n'est pas encore prête »). On ne bloque pas, on conseille.
 - L'écran de confirmation montre clairement : ce qui sera perdu, les Graines gagnées, le bonus avant/après.
-- Cible : 1ʳᵉ Saison rentable vers **1 h 30 – 1 h 45** de jeu, puis des Saisons de plus en plus courtes pour atteindre le même point.
+- Cible : 1ʳᵉ Saison rentable vers **1 h 30 – 1 h 45** de jeu, puis des Saisons plus courtes pour atteindre le même point, mais **jamais moins de 15 minutes** : passé les premières, une Saison doit durer plus longtemps à mesure que les Graines s'accumulent (demande d'Antoine de corriger l'emballement des Saisons, 2026-10-11).
+
+**Freiner l'emballement (2026-10-11).** Demande d'Antoine : corriger l'emballement des Saisons par des mécaniques. Avant, dès ~80 Graines, chaque Saison ne durait que 1 à 3 minutes : en une minute, le joueur rachetait presque tous les bâtiments de la Saison précédente, et la production (Graines, talents, sites, améliorations ×2 débloquées par plus de bâtiments) croissait plus vite que la Lumière qu'il fallait pour doubler ses Graines. Deux mécaniques s'ajoutent, sans toucher aux bâtiments ni au début de partie :
+
+- **Les Graines mûrissent.** Les Graines d'une Saison poussent dès que la Lumière les mérite, mais ne se récoltent que **mûres, après 15 minutes de Saison** (temps réel écoulé, hors ligne compris). Avant, le bouton Nouvelle Saison reste grisé. L'écran des Saisons montre les Graines qui poussent, une jauge de maturité et le temps restant (« Les Graines mûrissent : encore 7 min de Saison »). Sur la carte, la teinte de saison suit la maturité (§6) : printemps, été, puis automne quand la récolte est prête. Les trois premières Saisons durent naturellement plus de 15 minutes et ne changent pas. Une Saison qui mûrit plus longtemps récolte plus : la Lumière gagnée pendant l'attente compte, et l'Eau des collecteurs (§7.4), qui suit le temps, profite aussi des Saisons longues.
+- **Le sol s'approfondit.** Au-delà de **100 Graines** dans le Cycle, les Graines suivent une racine cubique au lieu d'une racine carrée : doubler ses Graines demande ×8 Lumière au lieu de ×4. Sans cela, l'attente de la maturité ferait bondir les Graines de ×15 à ×40 par Saison ; avec, de ×4 à ×10, puis ×2 quand les Saisons s'allongent.
+
+Ni l'une ni l'autre ne suffit seule : un sol plus exigeant seul laissait des Saisons de 5 minutes pendant longtemps, et une maturité progressive (Graines multipliées par la part de maturité) n'allongeait les Saisons que d'une à deux minutes. Ensemble, elles donnent des Saisons d'au moins 15 minutes qui s'allongent ensuite d'elles-mêmes (mesures au §8).
 
 **Implémentation (jalon 3).** `src/game/seasons.ts`. Précisions retenues :
 
 - Le bonus des Graines multiplie la production des générateurs (et donc la part du clic indexée sur la production, §5.2), pas la valeur de base du clic : `multiplicateurGlobal = (1 + 0,05 × graines) × (1 + bonusBiodiversité)`.
 - Le conseil « La terre n'est pas encore prête » ne s'affiche que pour la première Saison, tant qu'on gagnerait moins de 10 Graines. Les Saisons suivantes ne sont jamais déconseillées.
-- L'écran des Saisons apparaît dès qu'une Graine est à gagner, puis reste accessible une fois une Saison accomplie. Le bouton du menu montre les Graines à gagner.
+- L'écran des Saisons apparaît dès qu'une Graine pousse, mûre ou non, puis reste accessible une fois une Saison accomplie. Le bouton du menu montre les Graines mûres à gagner.
+- Maturité et sol profond (2026-10-11) : `SEED_RIPENING_SECONDS` (15 min, sur `seasonSeconds`) et `DEEP_SOIL_SEEDS` (100). `seedsGrowing` compte les Graines qui poussent, `seedsToGain` celles qu'une nouvelle Saison récolterait (aucune avant maturité). Le Cycle de l'eau (§7.4) ne dépend pas de la maturité.
 - La Lumière totale cumulée, les clics, le temps de jeu, le nombre de Saisons et les Graines sont conservés ; la durée et la Lumière de la Saison en cours repartent de zéro. Le temps de jeu compte aussi la progression hors ligne.
 - La nouvelle Saison est sauvegardée immédiatement.
 
@@ -446,7 +457,7 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
 - **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
 - **Conservé :** les Sources, les **talents de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
 - Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
-- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 50** ; le test du simulateur le garde entre 2 h et 4 h. Les Saisons qui suivent la 3ᵉ deviennent très courtes pour ce joueur, avec ou sans Biorégion : c'est l'emballement déjà présent des Graines (+5 % chacune) et des talents, que les routines d'équilibrage pourront adoucir. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~22 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), la 4ᵉ ~9 min, puis chaque Saison 1 à 3 min dès 80 Graines. Au bout d'une minute, le joueur a déjà racheté presque tous les bâtiments de la Saison précédente : sa production (Graines, sites, talents, améliorations ×2 débloquées par des bâtiments plus nombreux) croît plus vite que la Lumière qu'il faut pour doubler ses Graines (×4). Des rendements décroissants des Graines seuls (racine carrée au-delà de 100 Graines) n'y changent presque rien ; le levier serait plutôt la Lumière demandée par Graine dans les Saisons tardives, une décision de design encore ouverte.
+- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 45** ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
 
 **Écrans.** Un panneau **« La Biorégion »** sous « Bâtir » (onglet Bâtir sur mobile) liste les collecteurs (Bâtir ☀) puis les sites (Étendre 💧), avec l'Eau en réserve et par seconde. Une pastille d'Eau rejoint le compteur, puis une pastille des Sources. L'écran **« Le Cycle de l'eau »** (menu, dès qu'une Source est à gagner) reprend celui des Saisons : Sources, à faire jaillir, bonus avant/après, ce qui repart de zéro et ce qui reste, confirmation ; son ornement est une goutte qui tombe sous l'arche et ses ronds dans l'eau.
 
@@ -483,7 +494,7 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 
 - **Coût exponentiel, production linéaire par générateur** : chaque générateur finit par devenir cher à empiler, ce qui pousse vers le palier suivant puis vers les améliorations, puis vers le prestige.
 - **Les améliorations ×2 compensent la croissance des coûts** par paliers : elles créent des « marches » de progression qu'on sent.
-- **Le prestige compense le mur final.** Avec `sqrt`, gagner 10× plus de Graines demande 100× plus de Lumière : les Saisons longues restent rentables, mais le retour diminue, ce qui pousse à relancer régulièrement.
+- **Le prestige compense le mur final.** Avec `sqrt`, gagner 10× plus de Graines demande 100× plus de Lumière : les Saisons longues restent rentables, mais le retour diminue, ce qui pousse à relancer régulièrement. Au-delà de 100 Graines, le sol s'approfondit (racine cubique) et chaque Saison attend que ses Graines mûrissent (15 min) : la production ne peut plus rattraper en une minute la Lumière d'un doublement, et les Saisons tardives s'allongent au lieu de raccourcir (§7).
 
 ### Rythme cible (1ʳᵉ partie, joueur actif)
 
@@ -528,6 +539,22 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 > La terre se souvient (M7) : la 1ʳᵉ Saison ne change pas (pas encore de Graine à semer). Au début de la 2ᵉ, le joueur de référence sème ses 10 Graines dans cet ordre, tant qu'elles suffisent : les jardiniers, Fleurs nectarifères, Mycorhizes, les maraîchers, Haies fleuries, Boutures, Sous-bois, Veilleurs de nuit (ordre complet dans `REFERENCE_TALENTS`). Les deux coopératives achètent pour lui pendant qu'il joue sa stratégie habituelle (environ 45 et 95 achats). Sa 2ᵉ Saison conseillée passe de 52 min à 43 min (Arcologie à 36 min au lieu de 41), sans toucher aux cibles de la 1ʳᵉ.
 >
 > Le vivant revient (M8) : les espèces de l'Herbier (§9.5) s'ajoutent à la biodiversité dès la 1ʳᵉ Saison (le joueur de référence en ramène 8 : Coquelicot, Fougère, Abeille, Coccinelle, Bourdon, Grenouille, Hérisson, Citron). Comme Antoine le souhaite, c'est une synergie de plus plutôt qu'un changement de valeurs. Avec les 92 jalons et les jalons de M8, la Saison conseillée passe de 1 h 23 à 1 h 14 (−26 % de la cible, encore dans les ±30 %), l'Arcologie à 1 h 01 et la 2ᵉ Saison à 36 min. Les Saisons à défi (§7.3) sont jouées comme 3ᵉ Saison : `npm run simulate` affiche aussi le moment où chacune est gagnée.
+
+> Freiner l'emballement des Saisons (2026-10-11, §7) : le joueur de référence joue chaque Saison jusqu'à doubler ses Graines, une fois mûres, et sème ses talents à chaque Saison. Mesuré avec les visites (M11) et les quartiers voisins (M12), sur trois graines de hasard (0, 1 et 2), en prolongeant le parcours de `npm run simulate` ; la colonne « Avant » est la mesure d'avant M11 :
+>
+> | Saison | Avant | Après | Graines à la fin (après) |
+> |---|---|---|---|
+> | 1ʳᵉ | 1 h 14 | 1 h 15 – 1 h 16 | 10 |
+> | 2ᵉ | 46 min | 40 – 44 min | 20 |
+> | 3ᵉ (la Biorégion s'ouvre) | 23 min | 23 – 26 min | 40 |
+> | 4ᵉ | 9 min | 15 min | 290 – 340 |
+> | 5ᵉ | 2,7 min | 15 min | 1 300 – 1 650 |
+> | Suivantes, jusqu'au Cycle | 1 à 3 min | 15 min | 3 000 – 3 900 |
+> | 1ᵉʳ Cycle conseillé | 2 h 52 | 2 h 46 (graine 0) | |
+> | Trois Saisons après le Cycle | quelques minutes | 15 min chacune | 100 – 180, 2 100 – 2 400, 7 500 – 8 300 |
+> | Les trois suivantes | — | 17 – 20 min, 37 – 43 min, 1 h 28 – 1 h 32 | doublées à chaque fois |
+>
+> Les trois premières Saisons ne changent pas (elles durent déjà plus de 15 minutes, et le sol ne s'approfondit qu'à 100 Graines). Ensuite, chaque Saison dure au moins ses 15 minutes de maturité, puis s'allonge d'elle-même : au-delà de ~60 000 Graines, doubler demanderait 4 h de Saison, et le joueur replante plutôt avec ×1,3 à ×1,5 ou prépare le Cycle suivant. Le test du simulateur vérifie que chaque Saison entre la 3ᵉ et le Cycle dure au moins 15 minutes, que les cinq Saisons après le Cycle aussi, et que la 5ᵉ dure plus de 20 minutes.
 
 ### Affichage des nombres
 
