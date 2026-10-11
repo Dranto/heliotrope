@@ -22,7 +22,15 @@ import type { UpgradeId } from './upgrades';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { carryOutProject, offeredParcels, offeredProjects, restoreParcel } from './restoration';
-import { learnTalent, type TalentId } from './talents';
+import {
+  CANOPY_IDS,
+  canRaiseCanopy,
+  learnTalent,
+  nextCanopyCost,
+  raiseCanopy,
+  type TalentId,
+} from './talents';
+import { canWidenArm, openArm, WIDE_ARM_IDS, widenArm, type DeltaId } from './delta';
 
 /** Light earned in a Season that makes the first Season advisable: 10 Seeds (§7), 2e9. */
 export const ADVISED_SEASON_LIGHT = lightForSeeds(ADVISED_FIRST_SEASON_SEEDS);
@@ -311,10 +319,14 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   greenhouse: 5.5 * 60,
   verticalFarm: 12 * 60,
   mirrorPlant: 26 * 60,
-  urbanCanopy: 50 * 60,
-  arcology: 80 * 60,
-  advisedSeason: 100 * 60,
+  // Brought closer in M19 to what the synergies and the Herbier made of the end of the Season.
+  urbanCanopy: 45 * 60,
+  arcology: 70 * 60,
+  advisedSeason: 80 * 60,
 };
+
+/** §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. */
+export const CYCLE_TARGETS: readonly number[] = [35 * 60, 35 * 60, 45 * 60];
 
 /**
  * The reference player's later Seasons: each one is played until it would at least double the
@@ -401,4 +413,104 @@ export function simulateSeasonsAfterCycle({
     state = learnReferenceTalents(startNewSeason(result.state));
   }
   return { seasons, state };
+}
+
+/** Delta arms the reference player opens, in this order, as far as the Sources go (§7.5). */
+export const REFERENCE_DELTA: readonly DeltaId[] = [
+  'seedArm',
+  'hillsArm',
+  'memoryArm',
+  'seedArm',
+  'lockKeeper',
+  'floodArm',
+];
+
+/** Learn the reference talents, then sow the cheapest canopy level, as far as the Seeds go. */
+export function tendTree(state: GameState): GameState {
+  let next = learnReferenceTalents(state);
+  for (;;) {
+    const id = [...CANOPY_IDS]
+      .filter((c) => canRaiseCanopy(next, c))
+      .sort((a, b) => nextCanopyCost(next, a)! - nextCanopyCost(next, b)!)[0];
+    if (!id) return next;
+    next = raiseCanopy(next, id);
+  }
+}
+
+/**
+ * Open the reference arms of the delta the Sources left can pay for, then widen the cheapest arm
+ * (the seed arm first on a tie) as far as they go (M19).
+ */
+export function tendDelta(state: GameState): GameState {
+  let next = REFERENCE_DELTA.reduce(openArm, state);
+  for (;;) {
+    const id = WIDE_ARM_IDS.filter((arm) => canWidenArm(next, arm)).sort(
+      (a, b) => next.delta.widths[a] - next.delta.widths[b],
+    )[0];
+    if (!id) return next;
+    next = widenArm(next, id);
+  }
+}
+
+/** The reference player starts the next Cycle once it multiplies the Sources by this much. */
+export const REFERENCE_SOURCE_GROWTH = 1.5;
+
+export interface EndgameCycle {
+  /** Seconds of play of the whole Cycle. */
+  seconds: number;
+  /** Seconds of play of each of its Seasons. */
+  seasons: number[];
+  /** Sources owned once the Cycle is over, before the next one starts. */
+  sources: number;
+}
+
+/** Sources the reference player waits for before starting the Cycle after this one. */
+export function referenceCycleSources(state: GameState): number {
+  return Math.max(state.sources + 1, Math.ceil(state.sources * REFERENCE_SOURCE_GROWTH));
+}
+
+/**
+ * The endgame (§8, M19): from a state where a Cycle of water can start, start it and play the
+ * Cycles that follow. Each one opens the delta and sows the tree as far as it goes, plays
+ * Seasons that double the Seeds, and ends once its Sources reach referenceCycleSources.
+ */
+export function simulateCycles({
+  from,
+  count,
+  maxCycleSeconds = 10 * 3600,
+  ...options
+}: Omit<SimulationOptions, 'state' | 'stopAtSeeds' | 'maxSeconds'> & {
+  from: GameState;
+  count: number;
+  maxCycleSeconds?: number;
+}): { cycles: EndgameCycle[]; state: GameState } {
+  let state = from;
+  const cycles: EndgameCycle[] = [];
+  for (let i = 0; i < count; i += 1) {
+    state = tendTree(tendDelta(startNewCycle(state)));
+    const goal = referenceCycleSources(state);
+    const seasons: number[] = [];
+    let seconds = 0;
+    const reached = () => state.sources + sourcesToGain(state) >= goal;
+    while (!reached() && seconds < maxCycleSeconds) {
+      const target = Math.max(
+        ADVISED_FIRST_SEASON_SEEDS,
+        Math.ceil(state.seeds * REFERENCE_SEED_GROWTH),
+      );
+      let played = 0;
+      while (played < 4 * 3600 && seconds < maxCycleSeconds) {
+        const stretch = Math.min(15 * 60, maxCycleSeconds - seconds);
+        const result = simulate({ ...options, state, stopAtSeeds: target, maxSeconds: stretch });
+        state = result.state;
+        played += result.seconds;
+        seconds += result.seconds;
+        if (seedsToGain(state) >= target || reached()) break;
+      }
+      seasons.push(played);
+      if (reached()) break;
+      state = tendTree(startNewSeason(state));
+    }
+    cycles.push({ seconds, seasons, sources: state.sources + sourcesToGain(state) });
+  }
+  return { cycles, state };
 }

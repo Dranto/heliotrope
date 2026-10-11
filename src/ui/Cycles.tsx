@@ -12,16 +12,24 @@ import {
 import {
   availableSources,
   canOpenArm,
+  canWidenArm,
   DELTA,
   DELTA_IDS,
   isArmOpen,
   isDeltaOpen,
   LOCK_FACTORS,
+  memoryShare,
   nextArmCost,
+  nextWidenCost,
   openArm,
-  RIPENING_SECONDS,
+  ripeningFor,
   setLockFactor,
+  WIDE_ARM_IDS,
+  widenArm,
+  widenFactor,
+  WIDEN_MAX,
   type DeltaId,
+  type WideArmId,
 } from '../game/delta';
 import { formatCost, formatDecimal, formatNumber, formatPercent } from '../game/format';
 import type { GameState } from '../game/state';
@@ -85,16 +93,22 @@ function DeltaArt({ state }: { state: GameState }) {
         const level = state.delta.levels[id];
         const open = level > 0;
         const full = level >= DELTA[id].costs.length;
+        // A widened arm (M19) runs broader and its pool grows.
+        const width = isWideArm(id) ? state.delta.widths[id] : 0;
         return (
-          <g key={id} data-arm={id} data-open={open}>
-            <path className="delta-bank" d={d} />
-            <path className={`delta-water${open ? ' open' : ''}`} d={d} />
+          <g key={id} data-arm={id} data-open={open} data-width={width}>
+            <path className="delta-bank" d={d} style={{ strokeWidth: 9 + width * 0.6 }} />
+            <path
+              className={`delta-water${open ? ' open' : ''}`}
+              d={d}
+              style={open ? { strokeWidth: 4.5 + width * 0.45 } : undefined}
+            />
             <ellipse
               className={`delta-pool${open ? ' open' : ''}${full ? ' full' : ''}`}
               cx={x}
               cy="95"
-              rx="9"
-              ry="5"
+              rx={9 + width * 0.5}
+              ry={5 + width * 0.25}
             />
           </g>
         );
@@ -103,17 +117,81 @@ function DeltaArt({ state }: { state: GameState }) {
   );
 }
 
+function isWideArm(id: DeltaId): id is WideArmId {
+  return (WIDE_ARM_IDS as readonly DeltaId[]).includes(id);
+}
+
 function armEffect(id: DeltaId, level: number): string {
   const effects = t.cycles.delta.effects;
-  if (id === 'seedArm') {
-    const seconds = RIPENING_SECONDS[Math.min(level, RIPENING_SECONDS.length - 1)]!;
-    return effects.seedArm(t.duration(seconds));
-  }
+  if (id === 'seedArm') return effects.seedArm(t.duration(ripeningFor(level, 0)));
   return effects[id];
 }
 
+/** What a widened arm does at `width` (M19). */
+function widthEffect(state: GameState, id: WideArmId, width: number): string {
+  const effects = t.cycles.delta.widen.effects;
+  switch (id) {
+    case 'seedArm':
+      return effects.seedArm(t.duration(ripeningFor(state.delta.levels.seedArm, width)));
+    case 'memoryArm':
+      return effects.memoryArm(formatPercent(memoryShare(width)));
+    case 'hillsArm':
+      return effects.hillsArm(formatPercent(widenFactor(width) - 1));
+    case 'floodArm':
+      return effects.floodArm(formatPercent(widenFactor(width) - 1));
+  }
+}
+
+/** Once the whole delta is open, an arm widens level by level (M19). */
+function Widening({
+  state,
+  id,
+  onWiden,
+}: {
+  state: GameState;
+  id: WideArmId;
+  onWiden: (id: WideArmId) => void;
+}) {
+  const width = state.delta.widths[id];
+  const cost = nextWidenCost(state, id);
+  const name = t.cycles.delta.names[id];
+  if (cost === null && width === 0) return null;
+  return (
+    <div className="delta-widen" data-width={width}>
+      <div>
+        <span className="delta-level">
+          {t.cycles.delta.widen.level(formatNumber(width), formatNumber(WIDEN_MAX))}
+        </span>
+        <p className="delta-effect">{widthEffect(state, id, cost === null ? width : width + 1)}</p>
+      </div>
+      {cost === null ? (
+        <span className="delta-opened">{t.cycles.delta.widen.full}</span>
+      ) : (
+        <button
+          type="button"
+          className="buy delta-open"
+          disabled={!canWidenArm(state, id)}
+          aria-label={t.cycles.delta.widen.label(name, formatNumber(cost))}
+          onClick={() => onWiden(id)}
+        >
+          <span className="buy-verb">{t.cycles.delta.widen.verb}</span>
+          <span className="buy-cost">{t.cycles.delta.cost(formatNumber(cost))}</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 /** The arms of the delta (§7.5), opened with the Sources not yet spent. */
-function Delta({ state, onOpen }: { state: GameState; onOpen: (id: DeltaId) => void }) {
+function Delta({
+  state,
+  onOpen,
+  onWiden,
+}: {
+  state: GameState;
+  onOpen: (id: DeltaId) => void;
+  onWiden: (id: WideArmId) => void;
+}) {
   return (
     <section className="delta" aria-labelledby="delta-title">
       <h3 id="delta-title">{t.cycles.delta.title}</h3>
@@ -155,6 +233,7 @@ function Delta({ state, onOpen }: { state: GameState; onOpen: (id: DeltaId) => v
                   <span className="buy-cost">{t.cycles.delta.cost(formatNumber(cost))}</span>
                 </button>
               )}
+              {isWideArm(id) && <Widening state={state} id={id} onWiden={onWiden} />}
             </li>
           );
         })}
@@ -261,7 +340,11 @@ export function Cycles({ onClose }: { onClose: () => void }) {
       </p>
 
       {isDeltaOpen(state) && (
-        <Delta state={state} onOpen={(id) => store.dispatch((s) => openArm(s, id))} />
+        <Delta
+          state={state}
+          onOpen={(id) => store.dispatch((s) => openArm(s, id))}
+          onWiden={(id) => store.dispatch((s) => widenArm(s, id))}
+        />
       )}
 
       {isArmOpen(state, 'lockKeeper') && (

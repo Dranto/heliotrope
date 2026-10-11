@@ -4,7 +4,7 @@
 import { FLOOD_TIDE_SOURCES, unlockAchievement, unlockAchievements } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS } from './bioregion';
 import { offeredCycleChallenges, type CycleChallengeId } from './cycleChallenges';
-import { isArmOpen, isLockKeeperWorking, MEMORY_KEPT } from './delta';
+import { isLockKeeperWorking, keptByMemory } from './delta';
 import { replant } from './seasons';
 import { treeSeedsSpent } from './talents';
 import type { GameState } from './state';
@@ -72,7 +72,7 @@ export function startNewCycle(
 ): GameState {
   if (!canStartNewCycle(state)) return state;
   if (challenge && !offeredCycleChallenges(state).some((c) => c.id === challenge)) return state;
-  const kept = isArmOpen(state, 'memoryArm') ? MEMORY_KEPT : 0;
+  const kept = keptByMemory(state);
   const sources = state.sources + sourcesToGain(state);
   // The whole neighbourhood is replanted, without the Boutures; the next Season begins.
   const replanted = replant(state, null, 0);

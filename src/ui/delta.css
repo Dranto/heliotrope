@@ -103,3 +103,14 @@
     transition: stroke 0.6s ease;
   }
 }
+
+/* Widening an arm once the whole delta is open (M19). */
+.delta-widen {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding-top: 0.45rem;
+  border-top: 1px dashed rgb(79 159 191 / 0.35);
+}
