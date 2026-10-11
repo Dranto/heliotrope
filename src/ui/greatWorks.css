@@ -116,8 +116,9 @@
   color: #9a5a2a;
 }
 
-.works-give {
+.works-card .works-give {
   align-content: center;
+  align-items: center;
   justify-self: end;
   min-height: 2.2rem;
 }

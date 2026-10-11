@@ -372,6 +372,30 @@ Une étape coûte à peu près une Saison tardive d'efforts (§8) ; un chantier 
 - **Simulateur.** Il ne joue pas les chantiers : leurs bonus ne font que s'ajouter à la fin de partie mesurée en M19.
 - **Sauvegarde.** Version 22 : les étapes bâties et les versements de chaque chantier, et les paniers du potager, à zéro pour une sauvegarde plus ancienne.
 
+### 6.7 Les trames verte et bleue (M21)
+
+Les avenirs des parcelles (§6.5) se répondent (roadmap P20) : des parcelles restaurées **voisines** sur la carte dont l'avenir choisi est de la **même famille** forment une **trame**. Rien n'est gardé à part : les trames suivent les parcelles et leurs avenirs, donc changer un avenir (une fois par Cycle de l'eau) les réarrange. Données dans `src/game/corridors.ts`, dessins dans `src/ui/CorridorArt.tsx` et `src/ui/corridorMap.ts`.
+
+| Parcelle | 1ᵉʳ avenir | 2ᵈ avenir |
+|---|---|---|
+| Rue jardin | verte | aucune (rue des enfants) |
+| Jardins de pluie | bleue | bleue |
+| Corridor des pollinisateurs | verte | verte |
+| Rivière retrouvée | bleue | bleue |
+| Parc du parking | verte | aucune (marché couvert) |
+| Verger de l'entrepôt | verte | aucune (serres) |
+| Toits vivants | aucune (les toits ne touchent pas le sol) | aucune |
+| Places plantées | verte | bleue (places des fontaines) |
+
+**Voisinage.** Les deux avenues touchent les deux rues qui traversent la ville et les places de leurs carrefours ; les deux rues touchent aussi les places ; le verger longe la rue ouest, le parc fait face à la rue de la rivière. Le petit casse-tête tient aux places : vertes, elles complètent une trame verte de quatre parcelles (rue jardin, pollinisateurs, verger, places) ; bleues, une trame bleue de trois (jardins de pluie, rivière, places).
+
+- **Effet.** Une trame compte à partir de **2 parcelles**. Verte : **+2 % de production par parcelle** (+8 % au plus). Bleue : **Eau ×(1 + 0,05 par parcelle)** (×1,15 au plus). Jamais de pénalité : les avenirs gardent leur effet propre.
+- **Espèces.** Une trame de **3 parcelles** ou plus fait revenir son espèce, qui reste ensuite comme les autres : le **Pic vert** (trame verte) et le **Triton crêté** (trame bleue). Comme celles de la rivière et de la ville, elles ne comptent pas dans les 18 espèces du quartier de l'Herbier complet (§9.5).
+- **Écran.** Dans « Les avenirs des parcelles » (panneau « Le quartier »), une pastille verte ou bleue marque la famille de chaque avenir, et la liste des trames donne leur longueur et leur effet.
+- **Sur la carte.** Une haie continue court le long d'une trame verte, un ruisseau qui coule le long d'une trame bleue, avec un trait qui relie le verger à la rue ouest ou le parc à la rivière. En SVG par-dessus les deux rendus (§10.4).
+- **Simulateur.** Il garde les premiers avenirs : sa trame verte (rue jardin, pollinisateurs, verger, qui fait revenir le Pic vert dès la 2ᵉ Saison) et sa trame bleue (jardins de pluie, rivière) restent dans les cibles du §8 (1ʳᵉ Saison conseillée 74 min, 1ᵉʳ Cycle 168 min).
+- **Sauvegarde.** Pas de changement de version : les trames se déduisent des parcelles et des avenirs.
+
 ---
 
 ## 7. Prestige : les Saisons

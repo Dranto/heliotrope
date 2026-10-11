@@ -2,6 +2,7 @@
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
+import { corridorBonuses } from './corridors';
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { CHALLENGES, type ChallengeId } from './challenges';
@@ -128,6 +129,7 @@ export function activeBonuses({
     ),
     ...(sites ? hillsidesBonuses(sites.hillsides, widenFactor(delta?.widths.hillsArm ?? 0)) : []),
     ...(greatWorks ? greatWorksBonuses(greatWorks.works) : []),
+    ...corridorBonuses({ parcels, futures }),
   ];
 }
 

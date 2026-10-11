@@ -123,4 +123,7 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   swallow: { spots: [[300, 120]], motion: 'fly', size: 17 },
   dragonfly: { spots: [[EAST + MID, 250]], motion: 'buzz', size: 14 },
   redstart: { spots: [[470, 196]], motion: 'still', size: 15 },
+  // The corridors' species (§6.7, M21), on the corridors they come along.
+  greenWoodpecker: { spots: [[WEST + MID, 380]], motion: 'still', size: 16 },
+  newt: { spots: [[EAST + MID, 330]], motion: 'hop', size: 13 },
 };

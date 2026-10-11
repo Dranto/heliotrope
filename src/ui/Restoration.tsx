@@ -1,3 +1,4 @@
+import { corridorBonus, corridors, FAMILIES } from '../game/corridors';
 import {
   areDistrictsOpen,
   canRestoreDistrict,
@@ -102,13 +103,47 @@ function FuturePills({
           role="radio"
           aria-checked={chosen === future}
           disabled={disabled && chosen !== future}
-          title={bonusesText(parcelBonuses(id, future))}
+          title={futureTitle(id, future)}
           onClick={() => onChoose(future)}
         >
+          {FAMILIES[id][future] && (
+            <i className="family-dot" data-family={FAMILIES[id][future]} aria-hidden="true" />
+          )}
           {parcelName(id, future)}
         </button>
       ))}
     </span>
+  );
+}
+
+/** The effect of a future, and the corridor family it joins (§6.7). */
+function futureTitle(id: ParcelId, future: Future): string {
+  const family = FAMILIES[id][future];
+  const effect = bonusesText(parcelBonuses(id, future));
+  return family ? `${effect} · ${t.corridors.joins(t.corridors.family[family])}` : effect;
+}
+
+/** The corridors on the map (§6.7, M21): their family, length and bonus. */
+function Corridors({ state }: { state: ReturnType<typeof useGameState> }) {
+  const found = corridors(state);
+  return (
+    <div className="corridors">
+      <p className="hint">{t.corridors.hint}</p>
+      {found.length > 0 && (
+        <ul>
+          {found.map((c) => (
+            <li key={c.parcels.join()} data-family={c.family}>
+              <i className="family-dot" data-family={c.family} aria-hidden="true" />
+              {t.corridors.line(
+                t.corridors.family[c.family],
+                c.parcels.length,
+                bonusesText([corridorBonus(c.family, c.parcels.length)]),
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -278,6 +313,7 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
         <details className="futures">
           <summary>{t.restoration.futuresTitle}</summary>
           <p className="hint">{t.restoration.futuresHint}</p>
+          <Corridors state={state} />
           <ul>
             {PARCEL_IDS.filter((id) => state.parcels.includes(id)).map((id) => {
               const locked = !canChangeFuture(state, id);
