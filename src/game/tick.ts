@@ -11,6 +11,7 @@ import { advanceButterfly } from './butterfly';
 import { completeChallenge, generatorLimit } from './challenges';
 import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
+import { growGarden } from './garden';
 import { recordProduction } from './history';
 import { runSower } from './seasons';
 import { earnLight } from './light';
@@ -57,7 +58,10 @@ export function unlockProgress(state: GameState): GameState {
  */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const watered = earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds);
+  const watered = growGarden(
+    earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds),
+    dtSeconds,
+  );
   const next = runCooperatives(advanceVisit(advanceButterfly(watered, dtSeconds), dtSeconds));
   return runSower(
     unlockProgress(

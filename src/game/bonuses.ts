@@ -8,6 +8,7 @@ import { CHALLENGES, type ChallengeId } from './challenges';
 import { DISTRICTS, type DistrictId } from './districts';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
+import { varietyBonuses, type VarietyId } from './seedBank';
 import { canopyBonuses, TALENTS, type CanopyState, type TalentId } from './talents';
 
 export type Bonus =
@@ -71,13 +72,15 @@ export interface BonusSource {
   canopy?: Pick<CanopyState, 'levels'>;
   /** Challenge Seasons won (§7.3). */
   challenges: readonly ChallengeId[];
+  /** The garden's seed bank (§9.7); absent where none can be. */
+  garden?: { varieties: readonly VarietyId[] };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
 
 /**
  * Every bonus in force: parcels, then neighbouring districts, then projects, then talents and the
- * canopy, then challenges won.
+ * canopy, then challenges won, then the varieties of the garden's seed bank.
  */
 export function activeBonuses({
   parcels,
@@ -86,6 +89,7 @@ export function activeBonuses({
   talents,
   canopy,
   challenges,
+  garden,
 }: BonusSource): Bonus[] {
   return [
     ...parcels.flatMap((id) => PARCELS[id].bonuses),
@@ -94,6 +98,7 @@ export function activeBonuses({
     ...talents.flatMap((id) => TALENTS[id].bonuses),
     ...(canopy ? canopyBonuses(canopy.levels) : []),
     ...challenges.flatMap((id) => CHALLENGES[id].bonuses),
+    ...(garden ? varietyBonuses(garden.varieties) : []),
   ];
 }
 

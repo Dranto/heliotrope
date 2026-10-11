@@ -37,6 +37,9 @@ import {
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
 import { NightLights, VisitLayer } from './VisitArt';
+import { GardenBeds } from './GardenArt';
+import { cropStage, encodeBeds } from './gardenMap';
+import { isGardenOpen, openPlots, plotGrowth } from '../game/garden';
 import { DistrictGround, DistrictOffer } from './DistrictArt';
 import { cityFrame } from './districtMap';
 import {
@@ -137,10 +140,12 @@ const CAPTION_ROOM = 52;
 export function Scene({
   onCatch,
   onVisit,
+  onHarvest,
   highlight,
 }: {
   onCatch: (result: CatchResult) => void;
   onVisit: (result: WelcomeResult) => void;
+  onHarvest: (index: number) => void;
   highlight: ParcelId | null;
 }) {
   const store = useGameStore();
@@ -172,6 +177,14 @@ export function Scene({
     store.dispatch(() => result.state);
     onVisit(result);
   }, [store, onVisit]);
+  // The open beds of the courtyard garden (§9.7), redrawn only when a stage changes.
+  const beds = isGardenOpen(state)
+    ? encodeBeds(
+        state.garden.plots
+          .slice(0, openPlots(state))
+          .map((plot) => ({ crop: plot.crop, stage: cropStage(plotGrowth(plot)) })),
+      )
+    : '';
   // Encoded as one string so the bikes only redraw when a cooperative starts, stops or buys.
   const bikes = unlockedCooperatives(state)
     .map(
@@ -201,6 +214,7 @@ export function Scene({
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
+        <GardenBeds beds={beds} onHarvest={onHarvest} />
         <VisitLayer kind={visitor} onWelcome={welcome} />
         <ParcelOffers
           offered={split(offered)}
@@ -222,6 +236,8 @@ export function Scene({
       reduced,
       visitor,
       welcome,
+      beds,
+      onHarvest,
       offered,
       affordable,
       highlight,

@@ -6,6 +6,7 @@ import { createCooperativesState, type CooperativesState } from './cooperatives'
 import type { ActiveEffect } from './effects';
 import type { Language, Notation } from './format';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
+import { createGardenState, type GardenState } from './garden';
 import { emptyCurve, type SeasonCurve } from './history';
 import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
@@ -17,7 +18,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 15;
+export const STATE_VERSION = 16;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -103,6 +104,8 @@ export interface GameState {
   sources: number;
   /** Cycles of water completed (§7.4). */
   cycles: number;
+  /** The courtyard garden's beds, harvests and seed bank (§9.7). Kept forever. */
+  garden: GardenState;
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -171,6 +174,7 @@ export function createInitialState(now: number): GameState {
     allTimeWater: 0,
     sources: 0,
     cycles: 0,
+    garden: createGardenState(),
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     // Drawn from the same number as the butterfly, so a quick one comes with a slow visit.

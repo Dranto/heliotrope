@@ -34,6 +34,8 @@ import { useLayoutPref } from './layoutPrefs';
 import { MilestoneBloom } from './MilestoneBloom';
 import { Options } from './Options';
 import { Restoration } from './Restoration';
+import { Garden } from './Garden';
+import { harvest } from '../game/garden';
 import { Scene } from './Scene';
 import { Seasons } from './Seasons';
 import { SeasonTree } from './SeasonTree';
@@ -179,6 +181,29 @@ export function App() {
       );
     },
     [notify],
+  );
+
+  // §9.7: harvest a ripe bed of the courtyard garden, from the map or from its panel.
+  const onHarvest = useCallback(
+    (index: number) => {
+      const result = harvest(store.getState(), index);
+      if (!result) return;
+      store.dispatch(() => result.state);
+      const { gain } = result;
+      if (gain.kind === 'butterfly') notify(t.garden.harvested.butterfly);
+      else if (gain.kind === 'effect') {
+        notify(t.garden.harvested.effect(t.duration(Math.ceil(gain.seconds))));
+      } else if (gain.water > 0) {
+        notify(
+          t.garden.harvested.lightWater(
+            formatNumber(Math.floor(gain.light)),
+            formatNumber(Math.floor(gain.water)),
+          ),
+        );
+      } else notify(t.garden.harvested.light(formatNumber(Math.floor(gain.light))));
+      if (result.variety) notify(t.garden.variety(t.garden.varieties[result.variety]));
+    },
+    [store, notify],
   );
 
   const onVisit = useCallback(
@@ -448,7 +473,7 @@ export function App() {
 
       {/* Memoised drawings keep their texts until their props change: redraw on a new language. */}
       <main className="layout" key={language}>
-        <Scene onCatch={onCatch} onVisit={onVisit} highlight={highlight} />
+        <Scene onCatch={onCatch} onVisit={onVisit} onHarvest={onHarvest} highlight={highlight} />
         <aside className="side" aria-label={t.layout.panels}>
           <button
             type="button"
@@ -467,6 +492,7 @@ export function App() {
             <div className="side-column">
               <Upgrades />
               <Restoration onHighlight={setHighlight} />
+              <Garden onHarvest={onHarvest} />
             </div>
             <div className="side-column">
               <Generators />

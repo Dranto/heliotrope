@@ -37,7 +37,8 @@ a design decision changes, update that document in the same PR.
   - `production.ts`: pure formulas: production, multipliers, biodiversity, click value, costs,
     upgrade availability
   - `seasons.ts`: prestige (design doc §7): Seeds formula, bonus, `startNewSeason`
-  - `talents.ts`: the Tree of Seasons (§7.1), talents bought with Seeds, kept across Seasons;
+  - `talents.ts`: the Tree of Seasons (§7.1), talents bought with Seeds, kept across Seasons, and
+    the levelled Canopy above it with the sower;
     `cooperatives.ts`: the Cooperatives (§7.2) that buy for the player, run by every tick
   - `achievements.ts`: Milestones ("Jalons", §9.3) data table, +1% bonus, unlock checks
   - `butterfly.ts`, `effects.ts`: the Golden Butterfly (§9.2), its schedule and timed effects
@@ -46,6 +47,8 @@ a design decision changes, update that document in the same PR.
     shape for the formulas; `restoration.ts` holds when they are offered and the buy actions
   - `species.ts`: the Herbier (§9.5), species that return on game conditions and add biodiversity;
     `challenges.ts`: challenge Seasons (§7.3), their constraints, goals and rewards
+  - `garden.ts`, `seedBank.ts`: the courtyard garden (§9.7), crops in real time and the seed
+    bank's varieties
   - `phases.ts`: progression phases and visual seasons of the scene (§6)
   - `random.ts`: seeded random numbers; the seed lives in `GameState` so random events stay pure
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state

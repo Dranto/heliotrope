@@ -10,6 +10,8 @@ import { BUTTERFLY_VISIBLE_SECONDS, effectSeconds } from './butterfly';
 import { isParcelId, type ParcelId } from './parcels';
 import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
+import { validPlots } from './garden';
+import { isVarietyId, type VarietyId } from './seedBank';
 import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
 import { isChallengeId, type ChallengeId } from './challenges';
@@ -73,6 +75,8 @@ const migrations: Record<number, Migration> = {
   // v15 adds the Canopy above the Tree of Seasons and its sower (§7.1, M13), and the fountaineers'
   // purchases: nothing sown yet, the sower off.
   14: (raw) => ({ ...raw, version: 15 }),
+  // v16 adds the courtyard garden (§9.7, M14): every bed bare, no variety yet.
+  15: (raw) => ({ ...raw, version: 16 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -238,6 +242,14 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (isCount(data.sources)) state.sources = data.sources;
   if (isCount(data.cycles)) state.cycles = data.cycles;
+  const garden = data.garden as Record<string, unknown> | undefined;
+  state.garden = {
+    plots: validPlots(garden?.plots),
+    harvests: isCount(garden?.harvests) ? garden.harvests : 0,
+    varieties: Array.isArray(garden?.varieties)
+      ? [...new Set<VarietyId>(garden.varieties.filter(isVarietyId))]
+      : [],
+  };
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;
   if (
