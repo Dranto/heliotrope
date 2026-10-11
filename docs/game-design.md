@@ -629,6 +629,43 @@ Dans l'écran du Cycle, chaque bras élargissable montre sous son effet son éla
 
 **Équilibrage.** Depuis M19, le simulateur (§8, « La fin de partie ») joue le delta et ses élargissements, mais pas les Cycles à défi. Le bras des semences raccourcit les Saisons tardives (15 → 10 min) sans revenir aux Saisons de quelques minutes d'avant la PR #35 ; le bras de la mémoire rend le début de Cycle moins long sans changer la formule des Sources.
 
+
+### 7.6 Les villes sœurs (M23)
+
+La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par les mesures de M19). Code dans `src/game/cities.ts` et `src/game/cityData.ts`, écran `src/ui/Cities.tsx` (bouton « Villes sœurs » du menu), carte de la région `src/ui/RegionMap.tsx`, paysages sur la carte `src/ui/LandscapeArt.tsx`.
+
+**Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit, et ni Saison ni Cycle à défi en cours. Le joueur choisit parmi **trois paysages** (décision D14) et fonde une ville sœur :
+
+- **Recommence :** tout ce qu'un Cycle remet à zéro (Lumière, bâtiments, améliorations, projets, Graines, Eau, collecteurs, sites), plus **l'Arbre des Saisons et la Canopée** (« relancer les Saisons ») et les **Sources non dépensées**.
+- **Reste :** le **delta** (ses bras et élargissements, gardés pour toujours, et les Sources qui les ont payés), l'Herbier, les Jalons, les parcelles et les quartiers voisins, le décor, les grands chantiers, le potager, le verger et les villes déjà fondées.
+- **Les Sources d'une ville sœur** viennent de l'Eau recueillie depuis sa fondation, au-dessus de celles qu'elle garde : le rythme des Cycles repart du début, avec tous les bonus gardés.
+
+**Les Savoirs.** Essaimer rapporte **⌊√(Sources gagnées dans la ville) / 2⌋ + ⌊log₁₀(1 + Graines du Cycle)⌋** Savoirs : les Graines, qui n'avaient plus d'usage une fois la Canopée complète (§8, fin de partie), comptent enfin (décision D12 tenue : ni les chantiers ni le reste ne les dépensent). Chaque Savoir gagné donne **+3 % de production** pour toujours, qu'il soit dépensé ou non.
+
+| Paysage | Dans la ville (sa règle) | Une fois quittée (le réseau) | Sur la carte |
+|---|---|---|---|
+| Le littoral | Eau ×2, Panneaux de balcon ×0,5 | Eau ×1,1 | Une baie et sa plage à l'est, entre les deux collines |
+| La montagne | Papillon et visites 25 % plus fréquents, Eau ×0,75 | Papillon 5 % plus fréquent | Une crête de sommets enneigés au nord, entre les collines |
+| La plaine | Bâtiments 15 % moins chers, clic ×0,5 | Bâtiments 3 % moins chers | Des champs de blé au sud, entre les collines |
+
+Le paysage fait partie du sol de la Biorégion (vue « La Biorégion ») : les deux rendus le dessinent, le rendu PixiJS le prenant au dessin SVG comme le reste de la terre (§10.4).
+
+La ville natale, une fois quittée, envoie **+3 % de production**. Chaque ville quittée fait aussi apporter **2 boutures de plus** aux voisins qui visitent (§9.6, Troc de graines). Il n'y a pas de serveur : le réseau est dans la sauvegarde.
+
+**L'atelier des Savoirs.** Des règles achetées une fois, pour toutes les villes à venir :
+
+| Règle | Savoirs | Effet |
+|---|---|---|
+| La mémoire des eaux | 5 | Une nouvelle ville garde un quart des Sources non dépensées |
+| Les semis voyageurs | 6 | L'Arbre des Saisons et la Canopée restent en essaimant |
+| Les bâtisseurs | 8 | Les sites de la Biorégion s'élèvent seuls, les moins chers d'abord, quand l'Eau suffit (3 niveaux par pas au plus) |
+| Les échanges | 12 | Le réseau envoie deux fois plus |
+
+- **Écran.** Les Savoirs et leur bonus, la carte de la région (la ville natale au centre, les villes fondées autour, reliées par des fils dorés, la ville actuelle cerclée), la règle de la ville actuelle, le réseau, les trois paysages avec leur règle, leur réseau et le bouton « Essaimer », puis l'atelier.
+- **Simulateur.** `npm run simulate` essaime vers la plaine à la fin de la partie mesurée (après le 6ᵉ Cycle, 59 Sources dont 34 hors du delta) : **8 Savoirs** (3 par les Sources, 5 par les 130 000 Graines), puis il joue la ville sœur. Son premier Cycle est conseillé après **19 min**, contre 2 h 48 pour la ville natale : tout ce qui reste (delta, Savoirs, Jalons, Herbier) fait repartir vite, et les 25 Sources de la ville suivante demandent ensuite quelques heures, comme les Cycles 2 à 4 de la ville natale.
+- **Jalons (2).** « Essaimage » (une ville sœur), « Les villes sœurs » (trois). 138 jalons en tout.
+- **Sauvegarde.** Version 24 : la ville actuelle, les villes quittées, les Savoirs, l'atelier, et les Sources et l'Eau de la fondation, à zéro pour une sauvegarde plus ancienne.
+
 ---
 
 ## 8. Équilibrage
@@ -722,15 +759,15 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 |---|---|---|---|---|
 | 1ᵉʳ (conseillé) | ~2 h 45 | 2 h 46 | une dizaine | 5 |
 | 2ᵉ | ~35 min | 36 min | 3 de 12 min | 9 |
-| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 14 |
-| 4ᵉ | ~45 min | 43 min | 4, de 10 à 13 min | 22 |
-| 5ᵉ | (~1 h) | 1 h | 5, de 10 à 15 min | 36 |
-| 6ᵉ | (~1 h 10) | 1 h 09 | 5, la dernière de 30 min | 55 |
+| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 15 |
+| 4ᵉ | ~45 min | 45 min | 4, de 10 à 15 min | 25 |
+| 5ᵉ | (~1 h) | 55 min | 5, de 10 à 15 min | 38 |
+| 6ᵉ | (~1 h 10) | 1 h 08 | 5, la dernière de 28 min | 59 |
 
 Ce qu'en tire la feuille de route (décision D11) :
 
 - **Les Cycles s'allongent doucement** (35 min → 1 h 10) et les Sources croissent d'environ ×1,6 par Cycle : le delta (26 Sources) est ouvert au 6ᵉ Cycle, puis ses élargissements (§7.5) prennent le relais pendant de nombreux Cycles (environ 2 300 Sources pour tout élargir). La troisième couche (M23) se justifie : après une dizaine d'heures, chaque Cycle n'apporte plus qu'un bonus plat de plus.
-- **La Canopée est complète dès le 2ᵉ Cycle** (~1 900 Graines quand une Saison en rapporte des milliers, 120 000 au 6ᵉ Cycle) : les Graines retrouvent un bonus plat. M20 à M24 devront leur rendre un usage (D12 garde les grands chantiers hors Graines ; les villes sœurs ou les alliances pourront s'en charger).
+- **La Canopée est complète dès le 2ᵉ Cycle** (~1 900 Graines quand une Saison en rapporte des milliers, 120 000 au 6ᵉ Cycle) : les Graines retrouvent un bonus plat. Depuis M23, les Graines du Cycle comptent dans les Savoirs d'un essaimage (§7.6), et les grands chantiers restent hors Graines (D12).
 - **Les nombres restent loin de la limite** : 3 × 10²¹ de Lumière au total au 6ᵉ Cycle, très loin de 10³⁰⁸. Pas besoin de bibliothèque de grands nombres.
 
 ### Affichage des nombres
@@ -786,7 +823,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).

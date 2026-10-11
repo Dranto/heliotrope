@@ -1,4 +1,5 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
+import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FruitId } from '../game/fruits';
 import type { TreeStage } from '../game/orchard';
@@ -300,6 +301,8 @@ export const en: Texts = {
       'works.4': 'Great works',
       firstFruit: 'First fruit',
       oldOrchard: 'Old orchards',
+      'cities.1': 'Swarming',
+      'cities.3': 'Sister cities',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -395,6 +398,8 @@ export const en: Texts = {
         count === 1 ? 'Complete a great work' : `Complete all ${count} great works`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Pick a first fruit in the orchard' : `Pick fruit ${count} times`,
+      sisterCities: (count: number) =>
+        count === 1 ? 'Found a sister city' : `Found ${count} sister cities`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
@@ -581,6 +586,53 @@ export const en: Texts = {
         `Climbing beans! Rooftop gardens and greenhouses ×2 for ${seconds}.`,
     },
     variety: (name: string) => `New variety: ${name}!`,
+  },
+  cities: {
+    open: 'Sister cities',
+    title: 'The sister cities',
+    close: 'Close the sister cities',
+    hint: 'Swarming founds a sister city elsewhere in the region: the Seasons, the Bioregion and the Cycles start again. The Herbier, the Milestones, the decor, the great works, the garden, the orchard, the delta and the cities already founded stay.',
+    savoirs: (count: string) => `${count} Savoirs`,
+    earned: (count: string, percent: string) =>
+      `${count} Savoirs earned in all: production +${percent}%`,
+    gain: (count: string) => `Swarming would bring ${count} Savoirs`,
+    gainHint:
+      'From the Sources earned in this city (square root, halved), plus one per order of magnitude of the Seeds of the Cycle.',
+    needSources: (have: string, need: string) =>
+      `Swarming needs ${need} Sources earned in this city (${have} so far).`,
+    lost: 'Sources not spent in the delta are lost; those in the delta stay.',
+    choose: 'Choose the sister city’s landscape',
+    landscapes: {
+      coast: 'The coast',
+      mountain: 'The mountain',
+      plain: 'The plain',
+    } satisfies Record<LandscapeId, string>,
+    home: 'The home city',
+    living: (name: string) => `Current city: ${name}`,
+    rule: 'In the city',
+    network: 'Once left',
+    swarm: 'Swarm',
+    swarmLabel: (name: string, gain: string) => `Swarm to ${name.toLowerCase()} (+${gain} Savoirs)`,
+    region: 'The region',
+    regionLabel: (count: string) => `Map of the region: ${count} cities`,
+    networkTitle: 'The network',
+    networkNone: 'Each city left behind will send a small bonus, and cuttings with the visits.',
+    workshop: 'The Savoirs’ workshop',
+    workshopHint: 'Rules that change for every city to come.',
+    workshopNames: {
+      memory: 'The memory of the waters',
+      seedlings: 'Travelling seedlings',
+      builders: 'The builders',
+      trade: 'Trade',
+    } satisfies Record<WorkshopId, string>,
+    workshopEffects: {
+      memory: 'A new city keeps a quarter of the unspent Sources.',
+      seedlings: 'The Tree of Seasons and the Canopy stay when swarming.',
+      builders: 'The Bioregion’s sites rise on their own, cheapest first, when the Water allows.',
+      trade: 'The network sends twice as much.',
+    } satisfies Record<WorkshopId, string>,
+    learn: 'Learn',
+    learnt: 'Learnt',
   },
   orchard: {
     title: 'The orchard and the hives',

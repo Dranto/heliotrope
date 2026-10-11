@@ -243,6 +243,8 @@ export function Scene({
   );
   // The orchard (§9.8), encoded so the layer only redraws when a tree or a hive changes.
   const orchardOpen = isOrchardOpen(state);
+  // The landscape of the sister city lived in (§7.6).
+  const landscape = state.city.landscape;
   const orchard = encodeOrchard(state.orchard);
   const onPick = useCallback(
     (id: FruitId) => store.dispatch((s) => pickFruit(s, id)?.state ?? s),
@@ -263,9 +265,15 @@ export function Scene({
   const land = useMemo(
     () =>
       bioregion ? (
-        <BioregionLand sites={sites} collectors={collectors} raining={raining} reduced={reduced} />
+        <BioregionLand
+          sites={sites}
+          collectors={collectors}
+          raining={raining}
+          reduced={reduced}
+          landscape={landscape}
+        />
       ) : null,
-    [bioregion, sites, collectors, raining, reduced],
+    [bioregion, sites, collectors, raining, reduced, landscape],
   );
   const { roofTanks, swales } = collectors;
   // What moves on its own or answers the pointer: over both maps, drawn in SVG.
@@ -407,6 +415,7 @@ export function Scene({
               collectors={collectors}
               raining={raining}
               bioregion={bioregion}
+              landscape={landscape}
               strict={!rendererChosen}
               overlay={marks}
               onFail={() => setWebglFailed(true)}

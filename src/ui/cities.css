@@ -1,0 +1,178 @@
+/* The sister cities (§7.6, M23): their screen, the region map and the landscapes on the map. */
+
+.cities-summary {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.region-map {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  height: auto;
+  margin: 0.6rem auto;
+}
+
+.region-land {
+  fill: #e6efd8;
+  stroke: #c7d8b0;
+}
+
+.region-river {
+  fill: none;
+  stroke: #8fc4dc;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.region-thread {
+  fill: none;
+  stroke: #e3b14a;
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3;
+}
+
+.region-here {
+  fill: rgb(244 192 99 / 0.2);
+  stroke: var(--gold);
+  stroke-width: 1;
+}
+
+.city-house {
+  fill: #fbf6ec;
+  stroke: #8a7a62;
+  stroke-width: 0.7;
+}
+
+.city-roof {
+  fill: none;
+  stroke: #b85f3a;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.city-tree {
+  fill: #6fa35a;
+}
+
+.city-flower {
+  fill: #a98ad6;
+}
+
+.city-sea {
+  fill: #8fc4dc;
+}
+
+.city-peak {
+  fill: #b9b2a6;
+  stroke: #8f887c;
+  stroke-width: 0.6;
+}
+
+.city-field path:first-child {
+  fill: #f0d98a;
+}
+
+.city-furrow {
+  fill: none;
+  stroke: #d6b45a;
+  stroke-width: 0.6;
+}
+
+.cities-landscapes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cities-landscape {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.55);
+}
+
+.cities-landscape p {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.cities-landscape .buy {
+  align-content: center;
+  justify-self: end;
+}
+
+.cities-landscape-art {
+  width: 4.5rem;
+  height: auto;
+}
+
+.cities-label {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.cities-workshop {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cities-rule {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.9rem;
+  background: rgb(255 255 255 / 0.5);
+}
+
+.cities-rule[data-learnt='true'] {
+  background: rgb(229 244 222 / 0.9);
+}
+
+.cities-learnt {
+  color: #2f6b4f;
+  font-weight: 700;
+}
+
+/* The landscape around the Bioregion, on the map. */
+
+.landscape-sea {
+  fill: #a9d4e6;
+}
+
+.landscape-foam {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.landscape-beach {
+  fill: #efe1b8;
+}
+
+.landscape-peak {
+  fill: #b9b2a6;
+  stroke: #8f887c;
+  stroke-width: 4;
+}
+
+.landscape-snow {
+  fill: #fbfbf7;
+}
+
+.landscape-field {
+  stroke: rgb(255 255 255 / 0.4);
+  stroke-width: 3;
+}

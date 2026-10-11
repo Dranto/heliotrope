@@ -2,6 +2,8 @@
 // plain of fields between four hills, crossed by the river that runs through the city. Each
 // level of a regional site turns more of it into wetlands, agrivoltaic meadows, food forests or
 // old-growth forest; the collectors dig ponds, open streams and fit the city with tanks and swales.
+import type { LandscapeId } from '../game/cityData';
+import { LandscapeArt } from './LandscapeArt';
 import { memo } from 'react';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import { t } from '../i18n';
@@ -316,6 +318,8 @@ export interface BioregionLandProps {
   /** Water is being gathered: a shower crosses the land now and then. */
   raining: boolean;
   reduced: boolean;
+  /** The landscape of the sister city lived in (§7.6), drawn on the ground; none at home. */
+  landscape?: LandscapeId | null;
 }
 
 /**
@@ -327,6 +331,7 @@ export const BioregionLand = memo(function BioregionLand({
   collectors,
   raining,
   reduced,
+  landscape = null,
 }: BioregionLandProps) {
   const shown = landShown(sites, collectors);
 
@@ -347,6 +352,7 @@ export const BioregionLand = memo(function BioregionLand({
         </radialGradient>
       </defs>
       <LandGround sites={sites} fields={shown.fields} />
+      <LandscapeArt landscape={landscape} />
       <g data-site="meadows">
         {sites.meadows > 0 && <title>{t.bioregion.sites.meadows.name}</title>}
         {shown.meadows.map(({ box }) => (

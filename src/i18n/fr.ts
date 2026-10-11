@@ -1,5 +1,6 @@
 // French texts, the reference language (docs/game-design.md §14 Q1). Every other language
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
+import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FruitId } from '../game/fruits';
 import type { TreeStage } from '../game/orchard';
@@ -347,6 +348,8 @@ export const fr = {
       'works.4': 'Grands travaux',
       firstFruit: 'Premier fruit',
       oldOrchard: 'Vieux vergers',
+      'cities.1': 'Essaimage',
+      'cities.3': 'Les villes sœurs',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -450,6 +453,8 @@ export const fr = {
         count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Cueillir un premier fruit au verger' : `Cueillir ${count} fois au verger`,
+      sisterCities: (count: number) =>
+        count === 1 ? 'Fonder une ville sœur' : `Fonder ${count} villes sœurs`,
       fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
@@ -640,6 +645,56 @@ export const fr = {
         `Haricots grimpants\u00a0! Potagers et Serres ×2 pendant ${seconds}.`,
     },
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
+  },
+  cities: {
+    open: 'Villes sœurs',
+    title: 'Les villes sœurs',
+    close: 'Fermer les villes sœurs',
+    hint: 'Essaimer fonde une ville sœur ailleurs dans la région\u00a0: les Saisons, la Biorégion et les Cycles recommencent. L’Herbier, les Jalons, le décor, les grands chantiers, le potager, le verger, le delta et les villes déjà fondées restent.',
+    savoirs: (count: string) => `${count} Savoirs`,
+    earned: (count: string, percent: string) =>
+      `${count} Savoirs gagnés en tout\u00a0: production +${percent}\u00a0%`,
+    gain: (count: string) => `Essaimer rapporterait ${count} Savoirs`,
+    gainHint:
+      'Selon les Sources gagnées dans cette ville (racine carrée, divisée par 2), plus une par ordre de grandeur des Graines du Cycle.',
+    needSources: (have: string, need: string) =>
+      `Il faut ${need} Sources gagnées dans cette ville pour essaimer (${have} pour l’instant).`,
+    lost: 'Les Sources non dépensées dans le delta sont perdues, celles du delta restent.',
+    choose: 'Choisir le paysage de la ville sœur',
+    landscapes: {
+      coast: 'Le littoral',
+      mountain: 'La montagne',
+      plain: 'La plaine',
+    } satisfies Record<LandscapeId, string>,
+    home: 'La ville natale',
+    living: (name: string) => `Ville actuelle\u00a0: ${name}`,
+    rule: 'Dans la ville',
+    network: 'Une fois quittée',
+    swarm: 'Essaimer',
+    swarmLabel: (name: string, gain: string) =>
+      `Essaimer vers ${name.toLowerCase()} (+${gain} Savoirs)`,
+    region: 'La région',
+    regionLabel: (count: string) => `Carte de la région\u00a0: ${count} villes`,
+    networkTitle: 'Le réseau',
+    networkNone:
+      'Les villes quittées enverront chacune un petit bonus, et des boutures aux visites.',
+    workshop: 'L’atelier des Savoirs',
+    workshopHint: 'Des règles qui changent pour toutes les villes à venir.',
+    workshopNames: {
+      memory: 'La mémoire des eaux',
+      seedlings: 'Les semis voyageurs',
+      builders: 'Les bâtisseurs',
+      trade: 'Les échanges',
+    } satisfies Record<WorkshopId, string>,
+    workshopEffects: {
+      memory: 'Une nouvelle ville garde un quart des Sources non dépensées.',
+      seedlings: 'L’Arbre des Saisons et la Canopée restent en essaimant.',
+      builders:
+        'Les sites de la Biorégion s’élèvent seuls, les moins chers d’abord, quand l’Eau suffit.',
+      trade: 'Le réseau envoie deux fois plus.',
+    } satisfies Record<WorkshopId, string>,
+    learn: 'Apprendre',
+    learnt: 'Appris',
   },
   orchard: {
     title: 'Le verger et les ruches',

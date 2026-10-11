@@ -93,6 +93,8 @@ export type AchievementCondition =
   /** Fruit picked in the orchard, and old varieties found there (§9.8). */
   | { kind: 'fruitHarvests'; count: number }
   | { kind: 'fruitVarieties'; count: number }
+  /** Sister cities founded (§7.6). */
+  | { kind: 'sisterCities'; count: number }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -150,6 +152,7 @@ const SITE_STEPS = [1, 10, 25] as const;
 const CYCLE_STEPS = [1, 3] as const;
 const DELTA_STEPS = [1, 6] as const;
 const WORK_STEPS = [1, 4] as const;
+const CITY_STEPS = [1, 3] as const;
 const CYCLE_CHALLENGE_STEPS = [1, 3] as const;
 
 export type AchievementId =
@@ -183,6 +186,7 @@ export type AchievementId =
   | `works.${(typeof WORK_STEPS)[number]}`
   | 'firstFruit'
   | 'oldOrchard'
+  | `cities.${(typeof CITY_STEPS)[number]}`
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -330,6 +334,12 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     id: `works.${count}` as const,
     family: 'neighbourhood' as const,
     condition: { kind: 'worksBuilt', count } as const,
+  })),
+  // The sister cities (§7.6).
+  ...CITY_STEPS.map((count) => ({
+    id: `cities.${count}` as const,
+    family: 'seasons' as const,
+    condition: { kind: 'sisterCities', count } as const,
   })),
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
@@ -569,6 +579,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.delta.lockCycles >= condition.count;
     case 'worksBuilt':
       return worksBuilt(state) >= condition.count;
+    case 'sisterCities':
+      return state.city.founded.length >= condition.count;
     case 'fruitHarvests':
       return state.orchard.harvests >= condition.count;
     case 'fruitVarieties':
