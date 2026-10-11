@@ -1,6 +1,6 @@
 # Heliotrope — Feuille de route
 
-> Statut : v3.1 (2026-10-11), validée par Antoine, sauf l'album, remplacé par les alliances (P23). La v1 (M5 à M12) et la v2 (M13 à M18) sont livrées ;
+> Statut : v3.1 (2026-10-11), validée par Antoine, sauf l'album, remplacé par les alliances (P23). La v1 (M5 à M12), la v2 (M13 à M18) et la v3 (M19 à M24) sont livrées ;
 > cette version propose la suite, de M19 à M24, à la demande d'Antoine (« établis un plan des nouvelles
 > fonctionnalités à mettre dans une nouvelle roadmap »).
 > Ce document classe les mécaniques à ajouter. Il ne fixe aucun chiffre : `docs/game-design.md` reste la référence pour
@@ -209,7 +209,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | **M21 — Les trames verte et bleue** *(livré)* | P20 : voisinage des parcelles, trames dessinées, espèces des trames | Petit jalon qui donne du sens aux avenirs de M16 ; peut s'échanger avec M22 |
 | **M22 — Le verger et les ruches** *(livré)* | P21 : arbres fruitiers sur plusieurs jours, ruches qui pollinisent, miel pour les chantiers, Grainothèque des fruitiers | Étoffe la boucle de soin pour tous les joueurs ; le miel nourrit M20 |
 | **M23 — Les villes sœurs** *(livré)* | P22 : essaimage, trois paysages au choix, carte de la région, Savoirs et leur atelier | La plus grosse pièce, une fois la fin de partie mesurée (M19) et les grands objectifs en place (M20) |
-| **M24 — Les alliances et la grande floraison** | P23 : synergies entre systèmes à choisir, leurs fils de lumière sur la carte, sommet de la région fêté sans texte | Clôt la v3 : les alliances relient tout ce que M19 à M23 ont construit, et le sommet n'a de sens qu'à la fin |
+| **M24 — Les alliances et la grande floraison** *(livré)* | P23 : synergies entre systèmes à choisir, leurs fils de lumière sur la carte, sommet de la région fêté sans texte | Clôt la v3 : les alliances relient tout ce que M19 à M23 ont construit, et le sommet n'a de sens qu'à la fin |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Comme avant, chaque mécanique se lie à l'existant (un chantier aux
 quartiers voisins, une trame à l'Herbier, une ruche au potager, une ville sœur à une règle de la carte) plutôt que

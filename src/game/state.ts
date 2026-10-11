@@ -7,6 +7,7 @@ import { createDeltaState, type DeltaState } from './delta';
 import { createGreatWorksState, type GreatWorksState } from './greatWorks';
 import { createOrchardState, type OrchardState } from './orchard';
 import { createCityState, type CityState } from './cities';
+import { createAlliancesState, type AlliancesState } from './alliances';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -25,7 +26,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 24;
+export const STATE_VERSION = 25;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -136,6 +137,8 @@ export interface GameState {
   orchard: OrchardState;
   /** The sister cities (§7.6, M23): the city lived in, the network, the Savoirs. */
   city: CityState;
+  /** The alliances chosen and the grand bloom (§9.9, M24). */
+  alliances: AlliancesState;
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -215,6 +218,7 @@ export function createInitialState(now: number): GameState {
     greatWorks: createGreatWorksState(),
     orchard: createOrchardState(),
     city: createCityState(),
+    alliances: createAlliancesState(),
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     // Drawn from the same number as the butterfly, so a quick one comes with a slow visit.

@@ -2,6 +2,8 @@
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
+import { allianceBonuses } from './alliances';
+import type { GameState } from './state';
 import { cityBonuses, type CitySource } from './cityData';
 import { corridorBonuses } from './corridors';
 import { fruitVarietyBonuses, type FruitId } from './fruits';
@@ -102,27 +104,33 @@ export interface BonusSource {
   generators: Readonly<Record<string, number>>;
 }
 
+/** The alliances (§9.9) read the whole game, so only a full state brings them. */
+function isGameState(source: BonusSource): source is GameState {
+  return 'alliances' in source && 'species' in source;
+}
+
 /**
  * Every bonus in force: parcels, then neighbouring districts, then projects, then talents and the
  * canopy, then challenges won, then the varieties of the garden's seed bank, then challenge
  * Cycles won and the hillsides site (§7.5).
  */
-export function activeBonuses({
-  parcels,
-  futures,
-  districts = [],
-  projects,
-  talents,
-  canopy,
-  challenges,
-  garden,
-  cycleChallenges = [],
-  sites,
-  delta,
-  greatWorks,
-  orchard,
-  city,
-}: BonusSource): Bonus[] {
+export function activeBonuses(source: BonusSource): Bonus[] {
+  const {
+    parcels,
+    futures,
+    districts = [],
+    projects,
+    talents,
+    canopy,
+    challenges,
+    garden,
+    cycleChallenges = [],
+    sites,
+    delta,
+    greatWorks,
+    orchard,
+    city,
+  } = source;
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
     ...parcels.flatMap((id) => parcelBonuses(id, futures?.chosen[id])),
@@ -140,6 +148,7 @@ export function activeBonuses({
     ...corridorBonuses({ parcels, futures }),
     ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
     ...(city ? cityBonuses(city) : []),
+    ...(isGameState(source) ? allianceBonuses(source) : []),
   ];
 }
 

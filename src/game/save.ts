@@ -14,6 +14,7 @@ import { validPlots } from './garden';
 import { validGreatWorks } from './greatWorks';
 import { validOrchard } from './orchard';
 import { validCity } from './cities';
+import { validAlliances } from './alliances';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
@@ -99,6 +100,8 @@ const migrations: Record<number, Migration> = {
   22: (raw) => ({ ...raw, version: 23 }),
   // v24 adds the sister cities (§7.6, M23): still in the home city, no Savoir.
   23: (raw) => ({ ...raw, version: 24 }),
+  // v25 adds the alliances and the grand bloom (§9.9, M24): none chosen, no bloom yet.
+  24: (raw) => ({ ...raw, version: 25 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -313,6 +316,7 @@ export function deserialize(json: string, now: number): GameState | null {
   state.greatWorks = validGreatWorks(data.greatWorks);
   state.orchard = validOrchard(data.orchard);
   state.city = validCity(data.city);
+  state.alliances = validAlliances(data.alliances);
   state.city.sourcesBase = Math.min(state.city.sourcesBase, state.sources);
   state.city.waterBase = Math.min(state.city.waterBase, state.allTimeWater);
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
