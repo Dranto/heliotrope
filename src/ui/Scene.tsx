@@ -56,6 +56,8 @@ import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
 import { CorridorLayer } from './CorridorArt';
+import { AllianceThreads, BloomLayer } from './AllianceArt';
+import { workingAlliances } from '../game/alliances';
 import { OrchardLayer } from './OrchardArt';
 import { encodeOrchard } from './orchardMap';
 import { isOrchardOpen, pickFruit, type FruitId } from '../game/orchard';
@@ -242,6 +244,9 @@ export function Scene({
       Object.entries(state.greatWorks.works).map(([id, w]) => [id, w.stage]),
     ) as Parameters<typeof encodeStages>[0],
   );
+  // The alliances at work and the grand bloom (§9.9), joined so the map redraws only on a change.
+  const working = workingAlliances(state).join();
+  const bloomed = state.alliances.bloomed;
   // The orchard (§9.8), encoded so the layer only redraws when a tree or a hive changes.
   const orchardOpen = isOrchardOpen(state);
   // The landscape of the sister city lived in (§7.6).
@@ -284,6 +289,8 @@ export function Scene({
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
         <CorridorLayer corridors={corridors} />
+        <BloomLayer bloomed={bloomed} />
+        <AllianceThreads working={working} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <ProjectMarks projects={projects} />
@@ -309,6 +316,8 @@ export function Scene({
       works,
       worksOpen,
       corridors,
+      working,
+      bloomed,
       orchard,
       orchardOpen,
       onPick,

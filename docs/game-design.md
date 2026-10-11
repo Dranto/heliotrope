@@ -663,7 +663,7 @@ La ville natale, une fois quittée, envoie **+3 % de production**. Chaque ville 
 
 - **Écran.** Les Savoirs et leur bonus, la carte de la région (la ville natale au centre, les villes fondées autour, reliées par des fils dorés, la ville actuelle cerclée), la règle de la ville actuelle, le réseau, les trois paysages avec leur règle, leur réseau et le bouton « Essaimer », puis l'atelier.
 - **Simulateur.** `npm run simulate` essaime vers la plaine à la fin de la partie mesurée (après le 6ᵉ Cycle, 59 Sources dont 34 hors du delta) : **8 Savoirs** (3 par les Sources, 5 par les 130 000 Graines), puis il joue la ville sœur. Son premier Cycle est conseillé après **19 min**, contre 2 h 48 pour la ville natale : tout ce qui reste (delta, Savoirs, Jalons, Herbier) fait repartir vite, et les 25 Sources de la ville suivante demandent ensuite quelques heures, comme les Cycles 2 à 4 de la ville natale.
-- **Jalons (2).** « Essaimage » (une ville sœur), « Les villes sœurs » (trois). 138 jalons en tout.
+- **Jalons (2).** « Essaimage » (une ville sœur), « Les villes sœurs » (trois). 138 jalons en tout (140 avec M24, §9.9).
 - **Sauvegarde.** Version 24 : la ville actuelle, les villes quittées, les Savoirs, l'atelier, et les Sources et l'Eau de la fondation, à zéro pour une sauvegarde plus ancienne.
 
 ---
@@ -823,7 +823,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -938,6 +938,26 @@ Les variétés anciennes se lisent dans le panneau du verger, sous les ruches, p
 - **Équilibrage.** Les paniers servent maintenant à trois choses (arbres, ruches, chantiers) : un choix, jamais une perte. Le simulateur ne joue pas le verger, comme le potager.
 - **Jalons (2).** « Premier fruit » (une cueillette), « Vieux vergers » (les 4 variétés anciennes). 136 jalons en tout.
 - **Sauvegarde.** Version 23 : les arbres (âge et fruits), les variétés, les ruches, le miel et les cueillettes, et le miel versé aux chantiers, à zéro pour une sauvegarde plus ancienne.
+
+### 9.9 Les alliances et la grande floraison (M24)
+
+Des **synergies entre systèmes** à composer (roadmap P23, décision D16), à la place de l'album. Une alliance relie deux choses que le joueur a fait grandir, souvent de deux couches différentes ; elle **s'éveille** quand les deux atteignent leur seuil et ne joue que si elle occupe une **place**. Code dans `src/game/alliances.ts`, panneau `src/ui/Alliances.tsx` (après les grands chantiers), fils et floraison dans `src/ui/AllianceArt.tsx` et `src/ui/allianceMap.ts`.
+
+| Alliance | Ce qu'elle relie (seuils) | Effet |
+|---|---|---|
+| Les abeilles du verger | 1 ruche (§9.8) · 3 pollinisateurs dans l'Herbier (abeille, bourdon, citron, coccinelle) | Le Papillon doré revient 15 % plus vite |
+| Le marché du tram | 1 étape du tram solaire (§6.6) · 2 quartiers voisins (§6.4) | Clic ×2 |
+| La rivière nourricière | Trame bleue de 2 parcelles (§6.7) · bras des coteaux du delta (§7.5) | Le potager pousse ×1,3 plus vite |
+| Les graines voyageuses | 1 ville sœur (§7.6) · 3 variétés du potager (§9.7) | Toute la production +10 % |
+| La fête au village | 10 visites de la ville (§9.6) · 1 étape des halles (§6.6) | Les haricots durent ×1,5 |
+| Les racines profondes | 10 niveaux de Canopée (§7.1) · 1 élargissement du delta (M19) | Bâtiments 10 % moins chers |
+
+- **Les places.** **Trois** au début, une de plus avec **deux grands chantiers achevés**, avec **chaque ville sœur** et avec la **grande floraison**, six au plus (autant que d'alliances). Le panneau s'ouvre dès qu'une alliance est éveillée. On choisit librement tant qu'une place est libre ; **retirer** une alliance n'est permis **qu'une fois par Cycle de l'eau**, pour que la composition soit un choix. Une alliance choisie dont un côté retombe sous son seuil (la Canopée qui recommence avec une ville sœur fondée sans l'atelier des semis, par exemple) garde sa place mais s'endort.
+- **Sur la carte.** Chaque alliance qui joue tend un **fil doré** entre ses deux lieux (du verger à la cour, du tram aux quartiers voisins, de la rivière aux coteaux, de la cour vers les villes sœurs…), une courbe lumineuse qui pulse doucement ; immobile avec les animations réduites.
+- **La grande floraison.** Quand toute la région est restaurée (les **quatre grands chantiers achevés**, l'**Herbier complet** et **chaque site de la Biorégion au niveau 5**), la carte entière fleurit : quelque 220 fleurs s'ouvrent l'une après l'autre sur les rues et les sites, puis restent. Aucun texte, **rien ne recommence** (décision D13) ; elle ouvre la dernière place. Elle n'arrive qu'une fois.
+- **Équilibrage.** Les effets sont des bonus modestes de fin de partie, du même ordre que les variétés et les trames. Le simulateur ne joue pas les alliances : elles s'éveillent après les mesures du §8.
+- **Jalons (2).** « Première alliance » (une alliance qui joue), « La grande floraison ». 140 jalons en tout.
+- **Sauvegarde.** Version 25 : les alliances choisies, le Cycle du dernier retrait et la floraison, vides pour une sauvegarde plus ancienne.
 
 ---
 

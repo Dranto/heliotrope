@@ -17,6 +17,7 @@ import type { GeneratorId } from './generators';
 import { growGarden } from './garden';
 import { growOrchard } from './orchard';
 import { runBuilders } from './cities';
+import { checkBloom } from './alliances';
 import { recordProduction } from './history';
 import { runSower } from './seasons';
 import { earnLight } from './light';
@@ -55,7 +56,7 @@ function produce(state: GameState, dtSeconds: number): GameState {
  */
 export function unlockProgress(state: GameState): GameState {
   return buildReadyStages(
-    unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(state)))),
+    unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(checkBloom(state))))),
   );
 }
 

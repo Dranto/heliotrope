@@ -44,6 +44,7 @@ import { Restoration } from './Restoration';
 import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
 import { Orchard } from './Orchard';
+import { Alliances } from './Alliances';
 import { Cities } from './Cities';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest } from '../game/garden';
@@ -588,6 +589,7 @@ export function App() {
               <Garden onHarvest={onHarvest} />
               <Orchard />
               <GreatWorks />
+              <Alliances />
             </div>
             <div className="side-column">
               <Generators />
