@@ -1,6 +1,6 @@
 # Heliotrope — Feuille de route
 
-> Statut : v3.0 (2026-10-11), proposée, à valider par Antoine. La v1 (M5 à M12) et la v2 (M13 à M18) sont livrées ;
+> Statut : v3.1 (2026-10-11), validée par Antoine, sauf l'album, remplacé par les alliances (P23). La v1 (M5 à M12) et la v2 (M13 à M18) sont livrées ;
 > cette version propose la suite, de M19 à M24, à la demande d'Antoine (« établis un plan des nouvelles
 > fonctionnalités à mettre dans une nouvelle roadmap »).
 > Ce document classe les mécaniques à ajouter. Il ne fixe aucun chiffre : `docs/game-design.md` reste la référence pour
@@ -50,8 +50,9 @@ nouveau **le très long terme**, et cette fois aussi **la mesure** de ce long te
   des voisines : le joueur façonne la carte sans qu'elle réagisse à l'ensemble.
 - **Le potager plafonne vite.** Six carrés et six variétés : une fois la Grainothèque complète, la boucle de soin ne
   donne plus que des bonus ponctuels.
-- **Le jeu n'a ni sommet ni mémoire.** Aucun moment ne fête la région entière restaurée, et rien ne garde la trace du
-  chemin parcouru, de la friche à la ville verte.
+- **Les couches ne se parlent presque pas.** Les synergies relient des bâtiments, des améliorations et le clic, mais
+  presque jamais le potager à l'Herbier, un quartier voisin à une visite, ou une couche de prestige à une autre.
+- **Le jeu n'a pas de sommet.** Aucun moment ne fête la région entière restaurée.
 
 ---
 
@@ -65,7 +66,7 @@ nouveau **le très long terme**, et cette fois aussi **la mesure** de ce long te
 | Des **voisinages qui se répondent** : l'emplacement compte | Townscaper, Islanders | Chaque parcelle vaut seule |
 | Une **boucle lente** qui s'étoffe avec le temps | Melvor Idle, Cats & Soup | Potager complet en quelques jours |
 | Un **sommet** atteint, puis une partie libre | Universal Paperclips, A Dark Room | Pas de fin, pas de fête finale |
-| Une **mémoire** du chemin parcouru | Townscaper (photos), Dorfromantik | Mode photo, sans album |
+| Des **synergies entre systèmes** que le joueur compose | Melvor Idle (synergies d'invocation), Path of Exile (arbre de passifs) | Synergies fixes, surtout entre bâtiments |
 
 ---
 
@@ -165,18 +166,33 @@ se gagne selon les Sources obtenues.
 - **Satisfaction :** un changement d'échelle et un renouveau visuel complet, avec des choix qui comptent.
 - **Effort :** élevé : une couche entière, un nouvel écran, des variantes de carte. C'est le plus gros jalon.
 
-### P23 — L'album et la grande floraison
+### P23 — Les alliances et la grande floraison
 
-- **L'album.** À chaque Saison et à chaque Cycle, le jeu garde tout seul une petite image de la carte (même rendu
-  que le mode photo, en vignette). L'album les montre en frise, et un **accéléré** rejoue toute la partie, de la
-  friche du Balcon à la Biorégion, sur la musique du quartier (§6.3). Exportable en images, comme le mode photo.
+- **Les alliances.** Une nouvelle famille de synergies, **entre systèmes** plutôt qu'entre bâtiments. Chaque alliance
+  relie deux choses que le joueur a déjà fait grandir, souvent de deux couches différentes, et s'éveille quand les
+  deux atteignent un seuil. Par exemple :
+
+  | Alliance | Relie | Effet (ordre de grandeur) |
+  |---|---|---|
+  | Les abeilles du verger | Ruches (P21) et espèces pollinisatrices de l'Herbier | Le Papillon doré revient plus vite par espèce pollinisatrice |
+  | Le marché du tram | Tram solaire (P19) et quartiers voisins (§6.4) | Chaque quartier voisin relève le clic |
+  | La rivière nourricière | Trame bleue (P20) et Coteaux (§7.5) | L'Eau fait pousser le potager plus vite |
+  | Les graines voyageuses | Villes sœurs (P22) et Grainothèque (§9.7) | Chaque variété trouvée relève les Savoirs |
+  | La fête au village | Visites de la ville (§9.6) et halles nourricières (P19) | Une visite accueillie prolonge les récoltes en cours |
+  | Les racines profondes | Canopée (§7.1) et bras du delta (P18) | Les niveaux de l'une rendent l'autre moins chère |
+
+  Le joueur **choisit** quelles alliances sont actives : quelques places au début (par exemple 3), une de plus avec
+  certains chantiers et chaque ville sœur. Composer ses alliances devient la décision de fin de partie, et on peut les
+  changer à chaque Cycle de l'eau, comme les avenirs (D7). Sur la carte, chaque alliance active tend un **fil de
+  lumière dorée** entre les deux lieux qu'elle relie, qui pulse quand l'effet joue.
 - **La grande floraison.** Quand toute la région est restaurée (tous les sites, tous les chantiers, l'Herbier
   complet), une animation sans texte fait fleurir toute la carte, des quartiers aux collines, puis le jeu continue
-  librement : rien ne se remet à zéro. Une fleur dorée au bord de l'écran garde la trace de ce sommet.
+  librement : rien ne se remet à zéro. Elle ouvre aussi la dernière place d'alliance.
 
-- **Thème et règle d'Antoine :** le récit par les images, sans un mot ; le monde réparé se fête.
-- **Satisfaction :** un sommet à viser, et la mémoire du chemin parcouru, à regarder et à montrer.
-- **Effort :** moyen : vignettes légères à stocker (taille de la sauvegarde à surveiller), une animation finale.
+- **Thème :** la ville tient par ses liens ; on voit le réseau de l'entraide se tisser sur la carte.
+- **Satisfaction :** des choix de composition qui récompensent tout ce qui a été construit, et un sommet à viser.
+- **Effort :** moyen : une table d'alliances, un écran de choix, des fils animés sur la carte (SVG et PixiJS) ;
+  l'équilibrage passe par le simulateur de M19, chaque alliance restant modeste.
 
 ---
 
@@ -193,7 +209,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | **M21 — Les trames verte et bleue** | P20 : voisinage des parcelles, trames dessinées, espèces des trames | Petit jalon qui donne du sens aux avenirs de M16 ; peut s'échanger avec M22 |
 | **M22 — Le verger et les ruches** | P21 : arbres fruitiers sur plusieurs jours, ruches qui pollinisent, miel pour les chantiers, Grainothèque des fruitiers | Étoffe la boucle de soin pour tous les joueurs ; le miel nourrit M20 |
 | **M23 — Les villes sœurs** | P22 : essaimage, trois paysages au choix, carte de la région, Savoirs et leur atelier | La plus grosse pièce, une fois la fin de partie mesurée (M19) et les grands objectifs en place (M20) |
-| **M24 — L'album et la grande floraison** | P23 : album automatique et accéléré, sommet de la région fêté sans texte | Clôt la v3 : le sommet n'a de sens qu'une fois tout le reste construit |
+| **M24 — Les alliances et la grande floraison** | P23 : synergies entre systèmes à choisir, leurs fils de lumière sur la carte, sommet de la région fêté sans texte | Clôt la v3 : les alliances relient tout ce que M19 à M23 ont construit, et le sommet n'a de sens qu'à la fin |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Comme avant, chaque mécanique se lie à l'existant (un chantier aux
 quartiers voisins, une trame à l'Herbier, une ruche au potager, une ville sœur à une règle de la carte) plutôt que
@@ -251,7 +267,7 @@ Questions de la v2, livrée avec le choix recommandé (Antoine n'y a pas répond
 | D8 | Notifications de la PWA ? | Facultatives, désactivées par défaut |
 | D9 | Troisième couche de prestige ? | Plus tard : reprise en v3 par D11 |
 
-Questions de la v3. En attendant la réponse d'Antoine, les jalons appliqueront le choix recommandé.
+Questions de la v3 (Antoine a validé les jalons le 2026-10-11, sauf l'album). En attendant la réponse d'Antoine, les jalons appliqueront le choix recommandé.
 
 | # | Question | Choix recommandé (appliqué par défaut) |
 |---|---|---|
@@ -260,7 +276,8 @@ Questions de la v3. En attendant la réponse d'Antoine, les jalons appliqueront 
 | D12 | Les grands chantiers se paient-ils aussi en Graines ou en Sources ? | **Non** : Lumière, Eau, récoltes et espèces ; Graines et Sources restent à l'Arbre et au delta |
 | D13 | La grande floraison termine-t-elle la partie ? | **Non** : un sommet fêté, puis le jeu continue librement, sans remise à zéro |
 | D14 | Une ville sœur se choisit-elle parmi trois, ou est-elle imposée ? | **Au choix parmi trois**, chacune avec son paysage et sa règle |
-| D15 | L'album garde-t-il une image par Saison, même pour des centaines de Saisons ? | **Non** : une par Cycle, plus les Saisons marquantes (1ʳᵉ, défis), pour garder la sauvegarde légère |
+| D15 | ~~L'album~~ | **Décidé (2026-10-11) :** pas d'album ; M24 propose les alliances à la place (P23) |
+| D16 | Les alliances : toutes actives, ou un nombre de places à composer ? | **Des places à composer** (3 au début, plus avec chantiers, villes sœurs et floraison), changeables à chaque Cycle |
 
 ---
 
