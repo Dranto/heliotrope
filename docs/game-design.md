@@ -389,9 +389,29 @@ L'arbre complet coûte 44 Graines : un joueur en a 10 après sa 1ʳᵉ Saison co
 
 **Écran.** Un écran « L'Arbre des Saisons » s'ouvre du menu dès la première Graine, avec un badge quand une Graine peut être semée, et depuis l'écran des Saisons. Il dessine l'arbre (§10.4) : le tronc sort du sol, les Racines s'étendent sous terre, les Pollinisateurs (à gauche) et la Mémoire (à droite) se partagent la ramure. Un talent appris est une fleur ouverte, un talent qu'on peut semer est un bourgeon qui respire, les autres restent des bourgeons pâles. En semant, une sève dorée monte le long de la branche puis la fleur s'ouvre ; le tronc s'épaissit et le feuillage s'étoffe à mesure que l'arbre se remplit. Aucun texte narratif : seuls le nom et l'effet de chaque talent sont écrits.
 
+#### La Canopée (M13)
+
+Une fois les 17 talents appris, l'Arbre a encore une place pour les Graines des Saisons tardives, qui en rapportent des centaines : au-dessus de la ramure s'ouvre la **Canopée**, des talents **à niveaux** dont chaque niveau coûte plus cher que le précédent. Les Graines semées y sont gardées pour toujours, comme les talents, et enracinées par un Cycle de l'eau (§7.4). Données dans `src/game/talents.ts` (`CANOPY_LIST`).
+
+| Talent | 1ᵉʳ niveau | Prix ×, par niveau | Niveaux | Effet au niveau *n* |
+|---|---|---|---|---|
+| Rameau des racines | 5 | ×1,5 | 10 | Synergies ×(1 + 0,05 *n*) |
+| Rameau des pollinisateurs | 5 | ×1,5 | 10 | Le Papillon doré revient 3 *n* % plus vite |
+| Rameau de la mémoire | 5 | ×1,5 | 10 | Les visites reviennent 3 *n* % plus vite |
+| Pépinière | 10 | ×2 | 4 | Les Boutures gardent 10 + 10 *n* % de chaque bâtiment (jusqu'à 50 %) |
+| Le semoir | 15 | — | 1 | Relance la Saison tout seul (ci-dessous) |
+| Les fontainiers | 15 | — | 1 | Une coopérative qui bâtit les collecteurs d'eau (§7.2) |
+
+La Canopée complète coûte environ 1 900 Graines : un puits de long terme, qui se remplit Cycle après Cycle. Ses effets restent liés à l'existant (synergies, Papillon, visites, Boutures) et modestes, pour allonger et alléger les Saisons tardives sans relancer leur emballement (§7, §8) ; le simulateur ne la joue pas, et les cibles du §8 ne bougent pas.
+
+- **Le semoir.** Une fois semé, un réglage de l'écran des Saisons choisit quand il relance : **éteint** (par défaut, décision D6 de la feuille de route), ou dès que les Graines mûres de la Saison multiplient celles déjà obtenues par **×1,5, ×2, ×3 ou ×5**. Il lance toujours une Saison libre et attend la fin d'une Saison à défi ; il travaille à chaque pas de simulation, donc hors ligne aussi. C'est l'automatisation de la couche du dessous, comme les Coopératives pour les bâtiments.
+- **Écran.** Sous l'arbre, la section « La Canopée » liste ses six talents, leur niveau (des pastilles dorées), l'effet d'aujourd'hui et celui du niveau suivant, et le bouton Semer avec son prix. Avant les 17 talents, une ligne dit quand elle s'ouvre. Sur le dessin, une feuille dorée s'ajoute au-dessus du feuillage à chaque niveau semé et se balance doucement.
+- **Jalons (4).** Jeune canopée (1 niveau), Canopée touffue (18 niveaux), Cime (la Canopée complète), Semis spontané (le semoir lance 10 Saisons). 120 jalons en tout.
+- **Sauvegarde.** Version 15 : les niveaux de la Canopée et les réglages du semoir, rien de semé et le semoir éteint pour une sauvegarde plus ancienne.
+
 ### 7.2 Coopératives (M7)
 
-Des voisins achètent à la place du joueur : ce sont les talents de la branche Mémoire qui les font venir. Chaque coopérative s'occupe de deux bâtiments, le conseil de quartier des améliorations.
+Des voisins achètent à la place du joueur : ce sont les talents de la branche Mémoire qui les font venir. Chaque coopérative s'occupe de deux bâtiments, le conseil de quartier des améliorations. Depuis M13, **les fontainiers** (Canopée, §7.1) bâtissent les collecteurs d'eau de la Biorégion : le moins cher de ceux qui sont révélés, dès qu'il coûte au plus 10 % de la Lumière en réserve, pour que la Biorégion grandisse à côté sans retenir les bâtiments ; ils passent avant les autres, et leur vélo-cargo bleu parcourt la rue de l'est.
 
 - **Ce qu'elles achètent.** Les coopératives de bâtiments choisissent ensemble, parmi leurs bâtiments déjà révélés, celui qui rembourse le plus vite son prix (`coût / gain de production d'un exemplaire`). Si c'est aussi une bonne affaire comparé à tous les bâtiments révélés (au plus 1,25 fois moins rentable que le meilleur), elles l'achètent dès qu'elles peuvent ; sinon le joueur économise sans doute pour mieux, et elles ne l'achètent qu'avec au plus 10 % de la réserve. Le conseil achète l'amélioration la moins chère, et les autres attendent qu'il l'ait achetée tant qu'elle ne coûte pas plus de 30 fois leur prochain bâtiment.
 - **Réglages.** Chaque coopérative peut être mise à l'arrêt, et l'option « Garder une réserve » limite chaque achat à 10 % de la Lumière en réserve. Les réglages restent d'une Saison à l'autre.
@@ -455,7 +475,7 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
 ```
 
 - **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
-- **Conservé :** les Sources, les **talents de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
+- **Conservé :** les Sources, les **talents et la Canopée de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
 - Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
 - **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 45** ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
 
@@ -608,14 +628,14 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
 - **Améliorations** (dans une même Saison) : 10, 25, 50, 75 améliorations ; « Fil doré » (une première synergie entre bâtiments), « Toile dorée » (les 18 synergies entre bâtiments), « Mains d'or » (les 10 améliorations du clic).
 - **La fleur** : 10, 100, 1 000, 10 000, 100 000 clics ; un clic qui vaut 1 000 puis 1 M Lumière ; caché : « Graine qui dort » (récolter 1 000 Lumière dans une Saison sans aucun bâtiment).
 - **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
-- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
+- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
 - **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
 
 Les jalons sont conservés d'une Saison à l'autre. Chaque jalon atteint **éclot** en haut de l'écran : un médaillon dont l'anneau doré se dessine, une couronne de laurier qui pousse feuille à feuille, des pétales lilas qui s'ouvrent, avec le nom du jalon, sa condition et « Production +1 % » ; il s'efface après environ 4 s. Plusieurs jalons atteints ensemble éclosent l'un après l'autre (au-delà de trois d'un coup, un seul médaillon les compte). Le compteur du bouton « Jalons » scintille à chaque nouveau jalon. Pas de texte d'ambiance : seulement le nom et la condition. Avec les animations réduites, le médaillon apparaît et disparaît sans mouvement. Les lecteurs d'écran entendent « Jalon atteint : nom ».
@@ -696,7 +716,7 @@ Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fle
 |---|---|---|
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
 | **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, choix d'une Saison à défi (§7.3, dès la 2ᵉ Saison), bouton Nouvelle Saison avec confirmation | Prestige disponible |
-| **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi (§7.1) | 1ʳᵉ Graine |
+| **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi, puis la Canopée à niveaux (§7.1) | 1ʳᵉ Graine |
 | **Cycle de l'eau** | Sources actuelles et à gagner, bonus avant/après, ce qui repart et ce qui reste, bouton Nouveau Cycle avec confirmation (§7.4) | 1ʳᵉ Source à gagner |
 | **Herbier** | Une planche par espèce, dessinée une fois revenue, silhouette avant, avec ce qui la ramène (§9.5) | 1ʳᵉ espèce ou 2ᵉ Saison |
 | **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons, courbe de la production des dernières Saisons (§10.5) | Toujours |

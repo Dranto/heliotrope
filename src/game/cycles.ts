@@ -4,7 +4,7 @@
 import { FLOOD_TIDE_SOURCES, unlockAchievement, unlockAchievements } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS } from './bioregion';
 import { replant } from './seasons';
-import { seedsSpent } from './talents';
+import { treeSeedsSpent } from './talents';
 import type { GameState } from './state';
 
 export { SOURCE_SEED_BONUS } from './seasons';
@@ -57,8 +57,8 @@ export function isCycleScreenUnlocked(state: GameState): boolean {
 /**
  * Player action: start a new Cycle of water (§7.4). Everything a new Season resets is reset
  * (§7), and so are the Seeds (the Light of the Cycle starts over), the Water, the collectors and
- * the sites, and a running challenge. The Sources gained are added; the talents of the Tree of
- * Seasons stay learnt, their Seeds rooted so the tree is not paid for twice. Milestones,
+ * the sites, and a running challenge. The Sources gained are added; the talents and canopy levels of
+ * the Tree of Seasons stay learnt, their Seeds rooted so the tree is not paid for twice. Milestones,
  * parcels, the Herbier, challenges won, the Seasons count and the Cooperatives' settings stay.
  * Returns the same state when no Source would be gained.
  */
@@ -71,7 +71,7 @@ export function startNewCycle(state: GameState): GameState {
     ...replanted,
     seasons: state.seasons + 1,
     seeds: 0,
-    rootedSeeds: seedsSpent(state.talents),
+    rootedSeeds: treeSeedsSpent(state),
     lightBeforeCycle: state.allTimeLight,
     resources: { light: 0, water: 0 },
     collectors: Object.fromEntries(COLLECTOR_IDS.map((id) => [id, 0])) as GameState['collectors'],

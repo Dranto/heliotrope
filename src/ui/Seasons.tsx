@@ -16,7 +16,7 @@ import {
   startNewSeason,
 } from '../game/seasons';
 import { offeredChallenges, type ChallengeId } from '../game/challenges';
-import { canLearnTalent, TALENT_LIST } from '../game/talents';
+import { canSowInTree, setSowerFactor, SOWER_FACTORS } from '../game/talents';
 import { t } from '../i18n';
 import {
   challengeGoalText,
@@ -163,10 +163,35 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
         {message}
       </p>
 
-      {TALENT_LIST.some((talent) => canLearnTalent(state, talent.id)) && (
+      {canSowInTree(state) && (
         <button type="button" className="tree-link" onClick={onOpenTree}>
           {t.tree.fromSeasons}
         </button>
+      )}
+
+      {state.canopy.levels.sower > 0 && (
+        <fieldset className="sower-choice">
+          <legend>{t.seeds.sower.title}</legend>
+          <p className="hint">{t.seeds.sower.hint}</p>
+          <div className="sower-options">
+            {[0, ...SOWER_FACTORS].map((factor) => (
+              <label key={factor} className="sower-option">
+                <input
+                  type="radio"
+                  name="sower"
+                  checked={state.canopy.sowerFactor === factor}
+                  onChange={() => store.dispatch((s) => setSowerFactor(s, factor))}
+                />
+                <span>
+                  {factor === 0 ? t.seeds.sower.off : t.seeds.sower.factor(formatNumber(factor))}
+                </span>
+              </label>
+            ))}
+          </div>
+          {state.canopy.sowerSeasons > 0 && (
+            <p className="hint">{t.seeds.sower.sown(formatNumber(state.canopy.sowerSeasons))}</p>
+          )}
+        </fieldset>
       )}
 
       {challenges.length > 0 && available && (

@@ -59,6 +59,12 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.projects(condition.count);
     case 'talents':
       return describe.talents(condition.count);
+    case 'canopyLevels':
+      return describe.canopyLevels(condition.count);
+    case 'fullCanopy':
+      return describe.fullCanopy;
+    case 'sowerSeasons':
+      return describe.sowerSeasons(condition.count);
     case 'species':
       return describe.species(condition.count);
     case 'challenges':

@@ -59,3 +59,20 @@ export function talentBranch(id: TalentId): string {
 export function treeGrowth(learnt: readonly TalentId[]): number {
   return learnt.length / TALENT_LIST.length;
 }
+
+/** Leaves of the Canopy (§7.1): one per level sown, along an arc above the crown. */
+export const CANOPY_LEAVES = 36;
+
+/** Where the first `levels` leaves of the Canopy sit: x, y and angle, from the middle outwards. */
+export function canopyLeafSpots(levels: number): [number, number, number][] {
+  const spots: [number, number, number][] = [];
+  for (let i = 0; i < Math.min(levels, CANOPY_LEAVES); i++) {
+    // Alternate sides from the centre: 0, +1, -1, +2, -2...
+    const step = Math.ceil(i / 2) * (i % 2 === 0 ? -1 : 1);
+    const t = step / (CANOPY_LEAVES / 2);
+    const x = 180 + t * 150;
+    const y = 10 + t * t * 34 + (i % 3) * 3;
+    spots.push([round(x), round(y), round(t * 40 + (i % 2 === 0 ? -18 : 18))]);
+  }
+  return spots;
+}

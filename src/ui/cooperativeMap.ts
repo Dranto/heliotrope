@@ -55,4 +55,11 @@ export const COOPERATIVE_ROUTES: Record<CooperativeId, CooperativeRoute> = {
     delay: 20,
     park: [EAST + MID + 5, NORTH + MID + 30, 90],
   },
+  // The east street, across the whole city, towards the river.
+  fountaineers: {
+    path: `M${EAST + MID + 4} -12 V462 H${EAST + MID - 4} V-12 Z`,
+    seconds: 52,
+    delay: 26,
+    park: [EAST + MID + 4, SOUTH - 30, 90],
+  },
 };

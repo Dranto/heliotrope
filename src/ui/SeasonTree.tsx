@@ -2,6 +2,12 @@ import { useState, type CSSProperties } from 'react';
 import { formatNumber } from '../game/format';
 import {
   availableSeeds,
+  CANOPY_LIST,
+  canopyLevels,
+  canRaiseCanopy,
+  isCanopyOpen,
+  nextCanopyCost,
+  raiseCanopy,
   canLearnTalent,
   hasTalent,
   isTalentReachable,
@@ -9,18 +15,20 @@ import {
   TALENT_BRANCHES,
   TALENT_LIST,
   TALENTS,
+  type CanopyId,
   type TalentDef,
   type TalentId,
 } from '../game/talents';
 import type { GameState } from '../game/state';
 import { t } from '../i18n';
-import { talentEffectText, talentName } from '../i18n/talents';
+import { canopyEffectText, canopyName, talentEffectText, talentName } from '../i18n/talents';
 import { Dialog } from './Dialog';
 import {
   BRANCH_ORIGINS,
   GROUND_Y,
   TALENT_SPOTS,
   TREE_VIEW,
+  canopyLeafSpots,
   talentBranch,
   treeGrowth,
 } from './seasonTree';
@@ -136,6 +144,11 @@ function TreeArt({ state, fresh }: { state: GameState; fresh: ReadonlySet<Talent
           <path key={x} d={`M${x} ${GROUND_Y + 1}q1-5 3-7M${x + 4} ${GROUND_Y + 1}q0-4-2-6`} />
         ))}
       </g>
+      <g className="tree-canopy-leaves">
+        {canopyLeafSpots(canopyLevels(state)).map(([x, y, angle], i) => (
+          <ellipse key={i} cx={x} cy={y} rx="7" ry="3.2" transform={`rotate(${angle} ${x} ${y})`} />
+        ))}
+      </g>
       {TALENT_LIST.map(({ id, branch }) => (
         <path
           key={id}
@@ -202,6 +215,72 @@ function Detail({
         </button>
       )}
     </div>
+  );
+}
+
+/**
+ * The Canopy (§7.1, M13): levelled talents above the crown, shown once the 17 talents are learnt;
+ * before that, a line saying when it opens.
+ */
+function Canopy({ state, onRaise }: { state: GameState; onRaise: (id: CanopyId) => void }) {
+  if (!isCanopyOpen(state)) {
+    return <p className="hint canopy-locked">{t.tree.canopy.locked(TALENT_LIST.length)}</p>;
+  }
+  return (
+    <section className="canopy" aria-labelledby="canopy-title">
+      <h3 id="canopy-title">{t.tree.canopy.title}</h3>
+      <p className="hint">{t.tree.canopy.hint}</p>
+      <ul className="canopy-list">
+        {CANOPY_LIST.map(({ id, maxLevel }) => {
+          const level = state.canopy.levels[id];
+          const cost = nextCanopyCost(state, id);
+          const name = canopyName(id);
+          return (
+            <li key={id} className="canopy-item" data-canopy={id} data-level={level}>
+              <div>
+                <h4>{name}</h4>
+                {maxLevel > 1 && (
+                  <span className="canopy-level">
+                    <span className="canopy-pips" aria-hidden="true">
+                      {Array.from({ length: maxLevel }, (_, i) => (
+                        <span key={i} data-on={i < level} />
+                      ))}
+                    </span>
+                    {t.tree.canopy.level(level, maxLevel)}
+                  </span>
+                )}
+                {level > 0 && maxLevel > 1 && (
+                  <p className="tree-effect">{t.tree.canopy.now(canopyEffectText(id, level))}</p>
+                )}
+                {cost !== null && (
+                  <p className="tree-effect">
+                    {maxLevel > 1
+                      ? t.tree.canopy.next(canopyEffectText(id, level + 1))
+                      : canopyEffectText(id, 1)}
+                  </p>
+                )}
+              </div>
+              {cost === null ? (
+                <span className="tree-learnt-tag">
+                  {maxLevel > 1 ? t.tree.canopy.maxed : t.tree.learntTag}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="buy tree-learn"
+                  disabled={!canRaiseCanopy(state, id)}
+                  aria-label={t.tree.canopy.raiseLabel(name, t.tree.cost(cost))}
+                  onClick={() => onRaise(id)}
+                >
+                  <span className="buy-verb">{t.tree.learn}</span>
+                  <span className="buy-cost">{t.tree.cost(cost)}</span>
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
@@ -287,6 +366,8 @@ export function SeasonTree({ onClose }: { onClose: () => void }) {
         state={state}
         onLearn={() => store.dispatch((s) => learnTalent(s, selected.id))}
       />
+
+      <Canopy state={state} onRaise={(id) => store.dispatch((s) => raiseCanopy(s, id))} />
     </Dialog>
   );
 }
