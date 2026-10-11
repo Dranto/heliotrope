@@ -116,13 +116,13 @@ describe('later Seasons, after the first Cycle (§7)', () => {
   // Before the ripening Seeds and the deeper soil, these Seasons lasted one to three minutes.
   const { first, second } = twoSeasons;
   const cycle = simulateFirstCycle({ from: second.state, elapsed: first.seconds + second.seconds });
-  const { seasons } = simulateSeasonsAfterCycle({ from: cycle.state, count: 4 });
+  const { seasons } = simulateSeasonsAfterCycle({ from: cycle.state, count: 5 });
 
   it('lasts at least the ripening time, Season after Season', () => {
     for (const seconds of seasons) expect(seconds).toBeGreaterThanOrEqual(SEED_RIPENING_SECONDS);
   });
 
   it('grows longer once doubling the Seeds asks for more than the ripening time', () => {
-    expect(seasons.at(-1)!).toBeGreaterThan(SEED_RIPENING_SECONDS + 120);
+    expect(seasons.at(-1)!).toBeGreaterThan(20 * 60);
   });
 });

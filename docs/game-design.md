@@ -457,7 +457,7 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
 - **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
 - **Conservé :** les Sources, les **talents de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
 - Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
-- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **3 h 10** ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~23 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
+- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 45** ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
 
 **Écrans.** Un panneau **« La Biorégion »** sous « Bâtir » (onglet Bâtir sur mobile) liste les collecteurs (Bâtir ☀) puis les sites (Étendre 💧), avec l'Eau en réserve et par seconde. Une pastille d'Eau rejoint le compteur, puis une pastille des Sources. L'écran **« Le Cycle de l'eau »** (menu, dès qu'une Source est à gagner) reprend celui des Saisons : Sources, à faire jaillir, bonus avant/après, ce qui repart de zéro et ce qui reste, confirmation ; son ornement est une goutte qui tombe sous l'arche et ses ronds dans l'eau.
 
@@ -540,21 +540,21 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 >
 > Le vivant revient (M8) : les espèces de l'Herbier (§9.5) s'ajoutent à la biodiversité dès la 1ʳᵉ Saison (le joueur de référence en ramène 8 : Coquelicot, Fougère, Abeille, Coccinelle, Bourdon, Grenouille, Hérisson, Citron). Comme Antoine le souhaite, c'est une synergie de plus plutôt qu'un changement de valeurs. Avec les 92 jalons et les jalons de M8, la Saison conseillée passe de 1 h 23 à 1 h 14 (−26 % de la cible, encore dans les ±30 %), l'Arcologie à 1 h 01 et la 2ᵉ Saison à 36 min. Les Saisons à défi (§7.3) sont jouées comme 3ᵉ Saison : `npm run simulate` affiche aussi le moment où chacune est gagnée.
 
-> Freiner l'emballement des Saisons (2026-10-11, §7) : le joueur de référence joue chaque Saison jusqu'à doubler ses Graines, une fois mûres, et sème ses talents à chaque Saison. Mesuré sur trois graines de hasard (0, 1 et 2), en prolongeant le parcours de `npm run simulate` :
+> Freiner l'emballement des Saisons (2026-10-11, §7) : le joueur de référence joue chaque Saison jusqu'à doubler ses Graines, une fois mûres, et sème ses talents à chaque Saison. Mesuré avec les visites (M11) et les quartiers voisins (M12), sur trois graines de hasard (0, 1 et 2), en prolongeant le parcours de `npm run simulate` ; la colonne « Avant » est la mesure d'avant M11 :
 >
 > | Saison | Avant | Après | Graines à la fin (après) |
 > |---|---|---|---|
-> | 1ʳᵉ | 1 h 14 | 1 h 14 – 1 h 17 | 10 |
-> | 2ᵉ | 46 min | 44 – 48 min | 20 |
-> | 3ᵉ (la Biorégion s'ouvre) | 23 min | 23 – 27 min | 40 |
-> | 4ᵉ | 9 min | 15 min | 310 – 420 |
-> | 5ᵉ | 2,7 min | 15 min | 1 600 – 1 850 |
-> | Suivantes, jusqu'au Cycle | 1 à 3 min | 15 min | ~3 700 |
-> | 1ᵉʳ Cycle conseillé | 2 h 52 | 3 h 08 – 3 h 14 | |
-> | Trois Saisons après le Cycle | — | 15 min chacune | 170 – 230, ~2 500, 6 500 – 9 500 |
-> | Les trois suivantes | — | 18 – 22 min, 43 – 58 min, 1 h 34 – 1 h 53 | doublées à chaque fois |
+> | 1ʳᵉ | 1 h 14 | 1 h 15 – 1 h 16 | 10 |
+> | 2ᵉ | 46 min | 40 – 44 min | 20 |
+> | 3ᵉ (la Biorégion s'ouvre) | 23 min | 23 – 26 min | 40 |
+> | 4ᵉ | 9 min | 15 min | 290 – 340 |
+> | 5ᵉ | 2,7 min | 15 min | 1 300 – 1 650 |
+> | Suivantes, jusqu'au Cycle | 1 à 3 min | 15 min | 3 000 – 3 900 |
+> | 1ᵉʳ Cycle conseillé | 2 h 52 | 2 h 46 (graine 0) | |
+> | Trois Saisons après le Cycle | quelques minutes | 15 min chacune | 100 – 180, 2 100 – 2 400, 7 500 – 8 300 |
+> | Les trois suivantes | — | 17 – 20 min, 37 – 43 min, 1 h 28 – 1 h 32 | doublées à chaque fois |
 >
-> Les trois premières Saisons ne changent pas (elles durent déjà plus de 15 minutes, et le sol ne s'approfondit qu'à 100 Graines). Ensuite, chaque Saison dure au moins ses 15 minutes de maturité, puis s'allonge d'elle-même : au-delà de ~20 000 Graines, doubler demanderait plus de 4 h de Saison, et le joueur replante plutôt avec ×1,3 à ×1,5 ou prépare le Cycle suivant. Le test du simulateur vérifie que chaque Saison entre la 3ᵉ et le Cycle dure au moins 15 minutes, que les quatre Saisons après le Cycle aussi, et que la 4ᵉ dure plus de 17 minutes.
+> Les trois premières Saisons ne changent pas (elles durent déjà plus de 15 minutes, et le sol ne s'approfondit qu'à 100 Graines). Ensuite, chaque Saison dure au moins ses 15 minutes de maturité, puis s'allonge d'elle-même : au-delà de ~60 000 Graines, doubler demanderait 4 h de Saison, et le joueur replante plutôt avec ×1,3 à ×1,5 ou prépare le Cycle suivant. Le test du simulateur vérifie que chaque Saison entre la 3ᵉ et le Cycle dure au moins 15 minutes, que les cinq Saisons après le Cycle aussi, et que la 5ᵉ dure plus de 20 minutes.
 
 ### Affichage des nombres
 
