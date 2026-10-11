@@ -66,6 +66,8 @@ export const fr = {
   biodiversityHint:
     'Chaque type de bâtiment possédé à 10, 50 puis 100 exemplaires ajoute 2\u00a0% à toute la production.',
   upgradesTitle: 'Améliorer',
+  upgradeTile: (name: string, cost: string, affordable: boolean) =>
+    `${name}, ${cost}\u00a0Lumière${affordable ? ', à portée' : ''}`,
   noUpgrades: 'De nouvelles améliorations apparaîtront à mesure que le quartier grandit.',
   upgradeEffect: {
     generatorMultiplier: (generator: string) => `${generator}\u00a0: production ×2`,
