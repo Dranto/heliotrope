@@ -1182,6 +1182,19 @@ button {
   box-shadow: 0 4px 12px -6px rgb(233 169 59 / 0.8);
 }
 
+/* Affordable tiles also carry a small sun dot, so the cue is not colour alone (§10.4). */
+.upgrade-tile[data-affordable='true']::after {
+  content: '';
+  position: absolute;
+  top: 0.32rem;
+  right: 0.32rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px #fff8e6;
+}
+
 .upgrade-tile:hover {
   transform: translateY(-1px);
 }

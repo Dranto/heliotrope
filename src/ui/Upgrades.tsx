@@ -41,14 +41,21 @@ export function Upgrades() {
           <ul className="upgrade-grid">
             {available.map((upgrade) => {
               const tier = upgrade.id.split('.')[1];
+              const affordable = canBuyUpgrade(state, upgrade.id);
+              const label = t.upgradeTile(
+                upgradeText(upgrade).name,
+                formatCost(upgrade.cost),
+                affordable,
+              );
               return (
                 <li key={upgrade.id}>
                   <button
                     type="button"
                     className="upgrade-tile"
-                    aria-label={upgradeText(upgrade).name}
+                    aria-label={label}
+                    title={label}
                     aria-pressed={upgrade.id === selected.id}
-                    data-affordable={canBuyUpgrade(state, upgrade.id)}
+                    data-affordable={affordable}
                     onClick={() => setSelectedId(upgrade.id)}
                   >
                     <UpgradeIcon upgrade={upgrade} />

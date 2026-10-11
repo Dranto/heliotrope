@@ -27,6 +27,8 @@ export const en: Texts = {
   biodiversity: (percent: string) => `Biodiversity +${percent}%`,
   biodiversityHint: 'Each building type owned 10, 50 then 100 times adds 2% to all production.',
   upgradesTitle: 'Improve',
+  upgradeTile: (name: string, cost: string, affordable: boolean) =>
+    `${name}, ${cost} Light${affordable ? ', affordable' : ''}`,
   noUpgrades: 'New upgrades will appear as the neighbourhood grows.',
   upgradeEffect: {
     generatorMultiplier: (generator: string) => `${generator}: production ×2`,
