@@ -40,6 +40,26 @@ describe('App', () => {
     expect(screen.getByLabelText('Encore à découvrir')).toHaveTextContent('100');
   });
 
+  it('shows the next goal, the time before a purchase, and buys with the keyboard (§10.5)', () => {
+    const store = renderApp();
+    expect(screen.getByTestId('next-goal')).toHaveTextContent(/Prochain\s+: Encore à découvrir/);
+    for (let i = 0; i < 15; i++) fireEvent.click(flower());
+    fireEvent.keyDown(document, { key: '1' });
+    expect(store.getState().generators.pot).toBe(1);
+    // The first click upgrade is now the cheapest thing out of reach.
+    expect(screen.getByTestId('next-goal')).toHaveTextContent(/Mains tièdes\s*dans \d/);
+    // 0,1 Light per second: the second pot (17,25) is about 2 min 53 away.
+    expect(
+      screen.getByRole('button', { name: /acheter héliotrope en pot pour/i }),
+    ).toHaveTextContent(/dans 2\s+min/);
+    fireEvent.keyDown(document, { key: 'm' });
+    expect(screen.getByRole('radio', { name: 'Max' })).toBeChecked();
+    // No shortcut while a dialog is open.
+    fireEvent.click(screen.getByRole('button', { name: /statistiques/i }));
+    fireEvent.keyDown(document, { key: 'm' });
+    expect(screen.getByRole('radio', { name: 'Max' })).toBeChecked();
+  });
+
   it('grows the heliotrope from a sprout as Light is harvested', () => {
     renderApp();
     const panel = () => flower().closest('section')!;

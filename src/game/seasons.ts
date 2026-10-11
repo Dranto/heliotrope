@@ -3,6 +3,7 @@ import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './ach
 import { keptGeneratorShare } from './bonuses';
 import { generatorLimit, offeredChallenges, type ChallengeId } from './challenges';
 import { GENERATOR_IDS } from './generators';
+import { startCurve } from './history';
 import { createInitialState, type GameState } from './state';
 
 /** §7.4: each Source makes every Seed worth one point more. Here so cycles.ts can import this module. */
@@ -96,6 +97,7 @@ export function replant(state: GameState, challenge: ChallengeId | null, kept: n
     challenge,
     butterfly: { nextIn: state.butterfly.nextIn || fresh.butterfly.nextIn, visible: 0 },
     effects: [],
+    history: startCurve(state.history, state.seasons + 2),
   };
 }
 

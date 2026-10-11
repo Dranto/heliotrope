@@ -16,6 +16,11 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('pagehide', store.save);
 
+// §10.5: installable and playable without a connection once loaded (public/sw.js).
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GameStoreContext.Provider value={store}>

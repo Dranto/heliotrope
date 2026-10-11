@@ -11,6 +11,7 @@ import { advanceButterfly } from './butterfly';
 import { completeChallenge, generatorLimit } from './challenges';
 import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
+import { recordProduction } from './history';
 import { earnLight } from './light';
 import { unlockSpecies } from './species';
 import type { GameState } from './state';
@@ -55,13 +56,15 @@ export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
   const watered = earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds);
   const next = runCooperatives(advanceButterfly(watered, dtSeconds));
-  return unlockProgress({
-    ...next,
-    playSeconds: state.playSeconds + dtSeconds,
-    seasonSeconds: state.seasonSeconds + dtSeconds,
-    idleSeconds: state.idleSeconds + dtSeconds,
-    lastUpdate: state.lastUpdate + dtSeconds * 1000,
-  });
+  return unlockProgress(
+    recordProduction({
+      ...next,
+      playSeconds: state.playSeconds + dtSeconds,
+      seasonSeconds: state.seasonSeconds + dtSeconds,
+      idleSeconds: state.idleSeconds + dtSeconds,
+      lastUpdate: state.lastUpdate + dtSeconds * 1000,
+    }),
+  );
 }
 
 /** Player action: click the heliotrope. */

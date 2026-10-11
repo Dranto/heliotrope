@@ -13,6 +13,7 @@ import { validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
 import { isChallengeId, type ChallengeId } from './challenges';
 import { isSpeciesId, type SpeciesId } from './species';
+import { emptyCurve, validHistory } from './history';
 
 export const SAVE_KEY = 'heliotrope.save';
 
@@ -55,6 +56,9 @@ const migrations: Record<number, Migration> = {
   // v11 adds the Bioregion and the Cycle of water (§7.4). Before it, every Season belonged to the
   // first Cycle: the defaults of the fresh state (no Water, no collector, no Source) fit.
   10: (raw) => ({ ...raw, version: 11 }),
+  // v12 adds the production curves of the Statistics (§10.5). Older saves start drawing from the
+  // current Season on, with the default of the fresh state.
+  11: (raw) => ({ ...raw, version: 12 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -178,6 +182,11 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.species)) {
     state.species = [...new Set<SpeciesId>(data.species.filter(isSpeciesId))];
   }
+  // The last curve is the current Season's; start it afresh when the save disagrees.
+  const history = validHistory(data.history);
+  const current = state.seasons + 1;
+  state.history =
+    history && history[history.length - 1]!.season === current ? history : [emptyCurve(current)];
   const collectors = data.collectors as Record<string, unknown> | undefined;
   for (const id of COLLECTOR_IDS) {
     const value = collectors?.[id];

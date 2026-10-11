@@ -21,6 +21,10 @@ function playedState(): GameState {
     allTimeLight: 9e9,
     seeds: 12,
     seasons: 2,
+    history: [
+      { season: 2, step: 60, points: [1, 4, 9] },
+      { season: 3, step: 30, points: [2, 3] },
+    ],
     clicks: 120,
     playSeconds: 30_000,
     seasonSeconds: 600,
@@ -223,6 +227,30 @@ describe('export and import', () => {
     expect(state.collectors).toEqual({ roofTanks: 0, swales: 0, ponds: 0, streams: 0 });
     expect(state.sources).toBe(0);
     expect(state.cycles).toBe(0);
+  });
+
+  it('migrates a v11 save with an empty production curve for the current Season (§10.5)', () => {
+    const v11 = JSON.stringify({ version: 11, seasons: 4, resources: { light: 10 } });
+    const state = deserialize(v11, 0)!;
+    expect(state.version).toBe(STATE_VERSION);
+    expect(state.history).toEqual([{ season: 5, step: 30, points: [] }]);
+  });
+
+  it('keeps well-formed production curves and drops broken ones', () => {
+    const curves = [
+      { season: 1, step: 30, points: [1, 2] },
+      { season: 2, step: 60, points: [3] },
+    ];
+    const good = JSON.stringify({ version: STATE_VERSION, seasons: 1, history: curves });
+    expect(deserialize(good, 0)!.history).toEqual(curves);
+    const stale = JSON.stringify({ version: STATE_VERSION, seasons: 3, history: curves });
+    expect(deserialize(stale, 0)!.history).toEqual([{ season: 4, step: 30, points: [] }]);
+    const broken = JSON.stringify({
+      version: STATE_VERSION,
+      seasons: 0,
+      history: [{ season: 1, step: 30, points: [-1] }],
+    });
+    expect(deserialize(broken, 0)!.history).toEqual([{ season: 1, step: 30, points: [] }]);
   });
 
   it('keeps the Bioregion and Cycle totals consistent', () => {

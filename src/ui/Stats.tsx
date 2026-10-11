@@ -5,6 +5,7 @@ import { seedBonus } from '../game/seasons';
 import { TALENT_LIST } from '../game/talents';
 import { t } from '../i18n';
 import { Dialog } from './Dialog';
+import { ProductionCurve } from './ProductionCurve';
 import { useGameState } from './useGame';
 
 function Row({ label, value, testId }: { label: string; value: string; testId?: string }) {
@@ -42,6 +43,10 @@ export function Stats({ onClose }: { onClose: () => void }) {
             value={t.stats.percent(formatPercent(biodiversityBonus(state)))}
           />
         </dl>
+      </section>
+      <section>
+        <h3>{t.stats.curveTitle}</h3>
+        <ProductionCurve curves={state.history} />
       </section>
       <section>
         <h3>{t.stats.allTitle}</h3>
