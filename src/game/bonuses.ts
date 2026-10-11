@@ -47,7 +47,11 @@ export type Bonus =
   /** Adds `bonus` to global production per generator type owned. */
   | { kind: 'globalPerType'; bonus: number }
   /** Multiplies the Water every collector gathers (§7.4). */
-  | { kind: 'water'; factor: number };
+  | { kind: 'water'; factor: number }
+  /** Multiplies the time between two visits (§9.6). */
+  | { kind: 'visitInterval'; factor: number }
+  /** The neighbours bring `units` more of their building (§9.6). */
+  | { kind: 'cuttingsGift'; units: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -88,6 +92,7 @@ export function factorOf(
     | 'biodiversityFactor'
     | 'synergyFactor'
     | 'butterflyInterval'
+    | 'visitInterval'
     | 'harvestFactor',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);

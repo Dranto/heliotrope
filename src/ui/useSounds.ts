@@ -20,7 +20,8 @@ function counters(state: GameState): Record<Exclude<SoundName, 'bird'>, number> 
     upgrade: state.upgrades.length,
     restore: state.parcels.length,
     project: state.projects.length,
-    butterfly: state.butterflies,
+    // A welcomed visit (§9.6) trills like a caught butterfly.
+    butterfly: state.butterflies + state.visits.cuttings + state.visits.shower + state.visits.birds,
     milestone: state.achievements.length,
     season: state.seasons,
   };

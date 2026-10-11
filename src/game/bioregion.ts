@@ -3,6 +3,7 @@
 // neighbourhood's buildings. Collectors, sites and Water are kept from one Season to the next;
 // only a new Cycle of water (cycles.ts) resets them. Names live in src/i18n, the art in src/ui.
 import { bonusesOf } from './bonuses';
+import { effectFactor } from './effects';
 import type { GeneratorId } from './generators';
 import type { GameState } from './state';
 
@@ -76,7 +77,9 @@ export function isBioregionOpen(state: Pick<GameState, 'seasons' | 'cycles'>): b
 /** Multiplier on every collector: Sources, then the Water bonuses of parcels and projects. */
 export function waterMultiplier(state: GameState): number {
   const bonuses = bonusesOf(state, 'water').reduce((product, b) => product * b.factor, 1);
-  return (1 + SOURCE_WATER_BONUS * state.sources) * bonuses;
+  // §9.6: the summer shower fills the collectors too.
+  const shower = effectFactor(state.effects, 'shower');
+  return (1 + SOURCE_WATER_BONUS * state.sources) * bonuses * shower;
 }
 
 /** Water per second of one more unit of a collector, with the multipliers in force. */

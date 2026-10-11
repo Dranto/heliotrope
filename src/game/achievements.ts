@@ -7,6 +7,10 @@ import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import type { GameState } from './state';
 import { CLICK_UPGRADE_IDS, SYNERGY_IDS, type UpgradeId } from './upgrades';
+import { VISIT_KINDS, type VisitKind } from './visits';
+
+/** Visits of one kind welcomed for their Milestone (§9.6). */
+export const VISIT_MILESTONE_COUNT = 10;
 
 /** §9.3: each Milestone unlocked adds +1% to global production (additive). */
 export const ACHIEVEMENT_BONUS = 0.01;
@@ -60,6 +64,10 @@ export type AchievementCondition =
   | { kind: 'everySite'; count: number }
   /** Cycles of water completed (§7.4). */
   | { kind: 'cycles'; count: number }
+  /** Visits of one kind welcomed over all Seasons (§9.6). */
+  | { kind: 'visits'; visit: VisitKind; count: number }
+  /** Every kind of visit welcomed at least once (§9.6). */
+  | { kind: 'everyVisit' }
   /** Seconds of play over all Seasons. */
   | { kind: 'playSeconds'; seconds: number }
   /** Seconds of play in the current Season. */
@@ -125,6 +133,10 @@ export type AchievementId =
   | `sites.${(typeof SITE_STEPS)[number]}`
   | `cycles.${(typeof CYCLE_STEPS)[number]}`
   | 'watershed'
+  | 'openDoors'
+  | 'goodNeighbours'
+  | 'afterRain'
+  | 'stopover'
   | 'floodTide'
   | 'mosaic'
   | 'patchwork'
@@ -257,6 +269,23 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'neighbourhood' as const,
     condition: { kind: 'species', count } as const,
   })),
+  // Visits (§9.6).
+  { id: 'openDoors', family: 'neighbourhood', condition: { kind: 'everyVisit' } },
+  {
+    id: 'goodNeighbours',
+    family: 'neighbourhood',
+    condition: { kind: 'visits', visit: 'cuttings', count: VISIT_MILESTONE_COUNT },
+  },
+  {
+    id: 'afterRain',
+    family: 'neighbourhood',
+    condition: { kind: 'visits', visit: 'shower', count: VISIT_MILESTONE_COUNT },
+  },
+  {
+    id: 'stopover',
+    family: 'neighbourhood',
+    condition: { kind: 'visits', visit: 'birds', count: VISIT_MILESTONE_COUNT },
+  },
   ...CHALLENGE_STEPS.map((count) => ({
     id: `challenges.${count}` as const,
     family: 'seasons' as const,
@@ -364,6 +393,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.clicks >= condition.count;
     case 'butterflies':
       return state.butterflies >= condition.count;
+    case 'visits':
+      return state.visits[condition.visit] >= condition.count;
+    case 'everyVisit':
+      return VISIT_KINDS.every((kind) => state.visits[kind] > 0);
     case 'seasons':
       return state.seasons >= condition.count;
     case 'everyGenerator':

@@ -242,8 +242,8 @@ Le quartier garde des places grises qu'aucun bâtiment n'occupe : une avenue, de
 | Parcelle | Place sur la carte | Phase | Coût | Effet |
 |---|---|---|---|---|
 | Rue jardin | L'avenue devant l'immeuble, dépavée, avec îlots fleuris et bancs | 1 | 1 500 | Clic ×2 |
-| Jardins de pluie | L'avenue derrière l'immeuble : deux noues plantées de roseaux | 1 | 8 000 | Héliotropes en pot ×2, Panneaux de balcon ×1,5 |
-| Corridor des pollinisateurs | La rue ouest, sur toute sa longueur : une prairie fleurie | 2 | 100 000 | Le Papillon doré revient 20 % plus vite |
+| Jardins de pluie | L'avenue derrière l'immeuble : deux noues plantées de roseaux | 1 | 8 000 | Héliotropes en pot ×2, Panneaux de balcon ×1,5 ; l'Averse d'été dure ×2 (M11, §9.6) |
+| Corridor des pollinisateurs | La rue ouest, sur toute sa longueur : une prairie fleurie | 2 | 100 000 | Le Papillon doré et les visites (§9.6) reviennent 20 % plus vite |
 | Rivière retrouvée | La rue est : la rivière enterrée coule à nouveau, sous des passerelles | 2 | 2 M | +2 h de plafond hors ligne (§9.1) |
 | Parc du parking | Le parking de l'est : pelouse, étang, bosquets | 3 | 30 M | Toute la production +10 % |
 | Verger de l'entrepôt | L'entrepôt du sud-ouest ouvre son toit à deux rangées d'arbres fruitiers | 3 | 300 M | Potagers ×1,5, Serres ×1,5 |
@@ -261,7 +261,7 @@ Des décisions uniques du quartier qui **changent une règle** plutôt que de mu
 
 | Projet | Condition | Coût | Effet | Trace sur la carte |
 |---|---|---|---|---|
-| Troc de graines | 5 Héliotropes en pot | 250 | Le clic rapporte +0,2 par Héliotrope en pot | Une table de sachets dans la cour |
+| Troc de graines | 5 Héliotropes en pot | 250 | Le clic rapporte +0,2 par Héliotrope en pot ; les voisins apportent une bouture de plus (M11, §9.6) | Une table de sachets dans la cour |
 | Outilthèque | 5 Panneaux de balcon | 2 000 | Tous les bâtiments coûtent 10 % de moins | Une cabane dans la cour |
 | Compost collectif | 5 Potagers | 20 000 | La biodiversité (§5.4) compte aussi chaque bâtiment possédé à 5 exemplaires | Trois bacs dans la cour |
 | Batteries partagées | 25 Panneaux | 50 000 | Panneaux +5 % par type de bâtiment possédé | Des armoires de batteries sous les panneaux |
@@ -559,7 +559,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -596,6 +596,22 @@ Les espèces reviennent à mesure que le quartier reverdit. Chacune revient par 
 - **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (18 espèces) multiplie toute la biodiversité par 1,5.
 - **Écran.** « Herbier » s'ouvre du menu dès la première espèce (ou après la 1ʳᵉ Saison). Une planche par espèce : le dessin en couleur dans un médaillon doré une fois revenue, une silhouette pâle avant ; sous chaque nom, ce qui la ramène. Aucun texte narratif.
 - **Retour.** Une notification « De retour dans le quartier : Hérisson » et l'apparition en douceur du médaillon sur la carte (sans animation au chargement, ni avec les animations réduites).
+
+### 9.6 Les visites du quartier (M11)
+
+Le quartier restauré raconte ses temps forts sans un mot (§1, §6) : de temps en temps, un **visiteur** s'arrête sur la carte, à côté de la fleur, dans la vue du Balcon pour que tout joueur le voie. Un cercle doré pointillé respire autour de lui ; un clic (ou Entrée) l'accueille. Code dans `src/game/visits.ts`, dessins dans `src/ui/VisitArt.tsx`.
+
+| Visiteur | Vient dès | Sur la carte | Effet de l'accueil | Synergie |
+|---|---|---|---|---|
+| **Les voisins et leurs boutures** | 10 Héliotropes en pot | Un vélo-cargo à remorque de jeunes plants arrive sur l'avenue sous l'immeuble | +1 exemplaire gratuit du bâtiment le plus cher possédé (dans la limite d'une Saison à défi) | Troc de graines : +1 bouture |
+| **L'Averse d'été** | 10 Potagers sur le toit | Un nuage qui pleut sur les toits potagers, à gauche de la cour | Potagers, Serres et Eau de la Biorégion ×2 pendant 60 s | Jardins de pluie : dure ×2 |
+| **La Nuée de migrateurs** | 1 Canopée urbaine ou les Toits vivants | Une nuée d'oiseaux qui tourne au-dessus des toits, à droite de la cour | Bonus de biodiversité (§5.4) ×2 pendant 90 s | +10 s par espèce de l'Herbier |
+
+- **Rythme.** Une visite toutes les 4 à 9 min (tirées au hasard, comme le Papillon, avec la graine de la sauvegarde), parmi les visiteurs que le quartier attire déjà ; elle reste 20 s. Le Corridor des pollinisateurs les fait revenir 20 % plus vite. Le compte à rebours ne court pas tant qu'aucun visiteur n'est attiré.
+- **Effets.** L'Averse et la Nuée sont des effets en cours, comme la Floraison (§9.2) : une pastille dans le compteur, une notification à l'accueil ; accueillir le même visiteur pendant son effet le relance sans cumul. Hors ligne, les visites et leurs effets sont en pause, comme le Papillon. Accueillir une visite joue le trille du Papillon.
+- **Jalons (4).** Portes ouvertes (accueillir chaque visiteur au moins une fois), Bon voisinage (10 fois les voisins), Après la pluie (10 averses), Escale (10 nuées). 113 jalons en tout.
+- **Équilibrage.** Le simulateur ne joue pas les visites, comme il ne compte qu'une part des Papillons : leurs gains restent un bonus pour le joueur attentif et ne déplacent pas les cibles du §8.
+- **Le soir et la nuit.** Décor seulement, d'après l'horloge de l'appareil : de 18 h à 21 h un voile chaud, de 21 h à 6 h un voile bleu, et les lanternes s'allument au pied d'un arbre de rue sur quatre. La production ne change jamais (roadmap §5 : on ne punit pas le joueur qui joue la nuit).
 
 ---
 

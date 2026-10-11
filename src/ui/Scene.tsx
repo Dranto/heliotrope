@@ -36,6 +36,9 @@ import {
 } from './neighbourhood';
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
+import { NightLights, VisitLayer } from './VisitArt';
+import { daylightOf, type Daylight } from './daylight';
+import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
@@ -125,9 +128,11 @@ const CAPTION_ROOM = 52;
  */
 export function Scene({
   onCatch,
+  onVisit,
   highlight,
 }: {
   onCatch: (result: CatchResult) => void;
+  onVisit: (result: WelcomeResult) => void;
   highlight: ParcelId | null;
 }) {
   const store = useGameStore();
@@ -145,6 +150,14 @@ export function Scene({
     .map((p) => p.id)
     .join();
   const { parcels, projects, species } = state;
+  const visitor = state.visit.kind;
+  const daylight = useDaylight();
+  const welcome = useCallback(() => {
+    const result = welcomeVisit(store.getState());
+    if (!result) return;
+    store.dispatch(() => result.state);
+    onVisit(result);
+  }, [store, onVisit]);
   // Encoded as one string so the bikes only redraw when a cooperative starts, stops or buys.
   const bikes = unlockedCooperatives(state)
     .map(
@@ -168,9 +181,11 @@ export function Scene({
   const marks = useMemo(
     () => (
       <>
+        <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
+        <VisitLayer kind={visitor} onWelcome={welcome} />
         <ParcelOffers
           offered={split(offered)}
           affordable={split(affordable)}
@@ -179,7 +194,19 @@ export function Scene({
         />
       </>
     ),
-    [projects, species, bikes, reduced, offered, affordable, highlight, restore],
+    [
+      daylight,
+      projects,
+      species,
+      bikes,
+      reduced,
+      visitor,
+      welcome,
+      offered,
+      affordable,
+      highlight,
+      restore,
+    ],
   );
   const overlay = useMemo(
     () => (
@@ -292,6 +319,16 @@ export function Scene({
       </figcaption>
     </figure>
   );
+}
+
+/** Evening and night from the player's clock (§9.6), checked every minute. */
+function useDaylight(): Daylight {
+  const [daylight, setDaylight] = useState(() => daylightOf(new Date().getHours()));
+  useEffect(() => {
+    const timer = setInterval(() => setDaylight(daylightOf(new Date().getHours())), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+  return daylight;
 }
 
 /** The device asks for less motion; SMIL animations do not follow the CSS rule by themselves. */

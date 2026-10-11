@@ -14,6 +14,7 @@ import type { GeneratorId } from './generators';
 import { recordProduction } from './history';
 import { earnLight } from './light';
 import { unlockSpecies } from './species';
+import { advanceVisit } from './visits';
 import type { GameState } from './state';
 import { UPGRADES, type UpgradeId } from './upgrades';
 
@@ -55,7 +56,7 @@ export function unlockProgress(state: GameState): GameState {
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
   const watered = earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds);
-  const next = runCooperatives(advanceButterfly(watered, dtSeconds));
+  const next = runCooperatives(advanceVisit(advanceButterfly(watered, dtSeconds), dtSeconds));
   return unlockProgress(
     recordProduction({
       ...next,

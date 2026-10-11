@@ -20,8 +20,8 @@ export interface OfflineResult {
 }
 
 /**
- * Production while the game was closed (§9.1). Golden Butterfly effects do not count offline:
- * they and the butterfly clock are paused, then resume where they were.
+ * Production while the game was closed (§9.1). Golden Butterfly and visit effects do not count
+ * offline: they, the butterfly and the visit clocks are paused, then resume where they were.
  */
 export function applyOfflineProgress(
   state: GameState,
@@ -43,6 +43,7 @@ export function applyOfflineProgress(
       ...next,
       effects: state.effects,
       butterfly: state.butterfly,
+      visit: state.visit,
       rngSeed: state.rngSeed,
       lastUpdate: now,
     },
