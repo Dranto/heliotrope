@@ -261,6 +261,14 @@ describe('export and import', () => {
     expect(deserialize(unknown, 0)!.visit.kind).toBeNull();
   });
 
+  it('keeps the neighbouring districts restored and drops unknown ones (§6.4)', () => {
+    const json = JSON.stringify({
+      version: 13,
+      districts: ['tanneries', 'moon', 'tanneries', 'railyard'],
+    });
+    expect(deserialize(json, 0)!.districts).toEqual(['tanneries', 'railyard']);
+  });
+
   it('keeps well-formed production curves and drops broken ones', () => {
     const curves = [
       { season: 1, step: 30, points: [1, 2] },

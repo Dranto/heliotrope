@@ -283,6 +283,28 @@ Les effets des parcelles et des projets s'ajoutent aux formules du §8 : les mul
 
 Le pilier « Élégant et lumineux » (§1) promettait des sons discrets. Ils sont synthétisés dans le navigateur (Web Audio, aucun fichier audio) et accordés sur une même gamme pentatonique, pour ne jamais sonner faux quand ils se superposent : une note pincée à chaque clic, qui change de hauteur d'un clic à l'autre ; un petit accord à chaque bâtiment ; un scintillement pour une amélioration ; un arpège pour une parcelle restaurée ; une cloche pour un projet ; un trille pour le Papillon doré ; deux notes pour un Jalon ; un accord lent pour une nouvelle Saison. À partir de la phase 2, des oiseaux chantent de temps en temps quand l'onglet est visible. Quand plusieurs choses arrivent ensemble, seul le son le plus rare joue. Les Options règlent le volume (50 % par défaut) et coupent le son. Code dans `src/ui/sound.ts` et `src/ui/useSounds.ts`.
 
+
+### 6.4 Les quartiers voisins (M12)
+
+Autour de la ville, la périphérie grise (§6) s'ouvre quand le quartier est **entièrement restauré** (les huit parcelles du §6.1). Ses îlots deviennent des **quartiers voisins**, à restaurer **un à un, dans l'ordre**, contre de la Lumière, **pour toujours** : ils restent d'une Saison à l'autre et après un Cycle de l'eau, comme les parcelles (décision D2). Chacun apporte une **règle** liée à l'existant (Biorégion, visites, Papillon, synergies) plutôt qu'un multiplicateur global, pour donner aux Saisons tardives des objectifs lointains sans aggraver leur rythme (§7). Données dans `src/game/districts.ts`, places et dessins dans `src/ui/districtMap.ts` et `src/ui/DistrictArt.tsx`.
+
+| Quartier voisin | Ancien usage, place | Coût | Effet |
+|---|---|---|---|
+| Jardins d'eau des Tanneries | Tanneries, à l'est | 100 Md | Eau ×1,5 ; l'Averse d'été dure ×1,5 |
+| Forêt de la gare de triage | Gare de triage, au nord | 500 Md | Canopées urbaines ×2 ; la Nuée de migrateurs dure ×1,5 |
+| Verger du centre commercial | Centre commercial, au sud | 2,5 Bn | Les voisins apportent une bouture de plus ; Potagers ×1,5 |
+| Halles du parking relais | Parking relais, à l'ouest | 12,5 Bn | Récolte du Papillon doré ×1,5 |
+| Parc de l'échangeur | Échangeur, au nord-est | 60 Bn | Les visites reviennent 20 % plus vite, le Papillon 10 % |
+| Tiers-lieu des bureaux | Bureaux, au sud-ouest | 300 Bn | Synergies ×1,25 |
+| Ateliers solaires | Zone industrielle, au sud-est | 1,5 Bd | Tous les bâtiments coûtent 10 % de moins |
+| Tours vivantes | Quartier des cheminées, au nord-ouest | 7,5 Bd | Arcologies ×2 ; chaque jalon donne +0,5 % de plus |
+
+- **Quand un quartier est proposé.** Le suivant dans l'ordre, dès que la Saison en cours a récolté la moitié de son prix, comme une parcelle. Il rejoint les offres du panneau « Le quartier » (et le prochain objectif du compteur, §10.5) ; la rangée de pastilles du panneau compte alors les quartiers voisins au lieu des parcelles.
+- **Sur la carte.** Chaque quartier occupe un îlot de la périphérie, au-delà de la rocade. Celui qui est proposé est cerné d'un pointillé doré qui respire, avec une grande épingle en forme de pousse au centre ; un clic dessus le restaure quand on peut se l'offrir. Restauré, l'îlot gris laisse place à son dessin : bassins et roseaux des jardins d'eau, rangées d'arbres le long des anciennes voies, verger en quinconce, halles aux auvents rayés, boucles de l'échangeur devenues allées, place plantée entre des toits verts, ateliers couverts de panneaux, tours en terrasses plantées. Il apparaît avec l'entrée habituelle de la carte (anneau doré), sans animation au chargement.
+- **La vue « La Ville » s'agrandit.** Son cadre englobe la ville et chaque quartier voisin restauré : à mesure que la périphérie reverdit, la vue s'élargit pour la montrer.
+- **Jalons (3).** Par-delà la rocade (1 quartier voisin), La ville déborde (4), Ville jardin (8). 116 jalons en tout.
+- **Sauvegarde.** Version 14 : la liste des quartiers restaurés, vide pour une sauvegarde plus ancienne.
+
 ---
 
 ## 7. Prestige : les Saisons
@@ -559,7 +581,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -609,7 +631,7 @@ Le quartier restauré raconte ses temps forts sans un mot (§1, §6) : de temps 
 
 - **Rythme.** Une visite toutes les 4 à 9 min (tirées au hasard, comme le Papillon, avec la graine de la sauvegarde), parmi les visiteurs que le quartier attire déjà ; elle reste 20 s. Le Corridor des pollinisateurs les fait revenir 20 % plus vite. Le compte à rebours ne court pas tant qu'aucun visiteur n'est attiré.
 - **Effets.** L'Averse et la Nuée sont des effets en cours, comme la Floraison (§9.2) : une pastille dans le compteur, une notification à l'accueil ; accueillir le même visiteur pendant son effet le relance sans cumul. Hors ligne, les visites et leurs effets sont en pause, comme le Papillon. Accueillir une visite joue le trille du Papillon.
-- **Jalons (4).** Portes ouvertes (accueillir chaque visiteur au moins une fois), Bon voisinage (10 fois les voisins), Après la pluie (10 averses), Escale (10 nuées). 113 jalons en tout.
+- **Jalons (4).** Portes ouvertes (accueillir chaque visiteur au moins une fois), Bon voisinage (10 fois les voisins), Après la pluie (10 averses), Escale (10 nuées). 113 jalons en tout avec ceux de M11.
 - **Équilibrage.** Le simulateur ne joue pas les visites, comme il ne compte qu'une part des Papillons : leurs gains restent un bonus pour le joueur attentif et ne déplacent pas les cibles du §8.
 - **Le soir et la nuit.** Décor seulement, d'après l'horloge de l'appareil : de 18 h à 21 h un voile chaud, de 21 h à 6 h un voile bleu, et les lanternes s'allument au pied d'un arbre de rue sur quatre. La production ne change jamais (roadmap §5 : on ne punit pas le joueur qui joue la nuit).
 

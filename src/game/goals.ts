@@ -1,4 +1,5 @@
 import { generatorLimit } from './challenges';
+import { offeredDistrict, type DistrictId } from './districts';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
 import {
@@ -28,7 +29,8 @@ export type Goal =
   | { kind: 'generator'; id: GeneratorId; cost: number; discovered: boolean }
   | { kind: 'upgrade'; id: UpgradeId; cost: number }
   | { kind: 'parcel'; id: ParcelId; cost: number }
-  | { kind: 'project'; id: ProjectId; cost: number };
+  | { kind: 'project'; id: ProjectId; cost: number }
+  | { kind: 'district'; id: DistrictId; cost: number };
 
 /** Every purchase on offer now, plus the next generator still to discover. */
 function offers(state: GameState): Goal[] {
@@ -46,6 +48,8 @@ function offers(state: GameState): Goal[] {
   for (const u of availableUpgrades(state)) goals.push({ kind: 'upgrade', id: u.id, cost: u.cost });
   for (const p of offeredParcels(state)) goals.push({ kind: 'parcel', id: p.id, cost: p.cost });
   for (const p of offeredProjects(state)) goals.push({ kind: 'project', id: p.id, cost: p.cost });
+  const district = offeredDistrict(state);
+  if (district) goals.push({ kind: 'district', id: district.id, cost: district.cost });
   return goals;
 }
 

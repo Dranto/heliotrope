@@ -1,6 +1,7 @@
 import type { AchievementId } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
 import type { ChallengeId } from './challenges';
+import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
 import type { Language, Notation } from './format';
@@ -16,7 +17,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 13;
+export const STATE_VERSION = 14;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -74,6 +75,8 @@ export interface GameState {
   achievements: AchievementId[];
   /** Parcels restored, in order (§6.1). Kept across Seasons. */
   parcels: ParcelId[];
+  /** Neighbouring districts restored, in order (§6.4). Kept across Seasons and Cycles. */
+  districts: DistrictId[];
   /** Neighbourhood projects carried out this Season, in order (§6.2). */
   projects: ProjectId[];
   /** Talents of the Tree of Seasons learnt, in order (§7.1). Kept across Seasons. */
@@ -152,6 +155,7 @@ export function createInitialState(now: number): GameState {
     idleSeconds: 0,
     achievements: [],
     parcels: [],
+    districts: [],
     projects: [],
     talents: [],
     cooperatives: createCooperativesState(),

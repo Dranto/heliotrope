@@ -30,6 +30,8 @@ function goalName(goal: Goal): string {
       return t.restoration.parcelNames[goal.id];
     case 'project':
       return t.restoration.projectNames[goal.id];
+    case 'district':
+      return t.restoration.districtNames[goal.id];
   }
 }
 

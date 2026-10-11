@@ -104,16 +104,18 @@ export interface Insets {
 }
 
 /**
- * Camera that shows the whole frame of `view` in a `width` × `height` screen, as large as it
- * fits beside `insets`. The rest of the screen shows the city around it.
+ * Camera that shows the whole frame of `view` (or `frame`, when the view has grown) in a
+ * `width` × `height` screen, as large as it fits beside `insets`. The rest of the screen shows
+ * the city around it.
  */
 export function fitCamera(
   view: View,
   width: number,
   height: number,
   insets: Insets = { top: 0, left: 0, bottom: 0 },
+  frame: Box = VIEW_FRAMES[view],
 ): Camera {
-  const [fx, fy, fw, fh] = VIEW_FRAMES[view];
+  const [fx, fy, fw, fh] = frame;
   // An inset only counts when keeping it free still leaves most of the screen to the frame.
   const left = insets.left < width * 0.4 ? insets.left : 0;
   const top = insets.top < height * 0.2 ? insets.top : 0;

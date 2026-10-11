@@ -53,6 +53,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
         : describe.goldenHands(UPGRADE_SETS.clicks.length);
     case 'parcels':
       return describe.parcels(condition.count);
+    case 'districts':
+      return describe.districts(condition.count);
     case 'projects':
       return describe.projects(condition.count);
     case 'talents':
