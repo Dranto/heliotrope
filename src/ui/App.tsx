@@ -43,6 +43,7 @@ import { Options } from './Options';
 import { Restoration } from './Restoration';
 import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
+import { Orchard } from './Orchard';
 import { harvest } from '../game/garden';
 import { Scene } from './Scene';
 import { Seasons } from './Seasons';
@@ -562,6 +563,7 @@ export function App() {
               <Upgrades />
               <Restoration onHighlight={setHighlight} />
               <Garden onHarvest={onHarvest} />
+              <Orchard />
               <GreatWorks />
             </div>
             <div className="side-column">

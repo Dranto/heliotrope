@@ -1,6 +1,6 @@
 // The great works (docs/game-design.md §6.6, M20): works of the whole city, built stage by stage
 // and kept forever, each stage paid with several resources at once (Light, Water, baskets from
-// the courtyard garden) and asking for species back in the Herbier. What is paid stays paid, so a
+// the courtyard garden, honey from the hives) and asking for species back in the Herbier. What is paid stays paid, so a
 // stage can be filled over several Seasons and Cycles. Each stage adds a synergy between two
 // systems. Names live in src/i18n, the drawings in src/ui.
 import { unlockAchievements } from './achievements';
@@ -16,11 +16,13 @@ export interface StageCost {
   light: number;
   water: number;
   baskets: number;
+  /** Jars of honey from the orchard's hives (§9.8, M22), asked by the last stages. */
+  honey: number;
   species: number;
 }
 
 /** The resources a stage is paid with, in the order the player gives them. */
-export const PAYMENTS = ['light', 'water', 'baskets'] as const;
+export const PAYMENTS = ['light', 'water', 'baskets', 'honey'] as const;
 export type Payment = (typeof PAYMENTS)[number];
 
 /**
@@ -28,10 +30,10 @@ export type Payment = (typeof PAYMENTS)[number];
  * Light a thousand times more each time, the Water ten times.
  */
 export const STAGE_COSTS: readonly StageCost[] = [
-  { light: 1e12, water: 2e5, baskets: 5, species: 0 },
-  { light: 1e15, water: 2e6, baskets: 15, species: 8 },
-  { light: 1e18, water: 2e7, baskets: 30, species: 14 },
-  { light: 1e21, water: 2e8, baskets: 60, species: 20 },
+  { light: 1e12, water: 2e5, baskets: 5, honey: 0, species: 0 },
+  { light: 1e15, water: 2e6, baskets: 15, honey: 0, species: 8 },
+  { light: 1e18, water: 2e7, baskets: 30, honey: 3, species: 14 },
+  { light: 1e21, water: 2e8, baskets: 60, honey: 8, species: 20 },
 ];
 
 export interface WorkDef {
@@ -105,7 +107,7 @@ export interface GreatWorksState {
 }
 
 function emptyPaid(): Record<Payment, number> {
-  return { light: 0, water: 0, baskets: 0 };
+  return { light: 0, water: 0, baskets: 0, honey: 0 };
 }
 
 export function createGreatWorksState(): GreatWorksState {
@@ -158,6 +160,8 @@ function owned(state: GameState, payment: Payment): number {
       return state.resources.water;
     case 'baskets':
       return state.garden.baskets;
+    case 'honey':
+      return state.orchard.honey;
   }
 }
 
@@ -169,6 +173,7 @@ export function missing(state: GameState, id: WorkId): Record<Payment, number> {
     light: cost ? Math.max(0, cost.light - paid.light) : 0,
     water: cost ? Math.max(0, cost.water - paid.water) : 0,
     baskets: cost ? Math.max(0, cost.baskets - paid.baskets) : 0,
+    honey: cost ? Math.max(0, cost.honey - paid.honey) : 0,
   };
 }
 
@@ -215,6 +220,7 @@ export function contribute(state: GameState, id: WorkId): GameState {
     light: Math.min(left.light, state.resources.light),
     water: Math.min(left.water, state.resources.water),
     baskets: Math.min(left.baskets, state.garden.baskets),
+    honey: Math.min(left.honey, state.orchard.honey),
   };
   const work = state.greatWorks.works[id];
   let next: GameState = {
@@ -224,6 +230,7 @@ export function contribute(state: GameState, id: WorkId): GameState {
       water: state.resources.water - give.water,
     },
     garden: { ...state.garden, baskets: state.garden.baskets - give.baskets },
+    orchard: { ...state.orchard, honey: state.orchard.honey - give.honey },
   };
   next = withWork(next, id, {
     stage: work.stage,
@@ -231,6 +238,7 @@ export function contribute(state: GameState, id: WorkId): GameState {
       light: work.paid.light + give.light,
       water: work.paid.water + give.water,
       baskets: work.paid.baskets + give.baskets,
+      honey: work.paid.honey + give.honey,
     },
   });
   return unlockAchievements(build(next, id));
