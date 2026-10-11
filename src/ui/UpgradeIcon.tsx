@@ -22,23 +22,57 @@ const CLICK_PATH =
 const SYNERGY_PATH =
   'M12 20v-9M12 11C12 7 9 4 4 4c0 5 3 7 8 7zM12 14.5c0-4 3-6.5 8-6.5 0 5-3 6.5-8 6.5z';
 
+/** The badge glyph of a synergy: the building (or click) that feeds the main one. */
+function badgeFor({ effect }: UpgradeDef): string | undefined {
+  switch (effect.kind) {
+    case 'synergy':
+      return GENERATOR_PATHS[effect.source];
+    case 'clickSynergy':
+      return CLICK_PATH;
+    default:
+      return undefined;
+  }
+}
+
 function pathFor({ effect }: UpgradeDef): string {
   switch (effect.kind) {
     case 'generatorMultiplier':
-      return GENERATOR_PATHS[effect.generator];
     case 'synergy':
-    case 'upgradeSynergy':
     case 'clickSynergy':
+      return GENERATOR_PATHS[effect.generator];
+    case 'upgradeSynergy':
       return SYNERGY_PATH;
     default:
       return CLICK_PATH;
   }
 }
 
+/**
+ * A synergy shows the building it boosts, with the one that feeds it in a small round badge, so
+ * each synergy tile reads at a glance instead of repeating the same sprout.
+ */
 export function UpgradeIcon({ upgrade }: { upgrade: UpgradeDef }) {
+  const badge = badgeFor(upgrade);
+  if (badge === undefined) {
+    return (
+      <svg viewBox="0 0 24 24" className="upgrade-icon" aria-hidden="true">
+        <path d={pathFor(upgrade)} />
+      </svg>
+    );
+  }
   return (
     <svg viewBox="0 0 24 24" className="upgrade-icon" aria-hidden="true">
-      <path d={pathFor(upgrade)} />
+      <path
+        d={pathFor(upgrade)}
+        className="upgrade-icon-main"
+        transform="translate(-0.5 -0.5) scale(0.78)"
+      />
+      <circle className="upgrade-icon-badge" cx="18.2" cy="18.2" r="5.3" />
+      <path
+        d={badge}
+        className="upgrade-icon-source"
+        transform="translate(13.6 13.6) scale(0.38)"
+      />
     </svg>
   );
 }
