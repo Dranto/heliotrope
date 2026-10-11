@@ -198,30 +198,28 @@
   }
 }
 
-/* Evening and night (§9.6): a veil over the map and the lanterns of the streets. */
-.night {
+/* Evening and night (§9.6): a veil that darkens the map beneath it, then the lit lanterns. */
+.night,
+.night-veil {
   pointer-events: none;
 }
 
 .night-veil {
-  fill: rgb(240 150 90 / 0.12);
   mix-blend-mode: multiply;
+  fill: #ffe4cc;
+  transition: fill 2s ease;
 }
 
-.night[data-daylight='night'] .night-veil {
-  fill: rgb(40 60 120 / 0.26);
-}
-
-.night-lantern-glow {
-  fill: rgb(255 214 140 / 0.35);
+.night-veil[data-daylight='night'] {
+  fill: #7d8dc4;
 }
 
 .night-lantern {
-  fill: #ffe9b8;
+  fill: #fff3d2;
 }
 
 .night[data-daylight='evening'] .night-lantern-glow {
-  fill: rgb(255 214 140 / 0.2);
+  opacity: 0.55;
 }
 
 /* The visits of the city (§9.6, M18). */

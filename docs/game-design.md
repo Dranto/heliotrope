@@ -885,7 +885,7 @@ Le quartier restauré raconte ses temps forts sans un mot (§1, §6) : de temps 
 | **La brocante solaire** | Ateliers solaires | Une table de panneaux d'occasion sous un parasol rayé | Le bâtiment le plus cher possédé coûte moitié prix pendant 60 s | Rougequeue noir |
 
   Comme les autres, ce sont des effets en cours (pastille dans le compteur, notification à l'accueil, relancés sans cumul, en pause hors ligne). La fête des récoltes est une visite tirée au hasard, jamais une date (roadmap §5). **Jalons (2).** La ville en fête (accueillir chaque visiteur de la ville au moins une fois), Toute la ville danse (25 visites de la ville). « Portes ouvertes » ne compte que les trois visiteurs du quartier. 132 jalons en tout. **Sauvegarde.** Version 20 : les accueils des quatre visiteurs, à zéro pour une sauvegarde plus ancienne.
-- **Le soir et la nuit.** Décor seulement, d'après l'horloge de l'appareil : de 18 h à 21 h un voile chaud, de 21 h à 6 h un voile bleu, et les lanternes s'allument au pied d'un arbre de rue sur quatre. La production ne change jamais (roadmap §5 : on ne punit pas le joueur qui joue la nuit).
+- **Le soir et la nuit.** Décor seulement, d'après l'horloge de l'appareil : de 18 h à 21 h un voile chaud, de 21 h à 6 h un voile bleu nuit qui assombrit la carte (en multiplication, les couleurs restent lisibles), et les lanternes s'allument au pied d'un arbre de rue sur quatre, au-dessus du voile avec leur halo doré ; l'héliotrope reste lumineux. La production ne change jamais (roadmap §5 : on ne punit pas le joueur qui joue la nuit).
 
 ### 9.7 Le potager de la cour (M14)
 
