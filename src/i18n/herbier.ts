@@ -34,6 +34,8 @@ export function speciesConditionText({ condition }: SpeciesDef): string {
       return describe.challenge(t.challenges.names[condition.challenge]);
     case 'cycleChallenge':
       return describe.challenge(t.cycleChallenges.names[condition.challenge]);
+    case 'visit':
+      return describe.visit(t.visits.welcome[condition.visit], condition.count);
   }
 }
 

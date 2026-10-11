@@ -735,7 +735,7 @@ Les espèces reviennent à mesure que le quartier reverdit. Chacune revient par 
 | Mésange bleue | 10 Canopées urbaines | Martin-pêcheur | La Saison des nuages (§7.3) |
 | Citron | 5 Papillons dorés attrapés | Orchis pyramidal, Lucane cerf-volant, Chouette hulotte | Les trois autres défis (§7.3) |
 
-- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (les 18 espèces du quartier) multiplie toute la biodiversité par 1,5. Trois espèces de la rivière, la loutre d'Europe, le saumon atlantique et la cigogne noire, reviennent avec les Cycles à défi (§7.5) : elles comptent chacune un palier de plus, mais ne sont pas exigées pour l'Herbier complet, que les joueurs qui l'avaient gardent.
+- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (les 18 espèces du quartier) multiplie toute la biodiversité par 1,5. Trois espèces de la rivière, la loutre d'Europe, le saumon atlantique et la cigogne noire, reviennent avec les Cycles à défi (§7.5) : elles comptent chacune un palier de plus, mais ne sont pas exigées pour l'Herbier complet, que les joueurs qui l'avaient gardent. Quatre espèces de la ville, l'alouette des champs, l'hirondelle rustique, la libellule déprimée et le rougequeue noir, reviennent de même avec les visites de la ville (§9.6, M18), chacune après cinq accueils de son visiteur ; elles non plus ne sont pas exigées. 25 espèces en tout.
 - **Écran.** « Herbier » s'ouvre du menu dès la première espèce (ou après la 1ʳᵉ Saison). Une planche par espèce : le dessin en couleur dans un médaillon doré une fois revenue, une silhouette pâle avant ; sous chaque nom, ce qui la ramène. Aucun texte narratif.
 - **Retour.** Une notification « De retour dans le quartier : Hérisson » et l'apparition en douceur du médaillon sur la carte (sans animation au chargement, ni avec les animations réduites).
 
@@ -753,6 +753,16 @@ Le quartier restauré raconte ses temps forts sans un mot (§1, §6) : de temps 
 - **Effets.** L'Averse et la Nuée sont des effets en cours, comme la Floraison (§9.2) : une pastille dans le compteur, une notification à l'accueil ; accueillir le même visiteur pendant son effet le relance sans cumul. Hors ligne, les visites et leurs effets sont en pause, comme le Papillon. Accueillir une visite joue le trille du Papillon.
 - **Jalons (4).** Portes ouvertes (accueillir chaque visiteur au moins une fois), Bon voisinage (10 fois les voisins), Après la pluie (10 averses), Escale (10 nuées). 113 jalons en tout avec ceux de M11.
 - **Équilibrage.** Le simulateur ne joue pas les visites, comme il ne compte qu'une part des Papillons : leurs gains restent un bonus pour le joueur attentif et ne déplacent pas les cibles du §8.
+- **Les visites de la ville (M18).** Quatre visiteurs de plus, liés à ce que le joueur a bâti dans la Biorégion (§7.4) et les quartiers voisins (§6.4), rejoignent le même tirage ; ils s'arrêtent aux mêmes abords de l'immeuble, pour que chacun les voie dans la vue du Balcon.
+
+| Visiteur | Vient dès | Sur la carte | Effet de l'accueil | Espèce (5 accueils) |
+|---|---|---|---|---|
+| **La transhumance** | 1 niveau de Prairies agrivoltaïques | Un petit troupeau de moutons et son chien sur l'avenue sous l'immeuble | Les moutons tondent sous les panneaux : Panneaux de balcon ×3 pendant 60 s | Alouette des champs |
+| **La fête des récoltes** | Halles du parking relais | Un étal de légumes sous des fanions, à droite de la cour | Récolte du Papillon doré (§9.2) ×2 pendant 120 s | Hirondelle rustique |
+| **Les lucioles** | Jardins d'eau des Tanneries | Des points de lumière qui clignent au-dessus des roseaux, sur l'avenue au nord | Chaque clic vaut ×3 pendant 60 s | Libellule déprimée |
+| **La brocante solaire** | Ateliers solaires | Une table de panneaux d'occasion sous un parasol rayé | Le bâtiment le plus cher possédé coûte moitié prix pendant 60 s | Rougequeue noir |
+
+  Comme les autres, ce sont des effets en cours (pastille dans le compteur, notification à l'accueil, relancés sans cumul, en pause hors ligne). La fête des récoltes est une visite tirée au hasard, jamais une date (roadmap §5). **Jalons (2).** La ville en fête (accueillir chaque visiteur de la ville au moins une fois), Toute la ville danse (25 visites de la ville). « Portes ouvertes » ne compte que les trois visiteurs du quartier. 132 jalons en tout. **Sauvegarde.** Version 20 : les accueils des quatre visiteurs, à zéro pour une sauvegarde plus ancienne.
 - **Le soir et la nuit.** Décor seulement, d'après l'horloge de l'appareil : de 18 h à 21 h un voile chaud, de 21 h à 6 h un voile bleu, et les lanternes s'allument au pied d'un arbre de rue sur quatre. La production ne change jamais (roadmap §5 : on ne punit pas le joueur qui joue la nuit).
 
 ### 9.7 Le potager de la cour (M14)

@@ -118,4 +118,9 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
     size: 14,
   },
   blackStork: { spots: [[EAST + MID + 4, 66]], motion: 'still', size: 19 },
+  // The species of the city's visits (§9.6, M18), near where their visitors stop.
+  skylark: { spots: [[132, NORTH + MID]], motion: 'hop', size: 15 },
+  swallow: { spots: [[300, 120]], motion: 'fly', size: 17 },
+  dragonfly: { spots: [[EAST + MID, 250]], motion: 'buzz', size: 14 },
+  redstart: { spots: [[470, 196]], motion: 'still', size: 15 },
 };

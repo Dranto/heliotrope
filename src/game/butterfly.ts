@@ -2,7 +2,13 @@
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
 import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
 import { effectDurationFactor, factorOf } from './bonuses';
-import { BIRDS_SECONDS_PER_SPECIES, EFFECTS, type ActiveEffect, type EffectKind } from './effects';
+import {
+  BIRDS_SECONDS_PER_SPECIES,
+  EFFECTS,
+  effectFactor,
+  type ActiveEffect,
+  type EffectKind,
+} from './effects';
 import { earnLight } from './light';
 import { phaseOf } from './phases';
 import { lightPerSecond } from './production';
@@ -36,7 +42,10 @@ export function harvestAmount(state: GameState): number {
     Math.min(
       state.resources.light * HARVEST_RESERVE_SHARE,
       lightPerSecond(state) * HARVEST_PRODUCTION_SECONDS,
-    ) * factorOf(state, 'harvestFactor')
+    ) *
+    factorOf(state, 'harvestFactor') *
+    // §9.6, M18: the harvest festival of the park-and-ride halls.
+    effectFactor(state.effects, 'festival')
   );
 }
 

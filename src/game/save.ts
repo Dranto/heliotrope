@@ -86,6 +86,8 @@ const migrations: Record<number, Migration> = {
   17: (raw) => ({ ...raw, version: 18 }),
   // v19 adds the music volume and the reminders (§6.3, §10.6, M17): music by default, no reminder.
   18: (raw) => ({ ...raw, version: 19 }),
+  // v20 adds the visits of the city (§9.6, M18): none welcomed yet.
+  19: (raw) => ({ ...raw, version: 20 }),
 };
 
 function isLanguage(value: string): value is Language {
