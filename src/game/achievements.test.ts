@@ -11,7 +11,7 @@ import { GENERATOR_IDS } from './generators';
 import { PARCEL_IDS } from './parcels';
 import { clickValue, globalMultiplier, lightPerSecond } from './production';
 import { PROJECT_IDS } from './projects';
-import { lightForSeeds, startNewSeason } from './seasons';
+import { lightForSeeds, SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { TALENT_IDS } from './talents';
 import { buyGenerator, clickHeliotrope, tick } from './tick';
@@ -191,9 +191,19 @@ describe('Milestones of the later systems', () => {
   });
 
   it('unlocks Moisson tardive when a Season brings 50 Seeds at once', () => {
-    const big = withState({ allTimeLight: lightForSeeds(60), seeds: 10, seasons: 1 });
+    const big = withState({
+      allTimeLight: lightForSeeds(60),
+      seeds: 10,
+      seasons: 1,
+      seasonSeconds: SEED_RIPENING_SECONDS,
+    });
     expect(startNewSeason(big).achievements).toContain('lateHarvest');
-    const small = withState({ allTimeLight: lightForSeeds(30), seeds: 10, seasons: 1 });
+    const small = withState({
+      allTimeLight: lightForSeeds(30),
+      seeds: 10,
+      seasons: 1,
+      seasonSeconds: SEED_RIPENING_SECONDS,
+    });
     expect(startNewSeason(small).achievements).not.toContain('lateHarvest');
   });
 });
@@ -209,6 +219,7 @@ describe('Milestone bonus', () => {
     const state = withState({
       allTimeLight: 5e7,
       totalLight: 5e7,
+      seasonSeconds: SEED_RIPENING_SECONDS,
       achievements: ['light.3', 'light.6'],
     });
     const next = startNewSeason(state);

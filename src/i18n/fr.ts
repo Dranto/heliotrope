@@ -471,11 +471,15 @@ export const fr = {
     ownedHint: (percent: string) => `+${percent}\u00a0% de production`,
     toGain: 'À récolter',
     toGainHint: 'en lançant une nouvelle Saison',
+    toGainRipening: (time: string) => `mûres dans ${time}`,
     bonus: 'Bonus de production',
     bonusAfter: 'après la nouvelle Saison',
     nextSeed: (light: string) => `Prochaine Graine dans ${light} Lumière.`,
-    formula:
-      'Chaque Graine ajoute 5\u00a0% à toute la production. Les Graines viennent de la Lumière récoltée au fil de toutes les Saisons.',
+    formula: (minutes: string, deepSoil: string) =>
+      `Chaque Graine ajoute 5\u00a0% à toute la production. Les Graines viennent de la Lumière récoltée au fil de toutes les Saisons et mûrissent en ${minutes} de Saison. Au-delà de ${deepSoil} Graines, le sol s’approfondit\u00a0: chacune demande plus de Lumière.`,
+    ripening: (time: string) => `Les Graines mûrissent\u00a0: encore ${time} de Saison.`,
+    ripe: 'Les Graines sont mûres.',
+    ripeness: (percent: string) => `Graines mûres à ${percent}\u00a0%`,
     notReadyTitle: 'La terre n’est pas encore prête',
     notReady: (advised: string) =>
       `Rien ne vous en empêche, mais pour une première Saison, mieux vaut attendre d’avoir au moins ${advised} Graines à récolter.`,

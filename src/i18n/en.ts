@@ -421,11 +421,15 @@ export const en: Texts = {
     ownedHint: (percent: string) => `+${percent}% production`,
     toGain: 'To harvest',
     toGainHint: 'by starting a new Season',
+    toGainRipening: (time: string) => `ripe in ${time}`,
     bonus: 'Production bonus',
     bonusAfter: 'after the new Season',
     nextSeed: (light: string) => `Next Seed in ${light} Light.`,
-    formula:
-      'Each Seed adds 5% to all production. Seeds come from the Light harvested over every Season.',
+    formula: (minutes: string, deepSoil: string) =>
+      `Each Seed adds 5% to all production. Seeds come from the Light harvested over every Season and ripen in ${minutes} of Season. Past ${deepSoil} Seeds, the soil deepens: each one asks for more Light.`,
+    ripening: (time: string) => `The Seeds are ripening: ${time} of Season to go.`,
+    ripe: 'The Seeds are ripe.',
+    ripeness: (percent: string) => `Seeds ${percent}% ripe`,
     notReadyTitle: 'The soil is not ready yet',
     notReady: (advised: string) =>
       `Nothing stops you, but for a first Season it is better to wait for at least ${advised} Seeds to harvest.`,
