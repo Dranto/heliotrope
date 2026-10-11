@@ -210,10 +210,24 @@ describe('App', () => {
       totalLight: 8e7,
       allTimeLight: 8e7,
       clicks: 77,
+      playSeconds: 600,
+      seasonSeconds: 600,
     });
     const store = renderApp(new GameStore(localStorage, () => 0));
-    fireEvent.click(screen.getByRole('button', { name: 'Saisons, 2 Graines à gagner' }));
+    // The Seeds grow before they are ripe: they are shown, but not harvested yet (§7).
+    fireEvent.click(screen.getByRole('button', { name: 'Saisons' }));
     expect(screen.getByRole('dialog', { name: 'Les Saisons' })).toBeInTheDocument();
+    expect(screen.getByTestId('seeds-gain')).toHaveTextContent('+2');
+    expect(screen.getByText('mûres dans 5 min')).toBeInTheDocument();
+    expect(screen.getByText('Les Graines mûrissent : encore 5 min de Saison.')).toBeInTheDocument();
+    expect(
+      screen.getByRole('progressbar', { name: 'Graines mûres à 66,7\u00a0%' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /Fermer les Saisons/ }));
+    act(() => store.dispatch((s) => ({ ...s, playSeconds: 900, seasonSeconds: 900 })));
+    fireEvent.click(screen.getByRole('button', { name: 'Saisons, 2 Graines à gagner' }));
+    expect(screen.getByText('Les Graines sont mûres.')).toBeInTheDocument();
     expect(screen.getByTestId('seeds-owned')).toHaveTextContent('0');
     expect(screen.getByTestId('seeds-gain')).toHaveTextContent('+2');
     expect(screen.getByTestId('seeds-bonus')).toHaveTextContent(/\+0.% → \+10.%/);
@@ -243,7 +257,15 @@ describe('App', () => {
 
   it('starts a challenge Season, shows its goal and lifts it once won (§7.3)', () => {
     const base = createInitialState(0);
-    saveGame({ ...base, seeds: 10, seasons: 1, allTimeLight: 1e11, totalLight: 1e9 });
+    saveGame({
+      ...base,
+      seeds: 10,
+      seasons: 1,
+      allTimeLight: 1e11,
+      totalLight: 1e9,
+      playSeconds: 3600,
+      seasonSeconds: 3600,
+    });
     const store = renderApp(new GameStore(localStorage, () => 0));
     fireEvent.click(screen.getByRole('button', { name: /^Saisons/ }));
     const dialog = screen.getByRole('dialog', { name: 'Les Saisons' });

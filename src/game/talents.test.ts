@@ -1,5 +1,5 @@
 import { globalMultiplier, clickValue } from './production';
-import { startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import {
   availableSeeds,
@@ -71,7 +71,7 @@ describe('Tree of Seasons (§7.1)', () => {
   });
 
   it('Boutures keeps a tenth of each building for the next Season', () => {
-    const base = withSeeds(10, { allTimeLight: 9e9 });
+    const base = withSeeds(10, { allTimeLight: 9e9, seasonSeconds: SEED_RIPENING_SECONDS });
     const state = {
       ...learnTalent(learnTalent(base, 'mycorrhiza'), 'cuttings'),
       generators: { ...base.generators, pot: 75, balconyPanel: 9, arcology: 12 },

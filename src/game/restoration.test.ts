@@ -21,7 +21,7 @@ import {
   offeredProjects,
   restoreParcel,
 } from './restoration';
-import { startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 
 function withState(patch: Partial<GameState>): GameState {
@@ -89,7 +89,11 @@ describe('restoring parcels', () => {
   });
 
   it('keeps restored parcels across Seasons, but not projects', () => {
-    const state = rich({ parcels: ['gardenStreet', 'park'], projects: ['seedSwap'] });
+    const state = rich({
+      parcels: ['gardenStreet', 'park'],
+      projects: ['seedSwap'],
+      seasonSeconds: SEED_RIPENING_SECONDS,
+    });
     const next = startNewSeason(state);
     expect(next.parcels).toEqual(['gardenStreet', 'park']);
     expect(next.projects).toEqual([]);

@@ -12,7 +12,7 @@ import {
   siteCost,
 } from './bioregion';
 import { catchButterfly } from './butterfly';
-import { ADVISED_FIRST_CYCLE_SOURCES, sourcesToGain } from './cycles';
+import { ADVISED_FIRST_CYCLE_SOURCES, sourcesToGain, startNewCycle } from './cycles';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { availableUpgrades, clickValue, generatorCost, lightPerSecond } from './production';
 import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, seedsToGain, startNewSeason } from './seasons';
@@ -374,4 +374,31 @@ export function simulateFirstCycle({
   }
   const advisedCycle = sourcesToGain(state) >= ADVISED_FIRST_CYCLE_SOURCES ? total : undefined;
   return { seasons, bioregionOpened, advisedCycle, state };
+}
+
+/**
+ * §7 pacing after the first Cycle of water: start it, then play `count` Seasons, each until it
+ * at least doubles the Seeds (10 for the first one) and they are ripe. Returns each Season's
+ * length in seconds of play.
+ */
+export function simulateSeasonsAfterCycle({
+  from,
+  count,
+  ...options
+}: Omit<SimulationOptions, 'state' | 'stopAtSeeds' | 'maxSeconds'> & {
+  from: GameState;
+  count: number;
+}): { seasons: number[]; state: GameState } {
+  let state = learnReferenceTalents(startNewCycle(from));
+  const seasons: number[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const target = Math.max(
+      ADVISED_FIRST_SEASON_SEEDS,
+      Math.ceil(state.seeds * REFERENCE_SEED_GROWTH),
+    );
+    const result = simulate({ ...options, state, stopAtSeeds: target, maxSeconds: 4 * 3600 });
+    seasons.push(result.seconds);
+    state = learnReferenceTalents(startNewSeason(result.state));
+  }
+  return { seasons, state };
 }

@@ -1,4 +1,5 @@
 // Progression phases and visual seasons (docs/game-design.md §6).
+import { seasonRipeness } from './seasons';
 import type { GameState } from './state';
 
 export type Phase = 1 | 2 | 3;
@@ -17,10 +18,13 @@ export const VISUAL_SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
 export type VisualSeason = (typeof VISUAL_SEASONS)[number];
 
 /**
- * §6 phase 4: after the first Season, the scene takes the tint of a season, starting with
- * spring and cycling. The first Season has no tint of its own.
+ * §6 phase 4 and §7: after the first Season, the scene follows the ripening of the Seeds:
+ * spring, then summer from half the ripening time, and autumn once the Seeds are ripe. The first
+ * Season has no tint of its own. Winter is the replanting itself, never a lasting tint.
  */
 export function visualSeason(state: GameState): VisualSeason | null {
   if (state.seasons === 0) return null;
-  return VISUAL_SEASONS[(state.seasons - 1) % VISUAL_SEASONS.length]!;
+  const ripeness = seasonRipeness(state);
+  if (ripeness >= 1) return 'autumn';
+  return ripeness >= 0.5 ? 'summer' : 'spring';
 }

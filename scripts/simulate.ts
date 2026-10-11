@@ -11,6 +11,7 @@ import {
   ADVISED_CYCLE_TARGET,
   simulate,
   simulateFirstCycle,
+  simulateSeasonsAfterCycle,
   simulateTwoSeasons,
 } from '../src/game/simulator';
 
@@ -97,3 +98,8 @@ console.log(
 );
 console.log('Collectors:', JSON.stringify(cycle.state.collectors));
 console.log('Sites:', JSON.stringify(cycle.state.sites));
+
+// Later Seasons (§7): the first Cycle, then Seasons that each double the Seeds once they are ripe.
+const after = simulateSeasonsAfterCycle({ clicksPerSecond, from: cycle.state, count: 6 });
+console.log('Seasons after the first Cycle:', after.seasons.map((s) => minutes(s)).join(' · '));
+console.log('Seeds after them:', after.state.seeds);

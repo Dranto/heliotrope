@@ -10,7 +10,7 @@ import {
   waterPerSecond,
 } from './bioregion';
 import { generatorMultiplier } from './production';
-import { startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
 
@@ -72,6 +72,7 @@ describe('the Bioregion (§7.4)', () => {
   it('keeps Water, collectors and sites from one Season to the next', () => {
     const state = open({
       allTimeLight: 1e10,
+      seasonSeconds: SEED_RIPENING_SECONDS,
       resources: { light: 1e9, water: 500 },
       collectors: { roofTanks: 3, swales: 1, ponds: 0, streams: 0 },
       sites: { wetlands: 2, meadows: 1, foodForests: 0, oldForest: 0 },
