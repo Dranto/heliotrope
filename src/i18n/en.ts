@@ -293,6 +293,8 @@ export const en: Texts = {
       floodTide: 'High waters',
       'delta.1': 'First branch',
       'delta.6': 'Open delta',
+      'works.1': 'Cornerstone',
+      'works.4': 'Great works',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -384,6 +386,8 @@ export const en: Texts = {
       deltaLevels: (count: number) =>
         count === 1 ? 'Open a first branch of the delta' : `Open all ${count} levels of the delta`,
       lockCycles: (count: number) => `Let the lock keeper start ${count} Cycles`,
+      worksBuilt: (count: number) =>
+        count === 1 ? 'Complete a great work' : `Complete all ${count} great works`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
     },
@@ -479,6 +483,9 @@ export const en: Texts = {
       globalPerType: (percent: string) => `All production +${percent}% per building type owned`,
       water: (factor: string) => `Water gathered ×${factor} (Bioregion)`,
       visitInterval: (percent: string) => `Visits come back ${percent}% sooner`,
+      perDistrict: (percent: string) =>
+        `Production +${percent}% per neighbouring district restored`,
+      gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
       cuttingsGift: (units: number) =>
         units === 1
           ? 'The neighbours bring one more cutting'
@@ -495,6 +502,34 @@ export const en: Texts = {
       fireflies: 'The Fireflies',
       fleaMarket: 'The Solar flea market',
     },
+  },
+  greatWorks: {
+    title: 'The great works',
+    hint: 'Each stage is paid with Light, Water and baskets from the garden. What is given stays given.',
+    baskets: (count: string) => `${count} baskets`,
+    basketsHint: 'Each harvest of the garden fills baskets.',
+    names: {
+      tram: 'The solar tram',
+      river: 'The reopened river',
+      hall: 'The food hall',
+      tower: 'The seed tower',
+    },
+    stages: {
+      tram: ['The rails', 'The flowering catenaries', 'The stations', 'The first tram'],
+      river: ['The broken slab', 'The banks', 'The footbridges', 'The bathing spot'],
+      hall: ['The frame', 'The stalls', 'The common kitchen'],
+      tower: ['The foundations', 'The growing floors', 'The seed bank', 'The belvedere'],
+    },
+    stage: (built: string, count: string) => `${built} of ${count} stages`,
+    next: (stage: string) => `Next stage: ${stage}`,
+    light: 'Light',
+    water: 'Water',
+    basketsLabel: 'Baskets',
+    species: (have: string, need: string) => `Herbarium species: ${have} of ${need}`,
+    contribute: 'Give',
+    contributeLabel: (work: string) => `Give towards ${work}`,
+    complete: 'Complete',
+    built: 'Built',
   },
   garden: {
     title: 'The courtyard garden',

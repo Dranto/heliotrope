@@ -91,6 +91,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.cycles(condition.count);
     case 'deltaLevels':
       return describe.deltaLevels(condition.count);
+    case 'worksBuilt':
+      return describe.worksBuilt(condition.count);
     case 'lockCycles':
       return describe.lockCycles(condition.count);
     case 'cycleChallenges':

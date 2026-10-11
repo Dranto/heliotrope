@@ -341,6 +341,37 @@ Le quartier restauré ressemble au joueur : chaque parcelle a **deux avenirs**, 
 - **Sur la carte (PixiJS).** Les seconds avenirs ont leur dessin dans les deux rendus ; les toits potagers sont dessinés par le rendu PixiJS sur ses propres bâtiments (`art.ts`), comme les toits vivants.
 - **Sauvegarde.** Version 18 : les avenirs choisis (le premier par défaut), le Cycle du dernier changement, les huit emplacements de décor et la couleur des fleurs (lilas).
 
+### 6.6 Les grands chantiers (M20)
+
+Quatre ouvrages de toute la ville (roadmap P19), bâtis **étape par étape** et **gardés pour toujours** (après une Saison comme après un Cycle). Ils s'ouvrent avec la Biorégion (§7.4), dont ils demandent l'Eau. Le panneau « Les grands chantiers » montre chaque chantier, ses étapes bâties, la prochaine étape avec son effet, ce qui est déjà versé et le bouton « Verser ».
+
+**Payer une étape.** Chaque étape se paie avec **trois ressources à la fois** : Lumière, Eau et **paniers** du potager (§9.7), et demande un nombre d'espèces revenues dans l'Herbier (§9.5), qui ne sont pas dépensées. « Verser » donne tout ce que le joueur possède, jusqu'à ce que l'étape demande encore : ce qui est versé reste versé, on peut donc remplir une étape en plusieurs Saisons. L'étape se bâtit dès que tout est payé et que les espèces sont là (à la prochaine seconde si une espèce revient après).
+
+| Étape | Lumière | Eau | Paniers | Espèces |
+|---|---|---|---|---|
+| 1 | 1 Bn | 200 000 | 5 | — |
+| 2 | 1 Bd | 2 M | 15 | 8 |
+| 3 | 1 Tn | 20 M | 30 | 14 |
+| 4 | 1 Td | 200 M | 60 | 20 |
+
+Une étape coûte à peu près une Saison tardive d'efforts (§8) ; un chantier complet, plusieurs Cycles. Les halles n'ont que trois étapes.
+
+**Les paniers.** Chaque récolte du potager rapporte des paniers en plus de son effet : Radis 1, Tournesols 2, Haricots grimpants 3, Courges 5. Ils se gardent, sans plafond, et ne servent qu'aux chantiers.
+
+| Chantier | Étapes | Chaque étape | Dernière étape |
+|---|---|---|---|
+| **Le tram solaire** | Rails, caténaires végétalisées, stations, premier tram | Production +1 % par quartier voisin restauré (§6.4) | +3 % par quartier voisin |
+| **La rivière rouverte** | Dalle cassée, berges, passerelles, baignade | Eau récoltée ×1,1 | Eau ×1,25, et les visites reviennent 10 % plus vite (§9.6) |
+| **Les halles nourricières** | Charpente, étals, cuisine commune | Le potager pousse ×1,15 plus vite | Les Haricots grimpants durent ×1,5 |
+| **La tour des semences** | Fondations, étages de culture, grainothèque, belvédère | Toute la production +3 % | +5 %, et +2 h de plafond hors ligne (§9.1) |
+
+Écart avec la roadmap : la rivière fait revenir les visites plutôt que les espèces (les espèces reviennent sur conditions de jeu, pas sur un délai) ; la tour donne de la production plutôt que des Graines, qui n'ont plus d'usage une fois la Canopée complète (§8, fin de partie).
+
+- **Sur la carte.** Chaque chantier a sa place dans les blocs gris autour de la rocade, sauf le tram qui suit la rocade elle-même : avant la première étape, un pointillé doré marque le terrain ; puis chaque étape se dessine (rails et traverses, mâts couverts de vigne, quais à toit vert, le tram jaune qui fait le tour ; la dalle fendue, la rivière, ses roseaux, passerelles et baigneurs ; la charpente, les étals et la fumée de la cuisine ; les fondations, les étages verts, le toit doré). Ces dessins sont en SVG par-dessus les deux rendus (§10.4). Avec les animations réduites, le tram et la fumée restent immobiles.
+- **Jalons (2).** « Première pierre » (un chantier complet), « Grands travaux » (les quatre). 134 jalons en tout.
+- **Simulateur.** Il ne joue pas les chantiers : leurs bonus ne font que s'ajouter à la fin de partie mesurée en M19.
+- **Sauvegarde.** Version 22 : les étapes bâties et les versements de chaque chantier, et les paniers du potager, à zéro pour une sauvegarde plus ancienne.
+
 ---
 
 ## 7. Prestige : les Saisons
@@ -731,7 +762,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).

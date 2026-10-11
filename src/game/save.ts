@@ -11,6 +11,7 @@ import { isParcelId, type ParcelId } from './parcels';
 import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
 import { validPlots } from './garden';
+import { validGreatWorks } from './greatWorks';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
@@ -90,6 +91,8 @@ const migrations: Record<number, Migration> = {
   19: (raw) => ({ ...raw, version: 20 }),
   // v21 adds the widening of the delta's arms (§7.5, M19): no arm widened yet.
   20: (raw) => ({ ...raw, version: 21 }),
+  // v22 adds the great works and the garden's baskets (§6.6, M20): nothing built, no basket.
+  21: (raw) => ({ ...raw, version: 22 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -299,7 +302,9 @@ export function deserialize(json: string, now: number): GameState | null {
     varieties: Array.isArray(garden?.varieties)
       ? [...new Set<VarietyId>(garden.varieties.filter(isVarietyId))]
       : [],
+    baskets: isCount(garden?.baskets) ? garden.baskets : 0,
   };
+  state.greatWorks = validGreatWorks(data.greatWorks);
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
   const butterfly = data.butterfly as Record<string, unknown> | undefined;
   if (

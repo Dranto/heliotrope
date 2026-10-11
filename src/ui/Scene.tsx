@@ -53,6 +53,9 @@ import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
+import { GreatWorksLayer } from './GreatWorksArt';
+import { encodeStages } from './greatWorksMap';
+import { areGreatWorksOpen } from '../game/greatWorks';
 import { ReturnReplay } from './ReturnReplay';
 import { replaySeconds, returnMarks, returnSweeps } from './returnMap';
 import { encodeDecor } from './decorMap';
@@ -225,6 +228,13 @@ export function Scene({
     )
     .join();
   const reduced = state.settings.reducedMotion || prefersReducedMotion();
+  // The great works (§6.6), encoded so the layer only redraws when a stage is built.
+  const worksOpen = areGreatWorksOpen(state);
+  const works = encodeStages(
+    Object.fromEntries(
+      Object.entries(state.greatWorks.works).map(([id, w]) => [id, w.stage]),
+    ) as Parameters<typeof encodeStages>[0],
+  );
   // The parcels in their second future (§6.5), joined so the ground only redraws on a change.
   const seconds = parcels.filter((id) => futureOf(state, id) === 1).join();
   const secondList = useMemo(() => split(seconds), [seconds]);
@@ -249,6 +259,7 @@ export function Scene({
       <>
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
+        <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
@@ -270,6 +281,8 @@ export function Scene({
     [
       districts,
       districtOffer,
+      works,
+      worksOpen,
       districtReady,
       restoreNeighbour,
       daylight,

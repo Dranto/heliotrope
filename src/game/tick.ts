@@ -12,6 +12,7 @@ import { completeChallenge, generatorLimit } from './challenges';
 import { completeCycleChallenge } from './cycleChallenges';
 import { runLockKeeper } from './cycles';
 import { runCooperatives } from './cooperatives';
+import { buildReadyStages } from './greatWorks';
 import type { GeneratorId } from './generators';
 import { growGarden } from './garden';
 import { recordProduction } from './history';
@@ -51,7 +52,9 @@ function produce(state: GameState, dtSeconds: number): GameState {
  * species now deserved (§9.5).
  */
 export function unlockProgress(state: GameState): GameState {
-  return unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(state))));
+  return buildReadyStages(
+    unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(state)))),
+  );
 }
 
 /**

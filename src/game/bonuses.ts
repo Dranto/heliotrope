@@ -8,6 +8,7 @@ import { CHALLENGES, type ChallengeId } from './challenges';
 import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
 import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
+import { greatWorksBonuses, type WorkId } from './greatWorks';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
@@ -54,6 +55,10 @@ export type Bonus =
   | { kind: 'water'; factor: number }
   /** Multiplies the time between two visits (§9.6). */
   | { kind: 'visitInterval'; factor: number }
+  /** Adds `bonus` to global production per neighbouring district restored (§6.4, §6.6). */
+  | { kind: 'perDistrict'; bonus: number }
+  /** Multiplies how fast the courtyard garden's crops grow (§9.7, §6.6). */
+  | { kind: 'gardenGrowth'; factor: number }
   /** The neighbours bring `units` more of their building (§9.6). */
   | { kind: 'cuttingsGift'; units: number };
 
@@ -84,6 +89,8 @@ export interface BonusSource {
   sites?: { hillsides: number };
   /** Widenings of the delta's arms, read for the hillsides and the flood arm (M19). */
   delta?: { widths: Readonly<Record<WideArmId, number>> };
+  /** Stages of the great works built (§6.6, M20); absent where none can be. */
+  greatWorks?: { works: Readonly<Record<WorkId, { stage: number }>> };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -105,6 +112,7 @@ export function activeBonuses({
   cycleChallenges = [],
   sites,
   delta,
+  greatWorks,
 }: BonusSource): Bonus[] {
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
@@ -119,6 +127,7 @@ export function activeBonuses({
       CYCLE_CHALLENGES[id].bonuses.map((b) => scaleBonus(b, floodScale)),
     ),
     ...(sites ? hillsidesBonuses(sites.hillsides, widenFactor(delta?.widths.hillsArm ?? 0)) : []),
+    ...(greatWorks ? greatWorksBonuses(greatWorks.works) : []),
   ];
 }
 
@@ -135,7 +144,8 @@ export function factorOf(
     | 'synergyFactor'
     | 'butterflyInterval'
     | 'visitInterval'
-    | 'harvestFactor',
+    | 'harvestFactor'
+    | 'gardenGrowth',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);
 }
@@ -153,6 +163,8 @@ export function globalBonus(source: BonusSource): number {
   let bonus = 0;
   for (const b of bonusesOf(source, 'global')) bonus += b.bonus;
   for (const b of bonusesOf(source, 'perParcel')) bonus += b.bonus * source.parcels.length;
+  const districts = source.districts?.length ?? 0;
+  for (const b of bonusesOf(source, 'perDistrict')) bonus += b.bonus * districts;
   for (const b of bonusesOf(source, 'perSeason')) bonus += b.bonus * source.seasons;
   const types = Object.values(source.generators).filter((owned) => owned > 0).length;
   for (const b of bonusesOf(source, 'globalPerType')) bonus += b.bonus * types;
