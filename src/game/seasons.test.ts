@@ -124,6 +124,8 @@ describe('new Season', () => {
         'playHours.1',
       ],
       butterfly: { nextIn: state.butterfly.nextIn, visible: 0 },
+      // The first Season's curve is kept for the Statistics; the second one starts (§10.5).
+      history: [state.history[0], { season: 2, step: 30, points: [] }],
     });
     expect(isSeasonsScreenUnlocked(next)).toBe(true);
   });

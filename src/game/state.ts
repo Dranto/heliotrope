@@ -5,6 +5,7 @@ import { createCooperativesState, type CooperativesState } from './cooperatives'
 import type { ActiveEffect } from './effects';
 import type { Language, Notation } from './format';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
+import { emptyCurve, type SeasonCurve } from './history';
 import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
 import { nextRandom, seedFrom } from './random';
@@ -14,7 +15,7 @@ import type { TalentId } from './talents';
 import type { UpgradeId } from './upgrades';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 11;
+export const STATE_VERSION = 12;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -101,6 +102,8 @@ export interface GameState {
   butterfly: ButterflyState;
   /** Golden Butterfly effects running now. */
   effects: ActiveEffect[];
+  /** Production curves of the last Seasons, the current one last (§10.5). */
+  history: SeasonCurve[];
   /** Seed of the pseudo-random generator used by random events. */
   rngSeed: number;
   settings: Settings;
@@ -159,6 +162,7 @@ export function createInitialState(now: number): GameState {
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     effects: [],
+    history: [emptyCurve(1)],
     rngSeed,
     settings: DEFAULT_SETTINGS,
     lastUpdate: now,

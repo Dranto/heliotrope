@@ -2753,6 +2753,12 @@ button {
     font-size: 1.3rem;
   }
 
+  /* §10.5: the next goal takes the last line of the counter. */
+  .counter-goal {
+    order: 10;
+    flex-basis: 100%;
+  }
+
   /* §10.3: one section at a time, picked in the tab bar. */
   .app[data-tab='harvest'] :is(.upgrades, .generators, .bioregion, .cooperatives),
   .app[data-tab='build'] :is(.upgrades, .restoration, .cooperatives),
@@ -3090,4 +3096,123 @@ button {
 .pixi-sources .bioregion-land .pond,
 .pixi-sources .bioregion-land .marsh-pool {
   fill: #6aa6aa;
+}
+
+/* Time before purchase and next goal (§10.5) ----------------------------- */
+
+.buy-eta {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.counter-goal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  max-width: 100%;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.counter-goal-eta {
+  font-weight: 600;
+  color: var(--leaf);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Production curve in the Statistics (§10.5) ----------------------------- */
+
+.curve {
+  margin: 0;
+}
+
+.curve svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: pan-y;
+}
+
+.curve-grid line {
+  stroke: var(--ink);
+  stroke-opacity: 0.08;
+}
+
+.curve-grid text,
+.curve-axis text {
+  font-family: var(--sans);
+  font-size: 9px;
+  fill: var(--ink-soft);
+}
+
+.curve-line {
+  fill: none;
+  stroke: var(--sage);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.curve-line[data-current='true'] {
+  stroke: var(--leaf);
+}
+
+.curve-hover line {
+  stroke: var(--ink-soft);
+  stroke-opacity: 0.4;
+  stroke-dasharray: 2 3;
+}
+
+.curve-hover circle {
+  fill: var(--sage);
+  stroke: var(--cream);
+  stroke-width: 2;
+}
+
+.curve-hover circle[data-current='true'] {
+  fill: var(--leaf);
+}
+
+.curve-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.9rem;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.curve-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.curve-legend span[data-current='true'] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.curve-legend i {
+  width: 0.9rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--sage);
+}
+
+.curve-legend span[data-current='true'] i {
+  background: var(--leaf);
+}
+
+.curve-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
 }

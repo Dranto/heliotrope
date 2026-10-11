@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { generatorLimit } from '../game/challenges';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from '../game/generators';
@@ -14,6 +14,7 @@ import {
 import type { GameState } from '../game/state';
 import { buyGenerator, canBuyGenerator } from '../game/tick';
 import { t } from '../i18n';
+import { Eta } from './Goals';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
@@ -31,6 +32,19 @@ function unitProduction(state: GameState, id: GeneratorId): number {
   return GENERATORS[id].baseProduction * generatorMultiplier(state, id) * globalMultiplier(state);
 }
 
+/** True when a key press belongs to a text field or a modal dialog, not to the game. */
+function isElsewhere(event: KeyboardEvent): boolean {
+  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return true;
+  const target = event.target;
+  if (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || target.closest('input, textarea, select'))
+  ) {
+    return true;
+  }
+  return document.querySelector('[aria-modal="true"]') !== null;
+}
+
 /**
  * Generator list (docs/game-design.md §4, §10.1): revealed generators, then the next one as a
  * silhouette with its price so the player always has a visible goal. Bulk buy ×1/×10/×100/Max.
@@ -44,13 +58,39 @@ export function Generators() {
   const next = GENERATOR_IDS.find((id) => !isGeneratorRevealed(state, id));
   const biodiversity = biodiversityBonus(state);
 
+  // §10.5: keys 1 to 8 buy the generator of that rank with the chosen amount; M toggles Max.
+  // No key clicks the heliotrope, so the keyboard never stands in for an autoclicker.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (isElsewhere(event)) return;
+      if (event.key === 'm' || event.key === 'M') {
+        setAmount((current) => (current === 'max' ? 1 : 'max'));
+        return;
+      }
+      const rank = Number(event.key);
+      const id = Number.isInteger(rank) && rank >= 1 ? GENERATOR_IDS[rank - 1] : undefined;
+      if (!id) return;
+      store.dispatch((s) =>
+        isGeneratorRevealed(s, id) ? buyGenerator(s, id, unitsFor(s, id, amount)) : s,
+      );
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [store, amount]);
+
   return (
     <section className="panel generators" aria-labelledby="generators-title" data-open={open}>
       <div className="panel-head">
         <PanelTitle id="generators-title" open={open} onToggle={toggle}>
           {t.generatorsTitle}
         </PanelTitle>
-        <div className="segmented" role="radiogroup" aria-label={t.buyAmount}>
+        <div
+          className="segmented"
+          role="radiogroup"
+          aria-label={t.buyAmount}
+          aria-keyshortcuts="M"
+          title={t.shortcutsHint}
+        >
           {BUY_AMOUNTS.map((option) => (
             <button
               key={option}
@@ -80,6 +120,7 @@ export function Generators() {
           const cost = formatCost(generatorCost(state, id, units));
           const affordable = canBuyGenerator(state, id, units);
           const limit = generatorLimit(state, id);
+          const rank = GENERATOR_IDS.indexOf(id) + 1;
           return (
             <li key={id} className="generator">
               <div className="generator-text">
@@ -108,6 +149,8 @@ export function Generators() {
                 className="buy"
                 disabled={!affordable}
                 aria-label={t.buyLabel(text.name, cost, units)}
+                aria-keyshortcuts={String(rank)}
+                title={t.shortcutsHint}
                 onClick={() => store.dispatch((s) => buyGenerator(s, id, unitsFor(s, id, amount)))}
               >
                 <span className="buy-verb">
@@ -115,6 +158,7 @@ export function Generators() {
                   {units > 1 && ` ×${units}`}
                 </span>
                 <span className="buy-cost">☀ {cost}</span>
+                {owned < limit && <Eta cost={generatorCost(state, id, units)} />}
               </button>
             </li>
           );

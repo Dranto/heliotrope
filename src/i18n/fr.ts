@@ -54,6 +54,13 @@ export const fr = {
       : `Acheter ${count} ${name} pour ${cost} Lumière`,
   buyAmount: 'Quantité à acheter',
   buyMax: 'Max',
+  /** §10.5: time before a purchase, under its price. */
+  eta: (duration: string) => `dans ${duration}`,
+  shortcutsHint:
+    'Raccourcis\u00a0: les touches 1 à 8 achètent un bâtiment, M passe à Max et revient',
+  nextGoal: (name: string) => `Prochain\u00a0: ${name}`,
+  nextGoalLabel: (name: string, duration: string) =>
+    `Prochain objectif\u00a0: ${name}, dans ${duration}`,
   biodiversity: (percent: string) => `Biodiversité +${percent}\u00a0%`,
   biodiversityHint:
     'Chaque type de bâtiment possédé à 10, 50 puis 100 exemplaires ajoute 2\u00a0% à toute la production.',
@@ -685,6 +692,13 @@ export const fr = {
     sources: 'Sources',
     cycles: 'Cycles de l’eau accomplis',
     percent: (percent: string) => `+${percent}\u00a0%`,
+    curveTitle: 'La production, Saison par Saison',
+    curveLabel:
+      'Courbe de la Lumière par seconde au fil de chaque Saison, sur une échelle logarithmique',
+    curveTime: 'Temps dans la Saison',
+    curveEmpty: 'La courbe se dessine au fil de la Saison.',
+    curveAt: (season: string, time: string, light: string) =>
+      `${season}, à ${time}\u00a0: ${light} / s`,
   },
   /** Each language is named in itself, so a player lost in the other one finds theirs. */
   languageNames: { fr: 'Français', en: 'English' } satisfies Record<Language, string>,
