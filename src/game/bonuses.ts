@@ -6,7 +6,7 @@ import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { CHALLENGES, type ChallengeId } from './challenges';
 import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
-import { hillsidesBonuses } from './delta';
+import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
@@ -82,6 +82,8 @@ export interface BonusSource {
   cycleChallenges?: readonly CycleChallengeId[];
   /** Levels of the Bioregion's sites, read for the hillsides (§7.5); absent where none can be. */
   sites?: { hillsides: number };
+  /** Widenings of the delta's arms, read for the hillsides and the flood arm (M19). */
+  delta?: { widths: Readonly<Record<WideArmId, number>> };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -102,7 +104,9 @@ export function activeBonuses({
   garden,
   cycleChallenges = [],
   sites,
+  delta,
 }: BonusSource): Bonus[] {
+  const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
     ...parcels.flatMap((id) => parcelBonuses(id, futures?.chosen[id])),
     ...districts.flatMap((id) => DISTRICTS[id].bonuses),
@@ -111,8 +115,10 @@ export function activeBonuses({
     ...(canopy ? canopyBonuses(canopy.levels) : []),
     ...challenges.flatMap((id) => CHALLENGES[id].bonuses),
     ...(garden ? varietyBonuses(garden.varieties) : []),
-    ...cycleChallenges.flatMap((id) => CYCLE_CHALLENGES[id].bonuses),
-    ...(sites ? hillsidesBonuses(sites.hillsides) : []),
+    ...cycleChallenges.flatMap((id) =>
+      CYCLE_CHALLENGES[id].bonuses.map((b) => scaleBonus(b, floodScale)),
+    ),
+    ...(sites ? hillsidesBonuses(sites.hillsides, widenFactor(delta?.widths.hillsArm ?? 0)) : []),
   ];
 }
 

@@ -204,7 +204,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
 | M5 à M18 | *Livrés* : carte, parcelles, projets, Arbre, Coopératives, Herbier, défis, Biorégion, confort, visites, quartiers voisins, Canopée, potager, delta, avenirs et décor, accueil et musique, visites de la ville (voir §7) | — |
-| **M19 — Mesurer la fin de partie** | P18 : le simulateur joue la Canopée, le delta et les Cycles 2 à 5, cibles du §8 étendues et testées, marge rendue à la Saison conseillée ; les bras du delta à niveaux | Tout le reste s'équilibre sur ces mesures, et la décision D9 les attend |
+| **M19 — Mesurer la fin de partie** *(livré)* | P18 : le simulateur joue la Canopée, le delta et les Cycles 2 à 5, cibles du §8 étendues et testées, marge rendue à la Saison conseillée ; les bras du delta à niveaux | Tout le reste s'équilibre sur ces mesures, et la décision D9 les attend |
 | **M20 — Les grands chantiers** | P19 : quatre chantiers en étapes payés avec Lumière, Eau, récoltes et espèces, leurs dessins sur la carte, leurs Jalons | Le grand objectif qui relie tous les systèmes existants, sans nouvelle couche |
 | **M21 — Les trames verte et bleue** | P20 : voisinage des parcelles, trames dessinées, espèces des trames | Petit jalon qui donne du sens aux avenirs de M16 ; peut s'échanger avec M22 |
 | **M22 — Le verger et les ruches** | P21 : arbres fruitiers sur plusieurs jours, ruches qui pollinisent, miel pour les chantiers, Grainothèque des fruitiers | Étoffe la boucle de soin pour tous les joueurs ; le miel nourrit M20 |

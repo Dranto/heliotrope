@@ -915,7 +915,8 @@ export const fr = {
     confirmYes: 'Oui, recommencer le Cycle',
     cancel: 'Pas encore',
     started: 'Un nouveau Cycle commence. Les sources coulent plus fort.',
-    memoryKept: 'Avec le bras de la mémoire, la moitié des collecteurs et des sites reste.',
+    memoryKept: (share: string) =>
+      `Avec le bras de la mémoire, ${share} % des collecteurs et des sites reste.`,
     delta: {
       title: 'Le delta',
       hint: 'Ouvrir un bras dépense des Sources sans rien retirer à leur bonus.',
@@ -939,6 +940,19 @@ export const fr = {
       opened: 'Ouvert',
       cost: (sources: string) => `${sources} Sources`,
       level: (level: string, max: string) => `niveau ${level} sur ${max}`,
+      widen: {
+        verb: 'Élargir',
+        label: (name: string, cost: string) => `Élargir ${name} pour ${cost} Sources`,
+        level: (width: string, max: string) => `élargi ${width} fois sur ${max}`,
+        full: 'Au plus large',
+        effects: {
+          seedArm: (minutes: string) => `Les Graines mûrissent en ${minutes}`,
+          memoryArm: (share: string) =>
+            `${share} % des collecteurs et des sites reste après un Cycle`,
+          hillsArm: (share: string) => `Les Coteaux font +${share} % d’effet`,
+          floodArm: (share: string) => `Les récompenses des Cycles à défi font +${share} % d’effet`,
+        },
+      },
     },
     lockKeeper: {
       title: 'L’éclusier',

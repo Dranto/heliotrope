@@ -561,7 +561,18 @@ Pendant un Cycle à défi, une pastille dans la barre du haut montre le défi et
 
 **Jalons (5 de plus, famille « La Biorégion »).** « Premier bras » et « Delta ouvert » (les 6 niveaux du delta) ; « L'éclusier veille » (5 Cycles lancés par l'éclusier) ; « Contre vents et marées » et « Gardien de la rivière » (1 puis 3 Cycles à défi réussis).
 
-**Équilibrage.** Le simulateur (§8) ne joue ni le delta ni les Cycles à défi : les cibles de rythme ne bougent pas. Le bras des semences raccourcit les Saisons tardives (15 → 10 min) sans revenir aux Saisons de quelques minutes d'avant la PR #35 ; le bras de la mémoire rend le début de Cycle moins long sans changer la formule des Sources.
+**Élargir les bras (M19).** Une fois le delta entièrement ouvert (26 Sources), quatre bras **s'élargissent** niveau par niveau, sur le modèle de la Canopée (§7.1) : 10 niveaux chacun, le 1ᵉʳ à 5 Sources, chaque suivant ×1,5 (environ 570 Sources par bras). Les Sources dépensées ne retirent toujours rien à leur bonus.
+
+| Bras | Chaque élargissement |
+|---|---|
+| Bras des semences | Les Graines mûrissent 30 s plus tôt (10 min → 5 min au plus large) |
+| Bras de la mémoire | 4 points de plus de chaque collecteur et niveau de site restent après un Cycle (50 % → 90 %) |
+| Bras des coteaux | Les effets des Coteaux (clic, visites) +10 % |
+| Bras des crues | Les récompenses des Cycles à défi gagnés +10 % (Eau ×1,25 devient ×1,275, etc.) |
+
+Dans l'écran du Cycle, chaque bras élargissable montre sous son effet son élargissement (« élargi 3 fois sur 10 »), l'effet du suivant et le bouton « Élargir » avec son prix ; sur le dessin du delta, le bras coule plus large et sa mare grandit. **Sauvegarde.** Version 21 : les élargissements, à zéro pour une sauvegarde plus ancienne ; une sauvegarde qui en tient plus que ses Sources n'en paient les perd.
+
+**Équilibrage.** Depuis M19, le simulateur (§8, « La fin de partie ») joue le delta et ses élargissements, mais pas les Cycles à défi. Le bras des semences raccourcit les Saisons tardives (15 → 10 min) sans revenir aux Saisons de quelques minutes d'avant la PR #35 ; le bras de la mémoire rend le début de Cycle moins long sans changer la formule des Sources.
 
 ---
 
@@ -598,11 +609,11 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 | 1ʳᵉ Serre communautaire | ~5 min 30 |
 | 1ʳᵉ Ferme verticale | ~12 min |
 | 1ʳᵉ Centrale à miroirs | ~26 min |
-| 1ʳᵉ Canopée urbaine | ~50 min |
-| 1ʳᵉ Arcologie vivante | ~1 h 20 |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~1 h 40 |
+| 1ʳᵉ Canopée urbaine | ~45 min |
+| 1ʳᵉ Arcologie vivante | ~1 h 10 |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~1 h 20 |
 
-Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie. Les améliorations de clic précoces (§5.2) accélèrent ensuite surtout le début : le Potager arrive vers 1 min 30 au lieu de 2 min 40. Avec les parcelles et les projets du jalon 6 (§6.1, §6.2), qui accélèrent la seconde moitié, la Saison conseillée arrive vers 1 h 30 – 1 h 40.
+Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie. Les améliorations de clic précoces (§5.2) accélèrent ensuite surtout le début : le Potager arrive vers 1 min 30 au lieu de 2 min 40. Avec les parcelles et les projets du jalon 6 (§6.1, §6.2), qui accélèrent la seconde moitié, la Saison conseillée arrive vers 1 h 30 – 1 h 40. Les synergies, les Jalons et l'Herbier l'ont ensuite avancée vers 1 h 12 – 1 h 15, à −28 % de l'ancienne cible de 1 h 40, au bord de la marge : M19 rapproche les trois dernières cibles de ce rythme voulu (Canopée 50 → 45 min, Arcologie 1 h 20 → 1 h 10, Saison conseillée 1 h 40 → 1 h 20), sans changer le jeu.
 
 ### Outil de simulation
 
@@ -620,9 +631,9 @@ Sortie actuelle (améliorations de clic, parcelles et projets, Arbre et Coopéra
 | 1ʳᵉ Serre communautaire | ~5 min 30 | 5,6 min | +2 % | 1,6 min |
 | 1ʳᵉ Ferme verticale | ~12 min | 11,1 min | −8 % | 4,8 min |
 | 1ʳᵉ Centrale à miroirs | ~26 min | 22 min | −16 % | 10,4 min |
-| 1ʳᵉ Canopée urbaine | ~50 min | 40 min | −20 % | 17,4 min |
-| 1ʳᵉ Arcologie vivante | ~1 h 20 | 1 h 01 | −24 % | 30 min |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 40 | 1 h 14 | −26 % | 36 min |
+| 1ʳᵉ Canopée urbaine | ~45 min | 39 min | −12 % | 17 min |
+| 1ʳᵉ Arcologie vivante | ~1 h 10 | 1 h 01 | −12 % | 26,5 min |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 20 | 1 h 12 | −10 % | 31 min |
 
 Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, la 1ʳᵉ Saison suit ses cibles jusqu'à la Ferme verticale (entre −8 % et +5 %), puis prend de l'avance : Centrale entre −14 % et −2 %, Canopée entre −20 % et −7 %, Arcologie entre −24 % et −13 %, Saison conseillée entre −26 % et −21 %, toujours dans les ±30 %. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
@@ -647,6 +658,25 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 > | Les trois suivantes | — | 17 – 20 min, 37 – 43 min, 1 h 28 – 1 h 32 | doublées à chaque fois |
 >
 > Les trois premières Saisons ne changent pas (elles durent déjà plus de 15 minutes, et le sol ne s'approfondit qu'à 100 Graines). Ensuite, chaque Saison dure au moins ses 15 minutes de maturité, puis s'allonge d'elle-même : au-delà de ~60 000 Graines, doubler demanderait 4 h de Saison, et le joueur replante plutôt avec ×1,3 à ×1,5 ou prépare le Cycle suivant. Le test du simulateur vérifie que chaque Saison entre la 3ᵉ et le Cycle dure au moins 15 minutes, que les cinq Saisons après le Cycle aussi, et que la 5ᵉ dure plus de 20 minutes.
+
+### La fin de partie (M19)
+
+Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`, et la fin de `npm run simulate`). Au début de chaque Cycle, le joueur de référence ouvre les bras du delta dans l'ordre semences, coteaux, mémoire, semences, éclusier, crues (`REFERENCE_DELTA`), puis élargit le bras le moins large (§7.5) ; à chaque Saison, il sème ses talents puis le niveau de Canopée le moins cher (§7.1). Il joue chaque Saison jusqu'à doubler ses Graines, une fois mûres, et lance le Cycle suivant quand ses Sources atteignent **×1,5** (le réglage par défaut de l'éclusier). Un test (`src/game/endgame.test.ts`) vérifie les Cycles 2 à 4 à ±30 % de leur cible.
+
+| Cycle | Cible | Simulé | Saisons | Sources à la fin |
+|---|---|---|---|---|
+| 1ᵉʳ (conseillé) | ~2 h 45 | 2 h 46 | une dizaine | 5 |
+| 2ᵉ | ~35 min | 36 min | 3 de 12 min | 9 |
+| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 14 |
+| 4ᵉ | ~45 min | 43 min | 4, de 10 à 13 min | 22 |
+| 5ᵉ | (~1 h) | 1 h | 5, de 10 à 15 min | 36 |
+| 6ᵉ | (~1 h 10) | 1 h 09 | 5, la dernière de 30 min | 55 |
+
+Ce qu'en tire la feuille de route (décision D11) :
+
+- **Les Cycles s'allongent doucement** (35 min → 1 h 10) et les Sources croissent d'environ ×1,6 par Cycle : le delta (26 Sources) est ouvert au 6ᵉ Cycle, puis ses élargissements (§7.5) prennent le relais pendant de nombreux Cycles (environ 2 300 Sources pour tout élargir). La troisième couche (M23) se justifie : après une dizaine d'heures, chaque Cycle n'apporte plus qu'un bonus plat de plus.
+- **La Canopée est complète dès le 2ᵉ Cycle** (~1 900 Graines quand une Saison en rapporte des milliers, 120 000 au 6ᵉ Cycle) : les Graines retrouvent un bonus plat. M20 à M24 devront leur rendre un usage (D12 garde les grands chantiers hors Graines ; les villes sœurs ou les alliances pourront s'en charger).
+- **Les nombres restent loin de la limite** : 3 × 10²¹ de Lumière au total au 6ᵉ Cycle, très loin de 10³⁰⁸. Pas besoin de bibliothèque de grands nombres.
 
 ### Affichage des nombres
 

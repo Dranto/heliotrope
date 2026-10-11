@@ -9,6 +9,8 @@ import {
   PACING_TARGETS,
   REFERENCE_CLICKS_PER_SECOND,
   ADVISED_CYCLE_TARGET,
+  CYCLE_TARGETS,
+  simulateCycles,
   simulate,
   simulateFirstCycle,
   simulateSeasonsAfterCycle,
@@ -103,3 +105,33 @@ console.log('Sites:', JSON.stringify(cycle.state.sites));
 const after = simulateSeasonsAfterCycle({ clicksPerSecond, from: cycle.state, count: 6 });
 console.log('Seasons after the first Cycle:', after.seasons.map((s) => minutes(s)).join(' · '));
 console.log('Seeds after them:', after.state.seeds);
+
+// The endgame (§8, M19): the Cycles after the first, each played until its Sources reach ×1.5,
+// with the delta opened and widened and the tree sown as far as they go.
+const endgame = simulateCycles({ clicksPerSecond, from: cycle.state, count: 5 });
+console.log('\nCycle   Target     Simulated  Seasons                        Sources');
+endgame.cycles.forEach((c, i) => {
+  const target = CYCLE_TARGETS[i];
+  console.log(
+    String(i + 2).padEnd(8),
+    (target === undefined ? '—' : minutes(target)).padStart(9),
+    minutes(c.seconds).padStart(10),
+    ' ',
+    c.seasons
+      .map((s) => minutes(s))
+      .join(' · ')
+      .padEnd(30),
+    c.sources,
+  );
+});
+console.log(
+  'Delta:',
+  JSON.stringify(endgame.state.delta.levels),
+  JSON.stringify(endgame.state.delta.widths),
+);
+console.log(
+  'Canopy complete:',
+  Object.values(endgame.state.canopy.levels).join('/'),
+  '· Seeds',
+  endgame.state.seeds,
+);

@@ -28,6 +28,25 @@ export const DELTA: Record<DeltaId, DeltaDef> = {
   lockKeeper: { id: 'lockKeeper', costs: [8] },
 };
 
+// Widening the arms (§7.5, M19): once the whole delta is open, four arms widen level by level,
+// on the model of the Canopy (§7.1), so the Sources of the late Cycles always have a use.
+export const WIDE_ARM_IDS = ['seedArm', 'memoryArm', 'hillsArm', 'floodArm'] as const;
+export type WideArmId = (typeof WIDE_ARM_IDS)[number];
+
+/** Sources asked for the first widening of an arm; each next one costs WIDEN_GROWTH times more. */
+export const WIDEN_BASE_COST = 5;
+export const WIDEN_GROWTH = 1.5;
+/** Widening levels of each arm. */
+export const WIDEN_MAX = 10;
+
+/** Each widening of the seed arm: the Seeds ripen this many seconds sooner, down to the floor. */
+export const SEED_WIDEN_SECONDS = 30;
+export const MIN_RIPENING_SECONDS = 5 * 60;
+/** Each widening of the memory arm: this much more of each collector and site level stays. */
+export const MEMORY_WIDEN_SHARE = 0.04;
+/** Each widening of the hillsides or the flood arm: its effects grow by this share. */
+export const WIDEN_EFFECT_SHARE = 0.1;
+
 /** Seconds a Season lasts before its Seeds are ripe, by level of the seed arm. */
 export const RIPENING_SECONDS = [15 * 60, 12 * 60, 10 * 60] as const;
 
@@ -53,6 +72,12 @@ export interface DeltaState {
   lockFactor: number;
   /** Cycles the lock keeper started (Milestone). */
   lockCycles: number;
+  /** Widening levels of each wide arm (M19), 0 at first. Kept forever. */
+  widths: Record<WideArmId, number>;
+}
+
+export function createWidths(): Record<WideArmId, number> {
+  return Object.fromEntries(WIDE_ARM_IDS.map((id) => [id, 0])) as Record<WideArmId, number>;
 }
 
 export function createDeltaState(): DeltaState {
@@ -60,6 +85,7 @@ export function createDeltaState(): DeltaState {
     levels: Object.fromEntries(DELTA_IDS.map((id) => [id, 0])) as Record<DeltaId, number>,
     lockFactor: 0,
     lockCycles: 0,
+    widths: createWidths(),
   };
 }
 
@@ -76,18 +102,29 @@ export function isArmOpen(state: Pick<GameState, 'delta'>, id: DeltaId): boolean
   return state.delta.levels[id] > 0;
 }
 
-/** Sources spent on the arms opened. */
-export function deltaSourcesSpent(levels: Readonly<Record<DeltaId, number>>): number {
+/** Sources asked for the widening after `width` of an arm. */
+export function widenCost(width: number): number {
+  return Math.round(WIDEN_BASE_COST * WIDEN_GROWTH ** width);
+}
+
+/** Sources spent on the arms opened, and on their widenings. */
+export function deltaSourcesSpent(
+  levels: Readonly<Record<DeltaId, number>>,
+  widths: Readonly<Record<WideArmId, number>> = createWidths(),
+): number {
   let spent = 0;
   for (const id of DELTA_IDS) {
     for (let level = 0; level < levels[id]; level++) spent += DELTA[id].costs[level] ?? 0;
+  }
+  for (const id of WIDE_ARM_IDS) {
+    for (let width = 0; width < widths[id]; width++) spent += widenCost(width);
   }
   return spent;
 }
 
 /** Sources left to spend in the delta; the bonus of the Sources counts them all. */
 export function availableSources(state: Pick<GameState, 'sources' | 'delta'>): number {
-  return Math.max(0, state.sources - deltaSourcesSpent(state.delta.levels));
+  return Math.max(0, state.sources - deltaSourcesSpent(state.delta.levels, state.delta.widths));
 }
 
 /** Sources asked for the next level of an arm; null at its last level. */
@@ -112,6 +149,51 @@ export function isDeltaComplete(state: Pick<GameState, 'delta'>): boolean {
   return DELTA_IDS.every((id) => state.delta.levels[id] >= DELTA[id].costs.length);
 }
 
+/** Sources asked for the next widening of an arm; null before the whole delta is open or at the last. */
+export function nextWidenCost(state: Pick<GameState, 'delta'>, id: WideArmId): number | null {
+  const width = state.delta.widths[id];
+  return isDeltaComplete(state) && width < WIDEN_MAX ? widenCost(width) : null;
+}
+
+export function canWidenArm(state: GameState, id: WideArmId): boolean {
+  const cost = nextWidenCost(state, id);
+  return cost !== null && availableSources(state) >= cost;
+}
+
+/** Player action: widen an arm by one level, kept forever (M19). */
+export function widenArm(state: GameState, id: WideArmId): GameState {
+  if (!canWidenArm(state, id)) return state;
+  const { widths } = state.delta;
+  return { ...state, delta: { ...state.delta, widths: { ...widths, [id]: widths[id] + 1 } } };
+}
+
+/** Widening levels over the whole delta. */
+export function deltaWidths(state: Pick<GameState, 'delta'>): number {
+  return WIDE_ARM_IDS.reduce((sum, id) => sum + state.delta.widths[id], 0);
+}
+
+/** Ripening time with the seed arm at `level` and widened `width` times. */
+export function ripeningFor(level: number, width: number): number {
+  const base =
+    RIPENING_SECONDS[Math.min(level, RIPENING_SECONDS.length - 1)] ?? RIPENING_SECONDS[0];
+  return Math.max(MIN_RIPENING_SECONDS, base - SEED_WIDEN_SECONDS * width);
+}
+
+/** Share of each collector and site level a Cycle keeps with the memory arm widened `width` times. */
+export function memoryShare(width: number): number {
+  return MEMORY_KEPT + MEMORY_WIDEN_SHARE * width;
+}
+
+/** Share of each collector and site level the next Cycle keeps: none without the memory arm. */
+export function keptByMemory(state: Pick<GameState, 'delta'>): number {
+  return isArmOpen(state, 'memoryArm') ? memoryShare(state.delta.widths.memoryArm) : 0;
+}
+
+/** How much the effects of a widened hillsides or flood arm are scaled. */
+export function widenFactor(width: number): number {
+  return 1 + WIDEN_EFFECT_SHARE * width;
+}
+
 /** Levels opened over the whole delta. */
 export function deltaLevels(state: Pick<GameState, 'delta'>): number {
   return DELTA_IDS.reduce((sum, id) => sum + state.delta.levels[id], 0);
@@ -119,8 +201,7 @@ export function deltaLevels(state: Pick<GameState, 'delta'>): number {
 
 /** Seconds a Season must last before its Seeds are ripe (§7), shorter with the seed arm. */
 export function ripeningSeconds(state: Pick<GameState, 'delta'>): number {
-  const level = Math.min(state.delta.levels.seedArm, RIPENING_SECONDS.length - 1);
-  return RIPENING_SECONDS[level] ?? RIPENING_SECONDS[0];
+  return ripeningFor(state.delta.levels.seedArm, state.delta.widths.seedArm);
 }
 
 /** Player action: the factor the lock keeper waits for, or 0 to switch it off. */
@@ -134,13 +215,37 @@ export function isLockKeeperWorking(state: Pick<GameState, 'delta'>): boolean {
   return isArmOpen(state, 'lockKeeper') && state.delta.lockFactor > 0;
 }
 
-/** Bonuses of the hillsides site at `level`: livelier clicks and more frequent visits. */
-export function hillsidesBonuses(level: number): Bonus[] {
+/**
+ * Bonuses of the hillsides site at `level`: livelier clicks and more frequent visits, `scale`
+ * times stronger once the hillsides arm is widened.
+ */
+export function hillsidesBonuses(level: number, scale = 1): Bonus[] {
   if (level <= 0) return [];
   return [
-    { kind: 'clickMultiplier', factor: 1 + HILLSIDES_CLICK_BONUS * level },
-    { kind: 'visitInterval', factor: 1 / (1 + HILLSIDES_VISIT_BONUS * level) },
+    { kind: 'clickMultiplier', factor: 1 + HILLSIDES_CLICK_BONUS * scale * level },
+    { kind: 'visitInterval', factor: 1 / (1 + HILLSIDES_VISIT_BONUS * scale * level) },
   ];
+}
+
+/** A bonus `scale` times as strong: its gain over neutral grows, never its sign. */
+export function scaleBonus(bonus: Bonus, scale: number): Bonus {
+  if (scale === 1) return bonus;
+  if ('factor' in bonus) return { ...bonus, factor: 1 + (bonus.factor - 1) * scale };
+  if ('bonus' in bonus) return { ...bonus, bonus: bonus.bonus * scale };
+  return bonus;
+}
+
+/** Keep only widening levels a save can hold. */
+export function validWidths(raw: unknown): Record<WideArmId, number> {
+  const widths = createWidths();
+  if (typeof raw !== 'object' || raw === null) return widths;
+  for (const id of WIDE_ARM_IDS) {
+    const value = (raw as Record<string, unknown>)[id];
+    if (typeof value === 'number' && Number.isInteger(value) && value > 0) {
+      widths[id] = Math.min(value, WIDEN_MAX);
+    }
+  }
+  return widths;
 }
 
 /** Keep only arm levels a save can hold. */

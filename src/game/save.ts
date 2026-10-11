@@ -13,7 +13,7 @@ import { isProjectId, type ProjectId } from './projects';
 import { validPlots } from './garden';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
-import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels } from './delta';
+import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
 import { isVarietyId, type VarietyId } from './seedBank';
 import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
@@ -88,6 +88,8 @@ const migrations: Record<number, Migration> = {
   18: (raw) => ({ ...raw, version: 19 }),
   // v20 adds the visits of the city (§9.6, M18): none welcomed yet.
   19: (raw) => ({ ...raw, version: 20 }),
+  // v21 adds the widening of the delta's arms (§7.5, M19): no arm widened yet.
+  20: (raw) => ({ ...raw, version: 21 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -268,9 +270,12 @@ export function deserialize(json: string, now: number): GameState | null {
   if (isCount(data.cycles)) state.cycles = data.cycles;
   const delta = data.delta as Record<string, unknown> | undefined;
   const armLevels = validDeltaLevels(delta?.levels);
+  const widths = validWidths(delta?.widths);
+  // Arms are paid with the Sources obtained: a save cannot hold more than they buy.
+  const paid = deltaSourcesSpent(armLevels, widths) <= state.sources;
   state.delta = {
-    // Arms are paid with the Sources obtained: a save cannot hold more than they buy.
-    levels: deltaSourcesSpent(armLevels) <= state.sources ? armLevels : state.delta.levels,
+    levels: paid || deltaSourcesSpent(armLevels) <= state.sources ? armLevels : state.delta.levels,
+    widths: paid ? widths : state.delta.widths,
     lockFactor: (LOCK_FACTORS as readonly unknown[]).includes(delta?.lockFactor)
       ? (delta!.lockFactor as number)
       : 0,
