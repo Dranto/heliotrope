@@ -17,6 +17,7 @@ import {
   DELTA_IDS,
   isArmOpen,
   isDeltaOpen,
+  keptByMemory,
   LOCK_FACTORS,
   memoryShare,
   nextArmCost,
@@ -333,7 +334,9 @@ export function Cycles({ onClose }: { onClose: () => void }) {
         </section>
       </div>
 
-      {isArmOpen(state, 'memoryArm') && <p className="hint">{t.cycles.memoryKept}</p>}
+      {isArmOpen(state, 'memoryArm') && (
+        <p className="hint">{t.cycles.memoryKept(formatPercent(keptByMemory(state)))}</p>
+      )}
 
       <p className="options-message" role="status">
         {message}

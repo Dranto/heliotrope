@@ -843,7 +843,8 @@ export const en: Texts = {
     confirmYes: 'Yes, start the Cycle again',
     cancel: 'Not yet',
     started: 'A new Cycle begins. The springs run stronger.',
-    memoryKept: 'With the branch of memory, half the collectors and sites stay.',
+    memoryKept: (share: string) =>
+      `With the branch of memory, ${share}% of the collectors and sites stay.`,
     delta: {
       title: 'The delta',
       hint: 'Opening a branch spends Springs without taking anything from their bonus.',
@@ -874,9 +875,9 @@ export const en: Texts = {
         full: 'At its widest',
         effects: {
           seedArm: (minutes: string) => `Seeds ripen in ${minutes}`,
-          memoryArm: (share: string) => `${share} of the collectors and sites stay after a Cycle`,
-          hillsArm: (share: string) => `The Hillsides work +${share} stronger`,
-          floodArm: (share: string) => `Challenge Cycle rewards work +${share} stronger`,
+          memoryArm: (share: string) => `${share}% of the collectors and sites stay after a Cycle`,
+          hillsArm: (share: string) => `The Hillsides work +${share}% stronger`,
+          floodArm: (share: string) => `Challenge Cycle rewards work +${share}% stronger`,
         },
       },
     },
