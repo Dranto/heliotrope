@@ -2,6 +2,7 @@
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
+import { cityBonuses, type CitySource } from './cityData';
 import { corridorBonuses } from './corridors';
 import { fruitVarietyBonuses, type FruitId } from './fruits';
 import type { EffectKind } from './effects';
@@ -95,6 +96,8 @@ export interface BonusSource {
   greatWorks?: { works: Readonly<Record<WorkId, { stage: number }>> };
   /** Old fruit varieties found in the orchard (§9.8, M22); absent where none can be. */
   orchard?: { varieties: readonly FruitId[] };
+  /** The sister cities (§7.6, M23); absent where none can be. */
+  city?: CitySource;
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -118,6 +121,7 @@ export function activeBonuses({
   delta,
   greatWorks,
   orchard,
+  city,
 }: BonusSource): Bonus[] {
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
@@ -135,6 +139,7 @@ export function activeBonuses({
     ...(greatWorks ? greatWorksBonuses(greatWorks.works) : []),
     ...corridorBonuses({ parcels, futures }),
     ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
+    ...(city ? cityBonuses(city) : []),
   ];
 }
 

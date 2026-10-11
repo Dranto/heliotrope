@@ -56,6 +56,7 @@ import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
 import { CorridorLayer } from './CorridorArt';
 import { OrchardLayer } from './OrchardArt';
+import { LandscapeLayer } from './LandscapeArt';
 import { encodeOrchard } from './orchardMap';
 import { isOrchardOpen, pickFruit, type FruitId } from '../game/orchard';
 import { encodeCorridors } from './corridorMap';
@@ -243,6 +244,8 @@ export function Scene({
   );
   // The orchard (§9.8), encoded so the layer only redraws when a tree or a hive changes.
   const orchardOpen = isOrchardOpen(state);
+  // The landscape of the sister city lived in (§7.6).
+  const landscape = state.city.landscape;
   const orchard = encodeOrchard(state.orchard);
   const onPick = useCallback(
     (id: FruitId) => store.dispatch((s) => pickFruit(s, id)?.state ?? s),
@@ -274,6 +277,7 @@ export function Scene({
       <>
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
+        <LandscapeLayer landscape={landscape} />
         <CorridorLayer corridors={corridors} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
@@ -303,6 +307,7 @@ export function Scene({
       corridors,
       orchard,
       orchardOpen,
+      landscape,
       onPick,
       districtReady,
       restoreNeighbour,

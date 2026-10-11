@@ -28,13 +28,23 @@ export function waterForSources(sources: number): number {
 
 /** Sources a new Cycle would add to the ones already obtained. */
 export function sourcesToGain(state: GameState): number {
-  return Math.max(0, sourcesForWater(state.allTimeWater) - state.sources);
+  return Math.max(0, citySourcesForWater(state) - state.sources);
+}
+
+/**
+ * Sources the Water of the city lived in is worth (§7.6): the home city counts all the Water,
+ * a sister city the Water since it was founded, above the Sources it started with.
+ */
+function citySourcesForWater(state: GameState): number {
+  const { waterBase, sourcesBase } = state.city;
+  return sourcesForWater(state.allTimeWater - waterBase) + sourcesBase;
 }
 
 /** All-time Water still missing before one more Source would be gained. */
 export function waterToNextSource(state: GameState): number {
-  const next = Math.max(state.sources, sourcesForWater(state.allTimeWater)) + 1;
-  return Math.max(0, waterForSources(next) - state.allTimeWater);
+  const { waterBase, sourcesBase } = state.city;
+  const next = Math.max(state.sources, citySourcesForWater(state)) + 1;
+  return Math.max(0, waterForSources(next - sourcesBase) + waterBase - state.allTimeWater);
 }
 
 /** Additive production bonus of the Sources owned: +10% each. */

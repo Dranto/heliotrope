@@ -2,6 +2,7 @@
 // The first Season is played until it is advisable (10 Seeds), then a second Season is played
 // with those Seeds to check that it reaches every event sooner (§12, milestone 3).
 import { CHALLENGE_IDS } from '../src/game/challenges';
+import { canSwarm, citySources, savoirsToGain, swarm } from '../src/game/cities';
 import { GENERATOR_IDS } from '../src/game/generators';
 import { startNewSeason } from '../src/game/seasons';
 import {
@@ -135,3 +136,22 @@ console.log(
   '· Seeds',
   endgame.state.seeds,
 );
+
+// The sister cities (§7.6, M23): swarm to the plain once the delta allows it, then play the
+// sister city until its first Cycle is advisable, as for the home city.
+if (canSwarm(endgame.state)) {
+  const gain = savoirsToGain(endgame.state);
+  const city = simulateFirstCycle({
+    clicksPerSecond,
+    from: learnReferenceTalents(swarm(endgame.state, 'plain')),
+  });
+  console.log(
+    `\nSister city (plain), ${gain} Savoirs: first Cycle advisable at`,
+    city.advisedCycle === undefined ? 'never' : minutes(city.advisedCycle),
+    `(home city ${minutes(cycle.advisedCycle ?? 0)}),`,
+    city.seasons.length,
+    'Seasons',
+  );
+} else {
+  console.log('\nNo swarming yet: Sources of the city', citySources(endgame.state));
+}

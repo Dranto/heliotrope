@@ -16,6 +16,7 @@ import { buildReadyStages } from './greatWorks';
 import type { GeneratorId } from './generators';
 import { growGarden } from './garden';
 import { growOrchard } from './orchard';
+import { runBuilders } from './cities';
 import { recordProduction } from './history';
 import { runSower } from './seasons';
 import { earnLight } from './light';
@@ -70,7 +71,9 @@ export function tick(state: GameState, dtSeconds: number): GameState {
     growGarden(earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds), dtSeconds),
     dtSeconds,
   );
-  const next = runCooperatives(advanceVisit(advanceButterfly(watered, dtSeconds), dtSeconds));
+  const next = runBuilders(
+    runCooperatives(advanceVisit(advanceButterfly(watered, dtSeconds), dtSeconds)),
+  );
   return runSower(
     runLockKeeper(
       unlockProgress(

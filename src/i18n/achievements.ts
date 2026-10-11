@@ -93,6 +93,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.deltaLevels(condition.count);
     case 'worksBuilt':
       return describe.worksBuilt(condition.count);
+    case 'sisterCities':
+      return describe.sisterCities(condition.count);
     case 'fruitHarvests':
       return describe.fruitHarvests(condition.count);
     case 'fruitVarieties':

@@ -44,6 +44,8 @@ import { Restoration } from './Restoration';
 import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
 import { Orchard } from './Orchard';
+import { Cities } from './Cities';
+import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest } from '../game/garden';
 import { Scene } from './Scene';
 import { Seasons } from './Seasons';
@@ -58,7 +60,8 @@ import { useReminders } from './useReminders';
 import type { OfflineReport } from '../game/offline';
 import { isRipe } from '../game/garden';
 
-type Screen = 'achievements' | 'herbier' | 'seasons' | 'tree' | 'cycles' | 'stats' | 'options';
+type Screen =
+  'achievements' | 'herbier' | 'seasons' | 'tree' | 'cycles' | 'cities' | 'stats' | 'options';
 /** §10.3: mobile tab bar sections. */
 type Tab = 'harvest' | 'build' | 'improve' | 'more';
 const TABS: Tab[] = ['harvest', 'build', 'improve', 'more'];
@@ -131,6 +134,14 @@ function SpringIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 3c-2.4 3.4-4.4 5.8-4.4 8.2a4.4 4.4 0 0 0 8.8 0C16.4 8.8 14.4 6.4 12 3Z" />
       <path d="M4 19.5c2.6 1.4 5.2 1.4 8 0s5.4-1.4 8 0" />
+    </svg>
+  );
+}
+
+function CitiesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 20v-6l3-2.4L9 14v6M15 20v-6l3-2.4 3 2.4v6M9 20V9l3-3 3 3v11M2 20h20" />
     </svg>
   );
 }
@@ -361,6 +372,18 @@ export function App() {
               +{formatNumber(sourceGain)}
             </span>
           )}
+        </button>
+      )}
+      {areCitiesOpen(state) && (
+        <button
+          type="button"
+          className="ghost menu-button cities-button"
+          aria-haspopup="dialog"
+          data-ready={canSwarm(state)}
+          onClick={() => setScreen('cities')}
+        >
+          <CitiesIcon />
+          {t.cities.open}
         </button>
       )}
       <button
@@ -609,6 +632,7 @@ export function App() {
       )}
       {screen === 'tree' && <SeasonTree onClose={closeScreen} />}
       {screen === 'cycles' && <Cycles onClose={closeScreen} />}
+      {screen === 'cities' && <Cities onClose={closeScreen} />}
       {screen === 'stats' && <Stats onClose={closeScreen} />}
       {screen === 'options' && <Options onClose={closeScreen} />}
     </div>

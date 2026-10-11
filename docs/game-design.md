@@ -629,6 +629,41 @@ Dans l'écran du Cycle, chaque bras élargissable montre sous son effet son éla
 
 **Équilibrage.** Depuis M19, le simulateur (§8, « La fin de partie ») joue le delta et ses élargissements, mais pas les Cycles à défi. Le bras des semences raccourcit les Saisons tardives (15 → 10 min) sans revenir aux Saisons de quelques minutes d'avant la PR #35 ; le bras de la mémoire rend le début de Cycle moins long sans changer la formule des Sources.
 
+
+### 7.6 Les villes sœurs (M23)
+
+La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par les mesures de M19). Code dans `src/game/cities.ts` et `src/game/cityData.ts`, écran `src/ui/Cities.tsx` (bouton « Villes sœurs » du menu), carte de la région `src/ui/RegionMap.tsx`, paysages sur la carte `src/ui/LandscapeArt.tsx`.
+
+**Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit, et ni Saison ni Cycle à défi en cours. Le joueur choisit parmi **trois paysages** (décision D14) et fonde une ville sœur :
+
+- **Recommence :** tout ce qu'un Cycle remet à zéro (Lumière, bâtiments, améliorations, projets, Graines, Eau, collecteurs, sites), plus **l'Arbre des Saisons et la Canopée** (« relancer les Saisons ») et les **Sources non dépensées**.
+- **Reste :** le **delta** (ses bras et élargissements, gardés pour toujours, et les Sources qui les ont payés), l'Herbier, les Jalons, les parcelles et les quartiers voisins, le décor, les grands chantiers, le potager, le verger et les villes déjà fondées.
+- **Les Sources d'une ville sœur** viennent de l'Eau recueillie depuis sa fondation, au-dessus de celles qu'elle garde : le rythme des Cycles repart du début, avec tous les bonus gardés.
+
+**Les Savoirs.** Essaimer rapporte **⌊√(Sources gagnées dans la ville) / 2⌋ + ⌊log₁₀(1 + Graines du Cycle)⌋** Savoirs : les Graines, qui n'avaient plus d'usage une fois la Canopée complète (§8, fin de partie), comptent enfin (décision D12 tenue : ni les chantiers ni le reste ne les dépensent). Chaque Savoir gagné donne **+3 % de production** pour toujours, qu'il soit dépensé ou non.
+
+| Paysage | Dans la ville (sa règle) | Une fois quittée (le réseau) | Sur la carte |
+|---|---|---|---|
+| Le littoral | Eau ×2, Panneaux de balcon ×0,5 | Eau ×1,1 | La mer et sa plage à l'est de la Biorégion |
+| La montagne | Papillon et visites 25 % plus fréquents, Eau ×0,75 | Papillon 5 % plus fréquent | Une crête de sommets enneigés au nord |
+| La plaine | Bâtiments 15 % moins chers, clic ×0,5 | Bâtiments 3 % moins chers | Des champs de blé au sud |
+
+La ville natale, une fois quittée, envoie **+3 % de production**. Chaque ville quittée fait aussi apporter **2 boutures de plus** aux voisins qui visitent (§9.6, Troc de graines). Il n'y a pas de serveur : le réseau est dans la sauvegarde.
+
+**L'atelier des Savoirs.** Des règles achetées une fois, pour toutes les villes à venir :
+
+| Règle | Savoirs | Effet |
+|---|---|---|
+| La mémoire des eaux | 5 | Une nouvelle ville garde un quart des Sources non dépensées |
+| Les semis voyageurs | 6 | L'Arbre des Saisons et la Canopée restent en essaimant |
+| Les bâtisseurs | 8 | Les sites de la Biorégion s'élèvent seuls, les moins chers d'abord, quand l'Eau suffit (3 niveaux par pas au plus) |
+| Les échanges | 12 | Le réseau envoie deux fois plus |
+
+- **Écran.** Les Savoirs et leur bonus, la carte de la région (la ville natale au centre, les villes fondées autour, reliées par des fils dorés, la ville actuelle cerclée), la règle de la ville actuelle, le réseau, les trois paysages avec leur règle, leur réseau et le bouton « Essaimer », puis l'atelier.
+- **Simulateur.** `npm run simulate` essaime vers la plaine à la fin de la partie mesurée, puis joue trois Cycles de la ville sœur (voir §8, « La fin de partie »).
+- **Jalons (2).** « Essaimage » (une ville sœur), « Les villes sœurs » (trois). 138 jalons en tout.
+- **Sauvegarde.** Version 24 : la ville actuelle, les villes quittées, les Savoirs, l'atelier, et les Sources et l'Eau de la fondation, à zéro pour une sauvegarde plus ancienne.
+
 ---
 
 ## 8. Équilibrage
@@ -786,7 +821,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
