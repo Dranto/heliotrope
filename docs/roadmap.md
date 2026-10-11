@@ -1,256 +1,285 @@
-# Heliotrope — Feuille de route après le MVP
+# Heliotrope — Feuille de route
 
-> Statut : v1.0 (2026-10-10), validée par Antoine : les jalons M5 à M9 sont réalisés dans cet ordre.
-> Ce document classe les mécaniques à ajouter maintenant que le MVP (jalons M1 à M4) est livré. Il ne fixe aucun chiffre : `docs/game-design.md` reste la
-> référence pour les mécaniques et l'équilibrage, et chaque mécanique retenue y sera décrite dans la PR qui
-> l'implémente. Les valeurs données ici sont des ordres de grandeur à confirmer avec le simulateur (§8).
+> Statut : v2.0 (2026-10-11). La v1 (M5 à M12) est entièrement livrée ; cette version propose la suite, de M13 à M18,
+> à la demande d'Antoine (« établis un plan des nouvelles fonctionnalités et une nouvelle roadmap »).
+> Ce document classe les mécaniques à ajouter. Il ne fixe aucun chiffre : `docs/game-design.md` reste la référence pour
+> les mécaniques et l'équilibrage, et chaque mécanique retenue y sera décrite dans la PR qui l'implémente. Les valeurs
+> données ici sont des ordres de grandeur à confirmer avec le simulateur (§8).
 
 ## Sommaire
 
 1. [État des lieux](#1-état-des-lieux)
-2. [Ce qui manque, comparé aux bons jeux incrémentaux](#2-ce-qui-manque-comparé-aux-bons-jeux-incrémentaux)
-3. [Mécaniques proposées, par priorité](#3-mécaniques-proposées-par-priorité)
-4. [Jalons proposés](#4-jalons-proposés)
+2. [Ce qui manque encore](#2-ce-qui-manque-encore)
+3. [Nouvelles mécaniques proposées, par priorité](#3-nouvelles-mécaniques-proposées-par-priorité)
+4. [Jalons](#4-jalons)
 5. [Ce qu'on écarte ou repousse](#5-ce-quon-écarte-ou-repousse)
 6. [Décisions d'Antoine](#6-décisions-dantoine)
+7. [Mécaniques de la v1 (livrées)](#7-mécaniques-de-la-v1-livrées)
 
 ---
 
 ## 1. État des lieux
 
-Ce que le jeu propose aujourd'hui (main au 2026-10-10, après la PR #8) :
+Ce que le jeu propose aujourd'hui (main au 2026-10-11, après les PR #32 à #36) :
 
-| Système | Contenu | Où |
+| Système | Contenu | Où (design doc) |
 |---|---|---|
-| Clic | Héliotrope cliquable, 5 améliorations de clic (×2, puis % de la production) | §5.2 |
-| Générateurs | 8 bâtiments du pot à l'Arcologie, coût ×1,15, achat ×1 / ×10 / ×100 / Max, silhouette du suivant | §4 |
-| Améliorations | 56 ×2 par générateur, 5 de clic, 3 synergies, bonus de biodiversité passif (jusqu'à +48 %) | §5 |
-| Prestige | Saisons : Graines d'Héliotrope, +5 % de production chacune, conseil d'attendre 10 Graines | §7 |
-| Succès | 43 Jalons à +1 % chacun, dont 3 cachés, conservés entre les Saisons | §9.3 |
-| Événement | Papillon doré toutes les 3 à 8 min : Floraison, Récolte ou Pollinisation | §9.2 |
-| Scène | Vue de face, ciel selon la phase, teinte selon la saison visuelle | §6, §10.4 |
-| Confort | Hors ligne 100 % plafonné à 8 h, sauvegarde auto, export / import, notation scientifique, animations réduites, mise en page mobile | §9, §10 |
+| Clic et générateurs | Héliotrope cliquable et ses améliorations, 8 bâtiments, achat ×1 / ×10 / ×100 / Max, temps avant achat | §4, §5.2, §10.5 |
+| Améliorations | ×2 par générateur, synergies entre bâtiments, avec le clic et entre améliorations, biodiversité | §5 |
+| Le quartier | 8 parcelles à restaurer pour toujours, 16 projets par Saison, 8 quartiers voisins | §6.1, §6.2, §6.4 |
+| Saisons | Graines qui mûrissent en 15 min, Arbre des Saisons (17 talents, 44 Graines), Coopératives, 4 Saisons à défi | §7 à §7.3 |
+| Biorégion | Eau, 4 collecteurs, 4 sites, 2ᵉ prestige « Cycle de l'eau » (Sources, bonus plat) | §7.4 |
+| Le vivant | Herbier (19 espèces), Papillon doré, visites (boutures, averse, migrateurs), soir et nuit en décor | §9.2, §9.5, §9.6 |
+| Succès | 116 Jalons à +1 % chacun | §9.3 |
+| Carte | Vue du dessus en PixiJS (SVG en secours), 4 vues du Balcon à la Biorégion, ville qui s'agrandit | §6, §10.4 |
+| Confort | Hors ligne plafonné à 8 h (24 h avec l'Arbre), PWA, raccourcis, courbes de production, anglais, sons | §9, §10 |
 
-**Bilan.** La boucle courte et la boucle moyenne sont complètes. Ce qui manque surtout, c'est la boucle longue :
-une fois l'Arcologie achetée, le joueur n'a plus que deux leviers (empiler et relancer une Saison), et la
-Saison ne lui laisse **aucun choix** : il reçoit un bonus plat, toujours le même. Le monde, lui, ne garde aucune
-trace de ce que le joueur a construit, alors que le pitch promet un quartier qui reverdit.
+En parallèle, le fil « Assets PixiJS de la carte » retravaille les dessins de la carte ; cette feuille de route ne le
+reprend pas, mais plusieurs jalons s'appuient dessus.
 
-Deux chantiers sont déjà en cours en parallèle et ne sont pas repris ici :
+**Bilan.** Les trois boucles existent et la carte raconte enfin le progrès. Ce qui s'essouffle maintenant, c'est
+**le très long terme**, là où se trouve le joueur qui a tout débloqué :
 
-- **Équilibrage plus doux** (rythme plus rapide, paliers plus satisfaisants) : il réécrit §4, §7 et §8.
-- **Quartier en vue du dessus** : bâtiments qui apparaissent avec des animations à chaque achat. Plusieurs
-  propositions ci-dessous s'appuient dessus.
+- **Les Graines n'ont plus d'usage** une fois l'Arbre complet (44 Graines), alors que les Saisons tardives en
+  rapportent des centaines. Chaque Saison redevient un bonus plat, le problème que M7 avait réglé.
+- **Les Sources sont un bonus plat**, sans aucun choix : le Cycle de l'eau répète l'erreur des premières Saisons.
+- **Chaque Saison se relance à la main**, et chaque Cycle refait la Biorégion à la main, alors que les Saisons
+  tardives durent désormais au moins 15 minutes (PR #35) : la répétition revient par le haut.
+- **Le joueur ne façonne pas son quartier** : chaque parcelle n'a qu'un avenir possible, deux joueurs voient la même
+  ville.
+- **Entre deux visites, rien ne pousse à son rythme** : tout suit la Lumière. Il manque une boucle de soin, lente et
+  douce, qui récompense le retour sans punir l'absence.
 
 ---
 
-## 2. Ce qui manque, comparé aux bons jeux incrémentaux
+## 2. Ce qui manque encore
 
-Ce que les références du genre font bien, et où Heliotrope en est :
-
-| Ce qui rend un incrémental satisfaisant | Référence | Heliotrope aujourd'hui |
+| Ce qui rend un incrémental satisfaisant sur la durée | Référence | Heliotrope aujourd'hui |
 |---|---|---|
-| Le prestige donne des **choix** à dépenser, pas seulement un bonus | Cookie Clicker (puces célestes), Realm Grinder | Bonus plat uniquement |
-| L'**automatisation** se gagne et allège les tâches répétitives à chaque relance | Antimatter Dimensions, Trimps | Rien : chaque Saison se rejoue à la main |
-| Des **projets uniques** qui racontent quelque chose et changent les règles | Universal Paperclips, A Dark Room | Les améliorations sont des multiplicateurs muets |
-| Une **deuxième ressource** qui ouvre une nouvelle couche de jeu | Kittens Game, Egg, Inc. | Une seule monnaie |
-| Une **collection** à compléter, distincte des succès | Cookie Clicker (laits, saveurs), Cats & Soup | Jalons seulement |
-| Des **défis** qui font rejouer autrement | Antimatter Dimensions, NGU Idle | Aucun |
-| Un **monde qui garde la trace** du progrès | Egg, Inc. (ferme), Melvor Idle (village) | Scène qui change de teinte, en cours de refonte |
-| Un **son** qui donne du poids aux achats | Cookie Clicker, Cats & Soup | Pas de son |
-
-Le fil commun : les meilleurs incrémentaux transforment chaque palier en **décision** ou en **changement visible**.
-C'est exactement ce qui manque à la satisfaction de passer les paliers.
+| Le prestige garde un **puits à dépenser** à chaque palier | Cookie Clicker (améliorations célestes), Realm Grinder | Arbre épuisé à 44 Graines |
+| Chaque couche de prestige donne des **choix**, pas seulement un bonus | Antimatter Dimensions (Eternity, Time Studies) | Sources : bonus plat |
+| L'**automatisation monte avec les couches** : on automatise le prestige du dessous | Antimatter Dimensions, Trimps | Coopératives des bâtiments seulement |
+| Une **boucle lente à temps réel**, qui pousse même hors ligne | Melvor Idle (cultures), Cats & Soup | Aucune |
+| Le joueur **façonne** son monde et le reconnaît | Egg, Inc. (ferme), Townscaper | Un seul avenir par parcelle |
+| Une **musique** qui évolue avec la progression | A Dark Room, Cats & Soup | Sons ponctuels, oiseaux |
+| Un **accueil** qui montre quoi faire sans mur de texte | Universal Paperclips (révélation progressive) | Le panneau se dévoile, sans repère pour la 1ʳᵉ minute |
 
 ---
 
-## 3. Mécaniques proposées, par priorité
+## 3. Nouvelles mécaniques proposées, par priorité
 
-Chaque mécanique est notée sur deux critères : ce qu'elle apporte au **thème solarpunk** (réparer un monde,
-ensemble) et à la **satisfaction du joueur** (sentir qu'il progresse). L'effort est une estimation relative.
+Mêmes critères que la v1 : ce que la mécanique apporte au **thème solarpunk** (réparer un monde, ensemble) et à la
+**satisfaction du joueur**, et un effort relatif. Les règles d'Antoine valent pour toutes : chaque mécanique se lie à
+l'existant par une **synergie** plutôt qu'un multiplicateur isolé, rien n'est raconté par du texte, et on ne punit
+jamais le joueur absent.
 
-### P1 — Parcelles du quartier à restaurer *(reprend §13.1)*
+### P11 — L'Arbre s'étend : la Canopée
 
-Le quartier en vue du dessus montre des parcelles grises : un parking, une friche, un toit nu, un canal bétonné.
-Le joueur les restaure contre de la Lumière, une à une ; chacune devient un parc, un verger, une rivière, avec
-une animation et un bonus ciblé (un parc : clic plus fort ; une rivière dépolluée :
-+1 h de plafond hors ligne ; un verger : +% à un générateur). Les parcelles restent restaurées d'une Saison à
-l'autre, ou repartent en friche mais se restaurent moins cher (décision D2).
+Au-dessus de la ramure, une quatrième partie de l'Arbre des Saisons, la **Canopée**, s'ouvre une fois les 17 talents
+appris. Ce sont des talents **à niveaux**, au prix qui grandit (par exemple ×1,5 par niveau), pour que les Graines
+des Saisons tardives aient toujours un usage :
 
-- **Thème :** c'est le cœur du pitch. On ne fait pas seulement grimper un compteur, on rend un lieu vivable.
-- **Satisfaction :** un objectif visible et unique entre deux générateurs, avec une récompense qu'on voit.
-- **Effort :** moyen, parce que la vue du dessus fournit déjà la carte et les animations.
+- **Rameaux** (un par branche) : synergies entre bâtiments +5 % par niveau, Papillon +3 % plus fréquent par niveau,
+  Coopératives qui gardent une réserve plus fine ;
+- **Le semoir** : relance la Saison **automatiquement** dès que les Graines ont mûri et atteint le palier que le joueur
+  choisit (×2 par défaut, réglable, éteint par défaut) ; c'est l'automatisation de la couche du dessous, comme dans
+  Antimatter Dimensions ;
+- **Les fontainiers** : une Coopérative qui bâtit les collecteurs d'eau (§7.4) ;
+- **Pépinière** : les Boutures (§7.1) gardent 10 % de plus par niveau, jusqu'à 50 %.
 
-### P2 — Arbre des Saisons *(reprend §7 et §13.2)*
+- **Thème :** l'arbre de la mémoire continue de grandir, Saison après Saison ; on le voit s'élever au-dessus du
+  quartier dans l'écran de l'Arbre.
+- **Satisfaction :** chaque Saison tardive rapporte de nouveau un choix, et la relance répétitive devient un réglage.
+- **Effort :** faible à moyen : les données et l'écran existent, il faut des talents à niveaux et un réglage.
 
-Les Graines deviennent aussi une monnaie à dépenser dans un arbre de talents permanents, sans réduire leur
-bonus de +5 % (modèle déjà décrit au §7). Une vingtaine de nœuds en trois branches :
+### P12 — Le potager de la cour
 
-- **Racines (production) :** garder 10 % des générateurs à la Saison suivante, synergies plus fortes,
-  biodiversité dès 5 exemplaires.
-- **Pollinisateurs (actif) :** Papillon doré plus fréquent, Floraison plus longue, clic qui gagne avec le temps
-  joué dans la Saison.
-- **Mémoire (confort) :** hors ligne plafonné à 12 h puis 24 h, achat automatique des générateurs (voir P3),
-  améliorations achetées seules.
+Une boucle de soin **à temps réel**. Dans la cour, au pied de la fleur, quelques carrés de potager (3 au début,
+jusqu'à 9) où le joueur **sème** une culture, la regarde **pousser** sur la carte, puis la **récolte** d'un clic.
+Chaque culture a sa durée (de 3 min pour les radis à 4 h pour les courges), et sa récolte un effet lié à l'existant :
 
-- **Thème :** « la terre garde la mémoire de ce qui a poussé » devient une mécanique.
-- **Satisfaction :** chaque Saison apporte un choix ; deux joueurs n'ont pas le même arbre.
-- **Effort :** moyen (données + écran + sauvegarde), surtout de l'équilibrage.
+| Culture (exemples) | Pousse en | Récolte |
+|---|---|---|
+| Radis | 3 min | Une bouffée de Lumière (quelques minutes de production) |
+| Tournesols | 20 min | Floraison du Papillon doré qui dure plus longtemps à sa prochaine venue |
+| Haricots grimpants | 1 h | Potagers et Serres ×2 jusqu'à la fin de la Saison |
+| Courges | 4 h | Une Graine qui mûrit tout de suite, ou de l'Eau |
 
-### P3 — Automatisation gagnée : les Coopératives
+- **Ce qui la rend douce :** une culture pousse hors ligne comme en ligne, et **ne fane jamais** : elle attend le
+  joueur. L'Averse d'été (§9.6) arrose et fait gagner du temps, les Jardins de pluie et l'Eau de la Biorégion aussi.
+- **Collection :** croiser deux cultures voisines fait parfois apparaître une **variété** nouvelle (tomate cerise,
+  haricot violet…), rangée dans une **Grainothèque**, une planche de l'Herbier (§9.5). Une variété ramène parfois une
+  espèce (les abeilles sur les tournesols).
+- **Thème :** jardiner ensemble dans la cour, le geste le plus solarpunk qui soit.
+- **Satisfaction :** des rendez-vous choisis par le joueur (« je reviens dans une heure pour les haricots »), et une
+  raison de revenir qui ne dépend pas de la Lumière.
+- **Effort :** moyen : un état par carré, des dessins de cultures à plusieurs stades, sur la carte SVG et PixiJS.
 
-Des automatismes qui achètent à la place du joueur : la coopérative des jardiniers achète les Héliotropes en
-pot, celle des électriciens les Panneaux, et ainsi de suite ; plus tard, une coopérative achète les
-améliorations. On les débloque dans l'Arbre des Saisons ou par des Jalons, on les règle (en marche, à l'arrêt,
-« garder 10 % de la réserve »).
+### P13 — Le delta des Sources
 
-- **Thème :** le quartier s'organise lui-même ; ce sont des voisins, pas des robots.
-- **Satisfaction :** les débuts de Saison, rejoués à l'identique, deviennent rapides ; le joueur se concentre sur
-  les décisions.
-- **Effort :** faible à moyen, la logique d'achat existe déjà dans le simulateur.
+Les Sources deviennent elles aussi une monnaie à dépenser, sans perdre leur bonus (même modèle que les Graines,
+§7.1) : un **delta** de bras de rivière à ouvrir, dessiné dans l'écran du Cycle de l'eau. Chaque bras **change une
+règle** de la Biorégion ou des Saisons plutôt que d'ajouter de la vitesse :
 
-### P4 — Projets du quartier
+- les Graines mûrissent plus vite (15 min → 12 min → 10 min) ;
+- un collecteur ou un site reste à moitié bâti après un Cycle ;
+- un cinquième site de la biorégion (les **Coteaux**, vignes et terrasses), qui relève le clic et les visites ;
+- **L'éclusier** : relance le Cycle automatiquement au palier choisi (l'automatisation de la couche du dessous, comme
+  le semoir de P11) ;
+- des **Cycles à défi**, sur le modèle des Saisons à défi (§7.3) : « l'année sèche » (Eau ÷4), « la crue » (les
+  collecteurs coûtent ×10), chacun avec une espèce rare de la rivière (loutre, saumon, cigogne noire).
 
-Des projets uniques, présentés comme des décisions de l'assemblée de quartier (« Voter le jardin partagé de la
-rue des Tilleuls »), chacun avec un coût, un changement visible sur la carte et un effet qui **change une règle** plutôt que de
-multiplier un chiffre : les Panneaux produisent aussi la nuit grâce aux batteries partagées, le Papillon doré
-peut amener un deuxième papillon, la Serre double la biodiversité… Une quinzaine pour commencer, débloqués par la
-phase et les parcelles.
+- **Thème :** la rivière se ramifie et irrigue toute la région, à mesure que le joueur la comprend.
+- **Satisfaction :** la deuxième couche gagne enfin ses décisions, comme la première en M7.
+- **Effort :** moyen : un deuxième arbre (écran et données), des défis qui réutilisent ceux des Saisons.
 
-- **Thème :** collectif ; prolonge le pilier « Collectif » (§1). Le projet se raconte par ce qu'il change à l'écran (le jardin apparaît dans la rue, les batteries s'allument), pas par du texte.
-- **Satisfaction :** des paliers qui surprennent, ce que les ×2 ne font plus après la première heure.
-- **Effort :** moyen, surtout de l'écriture.
+### P14 — Un quartier à son image
 
-### P5 — Herbier : une collection d'espèces
+Le joueur façonne son quartier, sans que cela change sa puissance totale :
 
-Les espèces reviennent à mesure que le quartier reverdit : abeilles, mésanges, hérissons, fougères, coquelicots.
-Chaque espèce s'obtient par une condition liée au jeu (une parcelle restaurée, 50 Serres, un Papillon rare) et
-apparaît dans la vue du dessus. L'herbier complet donne un bonus de biodiversité qui prolonge le §5.4.
+- **Deux avenirs par parcelle.** Au moment de la restaurer, chaque parcelle propose deux dessins et deux effets de
+  même valeur (le parking devient un parc ou un marché couvert ; le toit nu, une prairie ou un potager), et l'on peut
+  changer d'avis à chaque Cycle de l'eau. Le choix se lit sur la carte, pas dans un texte.
+- **Le décor.** Des éléments purement décoratifs (bancs, fresques, guirlandes, fontaines, couleur des fleurs de
+  l'héliotrope) gagnés avec les Jalons et l'Herbier, posés d'un clic sur des emplacements de la carte.
+- **Le mode photo.** Masquer le panneau et le compteur, choisir l'heure du jour et la saison de la scène, puis
+  enregistrer l'image de son quartier (PNG), pour le montrer.
 
-- **Thème :** la biodiversité visible, sans écran de statistiques.
-- **Satisfaction :** une collection à compléter, avec des découvertes inattendues.
-- **Effort :** moyen, surtout des illustrations.
+- **Thème :** chaque quartier ressemble à ceux qui l'habitent.
+- **Satisfaction :** l'attachement, et des choix sans erreur possible.
+- **Effort :** moyen à élevé : surtout des illustrations, à faire sur les dessins retravaillés par le fil des assets.
 
-### P6 — Sons discrets et ambiance *(reprend §13.6)*
+### P15 — L'accueil et le retour en images
 
-Un clic doux, un accord pour chaque achat de palier, des oiseaux qui apparaissent avec la phase 2, un réglage de
-volume. Musique d'ambiance optionnelle.
+- **Première minute guidée sans texte.** Un halo doré respire sur la fleur tant qu'on n'a pas cliqué, puis sur le
+  premier bâtiment abordable, puis sur la première amélioration ; il disparaît dès que le geste est fait. Aucune
+  bulle d'explication, seulement le regard guidé.
+- **Le retour en images.** La fenêtre du retour hors ligne montre, en accéléré sur la carte, ce qui a poussé pendant
+  l'absence (bâtiments achetés par les Coopératives, cultures mûres, Graines devenues mûres), avec les chiffres
+  actuels seulement.
+- **Rappels facultatifs.** Avec la PWA (§10.5), une notification **désactivée par défaut** quand les Graines sont mûres
+  ou qu'une culture du potager est prête. Le jeu ne pousse jamais à se connecter à heure fixe (§5).
 
-- **Thème :** le pilier « Élégant et lumineux » (§1) cite déjà des sons discrets.
-- **Satisfaction :** c'est souvent ce qui donne du poids à un achat ; peu coûteux pour un gros effet.
-- **Effort :** faible côté code, il faut trouver ou produire des sons sous licence libre.
+- **Thème et règle d'Antoine :** l'accueil passe par la scène et les animations, pas par du texte.
+- **Satisfaction :** le nouveau joueur trouve tout seul, le joueur qui revient voit d'un coup ce qu'il a gagné.
+- **Effort :** faible à moyen.
 
-### P7 — Saisons à défis *(reprend §13.5)*
+### P16 — La musique du quartier
 
-Des Saisons à contrainte, choisies avant de lancer la Nouvelle Saison : « sans Panneaux », « le clic seulement »,
-« un seul bâtiment par type de parcelle ». Chaque défi réussi donne une récompense unique (un nœud de l'arbre,
-une espèce de l'herbier, une parcelle rare).
+Une musique d'ambiance **générative**, synthétisée comme les sons (§6.3, aucun fichier audio), sur la même gamme
+pentatonique : quelques notes lentes au Balcon, puis une voix de plus à chaque phase, à chaque quartier voisin et à
+chaque site de la biorégion (les zones humides ajoutent des gouttes, la forêt ancienne un bourdon grave). Le tempo et
+la couleur suivent la saison visuelle et l'heure du soir (§9.6). Un réglage de volume séparé dans les Options, et
+coupée par défaut sur mobile.
 
-- **Thème :** des Saisons à thème (« l'été de la sécheresse »), montrées par la scène, plutôt que des punitions.
-- **Satisfaction :** du contenu de fin de partie qui réutilise l'existant.
-- **Effort :** moyen ; demande P2 pour avoir des récompenses intéressantes.
+- **Thème :** on entend la ville respirer à mesure qu'elle revit.
+- **Satisfaction :** un effet fort pour peu de code, et une progression qui s'entend.
+- **Effort :** faible à moyen.
 
-### P8 — Deuxième couche : la Biorégion *(reprend §13.4, livré en M9 : game-design §7.4)*
+### P17 — Les saisons qui passent sur la carte
 
-Une nouvelle ressource, l'**Eau** (récoltée par des toits-réservoirs, des noues, une rivière restaurée), qui
-alimente une nouvelle rangée de générateurs à l'échelle de la région, puis un deuxième prestige plus rare au-dessus
-des Saisons. C'est la plus grosse extension, à faire quand les Saisons sont riches.
+Les visites (§9.6) se diversifient avec ce que le joueur a bâti dans la Biorégion et les quartiers voisins, toujours
+chacune liée à l'existant par une synergie : la **transhumance** (les moutons des prairies agrivoltaïques traversent
+la ville et tondent : les Panneaux produisent plus un moment), la **fête des récoltes** (les halles du parking relais
+s'animent : Récolte du Papillon doublée), les **lucioles** du soir dans les jardins d'eau (le clic vaut plus tant
+qu'elles sont là), la **brocante solaire** des ateliers (un bâtiment moins cher un moment). De nouvelles espèces de
+l'Herbier viennent avec elles.
 
-- **Thème :** passer du quartier à la biorégion, comme le pitch le suggère (« la ville respire »).
-- **Satisfaction :** une nouvelle couche relance la découverte pour les joueurs de long terme.
-- **Effort :** élevé : nouvelle ressource, nouveaux écrans, nouvel équilibrage, migration de sauvegarde.
-
-### P9 — Le quartier vit : des visites sur la carte
-
-Le Papillon doré est aujourd'hui le seul événement en jeu. Le quartier restauré peut en raconter davantage, sans un
-mot : des **visites** qui traversent la carte de temps en temps, chacune à un endroit lié à ce que le joueur a bâti,
-et qu'un clic transforme en petit coup de pouce. Les voisins qui apportent des boutures (une remorque de plants qui
-arrive dans la cour), une averse d'été (un nuage qui arrose les potagers et les serres), une nuée d'oiseaux migrateurs
-(qui se pose sur les arbres et les toits vivants). Chaque visite se lie à l'existant par une synergie (une parcelle,
-un projet ou une espèce la rend plus fréquente ou plus forte) plutôt que d'ajouter un multiplicateur isolé. En toile
-de fond, une lumière de jour et de nuit purement décorative (§5) : fenêtres et lanternes qui s'allument le soir,
-sans effet sur la production.
-
-- **Thème :** les temps forts du récit (§6 du design : « les voisins apportent des boutures ») deviennent des
-  événements en jeu, comme le veut la règle d'Antoine.
-- **Satisfaction :** des surprises régulières, chacune visible et cliquable, qui récompensent l'œil attentif.
-- **Effort :** moyen : un planificateur pur comme celui du Papillon, des animations sur la carte (SVG et PixiJS).
-
-### P10 — Les quartiers voisins
-
-Autour de la ville, la périphérie reste grise et voilée depuis M5. Une fois le quartier entièrement restauré, ses
-**îlots voisins** s'ouvrent un à un : le joueur les restaure contre de la Lumière, une fois pour toutes (comme les
-parcelles, décision D2), et la vue « La Ville » s'agrandit à mesure qu'ils reverdissent. Chaque quartier voisin a
-son caractère (les tanneries devenues jardins d'eau, la gare de triage devenue forêt linéaire, la zone commerciale
-devenue verger…) et apporte une **règle** ou un **choix** plutôt que de la vitesse pure : une Coopérative de plus,
-une synergie nouvelle entre deux bâtiments, une espèce de l'Herbier. Le but est de donner aux Saisons tardives des
-objectifs lointains et variés sans aggraver l'emballement des Saisons (corrigé à part dans le §7 du design).
-
-- **Thème :** « d'autres quartiers verdissent », promis par le pitch, devient visible et jouable.
-- **Satisfaction :** un objectif lointain qui grandit la carte elle-même, Saison après Saison.
-- **Effort :** élevé : de nouvelles illustrations pour chaque quartier, sur la carte SVG et PixiJS.
-
-### Confort à glisser au fil de l'eau
-
-Petits ajouts restés en attente depuis M5, regroupés dans **M10** :
-
-- **Temps avant achat** affiché sur les générateurs et améliorations hors de portée (« dans 2 min »).
-- **Prochain objectif** rappelé sous le compteur (la règle d'or du §2 rendue visible).
-- **Raccourcis clavier** pour acheter (1 à 8 pour les générateurs, M pour Max), sans raccourci de clic pour ne pas encourager l'autoclic.
-- **Courbe de la production** dans les Statistiques, Saison par Saison.
-- ~~**Version anglaise** (§14 Q1)~~ : livrée en M8, choix de la langue dans les Options.
-- **Installation en application** (PWA) pour jouer hors connexion et retrouver le jeu sur l'écran d'accueil.
+- **Thème :** le récit par les événements, comme le veut la règle d'Antoine, à l'échelle de toute la ville.
+- **Satisfaction :** les objectifs lointains de M12 et M9 se remettent à vivre, et la carte réserve encore des
+  surprises au joueur qui a tout.
+- **Effort :** moyen : le planificateur des visites existe, il faut des dessins et des animations.
 
 ---
 
-## 4. Jalons proposés
+## 4. Jalons
 
-Chaque jalon reste livrable et jouable seul, comme M1 à M4. M10 à M12 ont été ajoutés le 2026-10-11, après la
-livraison de M9, à la demande d'Antoine (« continue la roadmap ») ; ils se construisent dans l'ordre.
+Chaque jalon reste livrable et jouable seul. Ils se construisent dans l'ordre ; chacun met à jour le design doc,
+rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (`STATE_VERSION`).
 
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
-| **M5 — Le quartier se voit** *(en cours)* | Vue du dessus animée, équilibrage plus doux porté par de nombreuses synergies, temps avant achat et prochain objectif | Répond directement à la demande ; tout le reste s'appuie sur la carte |
-| **M6 — Restaurer le quartier** *(livré)* | P1 Parcelles, P4 Projets du quartier (premiers 15), P6 Sons — voir game-design §6.1 à §6.3 | Donne enfin des paliers visibles sur la carte de M5 |
-| **M7 — La terre se souvient** *(livré)* | P2 Arbre des Saisons, P3 Coopératives — voir game-design §7.1 et §7.2 | Donne des choix à chaque Saison et retire la répétition des débuts |
-| **M8 — Le vivant revient** *(livré)* | P5 Herbier, P7 Saisons à défis, version anglaise — voir game-design §9.5, §7.3 et §14 Q1 | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
-| **M9 — La Biorégion** *(livré)* | P8 Eau, collecteurs et sites de la biorégion, deuxième prestige (le Cycle de l'eau), vue Biorégion sur la carte — voir game-design §7.4 | La grosse extension, une fois la boucle longue riche |
-| **M10 — Le jeu se lit d'un coup d'œil** *(livré)* | Le confort en attente : temps avant achat, prochain objectif sous le compteur, raccourcis clavier, courbe de la production Saison par Saison, installation en application (PWA) — voir game-design §10.5 | Petit et sans risque pour l'équilibrage, il rend chaque palier plus lisible avant d'ajouter du contenu |
-| **M11 — Le quartier vit** *(livré)* | P9 Visites sur la carte (boutures, averse d'été, oiseaux migrateurs), leurs synergies et Jalons, lumière de jour et de nuit en décor — voir game-design §9.6 | Raconte enfin les temps forts par des événements, sur la carte déjà riche de M6 à M9 |
-| **M12 — Les quartiers voisins** *(livré)* | P10 Les îlots de la périphérie à restaurer pour toujours, chacun avec sa règle, la vue « La Ville » qui s'agrandit — voir game-design §6.4 | Le grand objectif lointain des Saisons tardives, une fois leur rythme corrigé |
+| M5 à M12 | *Livrés* : carte, parcelles, projets, sons, Arbre, Coopératives, Herbier, défis, anglais, Biorégion, confort, visites, quartiers voisins (voir §7) | — |
+| **M13 — L'Arbre s'étend** | P11 : la Canopée (talents à niveaux), le semoir (relance automatique de la Saison), les fontainiers, la Pépinière ; leurs Jalons | Règle d'abord ce qui s'essouffle chez le joueur avancé : les Graines sans usage et les relances répétées, juste après l'allongement des Saisons (PR #35) |
+| **M14 — Le potager de la cour** | P12 : les carrés de la cour, cultures à temps réel, Grainothèque et variétés, synergies avec l'Averse, l'Eau et l'Herbier | Une boucle neuve pour tous les joueurs, dès la 1ʳᵉ Saison, qui donne des rendez-vous sans punir l'absence |
+| **M15 — Le delta des Sources** | P13 : les Sources à dépenser, les bras du delta, le site des Coteaux, l'éclusier, 3 Cycles à défi et leurs espèces | Donne ses choix à la deuxième couche, une fois que la première (M13) a montré le modèle |
+| **M16 — Un quartier à son image** | P14 : deux avenirs par parcelle, le décor à poser, le mode photo | Après le fil des assets PixiJS, pour dessiner les variantes sur les nouveaux dessins |
+| **M17 — L'accueil et le retour** | P15 : première minute guidée, retour hors ligne en images, rappels facultatifs ; P16 : la musique du quartier | Du soin pour tous, peu risqué pour l'équilibrage ; peut glisser plus tôt si Antoine le préfère |
+| **M18 — La ville en fête** | P17 : quatre visites nouvelles liées à la Biorégion et aux quartiers voisins, leurs espèces et leurs Jalons | Fait revivre la fin de partie une fois tout le reste en place |
 
-**Synergies (décision d'Antoine, 2026-10-10).** Pour adoucir l'équilibrage, on ajoute **beaucoup de synergies**,
-entre bâtiments et entre améliorations, plutôt que de retoucher les valeurs de base. Le fil d'équilibrage s'en charge
-dans M5 ; les jalons suivants gardent ce réflexe : chaque nouvelle mécanique (parcelles, projets, arbre, espèces)
-devrait se lier à l'existant par une synergie plutôt qu'ajouter un multiplicateur isolé.
+**Synergies (décision d'Antoine, 2026-10-10).** Comme en v1, chaque nouvelle mécanique se lie à l'existant (une
+culture à l'Averse, un bras du delta aux Graines, une visite à un quartier voisin) plutôt que d'ajouter un
+multiplicateur isolé. Les talents à niveaux de M13 et le delta de M15 restent sous les cibles du §8 : ils allègent et
+diversifient les Saisons tardives sans relancer leur emballement.
 
-**Récit par le jeu (décision d'Antoine, 2026-10-10).** Aucun jalon n'ajoute de journal ni de texte narratif (design doc §1) :
-ce qui doit être raconté passe par la scène, les animations ou un événement en jeu.
+**Récit par le jeu (décision d'Antoine, 2026-10-10).** Aucun jalon n'ajoute de journal ni de texte narratif : seuls
+les noms et les effets sont écrits ; le reste passe par la carte, les animations et les événements.
 
-Chaque jalon met à jour le design doc, rejoue le simulateur et, si l'état change, ajoute une migration de
-sauvegarde (`STATE_VERSION`), comme pour M1 à M4.
+**Après M18, à décider plus tard.** Une **troisième couche** au-dessus du Cycle de l'eau (le réseau des villes sœurs,
+qui s'échangent des boutures et des savoir-faire, simulé sans serveur) ne vaut que si le joueur de référence atteint
+encore le bout de M15 trop vite. On la réévaluera avec le simulateur après M15.
 
 ---
 
 ## 5. Ce qu'on écarte ou repousse
 
-- **Cycle jour / nuit avec production variable** (§13.3) : risque de punir le joueur qui revient la nuit, contraire
-  au §1. On le garde comme **décor** de la vue du dessus (éclairage qui change), et les batteries deviennent un
-  Projet du quartier (P4) au lieu d'une contrainte.
-- **Revente de bâtiments** : peu utile tant qu'il n'y a ni défis ni contraintes de place.
+Repris de la v1, toujours valables :
+
+- **Cycle jour / nuit avec production variable** : décor seulement (§9.6), on ne punit pas le joueur qui joue la nuit.
 - **Classements en ligne et sauvegarde dans le nuage** : demandent un serveur ; le jeu reste statique sur GitHub Pages.
-- **Événements à date réelle** (fête du solstice) : intéressants plus tard, mais ils poussent à se connecter à heure
-  fixe, ce que le §1 évite.
+- **Événements à date réelle** (fête du solstice) : ils poussent à se connecter à heure fixe, ce que le §1 évite. La
+  « fête des récoltes » de P17 est une visite tirée au hasard, pas une date.
+- **Revente de bâtiments** : toujours peu utile.
+
+Nouveaux :
+
+- **Cultures qui fanent** ou carrés qui se perdent si l'on ne revient pas : contraire au §1, le potager attend.
+- **Récompense de connexion quotidienne** : même raison que les événements à date réelle.
+- **Autoclic gagné** (un clic automatique) : le clic reste le geste du joueur ; l'automatisation porte sur les achats
+  et les relances, pas sur le clic.
+- **Monétisation** : aucune (§14 Q6).
 
 ---
 
 ## 6. Décisions d'Antoine
 
-Antoine a validé les quatre recommandations le 2026-10-10.
+Décisions de la v1, validées le 2026-10-10 :
 
 | # | Question | Décision |
 |---|---|---|
-| D1 | Après la vue du dessus, quoi d'abord : restaurer le quartier (M6) ou l'Arbre des Saisons (M7) ? | **Restaurer le quartier d'abord** : c'est ce qui rend la progression visible, la priorité d'Antoine, et ça réutilise tout de suite la vue du dessus |
-| D2 | Les parcelles restaurées restent-elles d'une Saison à l'autre ? | **Oui, elles restent** : le monde garde la trace de chaque Saison, et le joueur voit son quartier grandir sur plusieurs jours |
-| D3 | L'automatisation (Coopératives) se gagne ou est disponible d'emblée ? | **Elle se gagne** (arbre ou Jalons), dès la 2ᵉ Saison pour les premiers bâtiments : c'est une récompense, et la 1ʳᵉ Saison garde ses décisions |
-| D4 | Deuxième ressource de la Biorégion : Eau, Biodiversité ou Habitants ? | **L'Eau** : concrète, facile à montrer sur la carte (pluie, rivière), et la biodiversité reste le bonus qu'elle est déjà |
+| D1 | Après la vue du dessus, quoi d'abord ? | Restaurer le quartier d'abord (M6 avant M7) |
+| D2 | Les parcelles restaurées restent-elles d'une Saison à l'autre ? | Oui, elles restent |
+| D3 | L'automatisation se gagne ou est disponible d'emblée ? | Elle se gagne, dès la 2ᵉ Saison |
+| D4 | Deuxième ressource de la Biorégion ? | L'Eau |
+
+Questions de la v2. En attendant la réponse d'Antoine, les jalons appliquent le choix recommandé.
+
+| # | Question | Choix recommandé (appliqué par défaut) |
+|---|---|---|
+| D5 | Quoi d'abord : la fin de partie (M13, Arbre) ou une boucle neuve pour tous (M14, potager) ? | **M13 d'abord** : c'est là que le jeu s'essouffle aujourd'hui, et c'est le plus petit jalon |
+| D6 | Relance automatique de la Saison (le semoir) et du Cycle (l'éclusier) ? | **Oui, gagnée** dans l'Arbre et le delta, éteinte par défaut et réglable |
+| D7 | Les deux avenirs d'une parcelle : choix définitif ou modifiable ? | **Modifiable à chaque Cycle de l'eau** : on ose choisir, sans regret |
+| D8 | Notifications de la PWA ? | **Facultatives, désactivées par défaut**, seulement Graines mûres et cultures prêtes |
+| D9 | Troisième couche de prestige après M18 ? | **Plus tard**, réévaluée avec le simulateur après M15 |
+
+---
+
+## 7. Mécaniques de la v1 (livrées)
+
+La v1 (2026-10-10) proposait dix mécaniques, toutes livrées entre M5 et M12 ; leur détail est maintenant dans le
+design doc.
+
+| # | Mécanique | Jalon | Design doc |
+|---|---|---|---|
+| P1 | Parcelles du quartier à restaurer, gardées pour toujours | M6 | §6.1 |
+| P2 | Arbre des Saisons | M7 | §7.1 |
+| P3 | Coopératives (automatisation gagnée) | M7 | §7.2 |
+| P4 | Projets du quartier | M6 | §6.2 |
+| P5 | Herbier | M8 | §9.5 |
+| P6 | Sons discrets | M6 | §6.3 |
+| P7 | Saisons à défi | M8 | §7.3 |
+| P8 | La Biorégion, l'Eau et le Cycle de l'eau | M9 | §7.4 |
+| P9 | Les visites sur la carte, soir et nuit en décor | M11 | §9.6 |
+| P10 | Les quartiers voisins | M12 | §6.4 |
+| — | Confort : temps avant achat, prochain objectif, raccourcis, courbes, PWA | M10 | §10.5 |
+| — | Vue du dessus animée et équilibrage plus doux par les synergies | M5 | §5.3, §6, §8 |
