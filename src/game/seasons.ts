@@ -2,6 +2,7 @@
 import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './achievements';
 import { keptGeneratorShare } from './bonuses';
 import { generatorLimit, offeredChallenges, type ChallengeId } from './challenges';
+import { ripeningSeconds } from './delta';
 import { GENERATOR_IDS } from './generators';
 import { startCurve } from './history';
 import { createInitialState, type GameState } from './state';
@@ -27,7 +28,10 @@ export const ADVISED_FIRST_SEASON_SEEDS = 10;
 export const DEEP_SOIL_SEEDS = 100;
 /** Light of the Cycle that deserves DEEP_SOIL_SEEDS: 2e11. */
 const DEEP_SOIL_LIGHT = DEEP_SOIL_SEEDS * DEEP_SOIL_SEEDS * SEED_LIGHT_DIVISOR;
-/** §7 "Les Graines mûrissent": a Season gives its Seeds once it has lasted this long. */
+/**
+ * §7 "Les Graines mûrissent": a Season gives its Seeds once it has lasted this long; the seed arm
+ * of the delta shortens it (ripeningSeconds, §7.5).
+ */
 export const SEED_RIPENING_SECONDS = 15 * 60;
 
 /** Light earned over the Seasons of the current Cycle of water (§7.4). */
@@ -51,17 +55,17 @@ export function lightForSeeds(seeds: number): number {
 
 /** Share of the ripening time the Season has lasted, from 0 to 1 (§7). */
 export function seasonRipeness(state: GameState): number {
-  return Math.min(1, state.seasonSeconds / SEED_RIPENING_SECONDS);
+  return Math.min(1, state.seasonSeconds / ripeningSeconds(state));
 }
 
 /** The Seeds of the Season are ripe: a new Season can harvest them (§7). */
 export function areSeedsRipe(state: GameState): boolean {
-  return state.seasonSeconds >= SEED_RIPENING_SECONDS;
+  return state.seasonSeconds >= ripeningSeconds(state);
 }
 
 /** Seconds of Season left before its Seeds are ripe. */
 export function secondsToRipeness(state: GameState): number {
-  return Math.max(0, SEED_RIPENING_SECONDS - state.seasonSeconds);
+  return Math.max(0, ripeningSeconds(state) - state.seasonSeconds);
 }
 
 /** Seeds the Light of the Cycle adds to the ones already obtained, ripe or not. */

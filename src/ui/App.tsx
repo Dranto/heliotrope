@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { isBioregionOpen, waterPerSecond } from '../game/bioregion';
+import { cycleWater, isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { activeChallenge } from '../game/challenges';
+import { activeCycleChallenge } from '../game/cycleChallenges';
 import {
   canStartNewCycle,
   isCycleScreenUnlocked,
@@ -22,7 +23,13 @@ import {
 import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
 import { availableSeeds, canSowInTree } from '../game/talents';
-import { challengeRulesText, challengeTitle, speciesName } from '../i18n/herbier';
+import {
+  challengeRulesText,
+  challengeTitle,
+  cycleChallengeRulesText,
+  cycleChallengeTitle,
+  speciesName,
+} from '../i18n/herbier';
 import { setLanguage, t } from '../i18n';
 import { Achievements } from './Achievements';
 import { Bioregion, WaterIcon } from './Bioregion';
@@ -171,6 +178,12 @@ export function App() {
     seenChallenges.current = state.challenges.length;
     for (const id of fresh) notify(t.challenges.won(challengeTitle(id)));
   }, [state.challenges, notify]);
+  const seenCycleChallenges = useRef(state.cycleChallenges.length);
+  useEffect(() => {
+    const fresh = state.cycleChallenges.slice(seenCycleChallenges.current);
+    seenCycleChallenges.current = state.cycleChallenges.length;
+    for (const id of fresh) notify(t.cycleChallenges.won(cycleChallengeTitle(id)));
+  }, [state.cycleChallenges, notify]);
 
   const onCatch = useCallback(
     ({ outcome, light }: CatchResult) => {
@@ -220,6 +233,10 @@ export function App() {
 
   const challenge = activeChallenge(state);
   const challengeProgress = challenge ? Math.min(1, state.totalLight / challenge.goal) : 0;
+  const cycleChallenge = activeCycleChallenge(state);
+  const cycleChallengeProgress = cycleChallenge
+    ? Math.min(1, cycleWater(state) / cycleChallenge.goal)
+    : 0;
   const gain = seedsToGain(state);
   const seedsToSow = availableSeeds(state);
   const canSow = canSowInTree(state);
@@ -438,6 +455,25 @@ export function App() {
                 {t.challenges.progress(
                   challengeTitle(challenge.id),
                   formatPercent(challengeProgress),
+                )}
+              </span>
+            </span>
+          )}
+          {cycleChallenge && (
+            <span
+              className="challenge-chip"
+              data-testid="cycle-challenge-chip"
+              title={cycleChallengeRulesText(cycleChallenge)}
+            >
+              <SpeciesArt id={cycleChallenge.species} />
+              {cycleChallengeTitle(cycleChallenge.id)}
+              <span className="challenge-meter" aria-hidden="true">
+                <span style={{ width: `${cycleChallengeProgress * 100}%` }} />
+              </span>
+              <span className="visually-hidden">
+                {t.cycleChallenges.progress(
+                  cycleChallengeTitle(cycleChallenge.id),
+                  formatPercent(cycleChallengeProgress),
                 )}
               </span>
             </span>

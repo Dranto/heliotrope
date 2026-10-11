@@ -233,6 +233,11 @@ export const en: Texts = {
       'cycles.1': 'Back to the sea',
       'cycles.3': 'Great cycle',
       floodTide: 'High waters',
+      'delta.1': 'First branch',
+      'delta.6': 'Open delta',
+      lockKeeper: 'The lock keeper watches',
+      'cycleChallenges.1': 'Come hell or high water',
+      'cycleChallenges.3': 'Keeper of the river',
     },
     families: {
       light: 'Light',
@@ -312,6 +317,11 @@ export const en: Texts = {
       cycles: (count: number) =>
         count === 1 ? 'Complete a Water Cycle' : `Complete ${count} Water Cycles`,
       floodTide: (sources: number) => `Bring forth ${sources} Springs at once`,
+      deltaLevels: (count: number) =>
+        count === 1 ? 'Open a first branch of the delta' : `Open all ${count} levels of the delta`,
+      lockCycles: (count: number) => `Let the lock keeper start ${count} Cycles`,
+      cycleChallenges: (count: number) =>
+        count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
     },
   },
   restoration: {
@@ -450,7 +460,7 @@ export const en: Texts = {
     title: 'The Herbarium',
     close: 'Close the herbarium',
     summary: (count: string, total: string) => `${count} of ${total} species back`,
-    hint: 'Each species back counts as one biodiversity step (+2%). The complete herbarium multiplies all biodiversity by 1.5.',
+    hint: 'Each species back counts as one biodiversity step (+2%). The 18 species of the neighbourhood together multiply all biodiversity by 1.5.',
     returned: (name: string) => `Back in the neighbourhood: ${name}`,
     returnedMany: (count: string) => `${count} species come back to the neighbourhood!`,
     unknown: 'Species to find',
@@ -474,6 +484,9 @@ export const en: Texts = {
       orchid: 'Pyramidal orchid',
       stagBeetle: 'Stag beetle',
       owl: 'Tawny owl',
+      otter: 'Eurasian otter',
+      salmon: 'Atlantic salmon',
+      blackStork: 'Black stork',
     },
     describe: {
       parcel: (parcel: string) => `Restore ${parcel}`,
@@ -673,6 +686,7 @@ export const en: Texts = {
       meadows: { name: 'Agrivoltaic meadows', flavour: q('Sheep graze in the panels’ shade.') },
       foodForests: { name: 'Food forests', flavour: q('Seven layers of fruit, nuts and leaves.') },
       oldForest: { name: 'Old-growth forest', flavour: q('We let it grow. It knows how.') },
+      hillsides: { name: 'The Hillsides', flavour: q('Terraced vines, dry-stone walls.') },
     },
     gathers: (water: string) => `gathers ${water} Water / s`,
     unitWater: (water: string) => `+${water} Water / s`,
@@ -680,6 +694,9 @@ export const en: Texts = {
     siteEffect: (first: string, second: string, percent: string) =>
       `${first} and ${second}: +${percent}% per level`,
     siteNow: (factor: string) => `production ×${factor}`,
+    hillsidesEffect: (click: string, visits: string) =>
+      `Clicks +${click}% and visits +${visits}% per level`,
+    hillsidesNow: (factor: string) => `click ×${factor}`,
     level: 'level',
     build: 'Build',
     raise: 'Extend',
@@ -716,6 +733,7 @@ export const en: Texts = {
     kept: [
       'The Springs',
       'The talents of the Tree of Seasons, without paying for them again',
+      'The delta and its branches',
       'The restored parcels',
       'The Herbarium, the challenges won and the Milestones',
       'Statistics and options',
@@ -725,6 +743,58 @@ export const en: Texts = {
     confirmYes: 'Yes, start the Cycle again',
     cancel: 'Not yet',
     started: 'A new Cycle begins. The springs run stronger.',
+    memoryKept: 'With the branch of memory, half the collectors and sites stay.',
+    delta: {
+      title: 'The delta',
+      hint: 'Opening a branch spends Springs without taking anything from their bonus.',
+      available: (sources: string) => `${sources} Springs to spend`,
+      names: {
+        hillsArm: 'Branch of the hillsides',
+        floodArm: 'Branch of the floods',
+        seedArm: 'Branch of the seeds',
+        memoryArm: 'Branch of memory',
+        lockKeeper: 'The lock keeper',
+      },
+      effects: {
+        hillsArm: 'Opens a fifth bioregion site, the Hillsides',
+        floodArm: 'Opens the challenge Cycles',
+        seedArm: (minutes: string) => `Seeds ripen in ${minutes}`,
+        memoryArm: 'Half the collectors and site levels stay after a Cycle',
+        lockKeeper: 'Starts the Cycle on its own, at the level you choose',
+      },
+      open: 'Open',
+      openLabel: (name: string, cost: string) => `Open ${name} for ${cost} Springs`,
+      opened: 'Open',
+      cost: (sources: string) => `${sources} Springs`,
+      level: (level: string, max: string) => `level ${level} of ${max}`,
+    },
+    lockKeeper: {
+      title: 'The lock keeper',
+      hint: 'Starts a free Cycle as soon as its Springs multiply yours, never during a challenge.',
+      off: 'Off',
+      factor: (factor: string) => `×${factor}`,
+      started: (count: string) => `${count} Cycles started by the lock keeper`,
+    },
+  },
+  cycleChallenges: {
+    title: 'Challenge Cycle',
+    hint: 'A constraint for the whole Cycle. Gathering the goal lifts it, brings back a river species and grants a bonus for ever.',
+    free: 'Free Cycle',
+    freeHint: 'No constraint',
+    names: {
+      drought: 'the dry year',
+      flood: 'the flood',
+      still: 'still water',
+    },
+    rules: {
+      water: (factor: string) => `Water gathered divided by ${factor}`,
+      collectorCost: (factor: string) => `Collectors ${factor} times dearer`,
+      siteCost: (factor: string) => `Sites ${factor} times dearer`,
+    },
+    goal: (water: string) => `Goal: ${water} Water in the Cycle`,
+    won: (name: string) => `Challenge won: ${name}! The constraint lifts.`,
+    progress: (name: string, percent: string) => `${name}, goal ${percent}% reached`,
+    startWith: (name: string) => `Start ${name}`,
   },
   cooperatives: {
     title: 'Cooperatives',

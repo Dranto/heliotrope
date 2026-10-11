@@ -19,6 +19,7 @@ import {
   type Field,
   type Marsh,
   type Point,
+  type Terrace,
 } from './bioregionMap';
 import { Appear } from './Neighbourhood';
 import { centre, type Box } from './neighbourhood';
@@ -185,6 +186,17 @@ export function OldCrown({ x, y, r }: Crown) {
   );
 }
 
+/** A terrace of the hillsides: a dry-stone wall and, above it, two rows of vines. */
+export function TerraceArt({ d }: Terrace) {
+  return (
+    <g>
+      <path d={d} className="terrace-wall" />
+      <path d={d} className="terrace-vines" transform="translate(0 -9)" />
+      <path d={d} className="terrace-vines" transform="translate(5 -18)" />
+    </g>
+  );
+}
+
 export function Tank({ at: [x, y] }: { at: Point }) {
   return (
     <g>
@@ -331,6 +343,14 @@ export const BioregionLand = memo(function BioregionLand({
           </Appear>
         ))}
       </g>
+      <g data-site="hillsides">
+        {sites.hillsides > 0 && <title>{t.bioregion.sites.hillsides.name}</title>}
+        {shown.terraces.map((terrace) => (
+          <Appear key={terrace.d} at={[terrace.at[0], terrace.at[1]]} size={terrace.size}>
+            <TerraceArt {...terrace} />
+          </Appear>
+        ))}
+      </g>
       <path d={LAND_PATH} fillRule="evenodd" className="haze" />
       {raining && !reduced && (
         <g className="shower">
@@ -350,7 +370,7 @@ export interface CityWaterProps {
 /** Collectors in the city itself: tanks on the roofs and planted swales along the kerbs. */
 export const CityWater = memo(function CityWater({ roofTanks, swales }: CityWaterProps) {
   const { tanks, swales: ditches } = landShown(
-    { wetlands: 0, meadows: 0, foodForests: 0, oldForest: 0 },
+    { wetlands: 0, meadows: 0, foodForests: 0, oldForest: 0, hillsides: 0 },
     { roofTanks, swales, ponds: 0, streams: 0 },
   );
   return (

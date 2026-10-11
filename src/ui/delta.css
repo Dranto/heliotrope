@@ -1,0 +1,105 @@
+/* The delta of the Sources in the Cycle screen (docs/game-design.md §7.5, M15). */
+
+.delta {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.delta h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+}
+
+.delta-art {
+  width: min(100%, 22rem);
+  justify-self: center;
+}
+
+.delta-bank {
+  fill: none;
+  stroke: #e6dcc3;
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.delta-water {
+  fill: none;
+  stroke: #b9cfd3;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 2 5;
+}
+
+.delta-water.open {
+  stroke: #4f9fbf;
+  stroke-width: 4.5;
+  stroke-dasharray: none;
+}
+
+.delta-pool {
+  fill: #efe7d2;
+  stroke: #d8cdb1;
+}
+
+.delta-pool.open {
+  fill: #9ccfe0;
+  stroke: #4f9fbf;
+}
+
+.delta-pool.full {
+  fill: #6fb6d2;
+}
+
+.delta-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.delta-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.9rem 0.7rem 1.1rem;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-left: 4px solid #4f9fbf;
+  border-radius: 1.1rem;
+  background: linear-gradient(135deg, rgb(226 242 246 / 0.8), rgb(255 255 255 / 0.5));
+}
+
+.delta-item h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.delta-level {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.delta-effect {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #2f7896;
+}
+
+.delta-opened {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: rgb(79 159 191 / 0.14);
+  color: #2f7896;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .delta-water.open {
+    transition: stroke 0.6s ease;
+  }
+}

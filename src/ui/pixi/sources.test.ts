@@ -3,7 +3,7 @@ import { landShown, MEADOW_FIELDS, FIELDS } from '../bioregionMap';
 import { localUrl, paddedBox } from './snapshot';
 import { mapSources } from './sources';
 
-const none = { wetlands: 0, meadows: 0, foodForests: 0, oldForest: 0 };
+const none = { wetlands: 0, meadows: 0, foodForests: 0, oldForest: 0, hillsides: 0 };
 const dry = { roofTanks: 0, swales: 0, ponds: 0, streams: 0 };
 
 describe('drawings the WebGL map takes from the SVG scene (§10.4)', () => {
@@ -19,7 +19,7 @@ describe('drawings the WebGL map takes from the SVG scene (§10.4)', () => {
   });
 
   it('adds the Bioregion once open: the plain, its sites and the collectors', () => {
-    const sites = { wetlands: 1, meadows: 1, foodForests: 0, oldForest: 1 };
+    const sites = { wetlands: 1, meadows: 1, foodForests: 0, oldForest: 1, hillsides: 0 };
     const collectors = { roofTanks: 1, swales: 0, ponds: 1, streams: 1 };
     const sources = mapSources({ parcels: [], sites, collectors, bioregion: true });
     const shown = landShown(sites, collectors);

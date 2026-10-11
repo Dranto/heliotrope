@@ -1,6 +1,8 @@
 import type { AchievementId } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
 import type { ChallengeId } from './challenges';
+import type { CycleChallengeId } from './cycleChallenges';
+import { createDeltaState, type DeltaState } from './delta';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -18,7 +20,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 16;
+export const STATE_VERSION = 17;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -104,6 +106,12 @@ export interface GameState {
   sources: number;
   /** Cycles of water completed (§7.4). */
   cycles: number;
+  /** Arms of the delta opened with Sources and the lock keeper's settings (§7.5). Kept forever. */
+  delta: DeltaState;
+  /** Challenge running this Cycle of water (§7.5), null once won or without one. */
+  cycleChallenge: CycleChallengeId | null;
+  /** Challenge Cycles won, in order (§7.5). Kept forever. */
+  cycleChallenges: CycleChallengeId[];
   /** The courtyard garden's beds, harvests and seed bank (§9.7). Kept forever. */
   garden: GardenState;
   /** Golden Butterflies caught over all Seasons (§9.2). */
@@ -174,6 +182,9 @@ export function createInitialState(now: number): GameState {
     allTimeWater: 0,
     sources: 0,
     cycles: 0,
+    delta: createDeltaState(),
+    cycleChallenge: null,
+    cycleChallenges: [],
     garden: createGardenState(),
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },

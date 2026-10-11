@@ -5,6 +5,8 @@
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { CHALLENGES, type ChallengeId } from './challenges';
+import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
+import { hillsidesBonuses } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
@@ -74,13 +76,18 @@ export interface BonusSource {
   challenges: readonly ChallengeId[];
   /** The garden's seed bank (§9.7); absent where none can be. */
   garden?: { varieties: readonly VarietyId[] };
+  /** Challenge Cycles won (§7.5); absent where none can be. */
+  cycleChallenges?: readonly CycleChallengeId[];
+  /** Levels of the Bioregion's sites, read for the hillsides (§7.5); absent where none can be. */
+  sites?: { hillsides: number };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
 
 /**
  * Every bonus in force: parcels, then neighbouring districts, then projects, then talents and the
- * canopy, then challenges won, then the varieties of the garden's seed bank.
+ * canopy, then challenges won, then the varieties of the garden's seed bank, then challenge
+ * Cycles won and the hillsides site (§7.5).
  */
 export function activeBonuses({
   parcels,
@@ -90,6 +97,8 @@ export function activeBonuses({
   canopy,
   challenges,
   garden,
+  cycleChallenges = [],
+  sites,
 }: BonusSource): Bonus[] {
   return [
     ...parcels.flatMap((id) => PARCELS[id].bonuses),
@@ -99,6 +108,8 @@ export function activeBonuses({
     ...(canopy ? canopyBonuses(canopy.levels) : []),
     ...challenges.flatMap((id) => CHALLENGES[id].bonuses),
     ...(garden ? varietyBonuses(garden.varieties) : []),
+    ...cycleChallenges.flatMap((id) => CYCLE_CHALLENGES[id].bonuses),
+    ...(sites ? hillsidesBonuses(sites.hillsides) : []),
   ];
 }
 

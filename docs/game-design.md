@@ -345,7 +345,7 @@ Points de repère *(à valider)* :
 
 **Freiner l'emballement (2026-10-11).** Demande d'Antoine : corriger l'emballement des Saisons par des mécaniques. Avant, dès ~80 Graines, chaque Saison ne durait que 1 à 3 minutes : en une minute, le joueur rachetait presque tous les bâtiments de la Saison précédente, et la production (Graines, talents, sites, améliorations ×2 débloquées par plus de bâtiments) croissait plus vite que la Lumière qu'il fallait pour doubler ses Graines. Deux mécaniques s'ajoutent, sans toucher aux bâtiments ni au début de partie :
 
-- **Les Graines mûrissent.** Les Graines d'une Saison poussent dès que la Lumière les mérite, mais ne se récoltent que **mûres, après 15 minutes de Saison** (temps réel écoulé, hors ligne compris). Avant, le bouton Nouvelle Saison reste grisé. L'écran des Saisons montre les Graines qui poussent, une jauge de maturité et le temps restant (« Les Graines mûrissent : encore 7 min de Saison »). Sur la carte, la teinte de saison suit la maturité (§6) : printemps, été, puis automne quand la récolte est prête. Les trois premières Saisons durent naturellement plus de 15 minutes et ne changent pas. Une Saison qui mûrit plus longtemps récolte plus : la Lumière gagnée pendant l'attente compte, et l'Eau des collecteurs (§7.4), qui suit le temps, profite aussi des Saisons longues.
+- **Les Graines mûrissent.** Les Graines d'une Saison poussent dès que la Lumière les mérite, mais ne se récoltent que **mûres, après 15 minutes de Saison** (temps réel écoulé, hors ligne compris ; 12 puis 10 minutes avec le bras des semences du delta, §7.5). Avant, le bouton Nouvelle Saison reste grisé. L'écran des Saisons montre les Graines qui poussent, une jauge de maturité et le temps restant (« Les Graines mûrissent : encore 7 min de Saison »). Sur la carte, la teinte de saison suit la maturité (§6) : printemps, été, puis automne quand la récolte est prête. Les trois premières Saisons durent naturellement plus de 15 minutes et ne changent pas. Une Saison qui mûrit plus longtemps récolte plus : la Lumière gagnée pendant l'attente compte, et l'Eau des collecteurs (§7.4), qui suit le temps, profite aussi des Saisons longues.
 - **Le sol s'approfondit.** Au-delà de **100 Graines** dans le Cycle, les Graines suivent une racine cubique au lieu d'une racine carrée : doubler ses Graines demande ×8 Lumière au lieu de ×4. Sans cela, l'attente de la maturité ferait bondir les Graines de ×15 à ×40 par Saison ; avec, de ×4 à ×10, puis ×2 quand les Saisons s'allongent.
 
 Ni l'une ni l'autre ne suffit seule : un sol plus exigeant seul laissait des Saisons de 5 minutes pendant longtemps, et une maturité progressive (Graines multipliées par la part de maturité) n'allongeait les Saisons que d'une à deux minutes. Ensemble, elles donnent des Saisons d'au moins 15 minutes qui s'allongent ensuite d'elles-mêmes (mesures au §8).
@@ -475,7 +475,7 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
 ```
 
 - **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
-- **Conservé :** les Sources, les **talents et la Canopée de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
+- **Conservé :** les Sources, **le delta et ses bras** (§7.5), les **talents et la Canopée de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
 - Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
 - **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 45** ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
 
@@ -490,6 +490,42 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
 - chaque nouvel élément pousse avec l'entrée habituelle de la carte (anneau doré). Avec les animations réduites, ni averse ni reflets.
 
 **Jalons (12 de plus, famille « La Biorégion »).** Recueillir 1 000, 1 M, 1 Md Eau au total ; 10 et 50 collecteurs ; 1, 10 et 25 niveaux de sites ; « Bassin versant » (chacun des quatre sites étendu) ; 1 et 3 Cycles de l'eau ; caché : « Grandes eaux » (faire jaillir 25 Sources d'un coup).
+
+### 7.5 Le delta des Sources (M15)
+
+Les Sources deviennent elles aussi une monnaie à dépenser, sur le modèle des Graines dans l'Arbre (§7.1) : ouvrir un **bras du delta** coûte des Sources sans rien retirer à leur bonus (le bonus compte toutes les Sources obtenues, le delta se paie sur celles qui restent à dépenser). Le delta s'ouvre avec le premier Cycle de l'eau et se garde pour toujours. Chaque bras **change une règle** de la Biorégion ou des Saisons plutôt que d'ajouter de la vitesse (décision de la feuille de route, P13). `src/game/delta.ts` et `src/game/cycleChallenges.ts`.
+
+| Bras | Coût (Sources) | Effet |
+|---|---|---|
+| Bras des coteaux | 2 | Ouvre un cinquième site de la biorégion, **les Coteaux** |
+| Bras des crues | 2 | Ouvre les **Cycles à défi** |
+| Bras des semences | 3, puis 6 | Les Graines mûrissent en 12 min, puis 10 min (au lieu de 15, §7) |
+| Bras de la mémoire | 5 | Après un Cycle, la **moitié** de chaque collecteur et de chaque niveau de site reste (arrondie en dessous) |
+| L'éclusier | 8 | Relance le Cycle tout seul, au palier choisi |
+
+Tout le delta coûte 26 Sources, soit plusieurs Cycles : le joueur de référence en a ~5 au premier Cycle conseillé.
+
+**Les Coteaux.** Vignes en terrasses et murets de pierre sèche sur le flanc sud des collines. Comme les autres sites, ils s'étendent avec l'Eau (1ᵉʳ niveau 3 000 Eau, ×2,5 par niveau) et repartent de zéro à chaque Cycle ; au lieu de relever deux bâtiments, chaque niveau donne **clic +25 %** (multiplicatif sur la valeur de base du clic) et rend les **visites** (§9.6) **10 % plus fréquentes** (l'intervalle est divisé par 1 + 0,1 × niveau). Ils n'entrent pas dans « Bassin versant », qui garde les quatre sites d'origine.
+
+**L'éclusier.** Comme le semoir (§7.1), il est éteint par défaut et se règle à l'écran du Cycle : il lance un Cycle libre dès que les Sources à faire jaillir portent les Sources possédées à **×1,25, ×1,5, ×2 ou ×3**. Il n'interrompt jamais un Cycle à défi ni une Saison à défi en cours. Il tourne aussi hors ligne, comme le reste. Quand le semoir et l'éclusier sont prêts dans la même seconde, le Cycle passe d'abord.
+
+**Cycles à défi.** Sur le modèle des Saisons à défi (§7.3) : au moment de lancer un Cycle, on peut choisir une contrainte pour tout le Cycle. Recueillir l'objectif d'Eau dans le Cycle lève la contrainte, ramène une espèce rare de la rivière (§9.5) et donne un bonus pour toujours. Chacun ne se gagne qu'une fois.
+
+| Défi | Contrainte | Objectif (Eau dans le Cycle) | Espèce | Récompense |
+|---|---|---|---|---|
+| L'année sèche | Eau recueillie ÷4 | 2 M | Loutre d'Europe | Eau ×1,25 |
+| La crue | Collecteurs ×10 plus chers | 5 M | Saumon atlantique | Production +10 % |
+| L'eau dormante | Sites ×4 plus chers | 5 M | Cigogne noire | Synergies ×1,1 |
+
+Pendant un Cycle à défi, une pastille dans la barre du haut montre le défi et l'avancée vers son objectif, comme pour une Saison à défi.
+
+**Écran.** Sous le bilan du Cycle de l'eau, le **delta** est dessiné : la rivière descend sous l'arche et se divise en cinq bras ; un bras ouvert coule (bleu, avec une mare au bout), un bras fermé reste un lit sec en pointillés. Sous le dessin, chaque bras avec son effet et son bouton « Ouvrir ». Puis le réglage de l'éclusier (pastilles Éteint, ×1,25, ×1,5, ×2, ×3) et, quand un Cycle peut commencer, le choix d'un Cycle à défi. Aucun texte narratif.
+
+**Sur la carte.** Chaque niveau des Coteaux dessine des terrasses de vigne sur les quatre collines, du bas vers le haut, avec l'entrée habituelle (anneau doré). Les trois espèces de la rivière vivent au fil de la Rivière retrouvée.
+
+**Jalons (5 de plus, famille « La Biorégion »).** « Premier bras » et « Delta ouvert » (les 6 niveaux du delta) ; « L'éclusier veille » (5 Cycles lancés par l'éclusier) ; « Contre vents et marées » et « Gardien de la rivière » (1 puis 3 Cycles à défi réussis).
+
+**Équilibrage.** Le simulateur (§8) ne joue ni le delta ni les Cycles à défi : les cibles de rythme ne bougent pas. Le bras des semences raccourcit les Saisons tardives (15 → 10 min) sans revenir aux Saisons de quelques minutes d'avant la PR #35 ; le bras de la mémoire rend le début de Cycle moins long sans changer la formule des Sources.
 
 ---
 
@@ -628,7 +664,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -662,7 +698,7 @@ Les espèces reviennent à mesure que le quartier reverdit. Chacune revient par 
 | Mésange bleue | 10 Canopées urbaines | Martin-pêcheur | La Saison des nuages (§7.3) |
 | Citron | 5 Papillons dorés attrapés | Orchis pyramidal, Lucane cerf-volant, Chouette hulotte | Les trois autres défis (§7.3) |
 
-- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (18 espèces) multiplie toute la biodiversité par 1,5.
+- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (les 18 espèces du quartier) multiplie toute la biodiversité par 1,5. Trois espèces de la rivière, la loutre d'Europe, le saumon atlantique et la cigogne noire, reviennent avec les Cycles à défi (§7.5) : elles comptent chacune un palier de plus, mais ne sont pas exigées pour l'Herbier complet, que les joueurs qui l'avaient gardent.
 - **Écran.** « Herbier » s'ouvre du menu dès la première espèce (ou après la 1ʳᵉ Saison). Une planche par espèce : le dessin en couleur dans un médaillon doré une fois revenue, une silhouette pâle avant ; sous chaque nom, ce qui la ramène. Aucun texte narratif.
 - **Retour.** Une notification « De retour dans le quartier : Hérisson » et l'apparition en douceur du médaillon sur la carte (sans animation au chargement, ni avec les animations réduites).
 

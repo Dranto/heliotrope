@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { offeredCycleChallenges, type CycleChallengeId } from '../game/cycleChallenges';
 import {
   ADVISED_FIRST_CYCLE_SOURCES,
   canStartNewCycle,
@@ -8,10 +9,33 @@ import {
   startNewCycle,
   waterToNextSource,
 } from '../game/cycles';
-import { formatCost, formatNumber, formatPercent } from '../game/format';
+import {
+  availableSources,
+  canOpenArm,
+  DELTA,
+  DELTA_IDS,
+  isArmOpen,
+  isDeltaOpen,
+  LOCK_FACTORS,
+  nextArmCost,
+  openArm,
+  RIPENING_SECONDS,
+  setLockFactor,
+  type DeltaId,
+} from '../game/delta';
+import { formatCost, formatDecimal, formatNumber, formatPercent } from '../game/format';
+import type { GameState } from '../game/state';
 import { t } from '../i18n';
+import {
+  cycleChallengeGoalText,
+  cycleChallengeRewardText,
+  cycleChallengeRulesText,
+  cycleChallengeTitle,
+} from '../i18n/herbier';
 import { Dialog } from './Dialog';
+import { SpeciesArt } from './SpeciesArt';
 import { useGameState, useGameStore } from './useGame';
+import './delta.css';
 
 /** A spring rising under the arch, its rings spreading on the water (§10.4). */
 function CycleOrnament() {
@@ -37,21 +61,127 @@ function CycleOrnament() {
   );
 }
 
+/** Where each arm of the delta ends in its drawing, from west to east. */
+const ARM_ENDS: Record<DeltaId, number> = {
+  hillsArm: 28,
+  floodArm: 74,
+  seedArm: 120,
+  memoryArm: 166,
+  lockKeeper: 212,
+};
+
+/**
+ * The delta (§7.5): the river comes down under the arch and fans out into five arms; an open
+ * arm runs with water and ends in a pool, a closed one is a dry dotted bed.
+ */
+function DeltaArt({ state }: { state: GameState }) {
+  return (
+    <svg viewBox="0 0 240 104" className="delta-art" aria-hidden="true">
+      <path className="delta-bank" d="M120 0V30" />
+      <path className="delta-water open" d="M120 0V30" />
+      {DELTA_IDS.map((id) => {
+        const x = ARM_ENDS[id];
+        const d = `M120 30C120 58 ${x} 56 ${x} 92`;
+        const level = state.delta.levels[id];
+        const open = level > 0;
+        const full = level >= DELTA[id].costs.length;
+        return (
+          <g key={id} data-arm={id} data-open={open}>
+            <path className="delta-bank" d={d} />
+            <path className={`delta-water${open ? ' open' : ''}`} d={d} />
+            <ellipse
+              className={`delta-pool${open ? ' open' : ''}${full ? ' full' : ''}`}
+              cx={x}
+              cy="95"
+              rx="9"
+              ry="5"
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function armEffect(id: DeltaId, level: number): string {
+  const effects = t.cycles.delta.effects;
+  if (id === 'seedArm') {
+    const seconds = RIPENING_SECONDS[Math.min(level, RIPENING_SECONDS.length - 1)]!;
+    return effects.seedArm(t.duration(seconds));
+  }
+  return effects[id];
+}
+
+/** The arms of the delta (§7.5), opened with the Sources not yet spent. */
+function Delta({ state, onOpen }: { state: GameState; onOpen: (id: DeltaId) => void }) {
+  return (
+    <section className="delta" aria-labelledby="delta-title">
+      <h3 id="delta-title">{t.cycles.delta.title}</h3>
+      <p className="hint">
+        {t.cycles.delta.hint}{' '}
+        <strong data-testid="sources-available">
+          {t.cycles.delta.available(formatNumber(availableSources(state)))}
+        </strong>
+      </p>
+      <DeltaArt state={state} />
+      <ul className="delta-list">
+        {DELTA_IDS.map((id) => {
+          const level = state.delta.levels[id];
+          const max = DELTA[id].costs.length;
+          const cost = nextArmCost(state, id);
+          const name = t.cycles.delta.names[id];
+          return (
+            <li key={id} className="delta-item" data-arm={id} data-level={level}>
+              <div>
+                <h4>{name}</h4>
+                {max > 1 && (
+                  <span className="delta-level">
+                    {t.cycles.delta.level(formatNumber(level), formatNumber(max))}
+                  </span>
+                )}
+                <p className="delta-effect">{armEffect(id, cost === null ? level : level + 1)}</p>
+              </div>
+              {cost === null ? (
+                <span className="delta-opened">{t.cycles.delta.opened}</span>
+              ) : (
+                <button
+                  type="button"
+                  className="buy delta-open"
+                  disabled={!canOpenArm(state, id)}
+                  aria-label={t.cycles.delta.openLabel(name, formatNumber(cost))}
+                  onClick={() => onOpen(id)}
+                >
+                  <span className="buy-verb">{t.cycles.delta.open}</span>
+                  <span className="buy-cost">{t.cycles.delta.cost(formatNumber(cost))}</span>
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 /**
  * The Water Cycle screen (docs/game-design.md §7.4): the second prestige. Sources owned and to
- * gain, the bonus before and after, what is reset and what stays.
+ * gain, the bonus before and after, what is reset and what stays; then the delta (§7.5), the lock
+ * keeper's setting and the choice of a challenge Cycle.
  */
 export function Cycles({ onClose }: { onClose: () => void }) {
   const store = useGameStore();
   const state = useGameState();
   const [confirming, setConfirming] = useState(false);
   const [message, setMessage] = useState('');
+  const challenges = offeredCycleChallenges(state);
+  const [challenge, setChallenge] = useState<CycleChallengeId | null>(null);
   const gain = sourcesToGain(state);
   const available = canStartNewCycle(state);
   const premature = isCyclePremature(state);
 
   function start() {
-    store.dispatch((s) => startNewCycle(s));
+    store.dispatch((s) => startNewCycle(s, challenge));
+    setChallenge(null);
     store.save();
     setConfirming(false);
     setMessage(t.cycles.started);
@@ -124,16 +254,90 @@ export function Cycles({ onClose }: { onClose: () => void }) {
         </section>
       </div>
 
+      {isArmOpen(state, 'memoryArm') && <p className="hint">{t.cycles.memoryKept}</p>}
+
       <p className="options-message" role="status">
         {message}
       </p>
+
+      {isDeltaOpen(state) && (
+        <Delta state={state} onOpen={(id) => store.dispatch((s) => openArm(s, id))} />
+      )}
+
+      {isArmOpen(state, 'lockKeeper') && (
+        <fieldset className="sower-choice lock-choice">
+          <legend>{t.cycles.lockKeeper.title}</legend>
+          <p className="hint">{t.cycles.lockKeeper.hint}</p>
+          <div className="sower-options">
+            {[0, ...LOCK_FACTORS].map((factor) => (
+              <label key={factor} className="sower-option">
+                <input
+                  type="radio"
+                  name="lock-keeper"
+                  checked={state.delta.lockFactor === factor}
+                  onChange={() => store.dispatch((s) => setLockFactor(s, factor))}
+                />
+                <span>
+                  {factor === 0
+                    ? t.cycles.lockKeeper.off
+                    : t.cycles.lockKeeper.factor(formatDecimal(factor))}
+                </span>
+              </label>
+            ))}
+          </div>
+          {state.delta.lockCycles > 0 && (
+            <p className="hint">
+              {t.cycles.lockKeeper.started(formatNumber(state.delta.lockCycles))}
+            </p>
+          )}
+        </fieldset>
+      )}
+
+      {challenges.length > 0 && available && (
+        <fieldset className="challenge-choice">
+          <legend>{t.cycleChallenges.title}</legend>
+          <p className="hint">{t.cycleChallenges.hint}</p>
+          <label className="challenge-option">
+            <input
+              type="radio"
+              name="cycle-challenge"
+              checked={challenge === null}
+              onChange={() => setChallenge(null)}
+            />
+            <span aria-hidden="true" />
+            <span>
+              <strong>{t.cycleChallenges.free}</strong>
+              <span>{t.cycleChallenges.freeHint}</span>
+            </span>
+          </label>
+          {challenges.map((c) => (
+            <label key={c.id} className="challenge-option" data-challenge={c.id}>
+              <input
+                type="radio"
+                name="cycle-challenge"
+                checked={challenge === c.id}
+                onChange={() => setChallenge(c.id)}
+              />
+              <SpeciesArt id={c.species} />
+              <span>
+                <strong>{cycleChallengeTitle(c.id)}</strong>
+                <span>{cycleChallengeRulesText(c)}</span>
+                <span>{cycleChallengeGoalText(c)}</span>
+                <span className="challenge-reward">{cycleChallengeRewardText(c.id)}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
 
       {!available && <p className="hint">{t.cycles.noSourceYet}</p>}
       {confirming && available ? (
         <div className="confirm-row">
           <span>{t.cycles.confirm(formatNumber(gain))}</span>
           <button type="button" className="season-button cycle-button" onClick={start}>
-            {t.cycles.confirmYes}
+            {challenge
+              ? t.cycleChallenges.startWith(t.cycleChallenges.names[challenge])
+              : t.cycles.confirmYes}
           </button>
           <button type="button" className="ghost" onClick={() => setConfirming(false)}>
             {t.cycles.cancel}

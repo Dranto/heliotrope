@@ -45,6 +45,8 @@ a design decision changes, update that document in the same PR.
   - `parcels.ts`, `projects.ts`: parcels to restore (kept across Seasons) and neighbourhood
     projects (per Season), data tables (§6.1, §6.2); `bonuses.ts` reads their shared effect
     shape for the formulas; `restoration.ts` holds when they are offered and the buy actions
+  - `delta.ts`, `cycleChallenges.ts`: the delta of the Sources (§7.5), arms bought with Sources
+    and kept forever, and the challenge Cycles of water
   - `species.ts`: the Herbier (§9.5), species that return on game conditions and add biodiversity;
     `challenges.ts`: challenge Seasons (§7.3), their constraints, goals and rewards
   - `garden.ts`, `seedBank.ts`: the courtyard garden (§9.7), crops in real time and the seed
