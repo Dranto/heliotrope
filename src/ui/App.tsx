@@ -11,6 +11,7 @@ import type { CatchResult } from '../game/butterfly';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { phaseOf } from '../game/phases';
 import { lightPerSecond } from '../game/production';
+import { NextGoal } from './Goals';
 import {
   canStartNewSeason,
   isSeasonsScreenUnlocked,
@@ -323,6 +324,7 @@ export function App() {
           <span className="counter-rate" data-testid="light-rate">
             +{formatNumber(lightPerSecond(state))} {t.perSecond}
           </span>
+          <NextGoal />
           {state.seeds > 0 && (
             <span
               className="counter-seeds"

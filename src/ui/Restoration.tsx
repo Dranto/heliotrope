@@ -10,6 +10,7 @@ import {
   restoreParcel,
 } from '../game/restoration';
 import { t } from '../i18n';
+import { Eta } from './Goals';
 import { bonusesText } from '../i18n/restoration';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
@@ -85,6 +86,7 @@ function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: 
           {kind === 'parcel' ? t.restoration.restore : t.restoration.carryOut}
         </span>
         <span className="buy-cost">☀ {price}</span>
+        <Eta cost={cost} />
       </button>
     </li>
   );

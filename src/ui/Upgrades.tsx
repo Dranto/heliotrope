@@ -5,6 +5,7 @@ import { availableUpgrades } from '../game/production';
 import { buyUpgrade, canBuyUpgrade } from '../game/tick';
 import type { UpgradeId } from '../game/upgrades';
 import { t } from '../i18n';
+import { Eta } from './Goals';
 import { upgradeEffectText, upgradeText } from '../i18n/upgrades';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
@@ -63,6 +64,7 @@ export function Upgrades() {
             flavour={upgradeText(selected).flavour}
             effect={upgradeEffectText(selected)}
             cost={formatCost(selected.cost)}
+            price={selected.cost}
             affordable={canBuyUpgrade(state, selected.id)}
             onBuy={() => store.dispatch((s) => buyUpgrade(s, selected.id))}
           />
@@ -77,11 +79,12 @@ interface DetailProps {
   flavour: string;
   effect: string;
   cost: string;
+  price: number;
   affordable: boolean;
   onBuy: () => void;
 }
 
-function UpgradeDetail({ name, flavour, effect, cost, affordable, onBuy }: DetailProps) {
+function UpgradeDetail({ name, flavour, effect, cost, price, affordable, onBuy }: DetailProps) {
   return (
     <div className="upgrade-detail" aria-live="polite">
       <div>
@@ -98,6 +101,7 @@ function UpgradeDetail({ name, flavour, effect, cost, affordable, onBuy }: Detai
       >
         <span className="buy-verb">{t.buy}</span>
         <span className="buy-cost">☀ {cost}</span>
+        <Eta cost={price} />
       </button>
     </div>
   );
