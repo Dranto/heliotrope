@@ -8,6 +8,7 @@ import { isUpgradeId, type UpgradeId } from './upgrades';
 import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameState } from './state';
 import { BUTTERFLY_VISIBLE_SECONDS, effectSeconds } from './butterfly';
 import { isParcelId, type ParcelId } from './parcels';
+import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
 import { validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
@@ -67,6 +68,8 @@ const migrations: Record<number, Migration> = {
   // v13 adds the visits to the neighbourhood (§9.6). Defaults from the fresh state: none welcomed
   // yet, the first one on its way.
   12: (raw) => ({ ...raw, version: 13 }),
+  // v14 adds the neighbouring districts (§6.4): none restored yet.
+  13: (raw) => ({ ...raw, version: 14 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -165,6 +168,9 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (Array.isArray(data.parcels)) {
     state.parcels = [...new Set<ParcelId>(data.parcels.filter(isParcelId))];
+  }
+  if (Array.isArray(data.districts)) {
+    state.districts = [...new Set<DistrictId>(data.districts.filter(isDistrictId))];
   }
   if (Array.isArray(data.projects)) {
     state.projects = [...new Set<ProjectId>(data.projects.filter(isProjectId))];

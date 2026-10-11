@@ -175,6 +175,9 @@ export const en: Texts = {
       'parcels.1': 'First paving stone lifted',
       'parcels.4': 'The neighbourhood breathes',
       'parcels.8': 'Soil regained',
+      'districts.1': 'Beyond the ring road',
+      'districts.4': 'The city overflows',
+      'districts.8': 'Garden city',
       'projects.1': 'A helping hand',
       'projects.8': 'Neighbourhood party',
       'projects.15': 'All together',
@@ -245,6 +248,8 @@ export const en: Texts = {
       goldenWeb: (count: number) => `Buy all ${count} synergies between buildings in one Season`,
       goldenHands: (count: number) => `Buy all ${count} click upgrades in one Season`,
       parcels: (count: number) => (count === 1 ? 'Restore a plot' : `Restore ${count} plots`),
+      districts: (count: number) =>
+        count === 1 ? 'Restore a neighbouring district' : `Restore ${count} neighbouring districts`,
       projects: (count: number) =>
         count === 1
           ? 'Carry out a neighbourhood project'
@@ -307,6 +312,18 @@ export const en: Texts = {
       livingRoofs: 'Living roofs',
       squares: 'Planted squares',
     },
+    districts: 'Neighbouring districts',
+    districtNames: {
+      tanneries: 'Tannery water gardens',
+      railyard: 'Railyard forest',
+      mall: 'Mall orchard',
+      parkAndRide: 'Park-and-ride halls',
+      interchange: 'Interchange park',
+      offices: 'Office third place',
+      industrialZone: 'Solar workshops',
+      chimneys: 'Living towers',
+    },
+    districtRestored: (name: string) => `Neighbouring district restored: ${name}`,
     projectNames: {
       seedSwap: 'Seed swap',
       toolLibrary: 'Tool library',

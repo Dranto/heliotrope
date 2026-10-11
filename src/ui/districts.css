@@ -1,0 +1,116 @@
+/* The neighbouring districts on the map (§6.4): the same sunny greens as the restored parcels. */
+
+.district {
+  pointer-events: none;
+}
+
+.d-ground {
+  fill: #d9e8c4;
+  stroke: rgb(143 174 139 / 0.6);
+  stroke-width: 1;
+}
+
+.d-lawn {
+  fill: #c5dfa9;
+}
+
+.d-path,
+.d-path-loop {
+  fill: none;
+  stroke: #efe3c8;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.d-rail {
+  stroke: #e7dcc2;
+  stroke-width: 4;
+  stroke-dasharray: 1 3;
+}
+
+.d-tree {
+  fill: #7fae6e;
+}
+
+.d-tree-light {
+  fill: #a4c98b;
+}
+
+.d-tree-shadow,
+.d-roof-shadow,
+.d-hall-shadow {
+  fill: rgb(31 42 36 / 0.14);
+}
+
+.d-fruit {
+  fill: #e8846b;
+}
+
+.d-water {
+  fill: #8fcbd6;
+  stroke: #5fa9b8;
+  stroke-width: 0.8;
+}
+
+.d-water-light {
+  fill: rgb(255 255 255 / 0.45);
+}
+
+.d-reed {
+  stroke: #6f8f4e;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.d-hall {
+  fill: #f3e6cf;
+}
+
+.d-awning {
+  fill: #e9a93b;
+  opacity: 0.75;
+}
+
+.d-stall {
+  fill: #c8734f;
+  opacity: 0.8;
+}
+
+.d-plaza {
+  fill: #efe3c8;
+}
+
+.d-green-roof {
+  fill: #a9cf8e;
+}
+
+.d-roof-bed {
+  fill: #c9dfa0;
+  stroke: #f6d58f;
+  stroke-width: 0.6;
+}
+
+.d-terrace {
+  fill: #eef3e2;
+}
+
+.d-shed {
+  fill: #e9e4da;
+}
+
+.d-panel {
+  fill: #3f6f8f;
+  stroke: #b8d4e3;
+  stroke-width: 0.5;
+}
+
+.d-chimney {
+  fill: #c9b9a8;
+}
+
+.d-climber {
+  fill: none;
+  stroke: #6f9b5a;
+  stroke-width: 3;
+  stroke-dasharray: 3 2;
+}

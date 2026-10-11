@@ -37,6 +37,14 @@ import {
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
 import { NightLights, VisitLayer } from './VisitArt';
+import { DistrictGround, DistrictOffer } from './DistrictArt';
+import { cityFrame } from './districtMap';
+import {
+  canRestoreDistrict,
+  offeredDistrict,
+  restoreDistrict,
+  type DistrictId,
+} from '../game/districts';
 import { daylightOf, type Daylight } from './daylight';
 import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
@@ -149,7 +157,13 @@ export function Scene({
     .filter((p) => canRestoreParcel(state, p.id))
     .map((p) => p.id)
     .join();
-  const { parcels, projects, species } = state;
+  const { parcels, projects, species, districts } = state;
+  const districtOffer = offeredDistrict(state)?.id ?? null;
+  const districtReady = districtOffer !== null && canRestoreDistrict(state, districtOffer);
+  const restoreNeighbour = useCallback(
+    (id: DistrictId) => store.dispatch((s) => restoreDistrict(s, id)),
+    [store],
+  );
   const visitor = state.visit.kind;
   const daylight = useDaylight();
   const welcome = useCallback(() => {
@@ -181,6 +195,8 @@ export function Scene({
   const marks = useMemo(
     () => (
       <>
+        <DistrictGround districts={districts} />
+        <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
         <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
@@ -195,6 +211,10 @@ export function Scene({
       </>
     ),
     [
+      districts,
+      districtOffer,
+      districtReady,
+      restoreNeighbour,
       daylight,
       projects,
       species,
@@ -233,8 +253,10 @@ export function Scene({
   // Kept as one object while nothing moves, so the map does not redraw at every tick.
   const camera = useMemo(() => {
     const top = width >= height ? 0 : CAPTION_ROOM;
-    return fitCamera(view, width, height, { top, left: 0, bottom: 0 });
-  }, [view, width, height]);
+    // The City view grows with the neighbouring districts restored (§6.4).
+    const frame = view === 3 ? cityFrame(districts) : undefined;
+    return fitCamera(view, width, height, { top, left: 0, bottom: 0 }, frame);
+  }, [view, width, height, districts]);
   // The heliotrope stands in the home courtyard, at the heart of the city, and follows the camera.
   const flower = flowerFrame(camera, width, height, PLANTER);
   const season = visualSeason(state);

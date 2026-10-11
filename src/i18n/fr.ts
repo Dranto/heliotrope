@@ -4,6 +4,7 @@ import type { AchievementFamily, AchievementId } from '../game/achievements';
 import type { Language } from '../game/format';
 import type { GeneratorId } from '../game/generators';
 import type { ParcelId } from '../game/parcels';
+import type { DistrictId } from '../game/districts';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
 import type { ChallengeId } from '../game/challenges';
@@ -218,6 +219,9 @@ export const fr = {
       'parcels.1': 'Premier pavé levé',
       'parcels.4': 'Le quartier respire',
       'parcels.8': 'Terre retrouvée',
+      'districts.1': 'Par-delà la rocade',
+      'districts.4': 'La ville déborde',
+      'districts.8': 'Ville jardin',
       'projects.1': 'Coup de main',
       'projects.8': 'Quartier en fête',
       'projects.15': 'Tous ensemble',
@@ -292,6 +296,8 @@ export const fr = {
       goldenHands: (count: number) => `Acheter les ${count} améliorations du clic dans une Saison`,
       parcels: (count: number) =>
         count === 1 ? 'Restaurer une parcelle' : `Restaurer ${count} parcelles`,
+      districts: (count: number) =>
+        count === 1 ? 'Restaurer un quartier voisin' : `Restaurer ${count} quartiers voisins`,
       projects: (count: number) =>
         count === 1
           ? 'Mener un projet du quartier'
@@ -356,6 +362,18 @@ export const fr = {
       livingRoofs: 'Toits vivants',
       squares: 'Places plantées',
     } satisfies Record<ParcelId, string>,
+    districts: 'Quartiers voisins',
+    districtNames: {
+      tanneries: 'Jardins d’eau des Tanneries',
+      railyard: 'Forêt de la gare de triage',
+      mall: 'Verger du centre commercial',
+      parkAndRide: 'Halles du parking relais',
+      interchange: 'Parc de l’échangeur',
+      offices: 'Tiers-lieu des bureaux',
+      industrialZone: 'Ateliers solaires',
+      chimneys: 'Tours vivantes',
+    } satisfies Record<DistrictId, string>,
+    districtRestored: (name: string) => `Quartier voisin restauré\u00a0: ${name}`,
     projectNames: {
       seedSwap: 'Troc de graines',
       toolLibrary: 'Outilthèque',
