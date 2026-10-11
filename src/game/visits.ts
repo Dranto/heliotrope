@@ -10,8 +10,21 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { nextRandom } from './random';
 import type { GameState } from './state';
 
-export const VISIT_KINDS = ['cuttings', 'shower', 'birds'] as const;
+export const VISIT_KINDS = [
+  'cuttings',
+  'shower',
+  'birds',
+  'sheep',
+  'festival',
+  'fireflies',
+  'fleaMarket',
+] as const;
 export type VisitKind = (typeof VISIT_KINDS)[number];
+
+/** The first visitors, of the neighbourhood (M11). */
+export const NEIGHBOURHOOD_VISITS: readonly VisitKind[] = ['cuttings', 'shower', 'birds'];
+/** The visitors of the whole city (M18), drawn by the Bioregion and the neighbouring districts. */
+export const CITY_VISITS: readonly VisitKind[] = ['sheep', 'festival', 'fireflies', 'fleaMarket'];
 
 export interface VisitState {
   /** Seconds of play before the next visit arrives. */
@@ -34,6 +47,10 @@ export const CUTTINGS_UNITS = 1;
 export const VISIT_EFFECTS: Record<Exclude<VisitKind, 'cuttings'>, EffectKind> = {
   shower: 'shower',
   birds: 'birds',
+  sheep: 'grazing',
+  festival: 'festival',
+  fireflies: 'fireflies',
+  fleaMarket: 'fleaMarket',
 };
 
 /** Seconds until the next visit, drawn uniformly in the interval. */
@@ -48,7 +65,10 @@ export function createVisitState(random: number): VisitState {
 /**
  * Which visitors the neighbourhood draws: the neighbours once the courtyard has 10 pots, the
  * summer shower once there are 10 rooftop gardens to water, the migrating birds once there are
- * trees in the streets or living roofs.
+ * trees in the streets or living roofs. The city's visitors (M18) come with what they belong to:
+ * the sheep with the agrivoltaic meadows of the Bioregion, the festival with the park-and-ride
+ * halls, the fireflies with the water gardens of the tanneries, the flea market with the solar
+ * workshops.
  */
 export function isVisitUnlocked(state: GameState, kind: VisitKind): boolean {
   switch (kind) {
@@ -58,6 +78,14 @@ export function isVisitUnlocked(state: GameState, kind: VisitKind): boolean {
       return state.generators.rooftopGarden >= 10;
     case 'birds':
       return state.generators.urbanCanopy >= 1 || state.parcels.includes('livingRoofs');
+    case 'sheep':
+      return state.sites.meadows >= 1;
+    case 'festival':
+      return state.districts.includes('parkAndRide');
+    case 'fireflies':
+      return state.districts.includes('tanneries');
+    case 'fleaMarket':
+      return state.districts.includes('industrialZone');
   }
 }
 
@@ -88,6 +116,11 @@ export function advanceVisit(state: GameState, dtSeconds: number): GameState {
   const [random, rngSeed] = nextRandom(state.rngSeed);
   const chosen = kinds[Math.min(kinds.length - 1, Math.floor(random * kinds.length))]!;
   return { ...state, rngSeed, visit: { nextIn: 0, kind: chosen, visible: shown } };
+}
+
+/** Visitors of the city welcomed over the whole game (Milestones). */
+export function cityVisits(state: Pick<GameState, 'visits'>): number {
+  return CITY_VISITS.reduce((sum, kind) => sum + state.visits[kind], 0);
 }
 
 /** The building the neighbours bring: the most expensive one owned with room left. */

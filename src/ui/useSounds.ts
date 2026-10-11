@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { GENERATOR_IDS } from '../game/generators';
 import { phaseOf } from '../game/phases';
 import type { GameState } from '../game/state';
+import { VISIT_KINDS } from '../game/visits';
 import { sounds, type SoundName } from './sound';
 
 /** Seconds between two birdsongs, once the neighbourhood wakes up (phase 2). */
@@ -21,7 +22,7 @@ function counters(state: GameState): Record<Exclude<SoundName, 'bird'>, number> 
     restore: state.parcels.length,
     project: state.projects.length,
     // A welcomed visit (§9.6) trills like a caught butterfly.
-    butterfly: state.butterflies + state.visits.cuttings + state.visits.shower + state.visits.birds,
+    butterfly: state.butterflies + VISIT_KINDS.reduce((sum, kind) => sum + state.visits[kind], 0),
     milestone: state.achievements.length,
     season: state.seasons,
   };

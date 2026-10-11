@@ -132,7 +132,7 @@ describe('visits to the neighbourhood (§9.6)', () => {
   it('unlocks the visit Milestones', () => {
     let state = withState({
       generators: generators({ pot: 10 }),
-      visits: { cuttings: 9, shower: 1, birds: 1 },
+      visits: { ...withState({}).visits, cuttings: 9, shower: 1, birds: 1 },
     });
     state = welcomeVisit({ ...state, visit: { nextIn: 0, kind: 'cuttings', visible: 5 } })!.state;
     expect(state.achievements).toEqual(expect.arrayContaining(['openDoors', 'goodNeighbours']));

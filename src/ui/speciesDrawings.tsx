@@ -404,4 +404,86 @@ export const SPECIES_ART: Record<SpeciesId, () => ReactNode> = {
       <path d="M11 14c2-.4 4-.2 6 .6" fill="none" stroke="#5f7a6a" strokeWidth={0.7} />
     </>
   ),
+  // The species of the city's visits (§9.6, M18).
+  skylark: () => (
+    <>
+      <path d="M12 24 10.6 29M16 24l.6 5" {...line} stroke="#9a7a55" />
+      <path
+        d="M5 17c1-4 5-6 9-6 1-2 3-4 6-4 2.4 0 4 1.6 4 3.4l3 1-3 .8c0 4-3 8-8 9.4-5 1.2-10 .4-11-4.6Z"
+        fill="#b89468"
+        {...line}
+      />
+      <path
+        d="M19 7c0-2 1-3.4 2.4-4 0 1.4-.4 2.8-1.6 4"
+        fill="#8a6a46"
+        {...line}
+        strokeWidth={0.5}
+      />
+      <path d="M5 17 1.6 15.4 3 19Z" fill="#8a6a46" {...line} />
+      <path d="M9 15c3-1 6-1 9 .4" fill="none" stroke="#7a5a38" strokeWidth={0.7} />
+      {[
+        [11, 18],
+        [14, 19],
+        [17, 18.4],
+        [20, 17],
+      ].map(([x = 0, y = 0]) => (
+        <path key={`${x},${y}`} d={`M${x} ${y}l.6 1.4`} stroke="#6a4c2e" strokeWidth={0.6} />
+      ))}
+      <circle cx="21.4" cy="10" r="0.7" fill="#2b2622" />
+    </>
+  ),
+  swallow: () => (
+    <>
+      <path
+        d="M16 12c-4-1-8-4-13-4 3 3 6 5 10 6.4M16 12c4-1 8-4 13-4-3 3-6 5-10 6.4"
+        fill="#2c3d66"
+        {...line}
+      />
+      <path d="M13 14c0 5 1 9 3 11 2-2 3-6 3-11-1-2-5-2-6 0Z" fill="#2c3d66" {...line} />
+      <path
+        d="M14.6 24 12 30.4M17.4 24l2.6 6.4"
+        fill="none"
+        {...line}
+        stroke="#2c3d66"
+        strokeWidth={1}
+      />
+      <circle cx="16" cy="10" r="3" fill="#2c3d66" {...line} />
+      <path d="M14.4 12c1 1 2.2 1 3.2 0l-.4 2h-2.4Z" fill="#c8453a" />
+      <path d="M14.6 16c.8 1.6 2 1.6 2.8 0" fill="none" stroke="#f1ede4" strokeWidth={0.8} />
+      <circle cx="14.8" cy="9.4" r="0.5" fill="#fbf6ec" />
+      <circle cx="17.2" cy="9.4" r="0.5" fill="#fbf6ec" />
+    </>
+  ),
+  dragonfly: () => (
+    <>
+      {wing('M15 12C9 8 3 8 2 11c2 2.4 8 2.4 13 1Z', 'rgb(220 236 245 / 0.75)')}
+      {wing('M17 12c6-4 12-4 13-1-2 2.4-8 2.4-13 1Z', 'rgb(220 236 245 / 0.75)')}
+      {wing('M15 14c-5 0-10 2-10.6 4.6 2.6 1.2 7.6-.6 10.6-3.4Z', 'rgb(220 236 245 / 0.75)')}
+      {wing('M17 14c5 0 10 2 10.6 4.6-2.6 1.2-7.6-.6-10.6-3.4Z', 'rgb(220 236 245 / 0.75)')}
+      <circle cx="16" cy="8.6" r="2.4" fill="#5d7a4a" {...line} />
+      <path d="M14.6 11h2.8l.6 3.4h-4Z" fill="#7a6a3a" {...line} />
+      <path d="M13.6 14.6c-.4 4 .4 8.4 2.4 12.4 2-4 2.8-8.4 2.4-12.4Z" fill="#6f9fc8" {...line} />
+      {[17.6, 20.4, 23.2].map((y) => (
+        <path key={y} d={`M14.4 ${y}h3.2`} stroke="#d6b45a" strokeWidth={0.6} />
+      ))}
+    </>
+  ),
+  redstart: () => (
+    <>
+      <path d="M13 25 12 30M17 25l1 5" {...line} />
+      <path
+        d="M7 18c0-5 4-8 9-8 1-2 3-3 5-3 3 0 5 2 5 4.6l2.6.8-2.6.6c0 4-3 7-7 8-5 1.4-12 1-12-3Z"
+        fill="#4a4f55"
+        {...line}
+      />
+      <path
+        d="M7 18c-2 .6-4.6 0-6-1.6 1 2.4 1.6 4.6 1 6.6 2-.4 4-2 5-5Z"
+        fill="#d4623a"
+        {...line}
+      />
+      <path d="M11 16c3-1 6-1 9 .2" fill="none" stroke="#e2e2de" strokeWidth={0.8} />
+      <path d="M17 19c2 0 4-.6 6-2-1 2.4-3 3.4-6 2Z" fill="#2c2f33" />
+      <circle cx="22.4" cy="10.6" r="0.7" fill="#fbf6ec" />
+    </>
+  ),
 };

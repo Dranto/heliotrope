@@ -12,7 +12,7 @@ import type { CatchResult } from '../game/butterfly';
 import { VISIT_EFFECTS, type WelcomeResult } from '../game/visits';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { phaseOf } from '../game/phases';
-import { lightPerSecond } from '../game/production';
+import { fleaMarketGenerator, lightPerSecond } from '../game/production';
 import { NextGoal } from './Goals';
 import {
   canStartNewSeason,
@@ -251,7 +251,13 @@ export function App() {
         return;
       }
       const effect = next.effects.find((e) => e.kind === VISIT_EFFECTS[kind]);
-      notify(t.visits[kind](t.duration(Math.ceil(effect?.remaining ?? 0))));
+      const seconds = t.duration(Math.ceil(effect?.remaining ?? 0));
+      if (kind === 'fleaMarket') {
+        const generator = fleaMarketGenerator(next);
+        if (generator) notify(t.visits.fleaMarket(t.generators[generator].name, seconds));
+        return;
+      }
+      notify(t.visits[kind](seconds));
     },
     [notify],
   );

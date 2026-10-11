@@ -40,6 +40,10 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.visits[condition.visit](condition.count);
     case 'everyVisit':
       return describe.everyVisit;
+    case 'everyCityVisit':
+      return describe.everyCityVisit;
+    case 'cityVisits':
+      return describe.cityVisits(condition.count);
     case 'seasons':
       return describe.seasons(condition.count);
     case 'everyGenerator':

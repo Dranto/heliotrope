@@ -223,3 +223,113 @@
 .night[data-daylight='evening'] .night-lantern-glow {
   fill: rgb(255 214 140 / 0.2);
 }
+
+/* The visits of the city (§9.6, M18). */
+.visit-wool {
+  fill: #f6f1e6;
+  stroke: #b9ad97;
+  stroke-width: 0.5;
+}
+
+.visit-ewe-head,
+.visit-dog {
+  fill: #3e3832;
+}
+
+.visit-ewe {
+  animation: ewe-graze 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes ewe-graze {
+  to {
+    transform: translate(0.8px, 0.4px);
+  }
+}
+
+.visit-stall {
+  fill: #c89a64;
+  stroke: #8a6239;
+  stroke-width: 0.6;
+}
+
+.visit-bunting-line {
+  fill: none;
+  stroke: #8a6239;
+  stroke-width: 0.4;
+}
+
+.visit-bunting {
+  animation: bunting-flutter 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes bunting-flutter {
+  to {
+    transform: translateY(0.6px);
+  }
+}
+
+.visit-reed {
+  fill: none;
+  stroke: #6f8f5a;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+
+.visit-firefly {
+  animation: firefly-blink 2.2s ease-in-out infinite;
+}
+
+.visit-firefly-glow {
+  fill: rgb(255 214 80 / 0.5);
+}
+
+.visit-firefly-light {
+  fill: #fff3a0;
+  stroke: #e0a92e;
+  stroke-width: 0.4;
+}
+
+@keyframes firefly-blink {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translate(0, 0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(1.2px, -1.4px);
+  }
+}
+
+.visit-flea-table {
+  fill: #e8dcc4;
+  stroke: #8a6239;
+  stroke-width: 0.5;
+}
+
+.visit-flea-panel {
+  fill: #2f4a6b;
+  stroke: #a9bdd1;
+  stroke-width: 0.3;
+}
+
+.visit-parasol-a {
+  fill: #f4c063;
+}
+
+.visit-parasol-b {
+  fill: #fbf6ec;
+}
+
+.visit-parasol-top {
+  fill: #8a6239;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visit-ewe,
+  .visit-bunting,
+  .visit-firefly {
+    animation: none;
+  }
+}

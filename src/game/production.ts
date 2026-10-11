@@ -55,6 +55,8 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
   if (id === 'rooftopGarden' || id === 'greenhouse') {
     factor *= effectFactor(state.effects, 'shower') * effectFactor(state.effects, 'beans');
   }
+  // §9.6, M18: the transhumance's sheep graze under the panels.
+  if (id === 'balconyPanel') factor *= effectFactor(state.effects, 'grazing');
   return (
     factor *
     (1 + synergyBonus * factorOf(state, 'synergyFactor')) *
@@ -161,7 +163,20 @@ export function clickValue(state: GameState): number {
   }
   if (perBuilding > 0) for (const id of GENERATOR_IDS) flat += perBuilding * state.generators[id];
   const base = flat * multiplier + (fraction > 0 ? fraction * lightPerSecond(state) : 0);
-  return base * effectFactor(state.effects, 'pollination');
+  // §9.6, M18: the fireflies of the water gardens light up every click.
+  return (
+    base * effectFactor(state.effects, 'pollination') * effectFactor(state.effects, 'fireflies')
+  );
+}
+
+/** The most expensive building owned, the one the solar flea market sells cheaper (§9.6, M18). */
+export function fleaMarketGenerator(state: GameState): GeneratorId | null {
+  return [...GENERATOR_IDS].reverse().find((id) => state.generators[id] > 0) ?? null;
+}
+
+function fleaMarketFactor(state: GameState, id: GeneratorId): number {
+  if (!state.effects.some((e) => e.kind === 'fleaMarket')) return 1;
+  return fleaMarketGenerator(state) === id ? effectFactor(state.effects, 'fleaMarket') : 1;
 }
 
 /**
@@ -169,7 +184,11 @@ export function clickValue(state: GameState): number {
  * discounts of projects (§6.2): baseCost × 1.15^owned × (1.15^count − 1) / 0.15. For one unit: baseCost × 1.15^owned.
  */
 export function generatorCost(state: GameState, id: GeneratorId, count = 1): number {
-  const first = GENERATORS[id].baseCost * costFactor(state) * COST_GROWTH ** state.generators[id];
+  const first =
+    GENERATORS[id].baseCost *
+    costFactor(state) *
+    fleaMarketFactor(state, id) *
+    COST_GROWTH ** state.generators[id];
   if (count === 1) return first;
   return (first * (COST_GROWTH ** count - 1)) / (COST_GROWTH - 1);
 }

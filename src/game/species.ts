@@ -9,6 +9,7 @@ import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
 import type { GameState } from './state';
 import type { TalentId } from './talents';
+import type { VisitKind } from './visits';
 
 export const SPECIES_IDS = [
   'poppy',
@@ -32,6 +33,10 @@ export const SPECIES_IDS = [
   'otter',
   'salmon',
   'blackStork',
+  'skylark',
+  'swallow',
+  'dragonfly',
+  'redstart',
 ] as const;
 export type SpeciesId = (typeof SPECIES_IDS)[number];
 
@@ -45,7 +50,9 @@ export type SpeciesCondition =
   /** Won by completing a challenge Season (§7.3). */
   | { kind: 'challenge'; challenge: ChallengeId }
   /** Won by completing a challenge Cycle of water (§7.5). */
-  | { kind: 'cycleChallenge'; challenge: CycleChallengeId };
+  | { kind: 'cycleChallenge'; challenge: CycleChallengeId }
+  /** Won by welcoming a visitor of the city (§9.6, M18) a few times. */
+  | { kind: 'visit'; visit: VisitKind; count: number };
 
 export interface SpeciesDef {
   id: SpeciesId;
@@ -60,9 +67,13 @@ export const SPECIES_STEPS = 1;
 
 /**
  * §9.5: the complete Herbier multiplies the whole biodiversity bonus. It counts the species of
- * the neighbourhood; the river species of the challenge Cycles (§7.5) come on top.
+ * the neighbourhood; the river species of the challenge Cycles (§7.5) and the species of the
+ * city's visits (§9.6) come on top.
  */
 export const HERBIER_COMPLETE_FACTOR = 1.5;
+
+/** Welcomes of a visitor of the city that bring its species back. */
+export const CITY_SPECIES_VISITS = 5;
 
 /** Display order: the first returns of the Balcony, then the Neighbourhood, then the City. */
 export const SPECIES_LIST: readonly SpeciesDef[] = [
@@ -87,10 +98,17 @@ export const SPECIES_LIST: readonly SpeciesDef[] = [
   { id: 'otter', condition: { kind: 'cycleChallenge', challenge: 'drought' } },
   { id: 'salmon', condition: { kind: 'cycleChallenge', challenge: 'flood' } },
   { id: 'blackStork', condition: { kind: 'cycleChallenge', challenge: 'still' } },
+  { id: 'skylark', condition: { kind: 'visit', visit: 'sheep', count: CITY_SPECIES_VISITS } },
+  { id: 'swallow', condition: { kind: 'visit', visit: 'festival', count: CITY_SPECIES_VISITS } },
+  { id: 'dragonfly', condition: { kind: 'visit', visit: 'fireflies', count: CITY_SPECIES_VISITS } },
+  { id: 'redstart', condition: { kind: 'visit', visit: 'fleaMarket', count: CITY_SPECIES_VISITS } },
 ];
 
 /** The river species (§7.5), beyond the neighbourhood's Herbier. */
 export const RIVER_SPECIES: readonly SpeciesId[] = ['otter', 'salmon', 'blackStork'];
+
+/** The species of the city's visits (§9.6, M18), beyond the neighbourhood's Herbier too. */
+export const CITY_SPECIES: readonly SpeciesId[] = ['skylark', 'swallow', 'dragonfly', 'redstart'];
 
 export const SPECIES: Record<SpeciesId, SpeciesDef> = Object.fromEntries(
   SPECIES_LIST.map((s) => [s.id, s]),
@@ -116,6 +134,8 @@ function isMet(state: GameState, condition: SpeciesCondition): boolean {
       return state.challenges.includes(condition.challenge);
     case 'cycleChallenge':
       return state.cycleChallenges.includes(condition.challenge);
+    case 'visit':
+      return state.visits[condition.visit] >= condition.count;
   }
 }
 
@@ -129,5 +149,7 @@ export function unlockSpecies(state: GameState): GameState {
 }
 
 export function isHerbierComplete(state: Pick<GameState, 'species'>): boolean {
-  return SPECIES_IDS.every((id) => RIVER_SPECIES.includes(id) || state.species.includes(id));
+  return SPECIES_IDS.every(
+    (id) => RIVER_SPECIES.includes(id) || CITY_SPECIES.includes(id) || state.species.includes(id),
+  );
 }

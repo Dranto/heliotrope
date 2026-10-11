@@ -10,7 +10,7 @@ import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
 import { canopyLevels, isCanopyComplete } from './talents';
 import { CLICK_UPGRADE_IDS, SYNERGY_IDS, type UpgradeId } from './upgrades';
-import { VISIT_KINDS, type VisitKind } from './visits';
+import { CITY_VISITS, cityVisits, NEIGHBOURHOOD_VISITS, type VisitKind } from './visits';
 
 /** Seasons the sower starts for its Milestone "Semis spontané" (§7.1). */
 export const SOWER_MILESTONE_SEASONS = 10;
@@ -90,6 +90,9 @@ export type AchievementCondition =
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
   | { kind: 'visits'; visit: VisitKind; count: number }
+  /** Every visitor of the city (§9.6, M18) welcomed once, or this many of them in all. */
+  | { kind: 'everyCityVisit' }
+  | { kind: 'cityVisits'; count: number }
   /** Every kind of visit welcomed at least once (§9.6). */
   | { kind: 'everyVisit' }
   /** Seconds of play over all Seasons. */
@@ -176,6 +179,8 @@ export type AchievementId =
   | 'goodNeighbours'
   | 'afterRain'
   | 'stopover'
+  | 'cityFestival'
+  | 'cityVisits.25'
   | 'floodTide'
   | 'mosaic'
   | 'patchwork'
@@ -353,6 +358,9 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'neighbourhood',
     condition: { kind: 'visits', visit: 'birds', count: VISIT_MILESTONE_COUNT },
   },
+  // Visits of the city (§9.6, M18).
+  { id: 'cityFestival', family: 'neighbourhood', condition: { kind: 'everyCityVisit' } },
+  { id: 'cityVisits.25', family: 'neighbourhood', condition: { kind: 'cityVisits', count: 25 } },
   ...CHALLENGE_STEPS.map((count) => ({
     id: `challenges.${count}` as const,
     family: 'seasons' as const,
@@ -479,7 +487,11 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
     case 'visits':
       return state.visits[condition.visit] >= condition.count;
     case 'everyVisit':
-      return VISIT_KINDS.every((kind) => state.visits[kind] > 0);
+      return NEIGHBOURHOOD_VISITS.every((kind) => state.visits[kind] > 0);
+    case 'everyCityVisit':
+      return CITY_VISITS.every((kind) => state.visits[kind] > 0);
+    case 'cityVisits':
+      return cityVisits(state) >= condition.count;
     case 'seasons':
       return state.seasons >= condition.count;
     case 'everyGenerator':

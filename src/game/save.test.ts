@@ -248,7 +248,7 @@ describe('export and import', () => {
   it('migrates a v12 save with no visit yet, and keeps a visitor on the map (§9.6)', () => {
     const v12 = deserialize(JSON.stringify({ version: 12, resources: { light: 5 } }), 0)!;
     expect(v12.version).toBe(STATE_VERSION);
-    expect(v12.visits).toEqual({ cuttings: 0, shower: 0, birds: 0 });
+    expect(v12.visits).toEqual(createInitialState(0).visits);
     expect(v12.visit.kind).toBeNull();
     const json = JSON.stringify({
       version: STATE_VERSION,
@@ -260,7 +260,7 @@ describe('export and import', () => {
       ],
     });
     const state = deserialize(json, 0)!;
-    expect(state.visits).toEqual({ cuttings: 3, shower: 0, birds: 0 });
+    expect(state.visits).toEqual({ ...createInitialState(0).visits, cuttings: 3 });
     expect(state.visit).toEqual({ nextIn: 0, kind: 'birds', visible: 12 });
     expect(state.effects).toEqual([{ kind: 'shower', remaining: 30 }]);
     const unknown = JSON.stringify({
