@@ -24,6 +24,7 @@ const PAYMENT_LABEL: Record<Payment, () => string> = {
   light: () => t.greatWorks.light,
   water: () => t.greatWorks.water,
   baskets: () => t.greatWorks.basketsLabel,
+  honey: () => t.greatWorks.honeyLabel,
 };
 
 /**
@@ -95,7 +96,7 @@ function Work({
           <p className="works-next">{t.greatWorks.next(stageNames[stage] ?? '')}</p>
           <p className="works-effect">{bonusesText(WORKS[id].stages[stage] ?? [])}</p>
           <div className="works-meters">
-            {PAYMENTS.map((p) => (
+            {PAYMENTS.filter((p) => cost[p] > 0).map((p) => (
               <div key={p} className="works-meter" data-payment={p}>
                 <span className="works-meter-label">{PAYMENT_LABEL[p]()}</span>
                 <meter min={0} max={cost[p]} value={paid[p]} />

@@ -1,0 +1,191 @@
+/* The orchard and the hives (§9.8, M22): on the map, then their panel. */
+
+.orchard-ground {
+  fill: #cfe2b6;
+  stroke: #a9c58e;
+  stroke-width: 0.8;
+}
+
+.orchard-mow {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.35);
+  stroke-width: 6;
+}
+
+.orchard-pit ellipse {
+  fill: #9c7a55;
+  opacity: 0.6;
+}
+
+.orchard-stake {
+  fill: none;
+  stroke: #8a6a48;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.orchard-shadow {
+  fill: rgb(40 50 30 / 0.18);
+}
+
+.orchard-trunk {
+  fill: none;
+  stroke: #7a5638;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.orchard-crown {
+  fill: #5f9a4a;
+  stroke: #477a37;
+  stroke-width: 0.7;
+}
+
+.orchard-crown-light {
+  fill: #7db45d;
+}
+
+.orchard-blossom circle {
+  fill: #fbe9ef;
+  stroke: #e8b3c4;
+  stroke-width: 0.3;
+}
+
+.orchard-blossom .orchard-blossom-heart {
+  fill: #e7b84a;
+  stroke: none;
+}
+
+.orchard-fruit {
+  stroke: rgb(0 0 0 / 0.18);
+  stroke-width: 0.4;
+}
+
+.orchard-ripe {
+  cursor: pointer;
+  pointer-events: auto;
+  outline: none;
+}
+
+.orchard-ring {
+  fill: rgb(244 192 99 / 0.2);
+  stroke: var(--gold);
+  stroke-width: 0.8;
+  stroke-dasharray: 2 2;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: bed-ring 2.4s ease-in-out infinite;
+}
+
+.orchard-ripe:focus-visible .orchard-ring {
+  stroke: var(--leaf);
+  stroke-dasharray: none;
+}
+
+.orchard-hive-box {
+  fill: #e8c46a;
+  stroke: #a77b2a;
+  stroke-width: 0.6;
+}
+
+.orchard-hive-line {
+  fill: none;
+  stroke: #a77b2a;
+  stroke-width: 0.5;
+}
+
+.orchard-hive-roof {
+  fill: #b85f3a;
+  stroke: #8a4428;
+  stroke-width: 0.5;
+}
+
+.orchard-bee {
+  fill: #2c2622;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .orchard-bee {
+    animation: orchard-bee 2.2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes orchard-bee {
+  to {
+    transform: translate(2px, -2px);
+  }
+}
+
+/* Panel. */
+
+.orchard-trees {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orchard-card {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.5);
+}
+
+.orchard-card[data-stage='ripe'] {
+  border-color: var(--gold);
+  background: rgb(255 244 214 / 0.7);
+}
+
+.orchard-card-head {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.fruit-tree-art {
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+.orchard-card .buy {
+  align-content: center;
+  min-height: 2.2rem;
+}
+
+.orchard-hives {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.6rem;
+}
+
+.orchard-varieties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.orchard-varieties li {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(31 42 36 / 0.06);
+  color: var(--ink-soft);
+}
+
+.orchard-varieties li[data-found='true'] {
+  background: rgb(229 244 222 / 0.95);
+  color: var(--ink);
+}

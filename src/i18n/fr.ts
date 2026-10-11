@@ -1,6 +1,8 @@
 // French texts, the reference language (docs/game-design.md §14 Q1). Every other language
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
 import type { CorridorFamily } from '../game/corridors';
+import type { FruitId } from '../game/fruits';
+import type { TreeStage } from '../game/orchard';
 import type { AchievementFamily, AchievementId } from '../game/achievements';
 import type { Language } from '../game/format';
 import type { GeneratorId } from '../game/generators';
@@ -343,6 +345,8 @@ export const fr = {
       'delta.6': 'Delta ouvert',
       'works.1': 'Première pierre',
       'works.4': 'Grands travaux',
+      firstFruit: 'Premier fruit',
+      oldOrchard: 'Vieux vergers',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -444,6 +448,9 @@ export const fr = {
       lockCycles: (count: number) => `Laisser l’éclusier commencer ${count} Cycles`,
       worksBuilt: (count: number) =>
         count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
+      fruitHarvests: (count: number) =>
+        count === 1 ? 'Cueillir un premier fruit au verger' : `Cueillir ${count} fois au verger`,
+      fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
     },
@@ -565,7 +572,7 @@ export const fr = {
   },
   greatWorks: {
     title: 'Les grands chantiers',
-    hint: 'Chaque étape se paie en Lumière, en Eau et en paniers du potager. Ce qui est versé reste versé.',
+    hint: 'Chaque étape se paie en Lumière, en Eau et en paniers du potager, les dernières aussi en miel des ruches. Ce qui est versé reste versé.',
     baskets: (count: string) => `${count} paniers`,
     basketsHint: 'Chaque récolte du potager remplit des paniers.',
     names: {
@@ -585,6 +592,7 @@ export const fr = {
     light: 'Lumière',
     water: 'Eau',
     basketsLabel: 'Paniers',
+    honeyLabel: 'Miel',
     species: (have: string, need: string) => `Espèces de l’Herbier\u00a0: ${have} sur ${need}`,
     contribute: 'Verser',
     contributeLabel: (work: string) => `Verser pour ${work}`,
@@ -632,6 +640,43 @@ export const fr = {
         `Haricots grimpants\u00a0! Potagers et Serres ×2 pendant ${seconds}.`,
     },
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
+  },
+  orchard: {
+    title: 'Le verger et les ruches',
+    hint: 'Un arbre se plante une fois, grandit deux jours puis donne des fruits toutes les huit heures, en ligne comme hors ligne. Chaque cueillette rapporte une heure de production et des paniers, et parfois une variété ancienne.',
+    names: {
+      apple: 'Pommier',
+      pear: 'Poirier',
+      cherry: 'Cerisier',
+      plum: 'Prunier',
+    } satisfies Record<FruitId, string>,
+    varieties: {
+      apple: 'Pomme reinette',
+      pear: 'Poire curé',
+      cherry: 'Cerise burlat',
+      plum: 'Reine-claude',
+    } satisfies Record<FruitId, string>,
+    stages: {
+      none: 'À planter',
+      sapling: 'Jeune plant',
+      flowering: 'En fleurs',
+      fruiting: 'Les fruits mûrissent',
+      ripe: 'Fruits mûrs',
+    } satisfies Record<TreeStage, string>,
+    next: (time: string) => `encore ${time}`,
+    plant: 'Planter',
+    plantLabel: (name: string) => `Planter\u00a0: ${name}`,
+    free: 'offert',
+    cost: (baskets: string) => `${baskets} paniers`,
+    pick: 'Cueillir',
+    pickLabel: (name: string) => `Cueillir\u00a0: ${name}`,
+    hives: (count: string, max: string) => `Ruches\u00a0: ${count} sur ${max}`,
+    hiveHint:
+      'Chaque ruche fait tout pousser ×1,2 plus vite au potager et au verger, rend une variété du potager plus probable et donne un pot de miel toutes les 6\u00a0h, pour les grands chantiers.',
+    setHive: 'Poser une ruche',
+    honey: (count: string) => `${count} pots de miel`,
+    varietiesTitle: 'Variétés anciennes',
+    unknownVariety: (tree: string) => `Une variété ancienne du ${tree.toLowerCase()}`,
   },
   corridors: {
     family: { green: 'verte', blue: 'bleue' } satisfies Record<CorridorFamily, string>,

@@ -345,14 +345,14 @@ Le quartier restauré ressemble au joueur : chaque parcelle a **deux avenirs**, 
 
 Quatre ouvrages de toute la ville (roadmap P19), bâtis **étape par étape** et **gardés pour toujours** (après une Saison comme après un Cycle). Ils s'ouvrent avec la Biorégion (§7.4), dont ils demandent l'Eau. Le panneau « Les grands chantiers » montre chaque chantier, ses étapes bâties, la prochaine étape avec son effet, ce qui est déjà versé et le bouton « Verser ».
 
-**Payer une étape.** Chaque étape se paie avec **trois ressources à la fois** : Lumière, Eau et **paniers** du potager (§9.7), et demande un nombre d'espèces revenues dans l'Herbier (§9.5), qui ne sont pas dépensées. « Verser » donne tout ce que le joueur possède, jusqu'à ce que l'étape demande encore : ce qui est versé reste versé, on peut donc remplir une étape en plusieurs Saisons. L'étape se bâtit dès que tout est payé et que les espèces sont là (à la prochaine seconde si une espèce revient après).
+**Payer une étape.** Chaque étape se paie avec **plusieurs ressources à la fois** : Lumière, Eau, **paniers** du potager (§9.7) et, pour les deux dernières, **miel** des ruches (§9.8, M22), et demande un nombre d'espèces revenues dans l'Herbier (§9.5), qui ne sont pas dépensées. « Verser » donne tout ce que le joueur possède, jusqu'à ce que l'étape demande encore : ce qui est versé reste versé, on peut donc remplir une étape en plusieurs Saisons. L'étape se bâtit dès que tout est payé et que les espèces sont là (à la prochaine seconde si une espèce revient après).
 
-| Étape | Lumière | Eau | Paniers | Espèces |
-|---|---|---|---|---|
-| 1 | 1 Bn | 200 000 | 5 | — |
-| 2 | 1 Bd | 2 M | 15 | 8 |
-| 3 | 1 Tn | 20 M | 30 | 14 |
-| 4 | 1 Td | 200 M | 60 | 20 |
+| Étape | Lumière | Eau | Paniers | Miel (M22) | Espèces |
+|---|---|---|---|---|---|
+| 1 | 1 Bn | 200 000 | 5 | — | — |
+| 2 | 1 Bd | 2 M | 15 | — | 8 |
+| 3 | 1 Tn | 20 M | 30 | 3 | 14 |
+| 4 | 1 Td | 200 M | 60 | 8 | 20 |
 
 Une étape coûte à peu près une Saison tardive d'efforts (§8) ; un chantier complet, plusieurs Cycles. Les halles n'ont que trois étapes.
 
@@ -786,7 +786,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -879,6 +879,28 @@ Une boucle de soin **à temps réel**, à côté de la Lumière : dans la cour, 
 - **Équilibrage.** Le simulateur ne joue pas le potager : ses récoltes restent un bonus pour le joueur qui revient, et les cibles du §8 ne bougent pas.
 - **Jalons (5).** Premier radis (1 récolte), Main verte (25), Jardin nourricier (250), Croisement (1 variété), Grainothèque (les 6). 125 jalons en tout.
 - **Sauvegarde.** Version 16 : les carrés, le nombre de récoltes et les variétés, tout nu pour une sauvegarde plus ancienne.
+
+### 9.8 Le verger et les ruches (M22)
+
+La boucle **la plus lente** du jeu (roadmap P21), à côté du potager : des arbres fruitiers plantés une fois et des ruches. Tout pousse en ligne comme hors ligne et rien ne fane. Le verger s'ouvre avec la Biorégion (3ᵉ Saison) et reste d'une Saison et d'un Cycle à l'autre. Code dans `src/game/orchard.ts` et `src/game/fruits.ts`, dessins dans `src/ui/OrchardArt.tsx`, panneau `src/ui/Orchard.tsx` (après le potager).
+
+- **Les arbres.** Quatre fruitiers : le Pommier (offert), le Poirier (10 paniers), le Cerisier (20), le Prunier (40). Planté, un arbre grandit **deux jours** de temps réel : jeune plant tuteuré, **en fleurs** à mi-chemin, puis il porte des fruits qui mûrissent en **8 h**. Mûrs, ils attendent le joueur.
+- **La cueillette.** Un clic sur l'arbre (sur la carte, entouré d'un anneau doré, ou dans le panneau) donne **1 h de production de Lumière et d'Eau** et **8 paniers**, et relance les 8 h. Tant qu'elle n'est pas trouvée, chaque cueillette a **une chance sur trois** de donner la **variété ancienne** de l'arbre, un bonus gardé pour toujours :
+
+| Arbre | Variété ancienne | Bonus |
+|---|---|---|
+| Pommier | Pomme reinette | Toute la production +5 % |
+| Poirier | Poire curé | Eau récoltée ×1,1 |
+| Cerisier | Cerise burlat | Le Papillon doré revient 5 % plus vite |
+| Prunier | Reine-claude | Le potager pousse ×1,1 plus vite |
+
+Les variétés anciennes se lisent dans le panneau du verger, sous les ruches, plutôt que sur une planche de l'Herbier (qui reste aux espèces).
+
+- **Les ruches.** Deux au plus, posées sous les arbres pour 15 puis 40 paniers. Chaque ruche **pollinise** : le potager et le verger poussent **×1,2** plus vite, une variété du potager (§9.7) est plus probable (**+10 points** sur la chance d'une sur quatre), et elle remplit **un pot de miel toutes les 6 h**. Le miel ne sert qu'aux deux dernières étapes des grands chantiers (§6.6).
+- **Sur la carte.** Le verger prend le bloc gris au sud-ouest de la rocade : une prairie fauchée, quatre fosses avec leur tuteur, puis les arbres à leur stade (couronne en fleurs blanches et roses, fruits rouges, jaunes, cerise ou prune) et les ruches jaunes à toit rouge avec leurs abeilles. Avec les animations réduites, l'anneau et les abeilles restent immobiles.
+- **Équilibrage.** Les paniers servent maintenant à trois choses (arbres, ruches, chantiers) : un choix, jamais une perte. Le simulateur ne joue pas le verger, comme le potager.
+- **Jalons (2).** « Premier fruit » (une cueillette), « Vieux vergers » (les 4 variétés anciennes). 136 jalons en tout.
+- **Sauvegarde.** Version 23 : les arbres (âge et fruits), les variétés, les ruches, le miel et les cueillettes, et le miel versé aux chantiers, à zéro pour une sauvegarde plus ancienne.
 
 ---
 

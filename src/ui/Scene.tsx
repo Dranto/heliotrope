@@ -55,6 +55,9 @@ import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
 import { CorridorLayer } from './CorridorArt';
+import { OrchardLayer } from './OrchardArt';
+import { encodeOrchard } from './orchardMap';
+import { isOrchardOpen, pickFruit, type FruitId } from '../game/orchard';
 import { encodeCorridors } from './corridorMap';
 import { corridors as corridorsOf } from '../game/corridors';
 import { encodeStages } from './greatWorksMap';
@@ -238,6 +241,13 @@ export function Scene({
       Object.entries(state.greatWorks.works).map(([id, w]) => [id, w.stage]),
     ) as Parameters<typeof encodeStages>[0],
   );
+  // The orchard (§9.8), encoded so the layer only redraws when a tree or a hive changes.
+  const orchardOpen = isOrchardOpen(state);
+  const orchard = encodeOrchard(state.orchard);
+  const onPick = useCallback(
+    (id: FruitId) => store.dispatch((s) => pickFruit(s, id)?.state ?? s),
+    [store],
+  );
   // The green and blue corridors (§6.7), encoded so the layer only redraws when one changes.
   const corridors = encodeCorridors(corridorsOf(state));
   // The parcels in their second future (§6.5), joined so the ground only redraws on a change.
@@ -265,6 +275,7 @@ export function Scene({
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
         <CorridorLayer corridors={corridors} />
+        <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
@@ -290,6 +301,9 @@ export function Scene({
       works,
       worksOpen,
       corridors,
+      orchard,
+      orchardOpen,
+      onPick,
       districtReady,
       restoreNeighbour,
       daylight,

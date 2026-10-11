@@ -30,6 +30,7 @@ function rich(extra: Partial<GameState> = {}): GameState {
     seasons: 3,
     resources: { light: 1e30, water: 1e12 },
     garden: { ...fresh.garden, baskets: 10_000 },
+    orchard: { ...fresh.orchard, honey: 100 },
     species: [...SPECIES_IDS],
     ...extra,
   };
@@ -57,7 +58,7 @@ describe('The great works (§6.6, M20)', () => {
     const given = contribute(poor, 'hall');
     expect(given.greatWorks.works.hall).toEqual({
       stage: 0,
-      paid: { light: cost.light / 2, water: cost.water, baskets: 1 },
+      paid: { light: cost.light / 2, water: cost.water, baskets: 1, honey: 0 },
     });
     expect(given.resources.light).toBe(0);
     expect(given.resources.water).toBe(0);
@@ -71,7 +72,7 @@ describe('The great works (§6.6, M20)', () => {
       'hall',
     );
     expect(topped.greatWorks.works.hall.stage).toBe(1);
-    expect(topped.greatWorks.works.hall.paid).toEqual({ light: 0, water: 0, baskets: 0 });
+    expect(topped.greatWorks.works.hall.paid).toEqual({ light: 0, water: 0, baskets: 0, honey: 0 });
     expect(topped.resources.light).toBe(1e30 - cost.light / 2);
     expect(topped.garden.baskets).toBe(100 - (cost.baskets - 1));
   });
@@ -128,12 +129,12 @@ describe('The great works (§6.6, M20)', () => {
       greatWorks: {
         works: {
           ...state.greatWorks.works,
-          tram: { stage: 9, paid: { light: 1e40, water: -1, baskets: 3 } },
+          tram: { stage: 9, paid: { light: 1e40, water: -1, baskets: 3, honey: 2 } },
         },
       },
     };
     const clamped = deserialize(serialize(greedy), 0)!.greatWorks.works.tram;
-    expect(clamped).toEqual({ stage: 4, paid: { light: 0, water: 0, baskets: 0 } });
+    expect(clamped).toEqual({ stage: 4, paid: { light: 0, water: 0, baskets: 0, honey: 0 } });
   });
 
   it('folds the bonuses of a complete work into one line per effect', () => {

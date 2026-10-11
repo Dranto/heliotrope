@@ -3,6 +3,7 @@
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import { corridorBonuses } from './corridors';
+import { fruitVarietyBonuses, type FruitId } from './fruits';
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { CHALLENGES, type ChallengeId } from './challenges';
@@ -92,6 +93,8 @@ export interface BonusSource {
   delta?: { widths: Readonly<Record<WideArmId, number>> };
   /** Stages of the great works built (§6.6, M20); absent where none can be. */
   greatWorks?: { works: Readonly<Record<WorkId, { stage: number }>> };
+  /** Old fruit varieties found in the orchard (§9.8, M22); absent where none can be. */
+  orchard?: { varieties: readonly FruitId[] };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -114,6 +117,7 @@ export function activeBonuses({
   sites,
   delta,
   greatWorks,
+  orchard,
 }: BonusSource): Bonus[] {
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
@@ -130,6 +134,7 @@ export function activeBonuses({
     ...(sites ? hillsidesBonuses(sites.hillsides, widenFactor(delta?.widths.hillsArm ?? 0)) : []),
     ...(greatWorks ? greatWorksBonuses(greatWorks.works) : []),
     ...corridorBonuses({ parcels, futures }),
+    ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
   ];
 }
 

@@ -1,5 +1,7 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
 import type { CorridorFamily } from '../game/corridors';
+import type { FruitId } from '../game/fruits';
+import type { TreeStage } from '../game/orchard';
 import type { CropId, VarietyId } from '../game/seedBank';
 import type { CanopyId } from '../game/talents';
 import type { Texts, UpgradeText } from './fr';
@@ -296,6 +298,8 @@ export const en: Texts = {
       'delta.6': 'Open delta',
       'works.1': 'Cornerstone',
       'works.4': 'Great works',
+      firstFruit: 'First fruit',
+      oldOrchard: 'Old orchards',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -389,6 +393,9 @@ export const en: Texts = {
       lockCycles: (count: number) => `Let the lock keeper start ${count} Cycles`,
       worksBuilt: (count: number) =>
         count === 1 ? 'Complete a great work' : `Complete all ${count} great works`,
+      fruitHarvests: (count: number) =>
+        count === 1 ? 'Pick a first fruit in the orchard' : `Pick fruit ${count} times`,
+      fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
     },
@@ -506,7 +513,7 @@ export const en: Texts = {
   },
   greatWorks: {
     title: 'The great works',
-    hint: 'Each stage is paid with Light, Water and baskets from the garden. What is given stays given.',
+    hint: 'Each stage is paid with Light, Water and baskets from the garden, the last ones also with honey from the hives. What is given stays given.',
     baskets: (count: string) => `${count} baskets`,
     basketsHint: 'Each harvest of the garden fills baskets.',
     names: {
@@ -526,6 +533,7 @@ export const en: Texts = {
     light: 'Light',
     water: 'Water',
     basketsLabel: 'Baskets',
+    honeyLabel: 'Honey',
     species: (have: string, need: string) => `Herbarium species: ${have} of ${need}`,
     contribute: 'Give',
     contributeLabel: (work: string) => `Give towards ${work}`,
@@ -573,6 +581,43 @@ export const en: Texts = {
         `Climbing beans! Rooftop gardens and greenhouses ×2 for ${seconds}.`,
     },
     variety: (name: string) => `New variety: ${name}!`,
+  },
+  orchard: {
+    title: 'The orchard and the hives',
+    hint: 'A tree is planted once, grows for two days, then bears fruit every eight hours, online and offline. Each picking brings an hour of production and baskets, and sometimes an old variety.',
+    names: {
+      apple: 'Apple tree',
+      pear: 'Pear tree',
+      cherry: 'Cherry tree',
+      plum: 'Plum tree',
+    } satisfies Record<FruitId, string>,
+    varieties: {
+      apple: 'Reinette apple',
+      pear: 'Curé pear',
+      cherry: 'Burlat cherry',
+      plum: 'Greengage',
+    } satisfies Record<FruitId, string>,
+    stages: {
+      none: 'To plant',
+      sapling: 'Sapling',
+      flowering: 'In bloom',
+      fruiting: 'Fruit ripening',
+      ripe: 'Ripe fruit',
+    } satisfies Record<TreeStage, string>,
+    next: (time: string) => `${time} to go`,
+    plant: 'Plant',
+    plantLabel: (name: string) => `Plant: ${name}`,
+    free: 'free',
+    cost: (baskets: string) => `${baskets} baskets`,
+    pick: 'Pick',
+    pickLabel: (name: string) => `Pick: ${name}`,
+    hives: (count: string, max: string) => `Hives: ${count} of ${max}`,
+    hiveHint:
+      'Each hive makes the garden and the orchard grow ×1.2 faster, makes a garden variety likelier and gives a jar of honey every 6 h, for the great works.',
+    setHive: 'Set a hive',
+    honey: (count: string) => `${count} jars of honey`,
+    varietiesTitle: 'Old varieties',
+    unknownVariety: (tree: string) => `An old variety of the ${tree.toLowerCase()}`,
   },
   corridors: {
     family: { green: 'green', blue: 'blue' } satisfies Record<CorridorFamily, string>,

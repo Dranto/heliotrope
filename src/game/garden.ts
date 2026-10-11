@@ -10,6 +10,7 @@ import { effectSeconds } from './butterfly';
 import { effectFactor } from './effects';
 import { earnLight } from './light';
 import { lightPerSecond } from './production';
+import { HIVE_VARIETY_CHANCE, pollination } from './orchard';
 import { nextRandom } from './random';
 import { VARIETIES, type CropId, type VarietyId } from './seedBank';
 import type { GameState } from './state';
@@ -119,7 +120,7 @@ export function openPlots(state: GameState): number {
 export function growthSpeed(state: GameState): number {
   const shower = effectFactor(state.effects, 'shower');
   const rain = state.parcels.includes('rainGardens') ? 1.25 : 1;
-  return shower * rain * factorOf(state, 'gardenGrowth');
+  return shower * rain * factorOf(state, 'gardenGrowth') * pollination(state);
 }
 
 export function isRipe(plot: Plot): boolean {
@@ -272,8 +273,8 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
   if (possible.length > 0) {
     const [roll, rngSeed] = nextRandom(next.rngSeed);
     next = { ...next, rngSeed };
-    if (roll < VARIETY_CHANCE)
-      variety = possible[Math.floor((roll / VARIETY_CHANCE) * possible.length)]!;
+    const chance = VARIETY_CHANCE + HIVE_VARIETY_CHANCE * state.orchard.hives;
+    if (roll < chance) variety = possible[Math.floor((roll / chance) * possible.length)]!;
   }
   next = {
     ...next,

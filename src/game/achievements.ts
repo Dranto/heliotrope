@@ -6,6 +6,7 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
+import { FRUIT_IDS } from './fruits';
 import { worksBuilt } from './greatWorks';
 import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
@@ -89,6 +90,9 @@ export type AchievementCondition =
   | { kind: 'lockCycles'; count: number }
   /** Great works complete, kept forever (§6.6). */
   | { kind: 'worksBuilt'; count: number }
+  /** Fruit picked in the orchard, and old varieties found there (§9.8). */
+  | { kind: 'fruitHarvests'; count: number }
+  | { kind: 'fruitVarieties'; count: number }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -177,6 +181,8 @@ export type AchievementId =
   | `cycles.${(typeof CYCLE_STEPS)[number]}`
   | `delta.${(typeof DELTA_STEPS)[number]}`
   | `works.${(typeof WORK_STEPS)[number]}`
+  | 'firstFruit'
+  | 'oldOrchard'
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -325,6 +331,13 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'neighbourhood' as const,
     condition: { kind: 'worksBuilt', count } as const,
   })),
+  // The orchard (§9.8).
+  { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
+  {
+    id: 'oldOrchard',
+    family: 'neighbourhood',
+    condition: { kind: 'fruitVarieties', count: FRUIT_IDS.length },
+  },
   {
     id: 'selfSown',
     family: 'neighbourhood',
@@ -556,6 +569,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.delta.lockCycles >= condition.count;
     case 'worksBuilt':
       return worksBuilt(state) >= condition.count;
+    case 'fruitHarvests':
+      return state.orchard.harvests >= condition.count;
+    case 'fruitVarieties':
+      return state.orchard.varieties.length >= condition.count;
     case 'cycleChallenges':
       return state.cycleChallenges.length >= condition.count;
     case 'playSeconds':
