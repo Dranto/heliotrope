@@ -9,7 +9,7 @@ import {
   type RefObject,
 } from 'react';
 import type { ParcelId } from '../game/parcels';
-import { canRestoreParcel, offeredParcels, restoreParcel } from '../game/restoration';
+import { canRestoreParcel, futureOf, offeredParcels, restoreParcel } from '../game/restoration';
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
 import { isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { phaseOf, visualSeason } from '../game/phases';
@@ -51,6 +51,10 @@ import {
 import { daylightOf, type Daylight } from './daylight';
 import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
+import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
+import { DecorLayer } from './DecorArt';
+import { encodeDecor } from './decorMap';
+import { DecorToolbar, PhotoToolbar, type PhotoLook } from './MapTools';
 import { useGameState, useGameStore } from './useGame';
 
 /** The enriched WebGL map (§10.4), downloaded only where it is drawn. */
@@ -170,7 +174,19 @@ export function Scene({
     [store],
   );
   const visitor = state.visit.kind;
-  const daylight = useDaylight();
+  const clock = useDaylight();
+  // Decorating and the photo mode (§6.5) take over the map for a while.
+  const [mode, setMode] = useState<'play' | 'decor' | 'photo'>('play');
+  const [look, setLook] = useState<PhotoLook>({ daylight: 'day', season: 'summer' });
+  const photo = mode === 'photo';
+  const editing = mode === 'decor';
+  const daylight = photo ? look.daylight : clock;
+  const decor = encodeDecor(state.decor.slots);
+  const setDecor = useCallback(
+    (slot: number) =>
+      store.dispatch((s) => placeDecor(s, slot, nextDecor(s, s.decor.slots[slot] ?? null))),
+    [store],
+  );
   const welcome = useCallback(() => {
     const result = welcomeVisit(store.getState());
     if (!result) return;
@@ -192,7 +208,13 @@ export function Scene({
     )
     .join();
   const reduced = state.settings.reducedMotion || prefersReducedMotion();
-  const ground = useMemo(() => <ParcelGround parcels={parcels} />, [parcels]);
+  // The parcels in their second future (§6.5), joined so the ground only redraws on a change.
+  const seconds = parcels.filter((id) => futureOf(state, id) === 1).join();
+  const secondList = useMemo(() => split(seconds), [seconds]);
+  const ground = useMemo(
+    () => <ParcelGround parcels={parcels} seconds={seconds} />,
+    [parcels, seconds],
+  );
   const bioregion = isBioregionOpen(state);
   const { sites, collectors } = state;
   const raining = waterPerSecond(state) > 0;
@@ -215,6 +237,7 @@ export function Scene({
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <GardenBeds beds={beds} onHarvest={onHarvest} />
+        <DecorLayer slots={decor} editing={editing} onSlot={setDecor} />
         <VisitLayer kind={visitor} onWelcome={welcome} />
         <ParcelOffers
           offered={split(offered)}
@@ -238,6 +261,9 @@ export function Scene({
       welcome,
       beds,
       onHarvest,
+      decor,
+      editing,
+      setDecor,
       offered,
       affordable,
       highlight,
@@ -275,7 +301,7 @@ export function Scene({
   }, [view, width, height, districts]);
   // The heliotrope stands in the home courtyard, at the heart of the city, and follows the camera.
   const flower = flowerFrame(camera, width, height, PLANTER);
-  const season = visualSeason(state);
+  const season = photo ? look.season : visualSeason(state);
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
   // map only redraws when the colour visibly changes.
   const greenness = Math.round(Math.min(1, Math.log10(1 + lightPerSecond(state)) / 5) * 20) / 20;
@@ -301,6 +327,7 @@ export function Scene({
   return (
     <figure
       className="panel scene"
+      data-photo={photo || undefined}
       data-phase={phase}
       data-season={season ?? 'none'}
       data-challenge={state.challenge ?? undefined}
@@ -312,6 +339,7 @@ export function Scene({
               generators={state.generators}
               upgrades={state.upgrades}
               parcels={parcels}
+              seconds={secondList}
               phase={phase}
               season={season}
               greenness={greenness}
@@ -354,7 +382,33 @@ export function Scene({
         )}
         {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
         {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
+        {mode === 'play' && isDecorOpen(state) && (
+          <button type="button" className="scene-tool" onClick={() => setMode('decor')}>
+            {t.decor.open}
+          </button>
+        )}
+        {mode === 'play' && (
+          <button
+            type="button"
+            className="scene-tool"
+            onClick={() => {
+              setLook({ daylight: clock, season: visualSeason(state) ?? 'summer' });
+              setMode('photo');
+            }}
+          >
+            {t.photo.open}
+          </button>
+        )}
       </figcaption>
+      {editing && <DecorToolbar onDone={() => setMode('play')} />}
+      {photo && (
+        <PhotoToolbar
+          look={look}
+          onLook={setLook}
+          map={() => mapRef.current}
+          onClose={() => setMode('play')}
+        />
+      )}
     </figure>
   );
 }

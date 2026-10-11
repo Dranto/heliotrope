@@ -298,21 +298,30 @@ export function outskirtsTileArt(tile: { width: number; height: number; building
 /**
  * A building from above: its south facade (windows on every storey, some lit by the sun), then
  * the roof, lit from the sun's side, with parapet, membrane seams and equipment. A roof that
- * carries a garden keeps only its edge; living roofs turn it to sedum.
+ * carries a garden keeps only its edge; living roofs turn it to sedum, or, in their second future
+ * (§6.5), to rows of vegetables.
  */
 export function buildingArt(
   ctx: ArtContext,
   box: Box,
   storeys: number,
-  { bare = false, sedum = false }: { bare?: boolean; sedum?: boolean } = {},
+  {
+    bare = false,
+    sedum: meadow = false,
+    kitchen = false,
+  }: { bare?: boolean; sedum?: boolean; kitchen?: boolean } = {},
 ): Art {
+  // The kitchen-garden roofs are planted too: everything that skips the bare membrane skips it.
+  const sedum = meadow || kitchen;
   const [x, y, w, h] = box;
   const facade = Math.min(storeys * 1.5 + 2, h * 0.28);
   const top = h - facade;
   const seed = hash(x, y);
-  const roof = sedum
-    ? mix('#9dbb83', ctx.palette.foliageLight, 0.15)
-    : mix(CONCRETE, SAGE, ctx.greenness * 0.45);
+  const roof = kitchen
+    ? '#b48f68'
+    : sedum
+      ? mix('#9dbb83', ctx.palette.foliageLight, 0.15)
+      : mix(CONCRETE, SAGE, ctx.greenness * 0.45);
   const lit = ctx.lit;
   const parts: string[] = [
     `<defs>${litGradient('roof', shade(roof, 0.22), shade(roof, -0.08), lit)}
@@ -320,7 +329,7 @@ export function buildingArt(
       <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f1e6"/><stop offset=".5" stop-color="#b9cfd2"/><stop offset="1" stop-color="#8aa6ad"/></linearGradient>
       <radialGradient id="tank" cx=".35" cy=".35"><stop offset="0" stop-color="#f2efe8"/><stop offset="1" stop-color="#a39d93"/></radialGradient>
       <pattern id="gravel" width="1.8" height="1.6" patternUnits="userSpaceOnUse"><circle cx=".4" cy=".5" r=".2" fill="${shade(roof, -0.12)}"/><circle cx="1.3" cy="1.2" r=".16" fill="${shade(roof, 0.18)}"/></pattern>
-      ${sedum ? `<pattern id="sedum" width="5" height="4.4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".75" fill="${shade(roof, -0.14)}"/><circle cx="3.6" cy="3.2" r=".7" fill="${shade(roof, 0.12)}"/><circle cx="3.3" cy="1" r=".42" fill="${LILAC}"/><circle cx="1.3" cy="3.4" r=".36" fill="${GOLD_SOFT}"/><circle cx="4.6" cy="2.2" r=".3" fill="#fffaf0"/></pattern>` : ''}
+      ${meadow ? `<pattern id="sedum" width="5" height="4.4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".75" fill="${shade(roof, -0.14)}"/><circle cx="3.6" cy="3.2" r=".7" fill="${shade(roof, 0.12)}"/><circle cx="3.3" cy="1" r=".42" fill="${LILAC}"/><circle cx="1.3" cy="3.4" r=".36" fill="${GOLD_SOFT}"/><circle cx="4.6" cy="2.2" r=".3" fill="#fffaf0"/></pattern>` : ''}
     </defs>`,
     // Facade, then storeys of windows.
     `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="url(#wall)"/>`,
@@ -372,7 +381,24 @@ export function buildingArt(
       `<rect x="${x + 1.6}" y="${y + 1.6}" width="${w - 3.2}" height="${top - 3.2}" rx="1.2" fill="url(#gravel)" opacity=".55"/>`,
     );
   }
-  if (sedum) {
+  if (kitchen) {
+    // Rows of vegetables across the roof, in three greens, with a plank walkway.
+    const wide = w >= top;
+    const span = wide ? top - 4 : w - 4;
+    const rows = Math.max(2, Math.floor(span / 3.2));
+    const greens = [ctx.palette.foliage, '#8fae5a', '#5e9471'];
+    for (let i = 0; i < rows; i++) {
+      const f = (i + 0.5) / rows;
+      const d = wide
+        ? `M${x + 3} ${r(y + 2 + span * f)}H${x + w - 3}`
+        : `M${r(x + 2 + span * f)} ${y + 3}V${y + top - 3}`;
+      parts.push(
+        `<path d="${d}" stroke="${shade(roof, -0.14)}" stroke-width="2.2" stroke-linecap="round"/>`,
+        `<path d="${d}" stroke="${greens[(i + seed) % 3]}" stroke-width="1.6" stroke-dasharray="1.3 .7" stroke-linecap="round"/>`,
+      );
+    }
+  }
+  if (meadow) {
     // Drifts of sedum in several greens and russets, a fine carpet of rosettes and flowers,
     // and a gravel walkway for the gardeners.
     const tones = [

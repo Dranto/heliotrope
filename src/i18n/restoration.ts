@@ -1,6 +1,7 @@
 // Display texts of parcels and neighbourhood projects, resolved from their bonuses.
 import type { Bonus } from '../game/bonuses';
 import { formatDecimal, formatPercent } from '../game/format';
+import type { Future, ParcelId } from '../game/parcels';
 import { t } from './index';
 
 const factor = formatDecimal;
@@ -55,4 +56,9 @@ export function bonusText(bonus: Bonus): string {
 
 export function bonusesText(bonuses: readonly Bonus[]): string {
   return bonuses.map(bonusText).join(' · ');
+}
+
+/** The name of a parcel in one of its futures (§6.5). */
+export function parcelName(id: ParcelId, future: Future): string {
+  return future === 1 ? t.restoration.secondNames[id] : t.restoration.parcelNames[id];
 }

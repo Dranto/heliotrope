@@ -141,6 +141,130 @@
   stroke-dasharray: 1 2;
 }
 
+/* The second futures of the parcels (§6.5, M16). */
+.parcels .play-paint {
+  opacity: 0.85;
+}
+
+.parcels .paint-0 {
+  fill: #e8a3b8;
+}
+
+.parcels .paint-1 {
+  fill: #f4c063;
+}
+
+.parcels .paint-2 {
+  fill: #8ec7d0;
+}
+
+.parcels .sand {
+  fill: #f1dcae;
+}
+
+.parcels .sand-edge {
+  fill: #d8b98d;
+}
+
+.parcels .stepping-stone {
+  fill: #e9e2d2;
+  stroke: rgb(120 110 90 / 0.35);
+  stroke-width: 0.4;
+}
+
+.parcels .hedge {
+  fill: #4f8a5e;
+}
+
+.parcels .berry {
+  fill: #b5485e;
+}
+
+.parcels .pool {
+  fill: #7fbfd0;
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 1.2;
+}
+
+.parcels .deck {
+  fill: #d8b98d;
+  stroke: #9c7a52;
+  stroke-width: 0.4;
+}
+
+.parcels .market-roof {
+  fill: #c97d5d;
+  stroke: rgb(255 255 255 / 0.6);
+  stroke-width: 0.8;
+}
+
+.parcels .market-shadow {
+  fill: rgb(47 52 56 / 0.18);
+}
+
+.parcels .market-ridge {
+  stroke: #f3e2c8;
+  stroke-width: 1.4;
+}
+
+.parcels .market-rib {
+  stroke: rgb(255 255 255 / 0.35);
+  stroke-width: 0.6;
+}
+
+.parcels .awning {
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.5;
+}
+
+.parcels .glass {
+  fill: #cfe6e8;
+  stroke: #9fb9bc;
+  stroke-width: 0.5;
+}
+
+.parcels .glass-ridge {
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 0.6;
+}
+
+.parcels .roof-soil {
+  fill: #b48f68;
+}
+
+.parcels .roof-crop {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 2 1.2;
+}
+
+.parcels .crop-0 {
+  stroke: #5e9471;
+}
+
+.parcels .crop-1 {
+  stroke: #8fae5a;
+}
+
+.parcels .crop-2 {
+  stroke: #3d7a56;
+}
+
+.parcels .fountain-rim {
+  fill: #e9e2d2;
+}
+
+.parcels .fountain-ripple {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.6;
+}
+
+.parcels .fountain-jet {
+  fill: #fff;
+}
+
 /* A parcel restored while playing is unveiled from its pin, with petals bursting out. */
 .unveil {
   animation: unveil 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -551,4 +675,57 @@
    inside the map, must keep catching clicks. */
 .scene-map > svg > :not(.camera) {
   pointer-events: none;
+}
+
+/* The two futures of a parcel (§6.5, M16): pills on the card, then the list of restored ones. */
+.future-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.15rem 0;
+}
+
+.future-pills button {
+  padding: 0.12rem 0.55rem;
+  border: 1px solid rgb(31 42 36 / 0.14);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.5);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.future-pills button[aria-checked='true'] {
+  border-color: var(--gold);
+  background: rgb(255 244 214 / 0.95);
+  font-weight: 600;
+}
+
+.future-pills button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.futures {
+  margin-top: 0.6rem;
+}
+
+.futures summary {
+  cursor: pointer;
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+.futures ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.futures li {
+  display: grid;
+  gap: 0.1rem;
 }

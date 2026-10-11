@@ -9,6 +9,7 @@ import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
 import type { ChallengeId } from '../game/challenges';
 import type { CycleChallengeId } from '../game/cycleChallenges';
+import type { DecorId, FlowerColour } from '../game/decor';
 import type { DeltaId } from '../game/delta';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
@@ -98,6 +99,47 @@ export const fr = {
     autumn: 'Automne',
     winter: 'Hiver',
   } satisfies Record<VisualSeason, string>,
+  decor: {
+    open: 'Décorer',
+    done: 'Terminer',
+    title: 'Décorer le quartier',
+    hint: 'Cliquez un emplacement de la carte pour y poser un élément gagné, puis encore pour changer.',
+    slot: (index: number, piece: string) => `Emplacement ${index}\u00a0: ${piece}`,
+    empty: 'vide',
+    names: {
+      bench: 'Banc',
+      planter: 'Jardinière',
+      lanterns: 'Guirlande de lampions',
+      birdhouse: 'Nichoir',
+      fresco: 'Fresque au sol',
+      fountain: 'Fontaine',
+      insectHotel: 'Hôtel à insectes',
+    } satisfies Record<DecorId, string>,
+    flowerTitle: 'Couleur de l’héliotrope',
+    colours: {
+      lilac: 'Lilas',
+      gold: 'Or',
+      rose: 'Rose',
+      blue: 'Bleu',
+      white: 'Blanc',
+    } satisfies Record<FlowerColour, string>,
+    won: 'Gagnés',
+    toWin: 'À gagner',
+    achievements: (count: number) => `${count} jalons`,
+    species: (count: number) => `${count} espèces de l’Herbier`,
+  },
+  photo: {
+    open: 'Photo',
+    title: 'Mode photo',
+    daylight: 'Heure',
+    daylights: { day: 'Jour', evening: 'Soir', night: 'Nuit' },
+    season: 'Saison',
+    save: 'Enregistrer l’image',
+    close: 'Quitter le mode photo',
+    saved: 'Image enregistrée',
+    failed: 'L’image n’a pas pu être créée.',
+    fileName: 'mon-quartier-heliotrope.png',
+  },
   layout: {
     views: 'Vue de la carte',
     panels: 'Menus',
@@ -399,6 +441,21 @@ export const fr = {
       livingRoofs: 'Toits vivants',
       squares: 'Places plantées',
     } satisfies Record<ParcelId, string>,
+    secondNames: {
+      gardenStreet: 'Rue des enfants',
+      rainGardens: 'Bassin d’orage',
+      pollinatorStrip: 'Haie bocagère',
+      river: 'Rivière baignade',
+      park: 'Marché couvert',
+      orchard: 'Serres de l’entrepôt',
+      livingRoofs: 'Toits potagers',
+      squares: 'Places des fontaines',
+    } satisfies Record<ParcelId, string>,
+    futuresTitle: 'Les avenirs des parcelles',
+    futuresHint: 'Chaque parcelle peut changer d’avenir une fois par Cycle de l’eau.',
+    futureLocked: 'Changé ce Cycle',
+    futureLabel: (parcel: string) => `Avenir de ${parcel}`,
+    chooseFuture: 'Choisir son avenir',
     districts: 'Quartiers voisins',
     districtNames: {
       tanneries: 'Jardins d’eau des Tanneries',

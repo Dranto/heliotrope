@@ -4,6 +4,7 @@ import {
   PARCEL_LIST,
   PARCEL_REVEAL_SHARE,
   PARCELS,
+  type Future,
   type ParcelDef,
   type ParcelId,
 } from './parcels';
@@ -31,14 +32,56 @@ export function canRestoreParcel(state: GameState, id: ParcelId): boolean {
   return isParcelOffered(state, id) && state.resources.light >= PARCELS[id].cost;
 }
 
-/** Player action: restore a parcel. It stays restored in every later Season. */
-export function restoreParcel(state: GameState, id: ParcelId): GameState {
+/**
+ * Player action: restore a parcel in one of its two futures (§6.5). It stays restored in every
+ * later Season.
+ */
+export function restoreParcel(state: GameState, id: ParcelId, future: Future = 0): GameState {
   if (!canRestoreParcel(state, id)) return state;
   return {
     ...state,
     resources: { ...state.resources, light: Math.max(0, state.resources.light - PARCELS[id].cost) },
     parcels: [...state.parcels, id],
+    futures: withFuture(state.futures, id, future),
     idleSeconds: 0,
+  };
+}
+
+export interface FuturesState {
+  /** The future of each restored parcel; absent for the first one. */
+  chosen: Partial<Record<ParcelId, Future>>;
+  /** Cycle of water (§7.4, the Cycles completed) in which a parcel's future was last changed. */
+  changed: Partial<Record<ParcelId, number>>;
+}
+
+export function createFuturesState(): FuturesState {
+  return { chosen: {}, changed: {} };
+}
+
+function withFuture(futures: FuturesState, id: ParcelId, future: Future): FuturesState {
+  const chosen = { ...futures.chosen };
+  if (future === 1) chosen[id] = 1;
+  else delete chosen[id];
+  return { ...futures, chosen };
+}
+
+/** The future a restored parcel follows. */
+export function futureOf(state: Pick<GameState, 'futures'>, id: ParcelId): Future {
+  return state.futures.chosen[id] ?? 0;
+}
+
+/** A restored parcel can change its future once in every Cycle of water (decision D7). */
+export function canChangeFuture(state: GameState, id: ParcelId): boolean {
+  return state.parcels.includes(id) && state.futures.changed[id] !== state.cycles;
+}
+
+/** Player action: give a restored parcel its other future, free, once per Cycle of water. */
+export function changeFuture(state: GameState, id: ParcelId, future: Future): GameState {
+  if (!canChangeFuture(state, id) || futureOf(state, id) === future) return state;
+  const futures = withFuture(state.futures, id, future);
+  return {
+    ...state,
+    futures: { ...futures, changed: { ...futures.changed, [id]: state.cycles } },
   };
 }
 

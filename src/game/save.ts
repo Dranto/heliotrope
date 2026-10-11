@@ -11,6 +11,7 @@ import { isParcelId, type ParcelId } from './parcels';
 import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
 import { validPlots } from './garden';
+import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels } from './delta';
 import { isVarietyId, type VarietyId } from './seedBank';
@@ -81,6 +82,8 @@ const migrations: Record<number, Migration> = {
   15: (raw) => ({ ...raw, version: 16 }),
   // v17 adds the delta of the Sources and the challenge Cycles (§7.5, M15): every arm closed.
   16: (raw) => ({ ...raw, version: 17 }),
+  // v18 adds the futures of the parcels and the decor (§6.5, M16): first futures, no decor.
+  17: (raw) => ({ ...raw, version: 18 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -180,6 +183,19 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.parcels)) {
     state.parcels = [...new Set<ParcelId>(data.parcels.filter(isParcelId))];
   }
+  const futures = data.futures as Record<string, unknown> | undefined;
+  const chosen = futures?.chosen as Record<string, unknown> | undefined;
+  const changed = futures?.changed as Record<string, unknown> | undefined;
+  for (const id of state.parcels) {
+    if (chosen?.[id] === 1) state.futures.chosen[id] = 1;
+    const cycle = changed?.[id];
+    if (isCount(cycle)) state.futures.changed[id] = cycle;
+  }
+  const decor = data.decor as Record<string, unknown> | undefined;
+  state.decor = {
+    slots: validDecorSlots(decor?.slots),
+    flower: isFlowerColour(decor?.flower) ? decor.flower : 'lilac',
+  };
   if (Array.isArray(data.districts)) {
     state.districts = [...new Set<DistrictId>(data.districts.filter(isDistrictId))];
   }
