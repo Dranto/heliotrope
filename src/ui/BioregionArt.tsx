@@ -46,12 +46,51 @@ const [LX, LY, LW, LH] = LAND;
 /** The land, with the suburbs left open in its middle. */
 const LAND_PATH = `M${LX} ${LY}H${LX + LW}V${LY + LH}H${LX}Z ${roundedRect(SUBURBS, SUBURBS_RADIUS)}`;
 
+/**
+ * A crown of trees seen from afar: its shadow, a lobed outline in the given colour class, the
+ * shade on its far side and clumps lit by the sun.
+ */
+function LobedCrown({
+  x,
+  y,
+  r,
+  className,
+}: {
+  x: number;
+  y: number;
+  r: number;
+  className: string;
+}) {
+  const turn = (landHash(x, y) % 10) / 10;
+  return (
+    <g>
+      <circle cx={x + r * 0.3} cy={y + r * 0.4} r={r} className="crown-shadow" />
+      {Array.from({ length: 5 }, (_, i) => {
+        const a = ((i + turn) / 5) * Math.PI * 2;
+        return (
+          <circle
+            key={i}
+            cx={x + Math.cos(a) * r * 0.4}
+            cy={y + Math.sin(a) * r * 0.4}
+            r={r * 0.62}
+            className={className}
+          />
+        );
+      })}
+      <circle cx={x + r * 0.2} cy={y + r * 0.25} r={r * 0.7} className="crown-shade" />
+      <circle cx={x - r * 0.32} cy={y - r * 0.3} r={r * 0.36} className="crown-light" />
+      <circle cx={x + r * 0.12} cy={y - r * 0.42} r={r * 0.24} className="crown-light" />
+    </g>
+  );
+}
+
 export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
   const [x, y, w, h] = box;
   const hedge = landHash(x, y) % 2 === 0;
   return (
     <g>
       <rect x={x} y={y} width={w} height={h} rx="14" className={`field crop-${crop}`} />
+      <rect x={x + 2} y={y + 2} width={w - 4} height={h - 4} rx="12" className="field-edge" />
       <rect
         x={x + 6}
         y={y + 6}
@@ -72,6 +111,8 @@ export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
             className="hedge"
           />
         ))}
+      {/* A lone tree at the corner of the others, where the plough turns. */}
+      {!hedge && <LobedCrown x={x + w - 4} y={y + 4} r={9} className="old-crown" />}
     </g>
   );
 }
@@ -111,12 +152,12 @@ export function FoodForest({ box: [x, y, w, h] }: { box: Box }) {
   return (
     <g className="food-forest">
       <rect x={x} y={y} width={w} height={h} rx="14" className="forest-floor" />
+      <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} rx="10" fill="url(#land-flowers)" />
       {crowns.map(([cx, cy, r, kind]) => (
         <g key={`${cx},${cy}`}>
-          <circle cx={cx + 2} cy={cy + 3} r={r} className="crown-shadow" />
-          <circle cx={cx} cy={cy} r={r} className={`crown fruit-${kind}`} />
-          <circle cx={cx - r * 0.3} cy={cy - r * 0.3} r={r * 0.45} className="crown-light" />
+          <LobedCrown x={cx} y={cy} r={r} className={`crown fruit-${kind}`} />
           <circle cx={cx + r * 0.35} cy={cy + r * 0.1} r="1.8" className={`fruit fruit-${kind}`} />
+          <circle cx={cx - r * 0.2} cy={cy + r * 0.45} r="1.6" className={`fruit fruit-${kind}`} />
         </g>
       ))}
     </g>
@@ -147,6 +188,20 @@ export function Hills() {
       {HILLS.map((hill) => (
         <g key={`${hill.x},${hill.y}`}>
           <ellipse cx={hill.x} cy={hill.y} rx={hill.rx} ry={hill.ry} className="hill" />
+          <ellipse
+            cx={hill.x + hill.rx * 0.18}
+            cy={hill.y + hill.ry * 0.2}
+            rx={hill.rx * 0.82}
+            ry={hill.ry * 0.78}
+            className="hill-shade"
+          />
+          <ellipse
+            cx={hill.x - hill.rx * 0.22}
+            cy={hill.y - hill.ry * 0.24}
+            rx={hill.rx * 0.5}
+            ry={hill.ry * 0.45}
+            className="hill-light"
+          />
           {[0.78, 0.55, 0.32].map((f) => (
             <ellipse
               key={f}
@@ -172,6 +227,17 @@ export function Pond({ x, y, r }: Crown) {
         d={`M${x - r * 0.5} ${y - r * 0.2}q${r * 0.25} -3 ${r * 0.5} 0`}
         className="pond-glint"
       />
+      <circle cx={x + r * 0.4} cy={y + r * 0.35} r={r * 0.16} className="lily" />
+      <circle cx={x + r * 0.15} cy={y + r * 0.55} r={r * 0.12} className="lily" />
+      <path
+        className="reeds"
+        d={Array.from({ length: 6 }, (_, i) => {
+          const a = Math.PI * (0.65 + i * 0.13);
+          const rx0 = x + Math.cos(a) * (r + 2);
+          const ry0 = y + Math.sin(a) * (r + 2);
+          return `M${rx0} ${ry0}l-1.5 -6M${rx0} ${ry0}l1 -7M${rx0} ${ry0}l3 -4`;
+        }).join('')}
+      />
     </g>
   );
 }
@@ -179,9 +245,7 @@ export function Pond({ x, y, r }: Crown) {
 export function OldCrown({ x, y, r }: Crown) {
   return (
     <g>
-      <circle cx={x + 3} cy={y + 4} r={r} className="crown-shadow" />
-      <circle cx={x} cy={y} r={r} className="old-crown" />
-      <circle cx={x - r * 0.3} cy={y - r * 0.32} r={r * 0.45} className="crown-light" />
+      <LobedCrown x={x} y={y} r={r} className="old-crown" />
     </g>
   );
 }

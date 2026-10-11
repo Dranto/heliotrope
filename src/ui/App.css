@@ -2050,7 +2050,7 @@ button {
   --sun-x: -2.2px;
   --sun-y: 1.4px;
   --foliage: #2f6b4f;
-  --foliage-light: #8fae8b;
+  --foliage-light: #a8c98a;
 }
 
 .scene[data-phase='2'] {
@@ -2068,7 +2068,12 @@ button {
 
 .scene[data-season='spring'] {
   --foliage: #3d7a56;
-  --foliage-light: #e8b8d0;
+  /* Leaves stay green in spring; only the blossom turns pink, as on the enriched map. */
+  --foliage-light: #b5d68e;
+}
+
+.scene[data-season='spring'] .blossom {
+  fill: #f2bfd3;
 }
 
 .scene[data-season='summer'] {

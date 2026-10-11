@@ -3,6 +3,139 @@
 
 /* ---------- Restored ground ---------- */
 
+/* Textures and small details (§10.4): grass, mowing stripes, joints, tree shade, benches. */
+.parcels .meadow-blade {
+  fill: none;
+  stroke: rgb(47 107 79 / 0.35);
+  stroke-width: 0.3;
+  stroke-linecap: round;
+}
+
+.parcels .meadow-speck {
+  fill: rgb(47 107 79 / 0.22);
+}
+
+.parcels .meadow-speck-light {
+  fill: rgb(255 250 235 / 0.6);
+}
+
+.parcels .lawn-stripe {
+  fill: rgb(255 255 240 / 0.12);
+}
+
+.parcels .paving-joint {
+  fill: none;
+  stroke: rgb(150 130 100 / 0.28);
+  stroke-width: 0.2;
+}
+
+.parcels .tuft {
+  fill: none;
+  stroke: var(--foliage);
+  stroke-width: 0.4;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.parcels .bloom-heart {
+  fill: #fff4d6;
+  opacity: 0.9;
+}
+
+.crown-shade {
+  fill: rgb(31 42 36 / 0.16);
+}
+
+.leaf-glint {
+  fill: rgb(255 251 232 / 0.45);
+}
+
+.parcels .bench-back {
+  stroke: #8f6b44;
+  stroke-width: 0.5;
+  stroke-linecap: round;
+}
+
+.parcels .kerb {
+  fill: #ddd2bd;
+}
+
+.parcels .swale-bed {
+  fill: none;
+  stroke: #8f7a5c;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+  opacity: 0.35;
+}
+
+.parcels .swale-glint {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.5;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+}
+
+.parcels .iris {
+  fill: #9a7cc0;
+}
+
+.parcels .insect-hotel {
+  fill: #c39a6b;
+  stroke: #8f6b44;
+  stroke-width: 0.3;
+}
+
+.parcels .insect-hotel-lines {
+  stroke: #6e4f30;
+  stroke-width: 0.35;
+  stroke-dasharray: 0.5 0.4;
+}
+
+.parcels .park-path-edge {
+  fill: none;
+  stroke: #d8cbb0;
+  stroke-width: 5.2;
+  stroke-linecap: round;
+}
+
+.parcels .pond-bank {
+  fill: #c9b994;
+}
+
+.parcels .lily-pad {
+  fill: #6f9a62;
+}
+
+.parcels .flower-bed {
+  fill: #8a6a4e;
+  stroke: #e9dfcc;
+  stroke-width: 0.8;
+}
+
+.parcels .square-setts {
+  fill: none;
+  stroke: rgb(150 130 100 / 0.25);
+  stroke-width: 0.4;
+  stroke-dasharray: 1.2 0.6;
+}
+
+.parcels .sedum-drift {
+  opacity: 0.8;
+}
+
+.parcels .drift-0 {
+  fill: #93b07a;
+}
+
+.parcels .drift-1 {
+  fill: #c3a27c;
+}
+
+.parcels .drift-2 {
+  fill: #bfcf8a;
+}
+
 .parcels .paving {
   fill: #eee4d0;
 }

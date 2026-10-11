@@ -40,8 +40,16 @@ function Bike({ id, working, purchases, reduced }: BikeProps) {
       <path className="wheel" d="M-9 -5.2h4.5M-9 5.2h4.5M5 0h4.5" />
       <rect className="crate" x="-10.5" y="-4.6" width="10.5" height="9.2" rx="2" />
       <path className="crate-lid" d="M-9 -1.6h7.5M-9 1.6h7.5" />
+      {/* The load: a sack of compost, greens and a bunch of flowers peeking out of the crate. */}
+      <circle className="load-leaf" cx="-7.6" cy="-2.2" r="1.7" />
+      <circle className="load-leaf" cx="-3.4" cy="2.3" r="1.5" />
+      <circle className="load-bloom" cx="-6.8" cy="2.4" r="0.9" />
+      <circle className="load-bloom gold" cx="-2.6" cy="-2.4" r="0.8" />
+      <path className="handlebar" d="M6.2 -3.6v7.2" />
       <ellipse className="rider" cx="3.8" cy="0" rx="2.6" ry="3.8" />
+      <path className="rider-arm" d="M4.2 -2.8l2 -0.8M4.2 2.8l2 0.8" />
       <circle className="rider-head" cx="4.9" cy="0" r="1.9" />
+      <path className="rider-hair" d="M3.6 -1.2a1.9 1.9 0 0 1 2.6 -0.2" />
       {purchases > 0 && !reduced && (
         <circle key={purchases} className="appear-ring coop-ring" cx="-2" cy="0" r="10" />
       )}

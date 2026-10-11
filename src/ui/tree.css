@@ -517,7 +517,35 @@
 }
 
 .coop-bike .rider-head {
-  fill: #6b5a48;
+  fill: #e9c7a4;
+  stroke: #6b5a48;
+  stroke-width: 0.35;
+}
+
+.coop-bike .rider-hair {
+  fill: none;
+  stroke: #6b5a48;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.coop-bike .rider-arm,
+.coop-bike .handlebar {
+  stroke: #6b5a48;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.coop-bike .load-leaf {
+  fill: #5d9a62;
+}
+
+.coop-bike .load-bloom {
+  fill: var(--lilac);
+}
+
+.coop-bike .load-bloom.gold {
+  fill: #f4c063;
 }
 
 .coop-bike[data-working='false'] {
