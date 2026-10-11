@@ -1206,6 +1206,20 @@ button {
   stroke-linejoin: round;
 }
 
+.upgrade-icon-main {
+  stroke-width: 1.65;
+}
+
+.upgrade-icon-badge {
+  fill: var(--cream);
+  stroke: var(--lilac);
+  stroke-width: 1;
+}
+
+.upgrade-icon-source {
+  stroke-width: 2.4;
+}
+
 .tier {
   position: absolute;
   right: 0.3rem;
