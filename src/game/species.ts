@@ -3,6 +3,7 @@
 // Golden Butterflies caught, a challenge Season won), then lives on the map for good. Species are
 // kept across Seasons. Names live in src/i18n, drawings and places in src/ui.
 import type { ChallengeId } from './challenges';
+import { longestCorridor, SPECIES_LENGTH, type CorridorFamily } from './corridors';
 import type { CycleChallengeId } from './cycleChallenges';
 import type { GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
@@ -37,6 +38,8 @@ export const SPECIES_IDS = [
   'swallow',
   'dragonfly',
   'redstart',
+  'greenWoodpecker',
+  'newt',
 ] as const;
 export type SpeciesId = (typeof SPECIES_IDS)[number];
 
@@ -52,7 +55,9 @@ export type SpeciesCondition =
   /** Won by completing a challenge Cycle of water (§7.5). */
   | { kind: 'cycleChallenge'; challenge: CycleChallengeId }
   /** Won by welcoming a visitor of the city (§9.6, M18) a few times. */
-  | { kind: 'visit'; visit: VisitKind; count: number };
+  | { kind: 'visit'; visit: VisitKind; count: number }
+  /** A corridor of a family at least this long (§6.7, M21). */
+  | { kind: 'corridor'; family: CorridorFamily; length: number };
 
 export interface SpeciesDef {
   id: SpeciesId;
@@ -102,6 +107,12 @@ export const SPECIES_LIST: readonly SpeciesDef[] = [
   { id: 'swallow', condition: { kind: 'visit', visit: 'festival', count: CITY_SPECIES_VISITS } },
   { id: 'dragonfly', condition: { kind: 'visit', visit: 'fireflies', count: CITY_SPECIES_VISITS } },
   { id: 'redstart', condition: { kind: 'visit', visit: 'fleaMarket', count: CITY_SPECIES_VISITS } },
+  // The corridors' species (§6.7, M21): they only come along a long enough corridor.
+  {
+    id: 'greenWoodpecker',
+    condition: { kind: 'corridor', family: 'green', length: SPECIES_LENGTH },
+  },
+  { id: 'newt', condition: { kind: 'corridor', family: 'blue', length: SPECIES_LENGTH } },
 ];
 
 /** The river species (§7.5), beyond the neighbourhood's Herbier. */
@@ -109,6 +120,9 @@ export const RIVER_SPECIES: readonly SpeciesId[] = ['otter', 'salmon', 'blackSto
 
 /** The species of the city's visits (§9.6, M18), beyond the neighbourhood's Herbier too. */
 export const CITY_SPECIES: readonly SpeciesId[] = ['skylark', 'swallow', 'dragonfly', 'redstart'];
+
+/** The species of the corridors (§6.7, M21), outside the Herbier of the neighbourhood too. */
+export const CORRIDOR_SPECIES: readonly SpeciesId[] = ['greenWoodpecker', 'newt'];
 
 export const SPECIES: Record<SpeciesId, SpeciesDef> = Object.fromEntries(
   SPECIES_LIST.map((s) => [s.id, s]),
@@ -136,6 +150,8 @@ function isMet(state: GameState, condition: SpeciesCondition): boolean {
       return state.cycleChallenges.includes(condition.challenge);
     case 'visit':
       return state.visits[condition.visit] >= condition.count;
+    case 'corridor':
+      return longestCorridor(state, condition.family) >= condition.length;
   }
 }
 
@@ -150,6 +166,10 @@ export function unlockSpecies(state: GameState): GameState {
 
 export function isHerbierComplete(state: Pick<GameState, 'species'>): boolean {
   return SPECIES_IDS.every(
-    (id) => RIVER_SPECIES.includes(id) || CITY_SPECIES.includes(id) || state.species.includes(id),
+    (id) =>
+      RIVER_SPECIES.includes(id) ||
+      CITY_SPECIES.includes(id) ||
+      CORRIDOR_SPECIES.includes(id) ||
+      state.species.includes(id),
   );
 }

@@ -862,3 +862,68 @@
   display: grid;
   gap: 0.1rem;
 }
+
+/* The green and blue corridors (§6.7, M21): their dot on the futures, their list, their lines. */
+.family-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.3rem;
+  border-radius: 50%;
+  vertical-align: 0.05rem;
+}
+
+.family-dot[data-family='green'] {
+  background: #5f9e4a;
+}
+
+.family-dot[data-family='blue'] {
+  background: #4f9fca;
+}
+
+.corridors ul {
+  margin: 0.2rem 0 0.5rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.corridor path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.corridor[data-family='green'] .corridor-base {
+  stroke: #4c8a3c;
+  stroke-width: 3;
+}
+
+.corridor[data-family='green'] .corridor-top {
+  stroke: #82bd5e;
+  stroke-width: 4.4;
+  stroke-dasharray: 0.4 3.2;
+}
+
+.corridor[data-family='blue'] .corridor-base {
+  stroke: #5aaed4;
+  stroke-width: 2.4;
+}
+
+.corridor[data-family='blue'] .corridor-top {
+  stroke: #e2f4fb;
+  stroke-width: 0.6;
+  stroke-dasharray: 3 7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .corridor[data-family='blue'] .corridor-top {
+    animation: corridor-flow 3s linear infinite;
+  }
+}
+
+@keyframes corridor-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}

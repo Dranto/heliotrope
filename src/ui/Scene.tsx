@@ -54,6 +54,9 @@ import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
+import { CorridorLayer } from './CorridorArt';
+import { encodeCorridors } from './corridorMap';
+import { corridors as corridorsOf } from '../game/corridors';
 import { encodeStages } from './greatWorksMap';
 import { areGreatWorksOpen } from '../game/greatWorks';
 import { ReturnReplay } from './ReturnReplay';
@@ -235,6 +238,8 @@ export function Scene({
       Object.entries(state.greatWorks.works).map(([id, w]) => [id, w.stage]),
     ) as Parameters<typeof encodeStages>[0],
   );
+  // The green and blue corridors (§6.7), encoded so the layer only redraws when one changes.
+  const corridors = encodeCorridors(corridorsOf(state));
   // The parcels in their second future (§6.5), joined so the ground only redraws on a change.
   const seconds = parcels.filter((id) => futureOf(state, id) === 1).join();
   const secondList = useMemo(() => split(seconds), [seconds]);
@@ -259,6 +264,7 @@ export function Scene({
       <>
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
+        <CorridorLayer corridors={corridors} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
@@ -283,6 +289,7 @@ export function Scene({
       districtOffer,
       works,
       worksOpen,
+      corridors,
       districtReady,
       restoreNeighbour,
       daylight,

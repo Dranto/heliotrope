@@ -1,5 +1,6 @@
 // French texts, the reference language (docs/game-design.md §14 Q1). Every other language
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
+import type { CorridorFamily } from '../game/corridors';
 import type { AchievementFamily, AchievementId } from '../game/achievements';
 import type { Language } from '../game/format';
 import type { GeneratorId } from '../game/generators';
@@ -632,6 +633,13 @@ export const fr = {
     },
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
   },
+  corridors: {
+    family: { green: 'verte', blue: 'bleue' } satisfies Record<CorridorFamily, string>,
+    joins: (family: string) => `Rejoint une trame ${family}`,
+    hint: 'Des parcelles voisines aux avenirs de la même famille (pastille verte ou bleue) forment une trame\u00a0: un bonus qui grandit avec sa longueur, et une espèce dès trois parcelles.',
+    line: (family: string, length: number, effect: string) =>
+      `Trame ${family}\u00a0: ${length} parcelles · ${effect}`,
+  },
   herbier: {
     open: 'Herbier',
     title: 'L’Herbier',
@@ -668,6 +676,8 @@ export const fr = {
       swallow: 'Hirondelle rustique',
       dragonfly: 'Libellule déprimée',
       redstart: 'Rougequeue noir',
+      greenWoodpecker: 'Pic vert',
+      newt: 'Triton crêté',
     } satisfies Record<SpeciesId, string>,
     describe: {
       parcel: (parcel: string) => `Restaurer ${parcel}`,
@@ -677,6 +687,7 @@ export const fr = {
       talent: (talent: string) => `Apprendre ${talent} dans l’Arbre`,
       challenge: (challenge: string) => `Réussir ${challenge}`,
       visit: (visit: string, count: number) => `${visit}, ${count} fois`,
+      corridor: (family: string, length: number) => `Une trame ${family} de ${length} parcelles`,
     },
   },
   challenges: {

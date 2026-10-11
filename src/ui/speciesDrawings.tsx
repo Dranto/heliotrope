@@ -486,4 +486,53 @@ export const SPECIES_ART: Record<SpeciesId, () => ReactNode> = {
       <circle cx="22.4" cy="10.6" r="0.7" fill="#fbf6ec" />
     </>
   ),
+  greenWoodpecker: () => (
+    <>
+      <path d="M24 2v28" stroke="#8a6a48" strokeWidth={3.2} strokeLinecap="round" />
+      <path
+        d="M23 9c-1 1-1 3 0 4M25 20c1 1 1 2 0 3"
+        fill="none"
+        stroke="#6b5036"
+        strokeWidth={0.5}
+      />
+      <path d="M21 10c-4-1-8 1-9 5-1 5 1 10 5 13l3 2 1-4c1-5 1-11 0-16Z" fill="#7da45a" {...line} />
+      <path d="M21 27c-1-3-2-4-4-5 0 3 1 5 3 7Z" fill="#d6cf5a" {...line} strokeWidth={0.5} />
+      <path d="M13 15c2 1 4 3 5 7" fill="none" stroke="#5a7d42" strokeWidth={0.6} />
+      <circle cx="17" cy="9" r="4.2" fill="#9cbf72" {...line} />
+      <path d="M13.4 7c1-3 5-4 7.4-2-1 1-3 2-7.4 2Z" fill="#d23a30" {...line} strokeWidth={0.5} />
+      <path d="M13 9.4 6.4 10l6.8 1.2Z" fill="#5a5048" {...line} strokeWidth={0.5} />
+      <path d="M13.6 10.6c1 1.6 2.6 1.8 3.6 1" fill="none" stroke="#2c2f33" strokeWidth={1} />
+      <circle cx="15.6" cy="8.6" r="0.9" fill="#f3efe2" />
+      <circle cx="15.6" cy="8.6" r="0.45" fill="#2b2622" />
+      <path d="M21 28 23.6 26M21 22l2.6-1.4" stroke="#6b5036" strokeWidth={0.7} />
+    </>
+  ),
+  newt: () => (
+    <>
+      <path
+        d="M16 4c2 0 3 2 3 4 0 1-.4 2-1 3 1 2 1.4 5 1 8-.4 3-1.6 5-1.4 7 .2 2 2 3 4 4-3 0-5-1-6-3-1-2-.6-5-1-8-.4-3-1-6 0-8-.6-1-1-2-1-3 0-2 1-4 2.4-4Z"
+        fill="#5a4a38"
+        {...line}
+      />
+      <path d="M16 11v15" stroke="#3b3024" strokeWidth={1.2} strokeDasharray="1.2 0.8" />
+      <path
+        d="M14 12 9 10M18 12l5-2M14.6 20l-5 3M17.6 20l5 3"
+        fill="none"
+        {...line}
+        stroke="#5a4a38"
+        strokeWidth={1.4}
+      />
+      {[
+        [15, 14],
+        [17, 16],
+        [15.4, 18.4],
+        [17, 21],
+        [15, 9],
+      ].map(([x, y]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="0.6" fill="#f0a23c" />
+      ))}
+      <circle cx="14.6" cy="6" r="0.6" fill="#e7d9a8" />
+      <circle cx="17.4" cy="6" r="0.6" fill="#e7d9a8" />
+    </>
+  ),
 };

@@ -1,4 +1,5 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
+import type { CorridorFamily } from '../game/corridors';
 import type { CropId, VarietyId } from '../game/seedBank';
 import type { CanopyId } from '../game/talents';
 import type { Texts, UpgradeText } from './fr';
@@ -573,6 +574,13 @@ export const en: Texts = {
     },
     variety: (name: string) => `New variety: ${name}!`,
   },
+  corridors: {
+    family: { green: 'green', blue: 'blue' } satisfies Record<CorridorFamily, string>,
+    joins: (family: string) => `Joins a ${family} corridor`,
+    hint: 'Neighbouring parcels whose futures share a family (green or blue dot) form a corridor: a bonus that grows with its length, and a species from three parcels.',
+    line: (family: string, length: number, effect: string) =>
+      `${family.charAt(0).toUpperCase()}${family.slice(1)} corridor: ${length} parcels · ${effect}`,
+  },
   herbier: {
     open: 'Herbarium',
     title: 'The Herbarium',
@@ -609,6 +617,8 @@ export const en: Texts = {
       swallow: 'Barn swallow',
       dragonfly: 'Broad-bodied chaser',
       redstart: 'Black redstart',
+      greenWoodpecker: 'Green woodpecker',
+      newt: 'Great crested newt',
     },
     describe: {
       parcel: (parcel: string) => `Restore ${parcel}`,
@@ -618,6 +628,7 @@ export const en: Texts = {
       talent: (talent: string) => `Learn ${talent} in the Tree`,
       challenge: (challenge: string) => `Win ${challenge}`,
       visit: (visit: string, count: number) => `${visit}, ${count} times`,
+      corridor: (family: string, length: number) => `A ${family} corridor of ${length} parcels`,
     },
   },
   challenges: {
