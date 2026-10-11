@@ -11,6 +11,8 @@ import { isParcelId, type ParcelId } from './parcels';
 import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
 import { validPlots } from './garden';
+import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
+import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels } from './delta';
 import { isVarietyId, type VarietyId } from './seedBank';
 import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
@@ -77,6 +79,8 @@ const migrations: Record<number, Migration> = {
   14: (raw) => ({ ...raw, version: 15 }),
   // v16 adds the courtyard garden (§9.7, M14): every bed bare, no variety yet.
   15: (raw) => ({ ...raw, version: 16 }),
+  // v17 adds the delta of the Sources and the challenge Cycles (§7.5, M15): every arm closed.
+  16: (raw) => ({ ...raw, version: 17 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -242,6 +246,27 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (isCount(data.sources)) state.sources = data.sources;
   if (isCount(data.cycles)) state.cycles = data.cycles;
+  const delta = data.delta as Record<string, unknown> | undefined;
+  const armLevels = validDeltaLevels(delta?.levels);
+  state.delta = {
+    // Arms are paid with the Sources obtained: a save cannot hold more than they buy.
+    levels: deltaSourcesSpent(armLevels) <= state.sources ? armLevels : state.delta.levels,
+    lockFactor: (LOCK_FACTORS as readonly unknown[]).includes(delta?.lockFactor)
+      ? (delta!.lockFactor as number)
+      : 0,
+    lockCycles: isCount(delta?.lockCycles) ? delta.lockCycles : 0,
+  };
+  if (Array.isArray(data.cycleChallenges)) {
+    state.cycleChallenges = [
+      ...new Set<CycleChallengeId>(data.cycleChallenges.filter(isCycleChallengeId)),
+    ];
+  }
+  if (
+    isCycleChallengeId(data.cycleChallenge) &&
+    !state.cycleChallenges.includes(data.cycleChallenge)
+  ) {
+    state.cycleChallenge = data.cycleChallenge;
+  }
   const garden = data.garden as Record<string, unknown> | undefined;
   state.garden = {
     plots: validPlots(garden?.plots),

@@ -10,6 +10,7 @@ import {
   collectorWater,
   isBioregionOpen,
   isCollectorRevealed,
+  isSiteOffered,
   isSiteRevealed,
   raiseSite,
   SITE_BONUS,
@@ -18,6 +19,7 @@ import {
   siteCost,
   waterPerSecond,
 } from '../game/bioregion';
+import { HILLSIDES_CLICK_BONUS, HILLSIDES_VISIT_BONUS } from '../game/delta';
 import { formatCost, formatDecimal, formatNumber, formatPercent } from '../game/format';
 import { t } from '../i18n';
 import { usePanelOpen } from './layoutPrefs';
@@ -45,7 +47,7 @@ export function Bioregion() {
   const collectors = COLLECTOR_IDS.filter((id) => isCollectorRevealed(state, id));
   const nextCollector = COLLECTOR_IDS.find((id) => !isCollectorRevealed(state, id));
   const sites = SITE_IDS.filter((id) => isSiteRevealed(state, id));
-  const nextSite = SITE_IDS.find((id) => !isSiteRevealed(state, id));
+  const nextSite = SITE_IDS.find((id) => isSiteOffered(state, id) && !isSiteRevealed(state, id));
 
   return (
     <section className="panel bioregion" aria-labelledby="bioregion-title" data-open={open}>
@@ -118,15 +120,23 @@ export function Bioregion() {
               const level = state.sites[id];
               const cost = formatCost(siteCost(state, id));
               const [first, second] = SITES[id].buildings.map((g) => t.generators[g].name);
+              const hills = id === 'hillsides';
               return (
                 <li key={id} className="generator site" data-site={id}>
                   <div className="generator-text">
                     <h3>{text.name}</h3>
                     <p className="flavour">{text.flavour}</p>
                     <p className="generator-stats">
-                      {t.bioregion.siteEffect(first!, second!, formatPercent(SITE_BONUS))}
+                      {hills
+                        ? t.bioregion.hillsidesEffect(
+                            formatPercent(HILLSIDES_CLICK_BONUS),
+                            formatPercent(HILLSIDES_VISIT_BONUS),
+                          )
+                        : t.bioregion.siteEffect(first!, second!, formatPercent(SITE_BONUS))}
                       {level > 0 &&
-                        ` · ${t.bioregion.siteNow(formatDecimal(1 + SITE_BONUS * level))}`}
+                        ` · ${(hills ? t.bioregion.hillsidesNow : t.bioregion.siteNow)(
+                          formatDecimal(1 + (hills ? HILLSIDES_CLICK_BONUS : SITE_BONUS) * level),
+                        )}`}
                     </p>
                   </div>
                   <span

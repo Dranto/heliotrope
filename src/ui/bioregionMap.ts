@@ -243,6 +243,51 @@ function ringOf({ x, y }: Crown): number {
   return Math.hypot((x - hill.x) / hill.rx, (y - hill.y) / hill.ry);
 }
 
+export interface Terrace {
+  /** The terrace's wall and its rows of vines, along a contour of the hill. */
+  d: string;
+  /** Middle of the terrace, where it enters. */
+  at: Point;
+  /** Half its length, roughly: the size of its golden ring. */
+  size: number;
+}
+
+/**
+ * The hillsides (§7.5): terraces of vines on the sunny southern flank of each hill, below the
+ * old-growth forest, the lowest of every hill first.
+ */
+export const TERRACES: Terrace[] = (() => {
+  const terraces: (Terrace & { order: number })[] = [];
+  HILLS.forEach((hill) => {
+    [1.1, 1, 0.9].forEach((f, row) => {
+      [
+        [0.35, 1.5],
+        [1.64, 2.8],
+      ].forEach(([a0, a1], half) => {
+        const points: Point[] = [];
+        for (let i = 0; i <= 6; i++) {
+          const a = a0! + ((a1! - a0!) * i) / 6;
+          points.push([
+            round(hill.x + Math.cos(a) * hill.rx * f),
+            round(hill.y + Math.sin(a) * hill.ry * f),
+          ]);
+        }
+        const mid = (a0! + a1!) / 2;
+        terraces.push({
+          d: smoothPath(points),
+          at: [
+            round(hill.x + Math.cos(mid) * hill.rx * f),
+            round(hill.y + Math.sin(mid) * hill.ry * f),
+          ],
+          size: round(hill.rx * f * 0.45),
+          order: row * 2 + half,
+        });
+      });
+    });
+  });
+  return terraces.sort((a, b) => a.order - b.order).map(({ d, at, size }) => ({ d, at, size }));
+})();
+
 /** Ponds dug just beyond the suburbs, nearest home first. */
 export const PONDS: Crown[] = (() => {
   const [sx, sy, sw, sh] = SUBURBS;
@@ -329,6 +374,7 @@ export interface LandShown {
   gardens: Field[];
   marshes: Marsh[];
   crowns: Crown[];
+  terraces: Terrace[];
   ponds: Crown[];
   streams: string[];
   tanks: Point[];
@@ -351,6 +397,7 @@ export function landShown(
     gardens,
     marshes: MARSHES.slice(0, visibleElements(sites.wetlands, MARSHES.length, 2)),
     crowns: OLD_FOREST.slice(0, visibleElements(sites.oldForest, OLD_FOREST.length, 14)),
+    terraces: TERRACES.slice(0, visibleElements(sites.hillsides, TERRACES.length, 2)),
     ponds: PONDS.slice(0, visibleElements(collectors.ponds, PONDS.length)),
     streams: STREAMS.slice(0, visibleElements(collectors.streams, STREAMS.length)),
     tanks: ROOF_TANKS.slice(0, visibleElements(collectors.roofTanks, ROOF_TANKS.length)),

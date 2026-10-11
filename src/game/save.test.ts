@@ -315,7 +315,13 @@ describe('export and import', () => {
     expect(state.allTimeWater).toBe(50);
     expect(state.waterBeforeCycle).toBe(0);
     expect(state.collectors).toEqual({ roofTanks: 2, swales: 0, ponds: 0, streams: 0 });
-    expect(state.sites).toEqual({ wetlands: 3, meadows: 0, foodForests: 0, oldForest: 0 });
+    expect(state.sites).toEqual({
+      wetlands: 3,
+      meadows: 0,
+      foodForests: 0,
+      oldForest: 0,
+      hillsides: 0,
+    });
     expect(state.sources).toBe(4);
     expect(state.cycles).toBe(1);
     // The rooted Seeds still pay for the talents learnt before the Cycle.

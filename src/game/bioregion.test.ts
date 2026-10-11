@@ -75,7 +75,7 @@ describe('the Bioregion (§7.4)', () => {
       seasonSeconds: SEED_RIPENING_SECONDS,
       resources: { light: 1e9, water: 500 },
       collectors: { roofTanks: 3, swales: 1, ponds: 0, streams: 0 },
-      sites: { wetlands: 2, meadows: 1, foodForests: 0, oldForest: 0 },
+      sites: { wetlands: 2, meadows: 1, foodForests: 0, oldForest: 0, hillsides: 0 },
     });
     const next = startNewSeason(state);
     expect(next.seasons).toBe(3);

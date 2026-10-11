@@ -3,6 +3,7 @@
 // Golden Butterflies caught, a challenge Season won), then lives on the map for good. Species are
 // kept across Seasons. Names live in src/i18n, drawings and places in src/ui.
 import type { ChallengeId } from './challenges';
+import type { CycleChallengeId } from './cycleChallenges';
 import type { GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
@@ -28,6 +29,9 @@ export const SPECIES_IDS = [
   'orchid',
   'stagBeetle',
   'owl',
+  'otter',
+  'salmon',
+  'blackStork',
 ] as const;
 export type SpeciesId = (typeof SPECIES_IDS)[number];
 
@@ -39,7 +43,9 @@ export type SpeciesCondition =
   | { kind: 'project'; project: ProjectId }
   | { kind: 'talent'; talent: TalentId }
   /** Won by completing a challenge Season (§7.3). */
-  | { kind: 'challenge'; challenge: ChallengeId };
+  | { kind: 'challenge'; challenge: ChallengeId }
+  /** Won by completing a challenge Cycle of water (§7.5). */
+  | { kind: 'cycleChallenge'; challenge: CycleChallengeId };
 
 export interface SpeciesDef {
   id: SpeciesId;
@@ -52,7 +58,10 @@ export interface SpeciesDef {
  */
 export const SPECIES_STEPS = 1;
 
-/** §9.5: the complete Herbier multiplies the whole biodiversity bonus. */
+/**
+ * §9.5: the complete Herbier multiplies the whole biodiversity bonus. It counts the species of
+ * the neighbourhood; the river species of the challenge Cycles (§7.5) come on top.
+ */
 export const HERBIER_COMPLETE_FACTOR = 1.5;
 
 /** Display order: the first returns of the Balcony, then the Neighbourhood, then the City. */
@@ -75,7 +84,13 @@ export const SPECIES_LIST: readonly SpeciesDef[] = [
   { id: 'orchid', condition: { kind: 'challenge', challenge: 'wild' } },
   { id: 'stagBeetle', condition: { kind: 'challenge', challenge: 'frugal' } },
   { id: 'owl', condition: { kind: 'challenge', challenge: 'hands' } },
+  { id: 'otter', condition: { kind: 'cycleChallenge', challenge: 'drought' } },
+  { id: 'salmon', condition: { kind: 'cycleChallenge', challenge: 'flood' } },
+  { id: 'blackStork', condition: { kind: 'cycleChallenge', challenge: 'still' } },
 ];
+
+/** The river species (§7.5), beyond the neighbourhood's Herbier. */
+export const RIVER_SPECIES: readonly SpeciesId[] = ['otter', 'salmon', 'blackStork'];
 
 export const SPECIES: Record<SpeciesId, SpeciesDef> = Object.fromEntries(
   SPECIES_LIST.map((s) => [s.id, s]),
@@ -99,6 +114,8 @@ function isMet(state: GameState, condition: SpeciesCondition): boolean {
       return state.talents.includes(condition.talent);
     case 'challenge':
       return state.challenges.includes(condition.challenge);
+    case 'cycleChallenge':
+      return state.cycleChallenges.includes(condition.challenge);
   }
 }
 
@@ -112,5 +129,5 @@ export function unlockSpecies(state: GameState): GameState {
 }
 
 export function isHerbierComplete(state: Pick<GameState, 'species'>): boolean {
-  return state.species.length === SPECIES_IDS.length;
+  return SPECIES_IDS.every((id) => RIVER_SPECIES.includes(id) || state.species.includes(id));
 }

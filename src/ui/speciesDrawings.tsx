@@ -335,4 +335,73 @@ export const SPECIES_ART: Record<SpeciesId, () => ReactNode> = {
       <path d="M15.2 15.4 16 17.4l.8-2Z" fill="#c9a03e" {...line} strokeWidth={0.5} />
     </>
   ),
+  otter: () => (
+    <>
+      <path d="M3 24q3-1.6 6 0t6 0 6 0 6 0 3 0" fill="none" stroke="#5fa8c4" strokeWidth={0.9} />
+      <path
+        d="M6 22c1-4 5-7 10-7 3 0 5-2 7-2 3 0 5 2 5 4s-2 3-4 3c-3 0-4 2-8 3-4 .6-8 .4-10-1Z"
+        fill="#7a5638"
+        {...line}
+      />
+      <path d="M6 22c-2 0-3.4-1-4-2.6 1.6.2 3 .8 4 2.6Z" fill="#7a5638" {...line} />
+      <path d="M20 19c1.6 1 3.4 1.4 5.6 1" fill="none" stroke="#c9a77e" strokeWidth={0.9} />
+      <circle cx="24.6" cy="15.6" r="0.8" fill="#2b2622" />
+      <circle cx="27.6" cy="16.6" r="0.7" fill="#2b2622" />
+      <path
+        d="M27 18.2 30.6 17.4M27 18.8l3.6.4M23 14l.6-1.6 1 1.2"
+        fill="none"
+        {...line}
+        strokeWidth={0.5}
+      />
+    </>
+  ),
+  salmon: () => (
+    <>
+      <path d="M4 27q3-1.6 6 0t6 0 6 0 6 0" fill="none" stroke="#5fa8c4" strokeWidth={0.9} />
+      <path
+        d="M6 21c3-7 9-11 16-11 2 0 4 1 5 2-1 2-3 3-5 4-5 3-10 5-16 5Z"
+        fill="#c9cfd2"
+        {...line}
+      />
+      <path d="M8 19.6c4-1 9-3.4 13-6.4 2.4-.4 4 0 5.2.8-5 3.6-11 5.6-18.2 5.6Z" fill="#e48a7c" />
+      <path d="M6 21 2 23.6l1-4.4-2.4-3.4L6 18" fill="#aab4b8" {...line} />
+      <path
+        d="M14 12.6 15.6 9.6l2 2.4M13 19.6l1.4 3 1.4-2.6"
+        fill="#aab4b8"
+        {...line}
+        strokeWidth={0.5}
+      />
+      <circle cx="23.6" cy="12.6" r="0.8" fill="#2b2622" />
+      {[
+        [12, 15.4],
+        [15, 13.6],
+        [18, 12.2],
+      ].map(([x = 0, y = 0]) => (
+        <circle key={`${x},${y}`} cx={x} cy={y} r="0.5" fill="#3b4a40" />
+      ))}
+    </>
+  ),
+  blackStork: () => (
+    <>
+      <path d="M14 22 12.6 30.6M17 22l1.4 8.6" {...line} stroke="#c8453a" strokeWidth={1} />
+      <path
+        d="M8 17c0-4 3-6 7-6 2-3 2-6 4-7.4 1.4-.6 2.6.2 2.6 1.4-1 2-2 4-2.2 7 2 1.2 2.6 3 2.6 5 0 3-3 5-7 5s-7-2-7-5Z"
+        fill="#2f3438"
+        {...line}
+      />
+      <path
+        d="M11 19.6c1.4 1.4 3 2 5 2s3.6-.6 4.6-1.8c-1.6-.6-3.2-1-5-1-1.8 0-3.4.2-4.6.8Z"
+        fill="#f1ede4"
+      />
+      <path d="M8 17 3.6 19.6 8.6 19" fill="#2f3438" {...line} />
+      <path
+        d="M21.6 5c2 .2 5 1.4 7.4 3.4-2.6-.6-5.2-1-7.6-.8Z"
+        fill="#c8453a"
+        {...line}
+        strokeWidth={0.5}
+      />
+      <circle cx="20.4" cy="5.4" r="0.6" fill="#fbf6ec" />
+      <path d="M11 14c2-.4 4-.2 6 .6" fill="none" stroke="#5f7a6a" strokeWidth={0.7} />
+    </>
+  ),
 };

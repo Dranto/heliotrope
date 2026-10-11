@@ -14,6 +14,7 @@ import {
   Pond,
   Swale,
   Tank,
+  TerraceArt,
 } from '../BioregionArt';
 import { landShown } from '../bioregionMap';
 import { centre } from '../neighbourhood';
@@ -116,6 +117,15 @@ export function mapSources({ parcels, sites, collectors, bioregion }: SourceProp
       group: 'landTop',
       node: <OldCrown {...crown} />,
       entrance: { at: [crown.x, crown.y], size: crown.r + 2 },
+    });
+  }
+  for (const terrace of shown.terraces) {
+    sources.push({
+      ...land,
+      key: `terrace:${terrace.at.join()}`,
+      group: 'landTop',
+      node: <TerraceArt {...terrace} />,
+      entrance: { at: [terrace.at[0], terrace.at[1]], size: terrace.size },
     });
   }
   for (const box of shown.swales) {

@@ -1,10 +1,11 @@
 // Milestones ("Jalons", docs/game-design.md §9.3). Data table plus pure unlock checks; names
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
-import { collectorsOwned, SITE_IDS, siteLevels } from './bioregion';
+import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
+import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
 import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
 import { canopyLevels, isCanopyComplete } from './talents';
@@ -81,6 +82,12 @@ export type AchievementCondition =
   | { kind: 'everySite'; count: number }
   /** Cycles of water completed (§7.4). */
   | { kind: 'cycles'; count: number }
+  /** Levels opened in the delta of the Sources (§7.5). */
+  | { kind: 'deltaLevels'; count: number }
+  /** Cycles the lock keeper started (§7.5). */
+  | { kind: 'lockCycles'; count: number }
+  /** Challenge Cycles won (§7.5). */
+  | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
   | { kind: 'visits'; visit: VisitKind; count: number }
   /** Every kind of visit welcomed at least once (§9.6). */
@@ -131,6 +138,8 @@ const WATER_EXPONENTS = [3, 6, 9] as const;
 const COLLECTOR_STEPS = [10, 50] as const;
 const SITE_STEPS = [1, 10, 25] as const;
 const CYCLE_STEPS = [1, 3] as const;
+const DELTA_STEPS = [1, 6] as const;
+const CYCLE_CHALLENGE_STEPS = [1, 3] as const;
 
 export type AchievementId =
   | `light.${(typeof LIGHT_EXPONENTS)[number]}`
@@ -159,6 +168,9 @@ export type AchievementId =
   | `collectors.${(typeof COLLECTOR_STEPS)[number]}`
   | `sites.${(typeof SITE_STEPS)[number]}`
   | `cycles.${(typeof CYCLE_STEPS)[number]}`
+  | `delta.${(typeof DELTA_STEPS)[number]}`
+  | 'lockKeeper'
+  | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
   | 'openDoors'
   | 'goodNeighbours'
@@ -395,6 +407,22 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     condition: { kind: 'cycles', count } as const,
   })),
   { id: 'floodTide', family: 'bioregion', condition: { kind: 'action' }, hidden: true },
+  // The delta of the Sources and the challenge Cycles (§7.5).
+  ...DELTA_STEPS.map((count) => ({
+    id: `delta.${count}` as const,
+    family: 'bioregion' as const,
+    condition: { kind: 'deltaLevels', count } as const,
+  })),
+  {
+    id: 'lockKeeper',
+    family: 'bioregion',
+    condition: { kind: 'lockCycles', count: LOCK_MILESTONE_CYCLES },
+  },
+  ...CYCLE_CHALLENGE_STEPS.map((count) => ({
+    id: `cycleChallenges.${count}` as const,
+    family: 'bioregion' as const,
+    condition: { kind: 'cycleChallenges', count } as const,
+  })),
 ];
 
 export const ACHIEVEMENTS = Object.fromEntries(ACHIEVEMENT_LIST.map((a) => [a.id, a])) as Record<
@@ -496,9 +524,15 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
     case 'siteLevels':
       return siteLevels(state) >= condition.count;
     case 'everySite':
-      return SITE_IDS.every((id) => state.sites[id] >= condition.count);
+      return BASIN_SITE_IDS.every((id) => state.sites[id] >= condition.count);
     case 'cycles':
       return state.cycles >= condition.count;
+    case 'deltaLevels':
+      return deltaLevels(state) >= condition.count;
+    case 'lockCycles':
+      return state.delta.lockCycles >= condition.count;
+    case 'cycleChallenges':
+      return state.cycleChallenges.length >= condition.count;
     case 'playSeconds':
       return state.playSeconds >= condition.seconds;
     case 'seasonSeconds':

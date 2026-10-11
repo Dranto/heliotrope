@@ -85,6 +85,12 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.everySite;
     case 'cycles':
       return describe.cycles(condition.count);
+    case 'deltaLevels':
+      return describe.deltaLevels(condition.count);
+    case 'lockCycles':
+      return describe.lockCycles(condition.count);
+    case 'cycleChallenges':
+      return describe.cycleChallenges(condition.count);
     case 'playSeconds':
       return describe.playHours(condition.seconds / 3600);
     case 'seasonSeconds':

@@ -1,3 +1,4 @@
+import { BASIN_SITE_IDS } from './bioregion';
 import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
 import { CHALLENGE_IDS, type ChallengeId } from './challenges';
@@ -95,7 +96,7 @@ describe('the Bioregion and the first Cycle of water (§7.4)', () => {
 
   it('builds collectors and raises every site before the first Cycle', () => {
     expect(Object.values(run.state.collectors).every((n) => n > 0)).toBe(true);
-    expect(Object.values(run.state.sites).every((n) => n > 0)).toBe(true);
+    expect(BASIN_SITE_IDS.every((id) => run.state.sites[id] > 0)).toBe(true);
   });
 
   it('keeps every later Season at least as long as the Seeds take to ripen (§7)', () => {

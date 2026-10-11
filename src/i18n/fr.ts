@@ -8,6 +8,8 @@ import type { DistrictId } from '../game/districts';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
 import type { ChallengeId } from '../game/challenges';
+import type { CycleChallengeId } from '../game/cycleChallenges';
+import type { DeltaId } from '../game/delta';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
@@ -276,6 +278,11 @@ export const fr = {
       'cycles.1': 'Retour à la mer',
       'cycles.3': 'Grand cycle',
       floodTide: 'Grandes eaux',
+      'delta.1': 'Premier bras',
+      'delta.6': 'Delta ouvert',
+      lockKeeper: 'L’éclusier veille',
+      'cycleChallenges.1': 'Contre vents et marées',
+      'cycleChallenges.3': 'Gardien de la rivière',
     } satisfies Record<AchievementId, string>,
     families: {
       light: 'Lumière',
@@ -363,6 +370,11 @@ export const fr = {
       cycles: (count: number) =>
         count === 1 ? 'Accomplir un Cycle de l’eau' : `Accomplir ${count} Cycles de l’eau`,
       floodTide: (sources: number) => `Faire jaillir ${sources} Sources d’un coup`,
+      deltaLevels: (count: number) =>
+        count === 1 ? 'Ouvrir un premier bras du delta' : `Ouvrir les ${count} niveaux du delta`,
+      lockCycles: (count: number) => `Laisser l’éclusier commencer ${count} Cycles`,
+      cycleChallenges: (count: number) =>
+        count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
     },
   },
   restoration: {
@@ -505,7 +517,7 @@ export const fr = {
     title: 'L’Herbier',
     close: 'Fermer l’herbier',
     summary: (count: string, total: string) => `${count} espèces revenues sur ${total}`,
-    hint: 'Chaque espèce revenue compte comme un palier de biodiversité (+2\u00a0%). L’herbier complet multiplie toute la biodiversité par 1,5.',
+    hint: 'Chaque espèce revenue compte comme un palier de biodiversité (+2\u00a0%). Les 18 espèces du quartier réunies multiplient toute la biodiversité par 1,5.',
     returned: (name: string) => `De retour dans le quartier\u00a0: ${name}`,
     returnedMany: (count: string) => `${count} espèces reviennent dans le quartier\u00a0!`,
     unknown: 'Espèce à retrouver',
@@ -529,6 +541,9 @@ export const fr = {
       orchid: 'Orchis pyramidal',
       stagBeetle: 'Lucane cerf-volant',
       owl: 'Chouette hulotte',
+      otter: 'Loutre d’Europe',
+      salmon: 'Saumon atlantique',
+      blackStork: 'Cigogne noire',
     } satisfies Record<SpeciesId, string>,
     describe: {
       parcel: (parcel: string) => `Restaurer ${parcel}`,
@@ -738,6 +753,10 @@ export const fr = {
         flavour: q('Sept étages de fruits, de noix et de feuilles.'),
       },
       oldForest: { name: 'Forêt ancienne', flavour: q('On la laisse pousser. Elle sait faire.') },
+      hillsides: {
+        name: 'Les Coteaux',
+        flavour: q('Vignes en terrasses, murets de pierre sèche.'),
+      },
     } satisfies Record<SiteId, GeneratorText>,
     gathers: (water: string) => `recueille ${water} Eau / s`,
     unitWater: (water: string) => `+${water} Eau / s`,
@@ -745,6 +764,9 @@ export const fr = {
     siteEffect: (first: string, second: string, percent: string) =>
       `${first} et ${second}\u00a0: +${percent}\u00a0% par niveau`,
     siteNow: (factor: string) => `production ×${factor}`,
+    hillsidesEffect: (click: string, visits: string) =>
+      `Clic +${click}\u00a0% et visites +${visits}\u00a0% par niveau`,
+    hillsidesNow: (factor: string) => `clic ×${factor}`,
     level: 'niveau',
     build: 'Bâtir',
     raise: 'Étendre',
@@ -781,6 +803,7 @@ export const fr = {
     kept: [
       'Les Sources',
       'Les talents de l’Arbre des Saisons, sans les repayer',
+      'Le delta et ses bras',
       'Les parcelles restaurées',
       'L’Herbier, les défis réussis et les jalons',
       'Les statistiques et les options',
@@ -791,6 +814,58 @@ export const fr = {
     confirmYes: 'Oui, recommencer le Cycle',
     cancel: 'Pas encore',
     started: 'Un nouveau Cycle commence. Les sources coulent plus fort.',
+    memoryKept: 'Avec le bras de la mémoire, la moitié des collecteurs et des sites reste.',
+    delta: {
+      title: 'Le delta',
+      hint: 'Ouvrir un bras dépense des Sources sans rien retirer à leur bonus.',
+      available: (sources: string) => `${sources} Sources à dépenser`,
+      names: {
+        hillsArm: 'Bras des coteaux',
+        floodArm: 'Bras des crues',
+        seedArm: 'Bras des semences',
+        memoryArm: 'Bras de la mémoire',
+        lockKeeper: 'L’éclusier',
+      } satisfies Record<DeltaId, string>,
+      effects: {
+        hillsArm: 'Ouvre un cinquième site de la biorégion, les Coteaux',
+        floodArm: 'Ouvre les Cycles à défi',
+        seedArm: (minutes: string) => `Les Graines mûrissent en ${minutes}`,
+        memoryArm: 'La moitié des collecteurs et des niveaux de sites reste après un Cycle',
+        lockKeeper: 'Relance le Cycle tout seul, au palier choisi',
+      },
+      open: 'Ouvrir',
+      openLabel: (name: string, cost: string) => `Ouvrir ${name} pour ${cost} Sources`,
+      opened: 'Ouvert',
+      cost: (sources: string) => `${sources} Sources`,
+      level: (level: string, max: string) => `niveau ${level} sur ${max}`,
+    },
+    lockKeeper: {
+      title: 'L’éclusier',
+      hint: 'Il commence un Cycle libre dès que ses Sources multiplient les vôtres, jamais pendant un défi.',
+      off: 'Éteint',
+      factor: (factor: string) => `×${factor}`,
+      started: (count: string) => `${count} Cycles commencés par l’éclusier`,
+    },
+  },
+  cycleChallenges: {
+    title: 'Cycle à défi',
+    hint: 'Une contrainte pour tout le Cycle. Recueillir l’objectif la lève, ramène une espèce de la rivière et donne un bonus pour toujours.',
+    free: 'Cycle libre',
+    freeHint: 'Sans contrainte',
+    names: {
+      drought: 'l’année sèche',
+      flood: 'la crue',
+      still: 'l’eau dormante',
+    } satisfies Record<CycleChallengeId, string>,
+    rules: {
+      water: (factor: string) => `Eau recueillie divisée par ${factor}`,
+      collectorCost: (factor: string) => `Collecteurs ${factor} fois plus chers`,
+      siteCost: (factor: string) => `Sites ${factor} fois plus chers`,
+    },
+    goal: (water: string) => `Objectif\u00a0: ${water} Eau dans le Cycle`,
+    won: (name: string) => `Défi réussi\u00a0: ${name}\u00a0! La contrainte est levée.`,
+    progress: (name: string, percent: string) => `${name}, objectif atteint à ${percent}\u00a0%`,
+    startWith: (name: string) => `Commencer ${name}`,
   },
   cooperatives: {
     title: 'Coopératives',

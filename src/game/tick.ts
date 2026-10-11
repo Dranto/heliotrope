@@ -9,6 +9,8 @@ import { unlockAchievement, unlockAchievements } from './achievements';
 import { earnWater, waterPerSecond } from './bioregion';
 import { advanceButterfly } from './butterfly';
 import { completeChallenge, generatorLimit } from './challenges';
+import { completeCycleChallenge } from './cycleChallenges';
+import { runLockKeeper } from './cycles';
 import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
 import { growGarden } from './garden';
@@ -45,16 +47,18 @@ function produce(state: GameState, dtSeconds: number): GameState {
 
 /**
  * Unlock the Milestones the state now qualifies for, win the running challenge Season once its
- * goal is reached (§7.3), and bring back the species now deserved (§9.5).
+ * goal is reached (§7.3), the running challenge Cycle likewise (§7.5), and bring back the
+ * species now deserved (§9.5).
  */
 export function unlockProgress(state: GameState): GameState {
-  return unlockSpecies(completeChallenge(unlockAchievements(state)));
+  return unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(state))));
 }
 
 /**
  * Advance the simulation by dtSeconds of play. Pure: returns a new state. The collectors of the
  * Bioregion gather Water (§7.4), then the Cooperatives (§7.2) buy what the Light earned affords,
- * and the sower (§7.1) starts the next Season when its Seeds are ripe and plentiful enough.
+ * and the sower (§7.1) starts the next Season when its Seeds are ripe and plentiful enough, after
+ * the lock keeper (§7.5) has had its chance to start the next Cycle.
  */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
@@ -64,14 +68,16 @@ export function tick(state: GameState, dtSeconds: number): GameState {
   );
   const next = runCooperatives(advanceVisit(advanceButterfly(watered, dtSeconds), dtSeconds));
   return runSower(
-    unlockProgress(
-      recordProduction({
-        ...next,
-        playSeconds: state.playSeconds + dtSeconds,
-        seasonSeconds: state.seasonSeconds + dtSeconds,
-        idleSeconds: state.idleSeconds + dtSeconds,
-        lastUpdate: state.lastUpdate + dtSeconds * 1000,
-      }),
+    runLockKeeper(
+      unlockProgress(
+        recordProduction({
+          ...next,
+          playSeconds: state.playSeconds + dtSeconds,
+          seasonSeconds: state.seasonSeconds + dtSeconds,
+          idleSeconds: state.idleSeconds + dtSeconds,
+          lastUpdate: state.lastUpdate + dtSeconds * 1000,
+        }),
+      ),
     ),
   );
 }

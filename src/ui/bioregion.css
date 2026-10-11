@@ -127,6 +127,22 @@
   stroke-width: 1.2;
 }
 
+/* The hillsides (§7.5): terraces of vines on the hills' sunny flank. */
+.bioregion-land .terrace-wall {
+  fill: none;
+  stroke: #c4a977;
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+
+.bioregion-land .terrace-vines {
+  fill: none;
+  stroke: #4f7f34;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 11;
+}
+
 /* Water. */
 .bioregion-land .river-bed {
   fill: none;
