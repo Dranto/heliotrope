@@ -61,6 +61,12 @@ export function shade(hex: string, amount: number): string {
   return amount >= 0 ? mix(hex, '#ffffff', amount) : mix(hex, '#1f2a24', -amount);
 }
 
+/** A stable number from 0 to 1 for the `i`-th detail of a drawing seeded with `seed`. */
+function rnd(seed: number, i: number): number {
+  const v = Math.sin(seed * 12.9898 + i * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
+
 function r(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -93,7 +99,8 @@ export function groundArt(
     courtyardGreen,
     wastelands,
     carParks,
-  }: { courtyardGreen: number; wastelands: Box[]; carParks: Box[] },
+    mirrorField = null,
+  }: { courtyardGreen: number; wastelands: Box[]; carParks: Box[]; mirrorField?: Box | null },
 ): Art {
   const { greenness, palette } = ctx;
   const { width, height } = WORLD;
@@ -174,8 +181,31 @@ export function groundArt(
     `<rect x="${cx + 0.4}" y="${cy + 0.4}" width="${cw - 0.8}" height="${ch - 0.8}" rx="4" fill="none" stroke="#d8cdb8" stroke-width=".8"/>`,
   );
   for (const box of carParks) parts.push(carParkArt(box));
+  if (mirrorField) parts.push(mirrorFieldArt(ctx, mirrorField));
   for (const box of wastelands) parts.push(wastelandArt(box));
   return { box: [0, 0, width, height], svg: parts.join('') };
+}
+
+/**
+ * The ground of the mirror field: a sunny meadow where the car park was, with gravel paths
+ * around the tower along the rings of heliostats, and a few wild flowers.
+ */
+function mirrorFieldArt(ctx: ArtContext, [x, y, w, h]: Box): string {
+  const { x: tx, y: ty } = MIRROR_TOWER;
+  const meadow = mix('#cfe0b4', ctx.palette.foliageLight, 0.25);
+  const rings = [26, 38, 50]
+    .map(
+      (radius) =>
+        `<ellipse cx="${tx}" cy="${ty}" rx="${r(radius * 1.35)}" ry="${radius}" fill="none" stroke="#e6dcc6" stroke-width="2.4"/><ellipse cx="${tx}" cy="${ty}" rx="${r(radius * 1.35)}" ry="${radius}" fill="none" stroke="#f4ede0" stroke-width=".6" stroke-dasharray=".5 1.2"/>`,
+    )
+    .join('');
+  const flowers = Array.from({ length: 40 }, (_, i) => {
+    const fx = x + 4 + rnd(11, i) * (w - 8);
+    const fy = y + 4 + rnd(29, i) * (h - 8);
+    const fill = [LILAC, GOLD_SOFT, '#fffaf0'][i % 3];
+    return `<circle cx="${r(fx)}" cy="${r(fy)}" r=".55" fill="${fill}"/>`;
+  }).join('');
+  return `<clipPath id="field"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/></clipPath><g clip-path="url(#field)"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${meadow}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#grass)"/>${flowers}${rings}<path d="M${tx} ${ty}V${y + h}" stroke="#e6dcc6" stroke-width="2.4"/></g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="none" stroke="#d9d3c7" stroke-width=".8"/>`;
 }
 
 const CAR_COLOURS = ['#8c8f94', '#6f7a86', '#b9b4aa', '#9a6b5a', '#5f6f66', '#d6d1c6'];
@@ -289,6 +319,7 @@ export function buildingArt(
       <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c968d"/><stop offset="1" stop-color="#7f7a72"/></linearGradient>
       <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f1e6"/><stop offset=".5" stop-color="#b9cfd2"/><stop offset="1" stop-color="#8aa6ad"/></linearGradient>
       <radialGradient id="tank" cx=".35" cy=".35"><stop offset="0" stop-color="#f2efe8"/><stop offset="1" stop-color="#a39d93"/></radialGradient>
+      <pattern id="gravel" width="1.8" height="1.6" patternUnits="userSpaceOnUse"><circle cx=".4" cy=".5" r=".2" fill="${shade(roof, -0.12)}"/><circle cx="1.3" cy="1.2" r=".16" fill="${shade(roof, 0.18)}"/></pattern>
       ${sedum ? `<pattern id="sedum" width="5" height="4.4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".75" fill="${shade(roof, -0.14)}"/><circle cx="3.6" cy="3.2" r=".7" fill="${shade(roof, 0.12)}"/><circle cx="3.3" cy="1" r=".42" fill="${LILAC}"/><circle cx="1.3" cy="3.4" r=".36" fill="${GOLD_SOFT}"/><circle cx="4.6" cy="2.2" r=".3" fill="#fffaf0"/></pattern>` : ''}
     </defs>`,
     // Facade, then storeys of windows.
@@ -301,23 +332,77 @@ export function buildingArt(
     const count = Math.floor((w - 4) / 3.2);
     for (let k = 0; k < count; k++) {
       const s = (seed + i * 7 + k * 13) % 11;
-      const fill = s === 0 ? GOLD_SOFT : s < 4 ? '#f0e6cf' : '#d9d2c2';
+      const fill = s === 0 ? GOLD_SOFT : s < 4 ? '#f0e6cf' : '#c9d6d6';
+      const wx = x + 2.4 + k * 3.2;
+      const wh = Math.max(0.5, rowGap * 0.55);
       parts.push(
-        `<rect x="${r(x + 2.4 + k * 3.2)}" y="${r(wy - rowGap * 0.3)}" width="1.9" height="${r(Math.max(0.5, rowGap * 0.55))}" rx=".2" fill="${fill}" opacity=".92"/>`,
+        `<rect x="${r(wx - 0.2)}" y="${r(wy - rowGap * 0.3 - 0.2)}" width="2.3" height="${r(wh + 0.4)}" rx=".25" fill="#6d6860" opacity=".6"/>`,
+        `<rect x="${r(wx)}" y="${r(wy - rowGap * 0.3)}" width="1.9" height="${r(wh)}" rx=".2" fill="${fill}" opacity=".95"/>`,
       );
+      // Window boxes in flower as the city turns green.
+      if (rnd(seed + i, k) < ctx.greenness * 0.45) {
+        const bloom = [LILAC, GOLD_SOFT, TERRACOTTA, '#f2bfd3'][(k + i) % 4]!;
+        parts.push(
+          `<rect x="${r(wx - 0.3)}" y="${r(wy - rowGap * 0.3 + wh - 0.1)}" width="2.5" height=".55" rx=".2" fill="${ctx.palette.foliage}"/><circle cx="${r(wx + 0.4)}" cy="${r(wy - rowGap * 0.3 + wh + 0.05)}" r=".3" fill="${bloom}"/><circle cx="${r(wx + 1.5)}" cy="${r(wy - rowGap * 0.3 + wh + 0.1)}" r=".26" fill="${bloom}"/>`,
+        );
+      }
+    }
+  }
+  // Ivy climbing the corners of the facade.
+  if (ctx.greenness > 0.25) {
+    const reach = Math.min(1, (ctx.greenness - 0.25) * 1.6);
+    for (const [cx, k] of [
+      [x + 0.8, 0],
+      [x + w - 0.8, 1],
+    ] as const) {
+      if ((seed + k) % 3 === 2) continue;
+      for (let j = 0; j < Math.ceil(facade * reach); j += 1.1) {
+        parts.push(
+          `<circle cx="${r(cx + (rnd(seed, j * 7 + k) - 0.5) * 1.2)}" cy="${r(y + h - 0.6 - j)}" r="${r(0.55 + rnd(seed, j + k * 13) * 0.35)}" fill="${j % 2.2 < 1.1 ? ctx.palette.foliage : shade(ctx.palette.foliage, 0.18)}"/>`,
+        );
+      }
     }
   }
   parts.push(
     `<rect x="${x}" y="${y + top - 0.2}" width="${w}" height=".7" fill="#5e5a54" opacity=".45"/>`,
     `<rect x="${x}" y="${y}" width="${w}" height="${top}" rx="2" fill="url(#roof)"/>`,
   );
-  if (sedum) {
+  if (!sedum) {
     parts.push(
-      `<rect x="${x + 1.5}" y="${y + 1.5}" width="${w - 3}" height="${top - 3}" rx="1.5" fill="url(#sedum)"/>`,
+      `<rect x="${x + 1.6}" y="${y + 1.6}" width="${w - 3.2}" height="${top - 3.2}" rx="1.2" fill="url(#gravel)" opacity=".55"/>`,
     );
   }
-  // Parapet: a light rim on the sun's side, a dark one on the other.
+  if (sedum) {
+    // Drifts of sedum in several greens and russets, a fine carpet of rosettes and flowers,
+    // and a gravel walkway for the gardeners.
+    const tones = [
+      shade(roof, -0.12),
+      shade(roof, 0.14),
+      mix(roof, '#c98f6a', 0.35),
+      mix(roof, '#e1d27a', 0.3),
+    ];
+    const blotches: string[] = [];
+    const count = Math.round((w * top) / 60);
+    for (let i = 0; i < count; i++) {
+      blotches.push(
+        `<ellipse cx="${r(x + 2 + rnd(seed, i) * (w - 4))}" cy="${r(y + 2 + rnd(seed, i + 300) * (top - 4))}" rx="${r(2.5 + rnd(seed, i + 600) * 3.5)}" ry="${r(1.8 + rnd(seed, i + 900) * 2.4)}" fill="${tones[i % tones.length]}" opacity=".9"/>`,
+      );
+    }
+    const path =
+      w >= top
+        ? `M${x + 3} ${r(y + top / 2)}H${x + w - 3}`
+        : `M${r(x + w / 2)} ${y + 3}V${y + top - 3}`;
+    parts.push(
+      `<clipPath id="roofclip"><rect x="${x + 1.5}" y="${y + 1.5}" width="${w - 3}" height="${top - 3}" rx="1.5"/></clipPath>`,
+      `<g clip-path="url(#roofclip)">${blotches.join('')}</g>`,
+      `<rect x="${x + 1.5}" y="${y + 1.5}" width="${w - 3}" height="${top - 3}" rx="1.5" fill="url(#sedum)" opacity=".45"/>`,
+      `<path d="${path}" stroke="#ddd3bf" stroke-width="1.6" stroke-linecap="round"/><path d="${path}" stroke="#f1eadb" stroke-width=".5" stroke-dasharray=".4 .8" stroke-linecap="round"/>`,
+    );
+  }
+  // Parapet: a light rim on the sun's side, a dark one on the other, and the strip of roof it
+  // shades just inside the sunny edge.
   parts.push(
+    `<path d="M${lit === 1 ? x + 2.1 : x + w - 2.1} ${y + top - 2}V${y + 2.1}${lit === 1 ? `H${x + w - 2}` : `H${x + 2}`}" stroke="#3b3328" stroke-width="1" opacity=".14" fill="none"/>`,
     `<rect x="${x + 1.6}" y="${y + 1.6}" width="${w - 3.2}" height="${top - 3.2}" rx="1.2" fill="none" stroke="${shade(roof, -0.18)}" stroke-width=".55" opacity=".7"/>`,
     `<path d="M${lit === 1 ? x + 0.6 : x + w - 0.6} ${y + top - 1}V${y + 0.6}${lit === 1 ? `H${x + w - 1}` : `H${x + 1}`}" stroke="#fff" stroke-width=".7" opacity=".55" fill="none"/>`,
   );
@@ -356,6 +441,24 @@ export function buildingArt(
         );
       }
     }
+    // Planters and a potted tree on the roofs of a greener city.
+    if (ctx.greenness > 0.35 && top > 14 && w > 26 && seed % 4 !== 3) {
+      const py = y + top - 6;
+      const count = Math.min(3, Math.floor((w - 20) / 9));
+      for (let i = 0; i < count; i++) {
+        const px = x + 4 + i * 8.5;
+        parts.push(
+          `<rect x="${r(px + 0.5)}" y="${r(py + 0.6)}" width="7" height="3.2" rx=".5" fill="#3b3328" opacity=".22"/><rect x="${r(px)}" y="${r(py)}" width="7" height="3.2" rx=".5" fill="#b4895a"/><rect x="${r(px + 0.45)}" y="${r(py + 0.45)}" width="6.1" height="2.3" rx=".35" fill="${ctx.palette.foliage}"/><circle cx="${r(px + 1.5)}" cy="${r(py + 1.5)}" r=".8" fill="${shade(ctx.palette.foliage, 0.25)}"/><circle cx="${r(px + 3.4)}" cy="${r(py + 1.4)}" r=".7" fill="${shade(ctx.palette.foliage, 0.1)}"/><circle cx="${r(px + 5.3)}" cy="${r(py + 1.5)}" r=".55" fill="${i % 2 ? GOLD_SOFT : LILAC}"/><circle cx="${r(px + 2.5)}" cy="${r(py + 0.9)}" r=".4" fill="${i % 2 ? LILAC : GOLD_SOFT}"/>`,
+        );
+      }
+      if (ctx.greenness > 0.6) {
+        const tx = x + w * 0.5 + 3;
+        const ty = y + top * 0.3 + 2;
+        parts.push(
+          `<circle cx="${r(tx + 1)}" cy="${r(ty + 1.2)}" r="3" fill="#3b3328" opacity=".2"/><circle cx="${r(tx)}" cy="${r(ty)}" r="2.1" fill="${TERRACOTTA}"/><circle cx="${r(tx)}" cy="${r(ty)}" r="2.8" fill="${shade(ctx.palette.foliage, -0.08)}"/><circle cx="${r(tx - 0.6 * lit)}" cy="${r(ty - 0.6)}" r="1.6" fill="${mix(ctx.palette.foliage, ctx.palette.foliageLight, 0.55)}"/>`,
+        );
+      }
+    }
     const vx = x + w - 11;
     const vy = y + top - 10;
     if (top > 12) {
@@ -369,7 +472,10 @@ export function buildingArt(
 
 // Generators ---------------------------------------------------------------------------------
 
-/** A rooftop kitchen garden: wooden beds of leafy rows, tomatoes and flowers, a little path. */
+/**
+ * A rooftop kitchen garden: a timber deck around raised wooden beds of lettuces, staked tomatoes,
+ * lavender and sunflowers as it is upgraded, with a rain barrel and a gravel path between beds.
+ */
 export function gardenArt(ctx: ArtContext, box: Box, level: number): Art {
   const [x, y, w, h] = box;
   const horizontal = w >= h;
@@ -378,11 +484,17 @@ export function gardenArt(ctx: ArtContext, box: Box, level: number): Art {
   const rows = Math.max(1, Math.min(Math.floor((span - 4) / 4.5), 3 + level));
   const gap = (span - 4) / rows;
   const leaf = ctx.palette.foliage;
-  const leafLight = mix(ctx.palette.foliage, '#c8e0a8', 0.45);
+  const leafLight = mix(ctx.palette.foliage, ctx.palette.foliageLight, 0.7);
+  const sx = -0.6 * ctx.lit;
+  const seed = hash(x, y);
+  const plankDir = horizontal ? `M0 0H6` : `M0 0V6`;
   const parts = [
-    `<defs><linearGradient id="soil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6a4e"/><stop offset="1" stop-color="#6e533d"/></linearGradient></defs>`,
-    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#c9b48f"/>`,
-    `<rect x="${x + 0.8}" y="${y + 0.8}" width="${w - 1.6}" height="${h - 1.6}" rx="1.6" fill="none" stroke="#a88a5e" stroke-width=".6"/>`,
+    `<defs><linearGradient id="soil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d5d43"/><stop offset="1" stop-color="#5f4532"/></linearGradient>
+    <pattern id="deck" width="${horizontal ? 6 : 1.6}" height="${horizontal ? 1.6 : 6}" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#d2bb92"/><path d="${horizontal ? 'M0 1.55H6M3 0V1.6' : 'M1.55 0V6M0 3H1.6'}" stroke="#a88a5e" stroke-width=".14"/><path d="${plankDir}" stroke="#e3d0aa" stroke-width=".25" opacity=".7"/></pattern>
+    <pattern id="tilth" width="1.4" height="1.4" patternUnits="userSpaceOnUse"><circle cx=".4" cy=".5" r=".16" fill="#9a7a5c"/><circle cx="1.1" cy="1.1" r=".12" fill="#4a3526"/></pattern></defs>`,
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="url(#deck)"/>`,
+    `<rect x="${x + 0.5}" y="${y + 0.5}" width="${w - 1}" height="${h - 1}" rx="1.7" fill="none" stroke="#8f7148" stroke-width=".7"/>`,
+    `<rect x="${x + 1.1}" y="${y + 1.1}" width="${w - 2.2}" height="${h - 2.2}" rx="1.3" fill="none" stroke="#efe0bf" stroke-width=".25" opacity=".8"/>`,
   ];
   for (let i = 0; i < rows; i++) {
     const offset = 2 + gap * i;
@@ -390,74 +502,155 @@ export function gardenArt(ctx: ArtContext, box: Box, level: number): Art {
     const by = horizontal ? y + offset + 0.4 : y + 2.5;
     const bw = horizontal ? w - 5 : gap - 0.8;
     const bh = horizontal ? gap - 0.8 : h - 5;
+    // The bed: a wooden frame lit on the sun's side, crumbly soil inside.
     parts.push(
-      `<rect x="${r(bx)}" y="${r(by)}" width="${r(bw)}" height="${r(bh)}" rx=".6" fill="url(#soil)" stroke="#b08b5c" stroke-width=".35"/>`,
+      `<rect x="${r(bx + 0.35)}" y="${r(by + 0.45)}" width="${r(bw)}" height="${r(bh)}" rx=".6" fill="#3b3328" opacity=".25"/>`,
+      `<rect x="${r(bx)}" y="${r(by)}" width="${r(bw)}" height="${r(bh)}" rx=".6" fill="#b4895a"/>`,
+      `<rect x="${r(bx + 0.45)}" y="${r(by + 0.45)}" width="${r(bw - 0.9)}" height="${r(bh - 0.9)}" rx=".4" fill="url(#soil)"/>`,
+      `<rect x="${r(bx + 0.45)}" y="${r(by + 0.45)}" width="${r(bw - 0.9)}" height="${r(bh - 0.9)}" rx=".4" fill="url(#tilth)" opacity=".7"/>`,
+      `<path d="M${r(bx + 0.3)} ${r(by + 0.25)}H${r(bx + bw - 0.3)}" stroke="#e2c497" stroke-width=".22"/>`,
     );
-    const kind = level >= 3 && i % 3 === 2 ? 'blossom' : level >= 1 && i % 2 ? 'tomato' : 'leafy';
-    const plants = Math.floor((length - 6) / 2.4);
+    const kinds = ['leafy', 'tomato', 'leafy', 'lavender', 'tomato', 'sunflower'] as const;
+    const kind = kinds[(i + seed) % Math.min(kinds.length, 2 + level)]!;
+    const step = kind === 'sunflower' ? 3.2 : kind === 'lavender' ? 1.6 : 2.4;
+    const plants = Math.floor((length - 6) / step);
+    const across = (horizontal ? bh : bw) / 2;
     for (let k = 0; k < plants; k++) {
-      const along = 3.5 + k * 2.4;
-      const across = (horizontal ? bh : bw) / 2;
+      const along = 3.5 + k * step;
       const px = horizontal ? x + along : bx + across;
       const py = horizontal ? by + across : y + along;
-      const size = Math.min(across * 0.95, 1.25) * (0.85 + ((k * 7 + i) % 3) * 0.1);
-      parts.push(
-        `<circle cx="${r(px)}" cy="${r(py)}" r="${r(size)}" fill="${leaf}"/><circle cx="${r(px - 0.3 * ctx.lit)}" cy="${r(py - 0.3)}" r="${r(size * 0.55)}" fill="${leafLight}"/>`,
-      );
-      if (kind === 'tomato' && k % 2 === 0) {
-        parts.push(`<circle cx="${r(px + 0.5)}" cy="${r(py + 0.3)}" r=".45" fill="#d4573b"/>`);
-      }
-      if (kind === 'blossom' && k % 2 === 1) {
+      const size = Math.min(across * 0.9, 1.3) * (0.85 + ((k * 7 + i) % 3) * 0.1);
+      if (kind === 'leafy') {
+        // A lettuce: a rosette of pale leaves around a bright heart.
         parts.push(
-          `<circle cx="${r(px)}" cy="${r(py)}" r=".55" fill="${LILAC}"/><circle cx="${r(px)}" cy="${r(py)}" r=".2" fill="${GOLD}"/>`,
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(size)}" fill="${leaf}"/>`,
+          `<circle cx="${r(px + sx * 0.2)}" cy="${r(py - 0.2)}" r="${r(size * 0.7)}" fill="${mix(leafLight, '#d8ecb0', 0.3)}"/>`,
+          `<circle cx="${r(px + sx * 0.25)}" cy="${r(py - 0.25)}" r="${r(size * 0.32)}" fill="#eef6d6"/>`,
+        );
+      } else if (kind === 'tomato') {
+        // A staked tomato plant: jagged leaves and red fruit.
+        parts.push(
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(size * 1.05)}" fill="${shade(leaf, -0.1)}"/>`,
+          `<circle cx="${r(px + sx * 0.3)}" cy="${r(py - 0.3)}" r="${r(size * 0.6)}" fill="${leafLight}" opacity=".8"/>`,
+          `<circle cx="${r(px)}" cy="${r(py)}" r=".22" fill="#c9a776"/>`,
+        );
+        if (k % 2 === 0) {
+          parts.push(
+            `<circle cx="${r(px + 0.55)}" cy="${r(py + 0.35)}" r=".48" fill="#d4573b"/><circle cx="${r(px + 0.42)}" cy="${r(py + 0.22)}" r=".15" fill="#ffd2c2"/>`,
+          );
+        }
+        if (k % 3 === 1)
+          parts.push(`<circle cx="${r(px - 0.5)}" cy="${r(py + 0.5)}" r=".4" fill="#e9893f"/>`);
+      } else if (kind === 'lavender') {
+        // Lavender: a soft grey-green cushion topped with lilac spikes.
+        parts.push(
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(size * 0.85)}" fill="#8aa58a"/>`,
+          `<circle cx="${r(px + 0.2)}" cy="${r(py - 0.2)}" r="${r(size * 0.5)}" fill="${LILAC}"/>`,
+          `<circle cx="${r(px - 0.35)}" cy="${r(py + 0.25)}" r="${r(size * 0.32)}" fill="#9a7cc0"/>`,
+        );
+      } else {
+        // A sunflower: a ring of gold petals around a brown heart, facing the sun.
+        const fr = Math.min(across * 0.95, 1.5);
+        parts.push(
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(fr * 1.05)}" fill="${leaf}"/>`,
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(fr * 0.85)}" fill="${GOLD}"/>`,
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(fr * 0.85)}" fill="none" stroke="${GOLD_SOFT}" stroke-width="${r(fr * 0.25)}" stroke-dasharray="${r(fr * 0.3)} ${r(fr * 0.25)}"/>`,
+          `<circle cx="${r(px)}" cy="${r(py)}" r="${r(fr * 0.42)}" fill="#6b4a2a"/>`,
         );
       }
     }
   }
+  // A rain barrel in a corner of the deck.
+  if (span >= 12 && length >= 30) {
+    const kx = x + w - 1.8;
+    const ky = y + 1.8;
+    parts.push(
+      `<circle cx="${r(kx + 0.4)}" cy="${r(ky + 0.5)}" r="1.1" fill="#3b3328" opacity=".28"/><circle cx="${r(kx)}" cy="${r(ky)}" r="1.1" fill="#8b6a46" stroke="#5f4630" stroke-width=".2"/><circle cx="${r(kx)}" cy="${r(ky)}" r=".78" fill="${ctx.palette.water}"/><circle cx="${r(kx + sx * 0.25)}" cy="${r(ky - 0.25)}" r=".3" fill="${ctx.palette.sky}" opacity=".8"/>`,
+    );
+  }
   return { box, svg: parts.join('') };
 }
 
-/** A balcony solar panel: dark cells catching the sky, a thin frame, gilded when upgraded. */
+/**
+ * A balcony solar panel: a grid of deep blue cells with silver busbars, the sky sliding over its
+ * glass, a thin frame on its stand, gilded when upgraded.
+ */
 export function panelArt(ctx: ArtContext, x: number, y: number, level: number): Art {
-  const frame = level >= 1 ? GOLD : '#d9d6cf';
-  const svg = `<defs><linearGradient id="cells" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5d7d97"/><stop offset=".45" stop-color="#2f4a63"/><stop offset="1" stop-color="#253b50"/></linearGradient>
-    <linearGradient id="sky" x1="${ctx.lit === 1 ? 0 : 1}" y1="0" x2="${ctx.lit === 1 ? 1 : 0}" y2="1"><stop offset="0" stop-color="${ctx.palette.sky}" stop-opacity=".75"/><stop offset=".5" stop-color="${ctx.palette.sky}" stop-opacity="0"/></linearGradient></defs>
-    <rect x="${x + 0.5}" y="${y + 0.9}" width="11" height="8" rx=".8" fill="#3b3328" opacity=".25"/>
-    <rect x="${x}" y="${y}" width="11" height="8" rx=".8" fill="url(#cells)" stroke="${frame}" stroke-width=".5"/>
-    <path d="M${x} ${y + 2.67}h11M${x} ${y + 5.33}h11M${x + 2.75} ${y}v8M${x + 5.5} ${y}v8M${x + 8.25} ${y}v8" stroke="#9bb3c6" stroke-width=".18" opacity=".7"/>
-    <rect x="${x}" y="${y}" width="11" height="8" rx=".8" fill="url(#sky)"/>`;
-  return { box: [x - 0.5, y - 0.5, 12.5, 10], svg };
+  const frame = level >= 1 ? GOLD : '#dcd9d2';
+  const parts = [
+    `<defs><linearGradient id="cells" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7393"/><stop offset=".45" stop-color="#26405a"/><stop offset="1" stop-color="#1c3146"/></linearGradient>
+    <linearGradient id="sky" x1="${ctx.lit === 1 ? 0 : 1}" y1="0" x2="${ctx.lit === 1 ? 1 : 0}" y2="1"><stop offset="0" stop-color="${ctx.palette.sky}" stop-opacity=".8"/><stop offset=".35" stop-color="${ctx.palette.sky}" stop-opacity=".1"/><stop offset=".62" stop-color="#ffffff" stop-opacity="0"/><stop offset=".7" stop-color="#ffffff" stop-opacity=".22"/><stop offset=".78" stop-color="#ffffff" stop-opacity="0"/></linearGradient></defs>`,
+    `<rect x="${x + 0.7}" y="${y + 1.1}" width="11" height="8" rx=".8" fill="#3b3328" opacity=".28"/>`,
+    `<rect x="${x}" y="${y}" width="11" height="8" rx=".7" fill="${frame}"/>`,
+    `<rect x="${x + 0.45}" y="${y + 0.45}" width="10.1" height="7.1" rx=".4" fill="url(#cells)"/>`,
+  ];
+  // Six by four cells, with their thin silver lines.
+  const cells: string[] = [];
+  for (let i = 1; i < 6; i++) cells.push(`M${r(x + 0.45 + (10.1 / 6) * i)} ${y + 0.45}v7.1`);
+  for (let k = 1; k < 4; k++) cells.push(`M${x + 0.45} ${r(y + 0.45 + (7.1 / 4) * k)}h10.1`);
+  parts.push(
+    `<path d="${cells.join('')}" stroke="#a9bfd1" stroke-width=".16" opacity=".75"/>`,
+    `<path d="M${x + 0.45} ${y + 2.2}h10.1M${x + 0.45} ${y + 5.8}h10.1" stroke="#cfdbe6" stroke-width=".08" opacity=".6"/>`,
+    `<rect x="${x + 0.45}" y="${y + 0.45}" width="10.1" height="7.1" rx=".4" fill="url(#sky)"/>`,
+  );
+  if (level >= 3) {
+    parts.push(
+      `<rect x="${x}" y="${y}" width="11" height="8" rx=".7" fill="none" stroke="${GOLD_SOFT}" stroke-width=".18" opacity=".9"/>`,
+    );
+  }
+  return { box: [x - 0.5, y - 0.5, 12.5, 10], svg: parts.join('') };
 }
 
-/** A terracotta pot of heliotrope seen from above: its rim, leaves, lilac petals, gold heart. */
+/**
+ * A terracotta pot of heliotrope seen from above: its rim catching the sun, dark soil, pointed
+ * veined leaves, and a dome of florets, deep violet at the heart and lilac at the edge, that
+ * fills out with each upgrade, hearts turning gold.
+ */
 export function potArt(ctx: ArtContext, x: number, y: number, level: number): Art {
-  const petals = 3 + Math.min(level, 4);
+  const leaf = ctx.palette.foliage;
+  const sx = -0.6 * ctx.lit;
   const parts = [
-    `<defs><radialGradient id="pot" cx=".4" cy=".35"><stop offset="0" stop-color="#e09a74"/><stop offset="1" stop-color="#a95a3b"/></radialGradient></defs>`,
-    `<circle cx="${x + 0.6}" cy="${y + 0.8}" r="3.6" fill="#3b3328" opacity=".22"/>`,
+    `<defs><radialGradient id="pot" cx="${r(0.5 + sx * 0.25)}" cy=".3"><stop offset="0" stop-color="#eaa883"/><stop offset=".6" stop-color="#c8734f"/><stop offset="1" stop-color="#9a4f33"/></radialGradient>
+    <radialGradient id="dome" cx="${r(0.5 + sx * 0.2)}" cy=".35"><stop offset="0" stop-color="#d9c6ef"/><stop offset=".6" stop-color="${LILAC}"/><stop offset="1" stop-color="#7d5aa6"/></radialGradient></defs>`,
+    `<circle cx="${x + 0.7}" cy="${y + 0.9}" r="3.7" fill="#3b3328" opacity=".24"/>`,
     `<circle cx="${x}" cy="${y}" r="3.5" fill="url(#pot)"/>`,
-    `<circle cx="${x}" cy="${y}" r="2.8" fill="#5a3f2c"/>`,
-    `<circle cx="${x}" cy="${y}" r="2.6" fill="${ctx.palette.foliage}"/>`,
+    `<path d="M${r(x - 3.1 * ctx.lit)} ${y - 1.2}A3.3 3.3 0 0 1 ${x + 1.1 * ctx.lit} ${y - 3.2}" stroke="#ffe3cf" stroke-width=".45" fill="none" opacity=".7" stroke-linecap="round"/>`,
+    `<circle cx="${x}" cy="${y}" r="2.75" fill="#4a3324"/>`,
+    `<circle cx="${x}" cy="${y}" r="2.75" fill="none" stroke="#7a4a30" stroke-width=".3"/>`,
   ];
-  for (let i = 0; i < 4; i++) {
-    const a = (i / 4) * Math.PI * 2 + 0.6;
+  // Leaves radiating from the stem, each with its midrib.
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * 360 + 15;
+    const tone = i % 2 ? shade(leaf, 0.12) : leaf;
     parts.push(
-      `<ellipse cx="${r(x + Math.cos(a) * 1.5)}" cy="${r(y + Math.sin(a) * 1.5)}" rx="1.3" ry=".7" transform="rotate(${r((a * 180) / Math.PI)} ${r(x + Math.cos(a) * 1.5)} ${r(y + Math.sin(a) * 1.5)})" fill="${mix(ctx.palette.foliage, '#c8e0a8', 0.35)}"/>`,
+      `<g transform="translate(${x} ${y}) rotate(${a})"><path d="M0 0C.9 -.8 1.1 -2.2 0 -3.2C-1.1 -2.2 -.9 -.8 0 0Z" fill="${tone}"/><path d="M0 -.2V-2.9" stroke="${mix(leaf, '#e6f0d2', 0.5)}" stroke-width=".14"/></g>`,
     );
   }
-  for (let i = 0; i < petals; i++) {
-    const a = (i / petals) * Math.PI * 2;
+  // The dome of florets, laid out on the golden angle.
+  const florets = 10 + Math.min(level, 5) * 4;
+  parts.push(
+    `<circle cx="${x}" cy="${y}" r="${r(1.2 + Math.min(level, 5) * 0.12)}" fill="url(#dome)"/>`,
+  );
+  for (let i = 0; i < florets; i++) {
+    const a = i * 2.39996;
+    const d = 1.75 * Math.sqrt((i + 0.5) / florets);
+    const fx = x + Math.cos(a) * d;
+    const fy = y + Math.sin(a) * d;
+    const colour = mix('#7d5aa6', '#dccbee', d / 1.75);
     parts.push(
-      `<circle cx="${r(x + Math.cos(a) * 1.2)}" cy="${r(y + Math.sin(a) * 1.2)}" r="1" fill="${LILAC}"/><circle cx="${r(x + Math.cos(a) * 1.2 - 0.25)}" cy="${r(y + Math.sin(a) * 1.2 - 0.25)}" r=".4" fill="#dccbee"/>`,
+      `<circle cx="${r(fx)}" cy="${r(fy)}" r=".36" fill="${colour}"/>`,
+      level >= 3 && i % 3 === 0
+        ? `<circle cx="${r(fx)}" cy="${r(fy)}" r=".12" fill="${GOLD}"/>`
+        : `<circle cx="${r(fx + sx * 0.1)}" cy="${r(fy - 0.1)}" r=".12" fill="#ffffff" opacity=".55"/>`,
     );
   }
-  parts.push(`<circle cx="${x}" cy="${y}" r=".75" fill="${GOLD}"/>`);
   return { box: [x - 4.5, y - 4.5, 9.5, 9.5], svg: parts.join('') };
 }
 
 /**
- * A glass greenhouse on a former waste ground: a vaulted roof whose ribs catch the light, rows
- * of plants seen through the glass, warm inside once upgraded.
+ * A glass greenhouse on a former waste ground: a vaulted roof of panes on white ribs that catch
+ * the light, the sky sliding over the glass, beds of tomatoes and flowers seen through it, a
+ * central path to the door, vents opened once upgraded and a warm glow inside.
  */
 export function greenhouseArt(ctx: ArtContext, box: Box, level: number): Art {
   const [x, y, w, h] = box;
@@ -465,55 +658,103 @@ export function greenhouseArt(ctx: ArtContext, box: Box, level: number): Art {
   const iy = y + 4;
   const iw = w - 8;
   const ih = h - 8;
-  const ribs = 3 + Math.min(level, 5);
+  const ribs = 4 + Math.min(level, 5);
   const leaf = ctx.palette.foliage;
+  const leafLight = mix(leaf, ctx.palette.foliageLight, 0.65);
+  const frame = level >= 3 ? '#f3e2b8' : '#f7f4ec';
+  const lit = ctx.lit;
   const parts = [
     `<defs>
-      <linearGradient id="vault" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4faf6" stop-opacity=".5"/><stop offset=".46" stop-color="#bcd8d2" stop-opacity=".12"/><stop offset=".54" stop-color="#5f8f88" stop-opacity=".22"/><stop offset="1" stop-color="#d8ebe4" stop-opacity=".3"/></linearGradient>
-      <radialGradient id="warm" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="${GOLD_SOFT}" stop-opacity=".55"/><stop offset="1" stop-color="${GOLD_SOFT}" stop-opacity="0"/></radialGradient>
+      <linearGradient id="vault" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6fbf8" stop-opacity=".38"/><stop offset=".44" stop-color="#cfe4de" stop-opacity=".06"/><stop offset=".5" stop-color="#ffffff" stop-opacity=".02"/><stop offset=".56" stop-color="#5f8f88" stop-opacity=".18"/><stop offset="1" stop-color="#cfe4dc" stop-opacity=".26"/></linearGradient>
+      <linearGradient id="skyglass" x1="${lit === 1 ? 0 : 1}" y1="0" x2="${lit === 1 ? 1 : 0}" y2=".4"><stop offset="0" stop-color="${ctx.palette.sky}" stop-opacity=".55"/><stop offset=".45" stop-color="${ctx.palette.sky}" stop-opacity="0"/></linearGradient>
+      <radialGradient id="warm" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="${GOLD_SOFT}" stop-opacity=".38"/><stop offset="1" stop-color="${GOLD_SOFT}" stop-opacity="0"/></radialGradient>
+      <pattern id="gravel" width="2.2" height="2" patternUnits="userSpaceOnUse"><rect width="2.2" height="2" fill="#ded4c0"/><circle cx=".5" cy=".6" r=".28" fill="#c8bca6"/><circle cx="1.6" cy="1.4" r=".24" fill="#efe7d8"/><circle cx="1.5" cy=".3" r=".16" fill="#b9ad97"/></pattern>
     </defs>`,
-    // Gravel apron around the greenhouse.
-    `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" rx="4" fill="#ddd3bf"/>`,
-    `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="#b9cfae"/>`,
-    `<rect x="${ix + 2}" y="${iy + 2}" width="${iw - 4}" height="${ih - 4}" rx="5" fill="#8a6a4e" opacity=".35"/>`,
+    // Gravel apron, a lawn edge, then the greenhouse's own soil.
+    `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" rx="4" fill="url(#gravel)"/>`,
+    `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" rx="4" fill="none" stroke="${mix(leaf, '#cfe0c0', 0.6)}" stroke-width="1.2"/>`,
+    `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="#b7cfa9"/>`,
+    `<rect x="${ix + 2}" y="${iy + 2}" width="${iw - 4}" height="${ih - 4}" rx="5" fill="#6e533d" opacity=".8"/>`,
   ];
-  // Rows of plants inside.
+  // Beds of plants on either side of a central path.
+  const mid = iy + ih / 2;
+  parts.push(
+    `<rect x="${ix + 3}" y="${r(mid - 1.4)}" width="${iw - 6}" height="2.8" rx="1" fill="#e6dccb"/>`,
+  );
   const beds = Math.max(2, Math.floor(ih / 7));
+  const crops = ['#d4573b', LILAC, '#e9893f', GOLD, '#d4573b', '#f2bfd3'];
   for (let i = 0; i < beds; i++) {
     const by = iy + 3 + ((ih - 6) / beds) * (i + 0.5);
+    if (Math.abs(by - mid) < 2.4) continue;
     parts.push(
-      `<path d="M${ix + 5} ${r(by)}H${ix + iw - 5}" stroke="${leaf}" stroke-width="3.4" stroke-linecap="round" opacity=".85"/><path d="M${ix + 5} ${r(by - 0.6)}H${ix + iw - 5}" stroke="${mix(leaf, '#c8e0a8', 0.5)}" stroke-width="1.6" stroke-linecap="round" stroke-dasharray=".1 2.2" opacity=".9"/>`,
+      `<path d="M${ix + 5} ${r(by)}H${ix + iw - 5}" stroke="${shade(leaf, -0.12)}" stroke-width="3.6" stroke-linecap="round"/>`,
+      `<path d="M${ix + 5} ${r(by - 0.5)}H${ix + iw - 5}" stroke="${leafLight}" stroke-width="2" stroke-linecap="round" stroke-dasharray=".1 2.1"/>`,
     );
+    const fruit = crops[(i + Math.min(level, 3)) % crops.length]!;
+    if (level >= 1) {
+      parts.push(
+        `<path d="M${ix + 6} ${r(by + 0.6)}H${ix + iw - 6}" stroke="${fruit}" stroke-width=".9" stroke-linecap="round" stroke-dasharray=".1 ${3.4 - Math.min(level, 4) * 0.4}"/>`,
+      );
+    }
   }
   if (level >= 2) {
     parts.push(`<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="url(#warm)"/>`);
   }
+  // The glass: a vault of panes, the sky reflected, ribs and a bright ridge.
   parts.push(
     `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="url(#vault)"/>`,
-    `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="none" stroke="#f7f4ec" stroke-width="1.1"/>`,
-    `<rect x="${ix + 1}" y="${iy + 1}" width="${iw - 2}" height="${ih - 2}" rx="6" fill="none" stroke="#6f958d" stroke-width=".4" opacity=".6"/>`,
+    `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="url(#skyglass)"/>`,
   );
+  const panes: string[] = [];
   for (let i = 0; i < ribs; i++) {
     const rx = ix + (iw / (ribs + 1)) * (i + 1);
-    parts.push(
-      `<path d="M${r(rx)} ${iy}V${iy + ih}" stroke="#f7f4ec" stroke-width=".45" opacity=".9"/>`,
-    );
+    panes.push(`M${r(rx)} ${iy + 0.4}V${iy + ih - 0.4}`);
   }
+  for (const f of [0.22, 0.36, 0.64, 0.78])
+    panes.push(`M${ix + 1.5} ${r(iy + ih * f)}H${ix + iw - 1.5}`);
   parts.push(
-    `<path d="M${ix} ${y + h / 2}H${ix + iw}" stroke="#ffffff" stroke-width=".9"/>`,
-    `<path d="M${ix} ${y + h / 2 + 0.8}H${ix + iw}" stroke="#7f9c95" stroke-width=".4" opacity=".6"/>`,
+    `<path d="${panes.join('')}" stroke="${frame}" stroke-width=".42" opacity=".95"/>`,
+    `<path d="${panes.join('')}" stroke="#5f8f88" stroke-width=".12" opacity=".35" transform="translate(.25 .25)"/>`,
+    `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="7" fill="none" stroke="${frame}" stroke-width="1.2"/>`,
+    `<rect x="${ix + 1}" y="${iy + 1}" width="${iw - 2}" height="${ih - 2}" rx="6" fill="none" stroke="#6f958d" stroke-width=".35" opacity=".6"/>`,
+    `<path d="M${ix + 1} ${r(mid)}H${ix + iw - 1}" stroke="#ffffff" stroke-width=".8"/>`,
+    `<path d="M${ix + 1} ${r(mid + 0.8)}H${ix + iw - 1}" stroke="#7f9c95" stroke-width=".35" opacity=".6"/>`,
+  );
+  // Roof vents, propped open once upgraded.
+  if (level >= 1) {
+    const vents = Math.min(1 + level, 5);
+    for (let i = 0; i < vents; i++) {
+      const vx = ix + (iw / (vents + 1)) * (i + 1) - 2;
+      parts.push(
+        `<rect x="${r(vx + 0.3)}" y="${r(mid - 3.9)}" width="4" height="2.6" fill="#3b3328" opacity=".22"/><rect x="${r(vx)}" y="${r(mid - 4.3)}" width="4" height="2.6" fill="#e8f3f0" stroke="${frame}" stroke-width=".3" opacity=".9"/>`,
+      );
+    }
+  }
+  // The door and its step, at the end towards the street.
+  const dx = lit === 1 ? ix - 0.6 : ix + iw - 2.4;
+  parts.push(
+    `<rect x="${r(dx)}" y="${r(mid - 2.2)}" width="3" height="4.4" rx=".5" fill="#e8f3f0" stroke="${frame}" stroke-width=".5"/>`,
   );
   return { box, svg: parts.join('') };
 }
 
-/** A grey tower turned vertical farm: stepped terraces planted at their rims around an atrium. */
+/**
+ * A grey tower turned vertical farm, seen from above: stepped terraces of warm decking, each
+ * casting its shade on the one below, their rims overflowing with shrubs, small trees at the
+ * corners, glass railings, and a glazed atrium at the top, ringed with solar louvres once upgraded.
+ */
 export function farmArt(ctx: ArtContext, box: Box, level: number): Art {
   const [x, y, w, h] = box;
   const terraces = Math.min(3 + Math.min(level, 3), Math.floor(Math.min(w, h) / 11));
   const leaf = ctx.palette.foliage;
+  const leafLight = mix(leaf, ctx.palette.foliageLight, 0.7);
+  const lit = ctx.lit;
+  const sx = -0.6 * lit;
+  const seed = hash(x, y);
   const parts = [
-    `<defs>${litGradient('deck', mix(ctx.palette.foliageLight, '#ffffff', 0.25), mix(ctx.palette.foliageLight, ctx.palette.foliage, 0.35), ctx.lit)}
-      <linearGradient id="fglass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3f7f2"/><stop offset="1" stop-color="#a9c4c0"/></linearGradient></defs>`,
+    `<defs>${litGradient('deck', '#ecdcbc', '#c9b08a', lit)}${litGradient('stone', '#f1ece2', '#cfc6b6', lit)}
+      <linearGradient id="fglass" x1="${lit === 1 ? 0 : 1}" y1="0" x2="${lit === 1 ? 1 : 0}" y2="1"><stop offset="0" stop-color="#fbfdfb"/><stop offset=".4" stop-color="${ctx.palette.sky}"/><stop offset="1" stop-color="#8fb0ae"/></linearGradient>
+      <pattern id="boards" width="2" height="2" patternUnits="userSpaceOnUse"><path d="M0 1.9H2" stroke="#a88a5e" stroke-width=".12" opacity=".6"/></pattern></defs>`,
   ];
   for (let i = 0; i < terraces; i++) {
     const inset = i * 5;
@@ -522,98 +763,221 @@ export function farmArt(ctx: ArtContext, box: Box, level: number): Art {
     const tw = w - inset * 2;
     const th = h - inset * 2;
     const rx = Math.max(1.5, 5 - i);
+    const deck = i % 2 ? 'url(#stone)' : 'url(#deck)';
     parts.push(
-      `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="${rx}" fill="${i % 2 ? 'url(#fglass)' : 'url(#deck)'}"/>`,
-      // The planted rim of each terrace, with leaves spilling over.
-      `<rect x="${tx + 1.3}" y="${ty + 1.3}" width="${tw - 2.6}" height="${th - 2.6}" rx="${rx}" fill="none" stroke="${leaf}" stroke-width="2"/>`,
-      `<rect x="${tx + 1.3}" y="${ty + 1.3}" width="${tw - 2.6}" height="${th - 2.6}" rx="${rx}" fill="none" stroke="${mix(leaf, '#c8e0a8', 0.5)}" stroke-width="1.1" stroke-dasharray=".1 1.6" stroke-linecap="round"/>`,
-      `<rect x="${tx + 2.6}" y="${ty + 2.6}" width="${tw - 5.2}" height="${th - 5.2}" rx="${rx}" fill="none" stroke="#3b3328" stroke-width=".4" opacity=".18"/>`,
+      `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="${rx}" fill="${deck}"/>`,
     );
-    if (level >= 2 && i % 2 === 0) {
+    if (i % 2 === 0) {
       parts.push(
-        `<rect x="${tx + 1.3}" y="${ty + 1.3}" width="${tw - 2.6}" height="${th - 2.6}" rx="${rx}" fill="none" stroke="${LILAC}" stroke-width=".8" stroke-dasharray=".1 4.3" stroke-linecap="round"/>`,
+        `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="${rx}" fill="url(#boards)"/>`,
+      );
+    }
+    // The terrace above casts its shade on this one, away from the sun.
+    if (i + 1 < terraces) {
+      parts.push(
+        `<rect x="${r(tx + 5 + 1.4 * lit)}" y="${r(ty + 6.4)}" width="${tw - 10}" height="${th - 10}" rx="${Math.max(1.5, 4 - i)}" fill="#3b3328" opacity=".22"/>`,
+      );
+    }
+    // Glass railing along the edge.
+    parts.push(
+      `<rect x="${tx + 0.3}" y="${ty + 0.3}" width="${tw - 0.6}" height="${th - 0.6}" rx="${rx}" fill="none" stroke="#ffffff" stroke-width=".35" opacity=".85"/>`,
+    );
+    // Shrubs spilling over the planted rim.
+    const inner = 1.6;
+    const perimeter = 2 * (tw + th - 4 * inner);
+    const count = Math.floor(perimeter / 2.3);
+    for (let k = 0; k < count; k++) {
+      const [px, py] = alongRect(tx + inner, ty + inner, tw - inner * 2, th - inner * 2, k / count);
+      const cr = 0.95 + rnd(seed + i, k) * 0.65;
+      parts.push(
+        `<circle cx="${r(px)}" cy="${r(py)}" r="${r(cr)}" fill="${mix(shade(leaf, -0.14), leafLight, rnd(seed, k + i * 50) * 0.3)}"/>`,
+        `<circle cx="${r(px + sx * 0.35)}" cy="${r(py - 0.35)}" r="${r(cr * 0.5)}" fill="${leafLight}" opacity=".85"/>`,
+      );
+      if (level >= 2 && (k + i) % 5 === 0) {
+        parts.push(
+          `<circle cx="${r(px + 0.3)}" cy="${r(py + 0.2)}" r=".5" fill="${i % 2 ? GOLD_SOFT : LILAC}"/>`,
+        );
+      }
+    }
+    // A small tree at two corners of each terrace.
+    for (const [cx, cy] of [
+      [tx + 3.2, ty + 3.2],
+      [tx + tw - 3.2, ty + th - 3.2],
+    ] as const) {
+      parts.push(
+        `<circle cx="${r(cx + 0.6 * lit)}" cy="${r(cy + 0.8)}" r="2.2" fill="#3b3328" opacity=".2"/><circle cx="${r(cx)}" cy="${r(cy)}" r="2.2" fill="${shade(leaf, -0.12)}"/><circle cx="${r(cx + sx * 0.5)}" cy="${r(cy - 0.5)}" r="1.4" fill="${mix(leaf, leafLight, 0.5)}"/><circle cx="${r(cx + sx * 0.8)}" cy="${r(cy - 0.8)}" r=".6" fill="${leafLight}"/>`,
       );
     }
   }
+  // The atrium's glass roof, its mullions, and solar louvres around it.
   const [cx, cy] = centre(box);
+  const top = Math.min(w, h) - (terraces - 1) * 10;
+  if (level >= 3 && top >= 26) {
+    for (let k = 0; k < 4; k++) {
+      parts.push(
+        `<g transform="rotate(${k * 90} ${cx} ${cy})"><rect x="${cx - 7}" y="${cy - 9.2}" width="14" height="2.2" rx=".4" fill="#2f4a63" stroke="${GOLD}" stroke-width=".25"/><path d="M${cx - 7} ${cy - 8.1}h14" stroke="#9bb3c6" stroke-width=".12"/></g>`,
+      );
+    }
+  }
   parts.push(
-    `<rect x="${cx - 5.5}" y="${cy - 5.5}" width="11" height="11" rx="2" fill="url(#fglass)" stroke="#f7f4ec" stroke-width=".6"/><path d="M${cx} ${cy - 5.5}v11M${cx - 5.5} ${cy}h11" stroke="#f7f4ec" stroke-width=".4"/>`,
+    `<rect x="${cx - 5.2}" y="${cy - 4.6}" width="11" height="11" rx="2" fill="#3b3328" opacity=".2"/>`,
+    `<rect x="${cx - 5.5}" y="${cy - 5.5}" width="11" height="11" rx="2" fill="url(#fglass)" stroke="#f7f4ec" stroke-width=".7"/>`,
+    `<path d="M${cx} ${cy - 5.5}v11M${cx - 5.5} ${cy}h11M${cx - 2.75} ${cy - 5.5}v11M${cx + 2.75} ${cy - 5.5}v11" stroke="#f7f4ec" stroke-width=".3"/>`,
+    `<path d="M${cx - 4.5} ${cy + 3}l7.5 -7.5" stroke="#ffffff" stroke-width=".8" opacity=".55"/>`,
   );
   return { box, svg: parts.join('') };
 }
 
-/** One heliostat: a mirror catching the sky, gilded once upgraded, on its post. */
-export function mirrorArt(ctx: ArtContext, gilded: boolean): Art {
-  const svg = `<defs><linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="${ctx.palette.sky}"/><stop offset="1" stop-color="#5f8496"/></linearGradient></defs>
-    <rect x="-4.6" y="-1.9" width="9.2" height="3.8" rx=".6" fill="url(#m)" stroke="${gilded ? GOLD : '#9fb0b6'}" stroke-width=".5"/>
-    <path d="M-4.4 0h8.8" stroke="#ffffff" stroke-width=".2" opacity=".6"/>`;
-  return { box: [-5.2, -2.5, 10.4, 5], svg };
-}
-
-/** The mirror field's tower, its receiver glowing gold. */
-export function towerArt(): Art {
-  const { x, y } = MIRROR_TOWER;
-  const svg = `<defs><radialGradient id="rcv" cx=".4" cy=".4"><stop offset="0" stop-color="#fff4d6"/><stop offset=".6" stop-color="${GOLD}"/><stop offset="1" stop-color="#b27422"/></radialGradient></defs>
-    <circle cx="${x + 1.5}" cy="${y + 1.8}" r="6" fill="#3b3328" opacity=".25"/>
-    <circle cx="${x}" cy="${y}" r="5.8" fill="#e8e2d6" stroke="${GOLD}" stroke-width=".7"/>
-    <circle cx="${x}" cy="${y}" r="3.6" fill="url(#rcv)"/>`;
-  return { box: [x - 7, y - 7, 15, 15], svg };
+/** Point at `t` (0 to 1) along the outline of a box, clockwise from its top-left corner. */
+function alongRect(x: number, y: number, w: number, h: number, t: number): [number, number] {
+  let d = t * 2 * (w + h);
+  if (d < w) return [x + d, y];
+  d -= w;
+  if (d < h) return [x + w, y + d];
+  d -= h;
+  if (d < w) return [x + w - d, y + h];
+  d -= w;
+  return [x, y + h - d];
 }
 
 /**
- * A street tree from above: a lobed crown in three depths of leaves, lit from the sun's side,
- * with leaf texture. Lime, plane and flowering cherry alternate along the streets.
+ * One heliostat: four mirror facets on a frame, reflecting a bright sky with a glint of sun
+ * across them, silver at first and gilded once upgraded.
+ */
+export function mirrorArt(ctx: ArtContext, gilded: boolean): Art {
+  const frame = gilded ? GOLD : '#b9c4c8';
+  const facets = [-4.2, -2.1, 0, 2.1]
+    .map(
+      (fx) => `<rect x="${fx + 0.1}" y="-1.55" width="1.9" height="3.1" rx=".2" fill="url(#m)"/>`,
+    )
+    .join('');
+  const svg = `<defs><linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="${ctx.palette.sky}"/><stop offset=".75" stop-color="#6f93a6"/><stop offset="1" stop-color="#3f6276"/></linearGradient>
+    <linearGradient id="glint" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset=".5" stop-color="#ffffff" stop-opacity=".85"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient></defs>
+    <rect x="-4.6" y="-1.9" width="9.2" height="3.8" rx=".6" fill="${shade(frame, -0.25)}"/>
+    <rect x="-4.45" y="-1.75" width="8.9" height="3.5" rx=".5" fill="${frame}"/>
+    ${facets}
+    <path d="M-1.4 -1.55l-1.6 3.1h1.1l1.6 -3.1z" fill="url(#glint)" opacity=".8"/>
+    <path d="M-4.4 -1.7h8.8" stroke="#ffffff" stroke-width=".18" opacity=".7"/>`;
+  return { box: [-5.2, -2.5, 10.4, 5], svg };
+}
+
+/**
+ * The mirror field's tower from above: a stone plinth, the lattice of its shaft in rings, and
+ * the receiver glowing gold at the top, rayed with the light the mirrors send it.
+ */
+export function towerArt(): Art {
+  const { x, y } = MIRROR_TOWER;
+  const rays = Array.from({ length: 16 }, (_, i) => {
+    const a = (i / 16) * Math.PI * 2;
+    const inner = 4.2;
+    const outer = i % 2 ? 7 : 8.6;
+    return `M${r(x + Math.cos(a) * inner)} ${r(y + Math.sin(a) * inner)}L${r(x + Math.cos(a) * outer)} ${r(y + Math.sin(a) * outer)}`;
+  }).join('');
+  const lattice = Array.from({ length: 12 }, (_, i) => {
+    const a = (i / 12) * Math.PI * 2;
+    return `M${r(x + Math.cos(a) * 3.8)} ${r(y + Math.sin(a) * 3.8)}L${r(x + Math.cos(a) * 6.4)} ${r(y + Math.sin(a) * 6.4)}`;
+  }).join('');
+  const svg = `<defs><radialGradient id="rcv" cx=".4" cy=".4"><stop offset="0" stop-color="#fffaf0"/><stop offset=".35" stop-color="#fff0c2"/><stop offset=".7" stop-color="${GOLD}"/><stop offset="1" stop-color="#b27422"/></radialGradient>
+    <radialGradient id="halo"><stop offset="0" stop-color="${GOLD_SOFT}" stop-opacity=".9"/><stop offset="1" stop-color="${GOLD_SOFT}" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="${x}" cy="${y}" r="9.5" fill="url(#halo)" opacity=".55"/>
+    <circle cx="${x}" cy="${y}" r="7.4" fill="#e3dccd" stroke="#bdb39f" stroke-width=".5"/>
+    <circle cx="${x}" cy="${y}" r="6.4" fill="#d1c8b6"/>
+    <path d="${lattice}" stroke="#9e9584" stroke-width=".35"/>
+    <circle cx="${x}" cy="${y}" r="5.2" fill="none" stroke="#9e9584" stroke-width=".3"/>
+    <circle cx="${x}" cy="${y}" r="6.4" fill="none" stroke="${GOLD}" stroke-width=".5"/>
+    <path d="${rays}" stroke="${GOLD_SOFT}" stroke-width=".35" stroke-linecap="round" opacity=".85"/>
+    <circle cx="${x}" cy="${y}" r="3.9" fill="url(#rcv)" stroke="#fff4d6" stroke-width=".3"/>
+    <circle cx="${x - 1}" cy="${y - 1.1}" r="1.1" fill="#ffffff" opacity=".75"/>`;
+  return { box: [x - 10, y - 10, 20, 20], svg };
+}
+
+/**
+ * A street tree from above: a lobed silhouette in deep shade, then clumps of leaves that each
+ * catch the sun on one side, a fine speckle of leaves, and flowers once upgraded. Lime (dense,
+ * small clumps), plane (broad mottled lobes) and flowering cherry alternate along the streets.
  */
 export function treeArt(ctx: ArtContext, kind: number, radius: number, level: number): Art {
-  const { foliage, foliageLight } = ctx.palette;
-  const lobes = kind === 1 ? 7 : 6;
+  const { foliage, foliageLight, blossom } = ctx.palette;
   const flowering = kind === 2 ? level >= 1 : level >= 2;
   const base =
     kind === 0 ? foliage : kind === 1 ? mix(foliage, '#5d8a4a', 0.4) : shade(foliage, -0.05);
-  const mid = mix(base, foliageLight, 0.35);
-  const light = mix(base, foliageLight, 0.75);
-  const lx = -0.3 * ctx.lit * radius;
-  const ly = -0.3 * radius;
+  const dark = shade(base, -0.22);
+  const mid = mix(base, foliageLight, 0.32);
+  const light = mix(base, foliageLight, 0.78);
+  const R = radius;
+  // Towards the sun, in the drawing: up and to the lit side.
+  const sx = -0.6 * ctx.lit;
+  const sy = -0.8;
+  const seed = kind * 31 + Math.round(R * 10);
   const parts = [
-    `<defs><radialGradient id="crown" cx="${0.5 - 0.18 * ctx.lit}" cy=".32" r=".7"><stop offset="0" stop-color="${light}"/><stop offset=".55" stop-color="${mid}"/><stop offset="1" stop-color="${shade(base, -0.15)}"/></radialGradient></defs>`,
+    `<defs><radialGradient id="crown" gradientUnits="userSpaceOnUse" cx="${r(sx * R * 0.4)}" cy="${r(sy * R * 0.4)}" r="${r(R * 1.35)}"><stop offset="0" stop-color="${light}"/><stop offset=".42" stop-color="${mid}"/><stop offset=".78" stop-color="${base}"/><stop offset="1" stop-color="${dark}"/></radialGradient>
+    <pattern id="leaves" width="2.6" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(${kind * 23})"><ellipse cx=".7" cy=".6" rx=".42" ry=".2" transform="rotate(35 .7 .6)" fill="${light}"/><ellipse cx="2" cy="1.7" rx=".38" ry=".18" transform="rotate(-30 2 1.7)" fill="${dark}"/></pattern></defs>`,
   ];
-  const lobeR = radius * (kind === 1 ? 0.52 : 0.58);
+  // The silhouette: a ring of lobes in deep shade, its edge never a perfect circle.
+  const lobes = kind === 1 ? 7 : kind === 2 ? 9 : 8;
+  const lobeR = R * (kind === 1 ? 0.46 : 0.4);
   for (let i = 0; i < lobes; i++) {
-    const a = (i / lobes) * Math.PI * 2 + kind;
+    const a = (i / lobes) * Math.PI * 2 + rnd(seed, i) * 0.5;
+    const d = R * (0.56 + rnd(seed, i + 9) * 0.1);
     parts.push(
-      `<circle cx="${r(Math.cos(a) * radius * 0.45)}" cy="${r(Math.sin(a) * radius * 0.45)}" r="${r(lobeR)}" fill="${shade(base, -0.12)}"/>`,
+      `<circle cx="${r(Math.cos(a) * d)}" cy="${r(Math.sin(a) * d)}" r="${r(lobeR * (0.85 + rnd(seed, i + 20) * 0.3))}" fill="${dark}"/>`,
     );
   }
+  // The body of the crown, lit as one volume.
   for (let i = 0; i < lobes; i++) {
-    const a = (i / lobes) * Math.PI * 2 + kind + 0.4;
+    const a = (i / lobes) * Math.PI * 2 + 0.35 + rnd(seed, i + 40) * 0.4;
     parts.push(
-      `<circle cx="${r(Math.cos(a) * radius * 0.36)}" cy="${r(Math.sin(a) * radius * 0.36)}" r="${r(lobeR * 0.95)}" fill="url(#crown)"/>`,
+      `<circle cx="${r(Math.cos(a) * R * 0.42)}" cy="${r(Math.sin(a) * R * 0.42)}" r="${r(lobeR * 1.05)}" fill="url(#crown)"/>`,
     );
   }
-  // Leaf clusters catching the light.
-  for (let i = 0; i < 9; i++) {
-    const a = i * 2.4 + kind;
-    const d = radius * (0.15 + ((i * 37) % 10) / 22);
-    const cx = Math.cos(a) * d + lx * 0.5;
-    const cy = Math.sin(a) * d + ly * 0.5;
+  parts.push(`<circle r="${r(R * 0.56)}" fill="url(#crown)"/>`);
+  // Clumps of leaves, each with a shaded side and a sunlit side.
+  const clumps = kind === 0 ? 17 : kind === 1 ? 11 : 14;
+  const clumpR = R * (kind === 1 ? 0.25 : kind === 0 ? 0.18 : 0.2);
+  for (let i = 0; i < clumps; i++) {
+    const a = i * 2.39996 + seed;
+    const d = R * 0.66 * Math.sqrt((i + 0.5) / clumps);
+    const x = Math.cos(a) * d;
+    const y = Math.sin(a) * d;
+    const cr = clumpR * (0.8 + rnd(seed, i + 60) * 0.4);
+    const facing = Math.max(-1, Math.min(1, (x * sx + y * sy) / (R * 0.7)));
     parts.push(
-      `<circle cx="${r(cx)}" cy="${r(cy)}" r="${r(radius * 0.13)}" fill="${light}" opacity=".7"/>`,
+      `<circle cx="${r(x - sx * cr * 0.3)}" cy="${r(y - sy * cr * 0.3)}" r="${r(cr)}" fill="${dark}" opacity=".45"/>`,
+      `<circle cx="${r(x)}" cy="${r(y)}" r="${r(cr * 0.92)}" fill="${mix(base, mid, 0.5 + facing * 0.5)}"/>`,
+      `<circle cx="${r(x + sx * cr * 0.32)}" cy="${r(y + sy * cr * 0.32)}" r="${r(cr * 0.45)}" fill="${light}" opacity="${r(0.25 + Math.max(0, facing) * 0.55)}"/>`,
     );
   }
-  parts.push(
-    `<circle cx="${r(lx)}" cy="${r(ly)}" r="${r(radius * 0.22)}" fill="#fffbe8" opacity=".35"/>`,
-  );
-  if (flowering) {
-    const petal = kind === 2 ? '#f2c4d6' : LILAC;
-    for (let i = 0; i < 11; i++) {
-      const a = i * 2.1 + kind;
-      const d = radius * (0.25 + ((i * 53) % 10) / 16);
+  // Mottled bark-light of the plane tree; the leaf speckle over every crown.
+  if (kind === 1) {
+    for (let i = 0; i < 5; i++) {
+      const a = i * 1.7 + seed;
+      const d = R * 0.45 * rnd(seed, i + 80);
       parts.push(
-        `<circle cx="${r(Math.cos(a) * d)}" cy="${r(Math.sin(a) * d)}" r="${r(Math.max(0.55, radius * 0.1))}" fill="${petal}"/>`,
+        `<ellipse cx="${r(Math.cos(a) * d)}" cy="${r(Math.sin(a) * d)}" rx="${r(R * 0.12)}" ry="${r(R * 0.07)}" transform="rotate(${r(a * 57)} ${r(Math.cos(a) * d)} ${r(Math.sin(a) * d)})" fill="${mix(light, '#f3ead0', 0.35)}" opacity=".45"/>`,
       );
     }
   }
-  const pad = radius * 1.15;
+  parts.push(`<circle r="${r(R * 0.82)}" fill="url(#leaves)" opacity=".35"/>`);
+  parts.push(
+    `<circle cx="${r(sx * R * 0.3)}" cy="${r(sy * R * 0.3)}" r="${r(R * 0.26)}" fill="#fffbe8" opacity=".14"/>`,
+  );
+  if (flowering) {
+    const petal = kind === 2 ? blossom : kind === 0 ? LILAC : GOLD_SOFT;
+    const count = kind === 2 ? 16 : 11;
+    for (let i = 0; i < count; i++) {
+      const a = i * 2.39996 + kind + rnd(seed, i + 100) * 0.6;
+      const d = R * 0.78 * Math.sqrt((i + 0.6) / count);
+      const x = Math.cos(a) * d;
+      const y = Math.sin(a) * d;
+      const pr = Math.max(0.45, R * (kind === 2 ? 0.075 : 0.065));
+      parts.push(
+        kind === 2
+          ? `<g transform="translate(${r(x)} ${r(y)})" fill="${petal}">${[0, 72, 144, 216, 288].map((deg) => `<circle cx="${r(Math.cos((deg * Math.PI) / 180) * pr)}" cy="${r(Math.sin((deg * Math.PI) / 180) * pr)}" r="${r(pr * 0.75)}"/>`).join('')}<circle r="${r(pr * 0.45)}" fill="${GOLD}"/></g>`
+          : `<circle cx="${r(x)}" cy="${r(y)}" r="${r(pr * 1.2)}" fill="${petal}"/><circle cx="${r(x - 0.2)}" cy="${r(y - 0.2)}" r="${r(pr * 0.5)}" fill="#ffffff" opacity=".5"/>`,
+      );
+    }
+  }
+  const pad = R * 1.2;
   return { box: [-pad, -pad, pad * 2, pad * 2], svg: parts.join('') };
 }
 
@@ -622,25 +986,78 @@ function petalPath(length: number, width: number): string {
   return `M0 0C${r(-width)} ${r(-length * 0.35)} ${r(-width * 0.6)} ${r(-length * 0.9)} 0 ${r(-length)}C${r(width * 0.6)} ${r(-length * 0.9)} ${r(width)} ${r(-length * 0.35)} 0 0Z`;
 }
 
-/** One ring of the living arcology: eight planted or glazed petal-shaped terraces. */
+/**
+ * One ring of the living arcology: eight petal-shaped terraces, planted or glazed. Planted
+ * petals carry stepped beds edged with shrubs and a few trees; glazed ones, mullions and the sky.
+ */
 export function arcologyRingArt(ctx: ArtContext, ring: number, level: number): Art {
   const length = 56 - ring * 9;
   const glass = ring % 2 === 1;
   const leaf = ctx.palette.foliage;
+  const leafLight = mix(leaf, ctx.palette.foliageLight, 0.7);
+  const width = length * 0.42;
   const parts = [
-    `<defs><linearGradient id="t" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${glass ? '#cfe3df' : mix(leaf, ctx.palette.foliageLight, 0.55)}"/><stop offset="1" stop-color="${glass ? '#f4f8f4' : mix(leaf, ctx.palette.foliageLight, 0.85)}"/></linearGradient></defs>`,
+    `<defs><linearGradient id="t" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${glass ? '#bfd8d4' : mix(leaf, ctx.palette.foliageLight, 0.45)}"/><stop offset="1" stop-color="${glass ? '#f6faf7' : mix(leaf, ctx.palette.foliageLight, 0.85)}"/></linearGradient>
+    <linearGradient id="sky" x1="0" y1="1" x2="1" y2="0"><stop offset=".3" stop-color="${ctx.palette.sky}" stop-opacity="0"/><stop offset=".6" stop-color="${ctx.palette.sky}" stop-opacity=".7"/><stop offset=".75" stop-color="#ffffff" stop-opacity=".2"/></linearGradient></defs>`,
   ];
+  const petal = (k: number): string => {
+    const inner: string[] = [
+      `<path d="${petalPath(length, width)}" fill="url(#t)" stroke="${glass ? '#ffffff' : shade(leaf, -0.1)}" stroke-width=".9"/>`,
+    ];
+    if (glass) {
+      // Mullions across the glazing and the sky gliding over it.
+      for (let f = 0.2; f < 0.95; f += 0.15) {
+        const half = width * Math.sin(f * Math.PI) * 0.62;
+        inner.push(
+          `<path d="M${r(-half)} ${r(-length * f)}Q0 ${r(-length * f - 2)} ${r(half)} ${r(-length * f)}" stroke="#ffffff" stroke-width=".4" fill="none" opacity=".9"/>`,
+        );
+      }
+      inner.push(
+        `<path d="${petalPath(length, width)}" fill="url(#sky)"/>`,
+        `<path d="M0 -3V${r(-length + 4)}" stroke="#ffffff" stroke-width=".6"/>`,
+      );
+    } else {
+      // Stepped beds: smaller petals inside, each edged with shrubs.
+      for (const s of [0.66]) {
+        inner.push(
+          `<path d="${petalPath(length * s, width * s)}" transform="translate(0 ${r(-length * (1 - s) * 0.5)})" fill="none" stroke="${shade(leaf, -0.05)}" stroke-width="1.3" opacity=".7"/>`,
+        );
+      }
+      const shrubs = Math.round(length / 3.2);
+      for (let i = 0; i < shrubs; i++) {
+        const f = (i + 0.5) / shrubs;
+        const side = i % 2 ? 1 : -1;
+        const half = width * Math.sin(f * Math.PI) * 0.56;
+        const sx = side * half * 0.88;
+        const sy = -length * f;
+        const cr = 1.2 + rnd(ring * 17 + k, i) * 0.7;
+        inner.push(
+          `<circle cx="${r(sx)}" cy="${r(sy)}" r="${r(cr)}" fill="${shade(leaf, -0.08)}"/><circle cx="${r(sx - 0.3)}" cy="${r(sy - 0.3)}" r="${r(cr * 0.5)}" fill="${leafLight}"/>`,
+        );
+      }
+      // A tree near the tip of every other petal.
+      if (k % 2 === 0) {
+        const ty = -length * 0.72;
+        inner.push(
+          `<circle cx="0" cy="${r(ty)}" r="3" fill="${shade(leaf, -0.15)}"/><circle cx="-.6" cy="${r(ty - 0.6)}" r="2" fill="${mix(leaf, leafLight, 0.5)}"/><circle cx="-1" cy="${r(ty - 1)}" r=".8" fill="${leafLight}"/>`,
+        );
+      }
+      inner.push(
+        `<path d="M0 -4V${r(-length + 6)}" stroke="#eadfca" stroke-width=".8" opacity=".9"/>`,
+      );
+    }
+    return inner.join('');
+  };
   for (let k = 0; k < 8; k++) {
     const angle = (k * 360) / 8 + (ring % 2) * 22.5;
-    parts.push(
-      `<g transform="rotate(${angle})"><path d="${petalPath(length, length * 0.42)}" fill="url(#t)" stroke="${glass ? '#ffffff' : leaf}" stroke-width=".8"/><path d="M0 -4V${r(-length + 6)}" stroke="${glass ? '#ffffff' : leaf}" stroke-width=".5" opacity=".6"/></g>`,
-    );
+    parts.push(`<g transform="rotate(${angle})">${petal(k)}</g>`);
   }
   if (ring === 0 && level >= 1) {
-    for (let k = 0; k < 8; k++) {
-      const a = ((k * 45 - 90) * Math.PI) / 180;
+    for (let k = 0; k < 16; k++) {
+      const a = ((k * 22.5 - 90) * Math.PI) / 180;
+      const d = k % 2 ? 40 : 46;
       parts.push(
-        `<circle cx="${r(Math.cos(a) * 44)}" cy="${r(Math.sin(a) * 44)}" r="2.4" fill="${LILAC}"/>`,
+        `<circle cx="${r(Math.cos(a) * d)}" cy="${r(Math.sin(a) * d)}" r="2.2" fill="${k % 4 === 1 && level >= 3 ? GOLD : LILAC}"/><circle cx="${r(Math.cos(a) * d - 0.5)}" cy="${r(Math.sin(a) * d - 0.5)}" r=".8" fill="#ffffff" opacity=".5"/>`,
       );
     }
   }
@@ -648,23 +1065,38 @@ export function arcologyRingArt(ctx: ArtContext, ring: number, level: number): A
   return { box: [-pad, -pad, pad * 2, pad * 2], svg: parts.join('') };
 }
 
-/** The courtyard planter around the heliotrope's pot: a stone ring of blooms. */
+/**
+ * The courtyard planter around the heliotrope's pot: a stone ring with a lit rim, a bed of
+ * leaves, and blooms of lilac and gold that multiply with click upgrades.
+ */
 export function planterArt(blooms: number): Art {
   const { x, y } = PLANTER;
-  const petals = 6 + blooms * 3;
+  const petals = 8 + blooms * 4;
   const parts = [
-    `<ellipse cx="${x + 0.6}" cy="${y + 1}" rx="17.5" ry="11" fill="#3b3328" opacity=".16"/>`,
-    `<ellipse cx="${x}" cy="${y}" rx="17.5" ry="11" fill="#e9dfcc" stroke="#cbbb9f" stroke-width=".7"/>`,
-    `<ellipse cx="${x}" cy="${y}" rx="15.2" ry="9" fill="#6e533d"/>`,
-    `<ellipse cx="${x}" cy="${y}" rx="15.2" ry="9" fill="none" stroke="#2f6b4f" stroke-width="2.2" opacity=".85"/>`,
+    `<defs><linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6efe0"/><stop offset="1" stop-color="#d6c8ad"/></linearGradient></defs>`,
+    `<ellipse cx="${x + 0.8}" cy="${y + 1.3}" rx="17.8" ry="11.3" fill="#3b3328" opacity=".18"/>`,
+    `<ellipse cx="${x}" cy="${y}" rx="17.5" ry="11" fill="url(#stone)" stroke="#c4b393" stroke-width=".6"/>`,
+    `<ellipse cx="${x}" cy="${y - 0.3}" rx="16.6" ry="10.2" fill="none" stroke="#fffaf0" stroke-width=".5" opacity=".8"/>`,
+    `<ellipse cx="${x}" cy="${y}" rx="15.2" ry="9" fill="#5e4532"/>`,
+    `<ellipse cx="${x}" cy="${y + 0.4}" rx="15.2" ry="8.6" fill="none" stroke="#3b2a1e" stroke-width=".6" opacity=".5"/>`,
   ];
-  for (let i = 0; i < petals; i++) {
-    const a = (i / petals) * Math.PI * 2;
-    const px = x + Math.cos(a) * 14;
-    const py = y + Math.sin(a) * 8.3;
-    const fill = i % 3 === 2 ? GOLD : LILAC;
+  // A ring of leaves, then the blooms.
+  for (let i = 0; i < 26; i++) {
+    const a = (i / 26) * Math.PI * 2;
+    const lx = x + Math.cos(a) * 13.3;
+    const ly = y + Math.sin(a) * 7.6;
     parts.push(
-      `<circle cx="${r(px)}" cy="${r(py)}" r="${r(1.5 + blooms * 0.12)}" fill="${fill}"/><circle cx="${r(px - 0.4)}" cy="${r(py - 0.4)}" r=".5" fill="#ffffff" opacity=".55"/>`,
+      `<ellipse cx="${r(lx)}" cy="${r(ly)}" rx="2" ry="1.2" transform="rotate(${r((a * 180) / Math.PI + 90)} ${r(lx)} ${r(ly)})" fill="${i % 2 ? '#2f6b4f' : '#467f5c'}"/>`,
+    );
+  }
+  for (let i = 0; i < petals; i++) {
+    const a = (i / petals) * Math.PI * 2 + 0.2;
+    const px = x + Math.cos(a) * 13.6;
+    const py = y + Math.sin(a) * 8;
+    const fill = i % 3 === 2 ? GOLD : i % 3 === 1 ? '#cdb4e4' : LILAC;
+    const size = 1.3 + blooms * 0.1;
+    parts.push(
+      `<circle cx="${r(px)}" cy="${r(py)}" r="${r(size)}" fill="${fill}"/><circle cx="${r(px)}" cy="${r(py)}" r="${r(size * 0.35)}" fill="${i % 3 === 2 ? '#fff4d6' : GOLD_SOFT}"/>`,
     );
   }
   return { box: [x - 19, y - 13, 38, 26], svg: parts.join('') };

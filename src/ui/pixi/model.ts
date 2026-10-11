@@ -85,7 +85,10 @@ export function hull(points: [number, number][]): [number, number][] {
 /** Colours of the scene for a phase and a visual season, as numbers for Pixi and hex for SVG. */
 export interface Palette {
   foliage: string;
+  /** Leaves in full sun: the highlight of crowns, beds and terraces. */
   foliageLight: string;
+  /** Petals of the trees and beds in flower. */
+  blossom: string;
   /** Warm light washing over the map from the sun's side, and its far side. */
   light: number;
   lightAlpha: number;
@@ -107,14 +110,21 @@ const PHASE_LIGHT: Record<Phase, Pick<Palette, 'light' | 'lightAlpha' | 'sun' | 
 };
 
 const SEASON_TINT: Record<VisualSeason, Partial<Palette>> = {
-  spring: { foliage: '#3d7a56', foliageLight: '#e8b8d0' },
+  spring: { foliage: '#3d7a56', foliageLight: '#b5d68e', blossom: '#f2bfd3' },
   summer: { light: 0xf8d58d, lightAlpha: 0.36 },
-  autumn: { light: 0xf2c49a, lightAlpha: 0.36, foliage: '#a65f3a', foliageLight: '#e2a04a' },
+  autumn: {
+    light: 0xf2c49a,
+    lightAlpha: 0.36,
+    foliage: '#a65f3a',
+    foliageLight: '#e2a04a',
+    blossom: '#e9c46a',
+  },
   winter: {
     light: 0xdfe6ea,
     lightAlpha: 0.4,
     foliage: '#4c6b5e',
     foliageLight: '#dde7e4',
+    blossom: '#f4f1ec',
     sky: '#e4ecef',
     shadowAlpha: 0.26,
   },
@@ -123,7 +133,8 @@ const SEASON_TINT: Record<VisualSeason, Partial<Palette>> = {
 export function palette(phase: Phase, season: VisualSeason | null): Palette {
   return {
     foliage: '#2f6b4f',
-    foliageLight: '#8fae8b',
+    foliageLight: '#a8c98a',
+    blossom: '#cdb4e4',
     shade: 0x6a5a8a,
     shadeAlpha: 0.1,
     water: '#3f8a92',

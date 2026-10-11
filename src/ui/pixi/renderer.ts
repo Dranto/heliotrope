@@ -316,7 +316,7 @@ function vignetteTexture(): Texture {
   const context = canvas.getContext('2d')!;
   const gradient = context.createRadialGradient(128, 128, 96, 128, 128, 182);
   gradient.addColorStop(0, 'rgba(251,246,236,0)');
-  gradient.addColorStop(1, 'rgba(251,246,236,0.45)');
+  gradient.addColorStop(1, 'rgba(251,246,236,0.32)');
   context.fillStyle = gradient;
   context.fillRect(0, 0, 256, 256);
   return Texture.from(canvas);
@@ -423,6 +423,8 @@ export class MapRenderer {
   private glints: { sprite: Sprite; box: Box; offset: number }[] = [];
   private sparkles: { sprite: Sprite; offset: number }[] = [];
   private flowMotes: { sprite: Sprite; curve: readonly number[]; offset: number }[] = [];
+  private mirrorGlints: { sprite: Sprite; offset: number }[] = [];
+  private towerGlow!: Sprite;
   private beams = new Graphics();
   private hearth!: Sprite;
   private displacement!: Sprite;
@@ -532,7 +534,14 @@ export class MapRenderer {
     this.hearth.width = 78;
     this.hearth.height = 54;
     this.beams.blendMode = 'add';
-    this.effects.addChild(this.beams, this.hearth);
+    // The receiver of the mirror tower glows with the light sent to it.
+    this.towerGlow = new Sprite(this.glow);
+    this.towerGlow.anchor.set(0.5);
+    this.towerGlow.tint = 0xffd88a;
+    this.towerGlow.blendMode = 'add';
+    this.towerGlow.position.set(MIRROR_TOWER.x, MIRROR_TOWER.y);
+    this.towerGlow.visible = false;
+    this.effects.addChild(this.beams, this.hearth, this.towerGlow);
 
     // Water: a living surface whose ripples bend the reflections.
     this.displacement = new Sprite(noiseTexture());
@@ -824,6 +833,7 @@ export class MapRenderer {
         ...GREENHOUSE_SITES.slice(greenhouses),
       ],
       carParks: CAR_PARKS.filter((_, i) => !(i === 1 && mirrors > 0)),
+      mirrorField: mirrors > 0 ? CAR_PARKS[1]! : null,
     });
     const groundKey = `${this.res}|${ground.svg}`;
     if (groundKey !== this.groundKey) {
@@ -919,6 +929,7 @@ export class MapRenderer {
     this.syncWater(props);
     this.syncLand(props);
     this.syncFlows(props);
+    this.syncMirrors(props);
     this.syncPollen(props);
     this.daylight.tint = this.palette.light;
     this.bloom.tint = this.palette.sun;
@@ -1121,6 +1132,25 @@ export class MapRenderer {
     }
   }
 
+  /** Mirrors flash now and then as they track the sun; the tower's receiver glows. */
+  private syncMirrors(props: MapProps): void {
+    for (const glint of this.mirrorGlints) glint.sprite.destroy();
+    this.mirrorGlints = [];
+    const mirrors = visibleElements(props.generators.mirrorPlant, MIRRORS.length, 2);
+    this.towerGlow.visible = mirrors > 0;
+    if (props.reduced) return;
+    MIRRORS.slice(0, mirrors).forEach(({ x, y }, i) => {
+      if (i % 2) return;
+      const sprite = new Sprite(this.glow);
+      sprite.anchor.set(0.5);
+      sprite.blendMode = 'add';
+      sprite.tint = 0xfff6dc;
+      sprite.position.set(x, y);
+      this.effects.addChild(sprite);
+      this.mirrorGlints.push({ sprite, offset: (i * 2.7) % 9 });
+    });
+  }
+
   private syncPollen(props: MapProps): void {
     const wanted = props.phase >= 2 && !props.reduced ? 42 : 0;
     while (this.motes.length > wanted) this.motes.pop()!.sprite.destroy();
@@ -1282,7 +1312,7 @@ export class MapRenderer {
     this.bloom.alpha = 0.16 + Math.sin(t * 0.4) * 0.04;
     this.daylight.scale.x = Math.abs(this.daylight.scale.x) * (fromLeft ? 1 : -1);
     this.daylight.x = fromLeft ? 0 : width;
-    this.daylight.alpha = this.palette.lightAlpha * 0.8;
+    this.daylight.alpha = this.palette.lightAlpha * 0.62;
     this.hearth.alpha = 0.6 + Math.sin(t * 1.3) * 0.12;
 
     // Clouds drift across the world and come back round.
@@ -1342,8 +1372,24 @@ export class MapRenderer {
       mote.sprite.alpha = Math.sin(p * Math.PI) * 0.9;
     }
 
-    // Beams of the mirror field shimmer towards the tower.
+    // Beams of the mirror field shimmer towards the tower; mirrors flash as they turn.
     this.drawBeams(t);
+    for (const { sprite, offset } of this.mirrorGlints) {
+      const p = ((t + offset) % 9) / 1.1;
+      sprite.alpha = p < 1 ? Math.sin(p * Math.PI) ** 3 : 0;
+      sprite.width = sprite.height = 4 + sprite.alpha * 9;
+    }
+    this.towerGlow.alpha = 0.55 + Math.sin(t * 1.1) * 0.15;
+    this.towerGlow.width = this.towerGlow.height = 26 + Math.sin(t * 1.1) * 3;
+
+    // A breeze moves through the street trees, in waves crossing the city.
+    for (const placed of this.placed.values()) {
+      if (placed.item.group !== 'urbanCanopy' || !placed.item.at) continue;
+      const [x, y] = placed.item.at;
+      const gust = Math.sin(t * 0.5 - x * 0.012) * 0.5 + 0.5;
+      const sway = still ? 0 : Math.sin(t * 1.6 + x * 0.21 + y * 0.13) * (0.012 + gust * 0.022);
+      placed.sprite.skew.set(sway, sway * 0.4);
+    }
 
     // Pollen drifts on the warm air.
     for (const mote of this.motes) {
