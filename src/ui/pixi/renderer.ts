@@ -2,6 +2,7 @@
 // game data as the SVG scene. Detailed SVG drawings become textures; the GPU adds what SVG
 // cannot afford: soft shadows cast by a moving sun, drifting cloud shadows, living water, glints
 // on glass, a warm bloom and pollen in the air. Visual only: it never touches the game state.
+import type { LandscapeId } from '../../game/cityData';
 import {
   Application,
   BlurFilter,
@@ -108,6 +109,8 @@ export interface MapProps {
   raining: boolean;
   /** The Bioregion is open: the land around the city is drawn. */
   bioregion: boolean;
+  /** The landscape of the sister city lived in (§7.6), drawn on the land; none at home. */
+  landscape?: LandscapeId | null;
   /** Gives up on devices that would draw it slowly, so the SVG map stays: the automatic choice. */
   strict?: boolean;
 }

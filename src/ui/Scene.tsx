@@ -56,7 +56,6 @@ import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
 import { CorridorLayer } from './CorridorArt';
 import { OrchardLayer } from './OrchardArt';
-import { LandscapeLayer } from './LandscapeArt';
 import { encodeOrchard } from './orchardMap';
 import { isOrchardOpen, pickFruit, type FruitId } from '../game/orchard';
 import { encodeCorridors } from './corridorMap';
@@ -266,9 +265,15 @@ export function Scene({
   const land = useMemo(
     () =>
       bioregion ? (
-        <BioregionLand sites={sites} collectors={collectors} raining={raining} reduced={reduced} />
+        <BioregionLand
+          sites={sites}
+          collectors={collectors}
+          raining={raining}
+          reduced={reduced}
+          landscape={landscape}
+        />
       ) : null,
-    [bioregion, sites, collectors, raining, reduced],
+    [bioregion, sites, collectors, raining, reduced, landscape],
   );
   const { roofTanks, swales } = collectors;
   // What moves on its own or answers the pointer: over both maps, drawn in SVG.
@@ -277,7 +282,6 @@ export function Scene({
       <>
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
-        <LandscapeLayer landscape={landscape} />
         <CorridorLayer corridors={corridors} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
@@ -307,7 +311,6 @@ export function Scene({
       corridors,
       orchard,
       orchardOpen,
-      landscape,
       onPick,
       districtReady,
       restoreNeighbour,
@@ -412,6 +415,7 @@ export function Scene({
               collectors={collectors}
               raining={raining}
               bioregion={bioregion}
+              landscape={landscape}
               strict={!rendererChosen}
               overlay={marks}
               onFail={() => setWebglFailed(true)}

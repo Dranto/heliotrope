@@ -644,9 +644,11 @@ La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par 
 
 | Paysage | Dans la ville (sa règle) | Une fois quittée (le réseau) | Sur la carte |
 |---|---|---|---|
-| Le littoral | Eau ×2, Panneaux de balcon ×0,5 | Eau ×1,1 | La mer et sa plage à l'est de la Biorégion |
-| La montagne | Papillon et visites 25 % plus fréquents, Eau ×0,75 | Papillon 5 % plus fréquent | Une crête de sommets enneigés au nord |
-| La plaine | Bâtiments 15 % moins chers, clic ×0,5 | Bâtiments 3 % moins chers | Des champs de blé au sud |
+| Le littoral | Eau ×2, Panneaux de balcon ×0,5 | Eau ×1,1 | Une baie et sa plage à l'est, entre les deux collines |
+| La montagne | Papillon et visites 25 % plus fréquents, Eau ×0,75 | Papillon 5 % plus fréquent | Une crête de sommets enneigés au nord, entre les collines |
+| La plaine | Bâtiments 15 % moins chers, clic ×0,5 | Bâtiments 3 % moins chers | Des champs de blé au sud, entre les collines |
+
+Le paysage fait partie du sol de la Biorégion (vue « La Biorégion ») : les deux rendus le dessinent, le rendu PixiJS le prenant au dessin SVG comme le reste de la terre (§10.4).
 
 La ville natale, une fois quittée, envoie **+3 % de production**. Chaque ville quittée fait aussi apporter **2 boutures de plus** aux voisins qui visitent (§9.6, Troc de graines). Il n'y a pas de serveur : le réseau est dans la sauvegarde.
 

@@ -68,10 +68,10 @@ export default function PixiMap({
 
   const { generators, upgrades, parcels, seconds, phase, season, greenness, reduced, camera } =
     props;
-  const { width, height, sites, collectors, raining, bioregion, strict } = props;
+  const { width, height, sites, collectors, raining, bioregion, landscape, strict } = props;
   const sources = useMemo(
-    () => mapSources({ parcels, seconds, sites, collectors, bioregion }),
-    [parcels, seconds, sites, collectors, bioregion],
+    () => mapSources({ parcels, seconds, sites, collectors, bioregion, landscape }),
+    [parcels, seconds, sites, collectors, bioregion, landscape],
   );
   useEffect(() => {
     renderer.current?.update({
@@ -90,6 +90,7 @@ export default function PixiMap({
       collectors,
       raining,
       bioregion,
+      landscape,
       strict,
     });
   }, [
@@ -108,6 +109,7 @@ export default function PixiMap({
     collectors,
     raining,
     bioregion,
+    landscape,
     strict,
   ]);
 

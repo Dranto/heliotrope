@@ -1,54 +1,58 @@
-// The landscape of a sister city on the map (docs/game-design.md §7.6, M23), at the edges of the
-// Bioregion's land: the sea and its beach to the east for the coast, a ridge of snowy peaks to
-// the north for the mountain, fields of wheat to the south for the plain. Drawn in SVG over both
-// maps; the home city has none.
-import { memo } from 'react';
+// The landscape of a sister city (docs/game-design.md §7.6, M23), drawn on the Bioregion's land
+// between its hills, inside the Bioregion view's frame (VIEW_FRAMES[4]): a bay of the sea and
+// its beach to the east for the coast, a ridge of snowy peaks to the north for the mountain,
+// fields of wheat to the south for the plain. Part of the land, so both renderers draw it (the
+// PixiJS map takes it from here, see pixi/sources.tsx); the home city has none.
 import type { LandscapeId } from '../game/cityData';
-import { LAND } from './bioregionMap';
 import './cities.css';
 
-const [X, Y, W, H] = LAND;
-const RIGHT = X + W;
-const BOTTOM = Y + H;
-/** Where each landscape begins, just inside the Bioregion view's frame (VIEW_FRAMES[4]). */
-const SHORE = 1180;
-const FOOTHILLS = -400;
-const FIELDS = 900;
+/** The bay: from the shore to beyond the frame, between the two eastern hills. */
+const SHORE = 1250;
+const BAY_TOP = -80;
+const BAY_BOTTOM = 540;
+/** The ridge: between the two northern hills, its foot just inside the frame. */
+const RIDGE = { from: -120, to: 740, foot: -430 };
+/** The fields: between the two southern hills, from just inside the frame. */
+const FIELDS = { from: -150, to: 900, top: 920, bottom: 1300 };
 
 function Coast() {
-  const waves = [-400, -150, 100, 350, 600, 850];
+  const mid = (BAY_TOP + BAY_BOTTOM) / 2;
+  const waves = [BAY_TOP + 90, mid - 60, mid + 60, BAY_BOTTOM - 90];
   return (
     <g className="landscape" data-landscape="coast">
       <path
         className="landscape-beach"
-        d={`M${SHORE - 70} ${Y}H${RIGHT}V${BOTTOM}H${SHORE - 90}Z`}
+        d={`M2400 ${BAY_TOP - 60}H${SHORE + 60}C${SHORE - 70} ${BAY_TOP + 60} ${SHORE - 90} ${BAY_BOTTOM - 60} ${SHORE + 60} ${BAY_BOTTOM + 60}H2400Z`}
       />
       <path
         className="landscape-sea"
-        d={`M${SHORE} ${Y}C${SHORE + 40} ${Y + H / 3} ${SHORE - 40} ${Y + (2 * H) / 3} ${SHORE + 10} ${BOTTOM}H${RIGHT}V${Y}Z`}
+        d={`M2400 ${BAY_TOP}H${SHORE + 80}C${SHORE - 20} ${BAY_TOP + 90} ${SHORE - 40} ${BAY_BOTTOM - 90} ${SHORE + 80} ${BAY_BOTTOM}H2400Z`}
       />
       {waves.map((y) => (
-        <path key={y} className="landscape-foam" d={`M${SHORE + 30} ${y}q40-20 80 0t80 0 80 0`} />
+        <path key={y} className="landscape-foam" d={`M${SHORE + 40} ${y}q30-16 60 0t60 0 60 0`} />
       ))}
     </g>
   );
 }
 
 function Mountain() {
-  const peaks = Array.from({ length: 9 }, (_, i) => X + 150 + i * ((W - 300) / 8));
+  const count = 6;
+  const step = (RIDGE.to - RIDGE.from) / (count - 1);
   return (
     <g className="landscape" data-landscape="mountain">
-      {peaks.map((x, i) => {
-        const h = 220 + ((i * 97) % 5) * 40;
+      {Array.from({ length: count }, (_, i) => {
+        const x = RIDGE.from + i * step;
+        const h = 200 + ((i * 3) % 4) * 45;
+        const top = RIDGE.foot - h;
         return (
           <g key={x}>
             <path
               className="landscape-peak"
-              d={`M${x - 260} ${FOOTHILLS}L${x} ${FOOTHILLS - h}L${x + 260} ${FOOTHILLS}Z`}
+              d={`M${x - 150} ${RIDGE.foot}L${x} ${top}L${x + 150} ${RIDGE.foot}Z`}
             />
             <path
               className="landscape-snow"
-              d={`M${x - 70} ${FOOTHILLS - h + 70}L${x} ${FOOTHILLS - h}L${x + 70} ${FOOTHILLS - h + 70}l-30 -10l-20 16l-20 -16Z`}
+              d={`M${x - 45} ${top + 60}L${x} ${top}L${x + 45} ${top + 60}l-18 -8l-14 12l-13 -12Z`}
             />
           </g>
         );
@@ -59,17 +63,18 @@ function Mountain() {
 
 function Plain() {
   const colours = ['#f0d98a', '#e6c66a', '#d9e4a0', '#f3e2a6'];
-  const width = W / 8;
+  const count = 7;
+  const width = (FIELDS.to - FIELDS.from) / count;
   return (
     <g className="landscape" data-landscape="plain">
-      {Array.from({ length: 8 }, (_, i) => (
+      {Array.from({ length: count }, (_, i) => (
         <rect
           key={i}
           className="landscape-field"
-          x={X + i * width}
-          y={FIELDS}
+          x={FIELDS.from + i * width}
+          y={FIELDS.top}
           width={width}
-          height={BOTTOM - FIELDS}
+          height={FIELDS.bottom - FIELDS.top}
           fill={colours[i % colours.length]}
         />
       ))}
@@ -77,11 +82,9 @@ function Plain() {
   );
 }
 
-function Landscape({ landscape }: { landscape: LandscapeId | null }) {
+export function LandscapeArt({ landscape }: { landscape: LandscapeId | null }) {
   if (landscape === 'coast') return <Coast />;
   if (landscape === 'mountain') return <Mountain />;
   if (landscape === 'plain') return <Plain />;
   return null;
 }
-
-export const LandscapeLayer = memo(Landscape);

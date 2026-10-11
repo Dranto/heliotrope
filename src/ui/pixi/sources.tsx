@@ -2,6 +2,8 @@
 // parcels, the Bioregion's land and the water collectors. PixiMap renders them, out of sight,
 // with the scene's own components and CSS; the renderer turns each one into a texture. So both
 // maps always show the same art.
+import type { LandscapeId } from '../../game/cityData';
+import { LandscapeArt } from '../LandscapeArt';
 import type { ReactNode } from 'react';
 import type { CollectorId, SiteId } from '../../game/bioregion';
 import type { ParcelId } from '../../game/parcels';
@@ -47,6 +49,8 @@ export interface SourceProps {
   sites: Record<SiteId, number>;
   collectors: Record<CollectorId, number>;
   bioregion: boolean;
+  /** The landscape of the sister city lived in (§7.6), drawn on the land's ground. */
+  landscape?: LandscapeId | null;
 }
 
 /** The plain is one large texture, kept light; its sites are small ones, a little sharper. */
@@ -60,6 +64,7 @@ export function mapSources({
   sites,
   collectors,
   bioregion,
+  landscape = null,
 }: SourceProps): Source[] {
   const sources: Source[] = [];
   for (const id of GROUND_ORDER) {
@@ -85,6 +90,15 @@ export function mapSources({
     node: <LandGround sites={sites} fields={shown.fields} />,
     maxRes: LAND_GROUND_RES,
   });
+  if (landscape) {
+    sources.push({
+      key: `landscape:${landscape}`,
+      group: 'landGround',
+      scope: 'bioregion-land',
+      node: <LandscapeArt landscape={landscape} />,
+      maxRes: LAND_GROUND_RES,
+    });
+  }
   for (const { box } of shown.meadows) {
     sources.push({
       ...land,
