@@ -1,4 +1,7 @@
 import { offlineCapBonus } from './bonuses';
+import { isRipe } from './garden';
+import { GENERATOR_IDS, type GeneratorId } from './generators';
+import { areSeedsRipe } from './seasons';
 import type { GameState } from './state';
 import { tick } from './tick';
 
@@ -49,4 +52,46 @@ export function applyOfflineProgress(
     },
     elapsedSeconds,
   };
+}
+
+/**
+ * What grew while the player was away (§9.1, M17), for the return in images: the buildings the
+ * Cooperatives bought, the beds of the garden that ripened, the Seeds that became ripe and the
+ * Seasons the sower started. Only what changed; the screen shows the current numbers.
+ */
+export interface OfflineReport {
+  /** Generators whose count went up, in data order. */
+  built: GeneratorId[];
+  /** Indexes of the garden beds that became ripe. */
+  ripened: number[];
+  seedsRipened: boolean;
+  /** Seasons started by the sower (§7.1) while away. */
+  seasons: number;
+}
+
+export function offlineReport(before: GameState, after: GameState): OfflineReport {
+  const seasons = after.seasons - before.seasons;
+  return {
+    // A new Season empties the buildings: what was built before it no longer shows.
+    built:
+      seasons > 0
+        ? GENERATOR_IDS.filter((id) => after.generators[id] > 0)
+        : GENERATOR_IDS.filter((id) => after.generators[id] > before.generators[id]),
+    ripened: after.garden.plots.flatMap((plot, i) => {
+      const was = before.garden.plots[i];
+      return isRipe(plot) && !(was && was.crop === plot.crop && isRipe(was)) ? [i] : [];
+    }),
+    seedsRipened: areSeedsRipe(after) && (seasons > 0 || !areSeedsRipe(before)),
+    seasons,
+  };
+}
+
+/** Nothing to show: the return then keeps to the Light gathered. */
+export function isReportEmpty(report: OfflineReport): boolean {
+  return (
+    report.built.length === 0 &&
+    report.ripened.length === 0 &&
+    !report.seedsRipened &&
+    report.seasons === 0
+  );
 }

@@ -51,6 +51,10 @@ import { Stats } from './Stats';
 import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
 import { useSounds } from './useSounds';
+import { useMusic } from './useMusic';
+import { useReminders } from './useReminders';
+import type { OfflineReport } from '../game/offline';
+import { isRipe } from '../game/garden';
 
 type Screen = 'achievements' | 'herbier' | 'seasons' | 'tree' | 'cycles' | 'stats' | 'options';
 /** §10.3: mobile tab bar sections. */
@@ -64,6 +68,25 @@ interface Toast {
 
 /** How long a notification stays on screen. */
 const TOAST_MS = 5000;
+
+/** The return in images (§9.1): what grew while away, with today's numbers only. */
+function WelcomeReport({ report, state }: { report: OfflineReport; state: GameState }) {
+  const ripe = state.garden.plots.filter(isRipe).length;
+  const chips = [
+    ...report.built.map((id) => `${t.generators[id].name} · ${formatNumber(state.generators[id])}`),
+    ...(report.ripened.length > 0 && ripe > 0 ? [t.welcomeReport.crops(ripe)] : []),
+    ...(report.seedsRipened ? [t.welcomeReport.seeds(formatNumber(seedsToGain(state)))] : []),
+    ...(report.seasons > 0 ? [t.welcomeReport.seasons(report.seasons)] : []),
+  ];
+  if (chips.length === 0) return null;
+  return (
+    <ul className="welcome-report" aria-label={t.welcomeReport.label}>
+      {chips.map((chip) => (
+        <li key={chip}>{chip}</li>
+      ))}
+    </ul>
+  );
+}
 
 function SeedIcon() {
   return (
@@ -148,6 +171,8 @@ export function App() {
     store.offlineSeconds >= 60 && store.offlineLight >= 1,
   );
   useSounds(state);
+  useMusic(state);
+  useReminders(state);
   // Every number on screen follows the notation chosen in the Options (§8), every text the
   // language (§14 Q1).
   setNotation(state.settings.notation);
@@ -500,6 +525,7 @@ export function App() {
                 t.duration(store.offlineSeconds),
               )}
             </p>
+            <WelcomeReport report={store.offlineReport} state={state} />
           </div>
           <button type="button" className="ghost" onClick={() => setShowWelcome(false)}>
             {t.dismiss}

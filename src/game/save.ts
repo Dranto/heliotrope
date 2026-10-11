@@ -84,6 +84,8 @@ const migrations: Record<number, Migration> = {
   16: (raw) => ({ ...raw, version: 17 }),
   // v18 adds the futures of the parcels and the decor (§6.5, M16): first futures, no decor.
   17: (raw) => ({ ...raw, version: 18 }),
+  // v19 adds the music volume and the reminders (§6.3, §10.6, M17): music by default, no reminder.
+  18: (raw) => ({ ...raw, version: 19 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -343,6 +345,12 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (typeof settings?.muted === 'boolean') {
     state.settings = { ...state.settings, muted: settings.muted };
+  }
+  if (isFiniteNumber(settings?.music) && settings.music >= 0 && settings.music <= 1) {
+    state.settings = { ...state.settings, music: settings.music };
+  }
+  if (typeof settings?.reminders === 'boolean') {
+    state.settings = { ...state.settings, reminders: settings.reminders };
   }
   if (typeof settings?.language === 'string' && isLanguage(settings.language)) {
     state.settings = { ...state.settings, language: settings.language };

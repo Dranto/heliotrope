@@ -1,0 +1,130 @@
+/* The return in images (§9.1, M17): the sun sweeps the map, then golden rings open in turn. */
+.return-replay {
+  pointer-events: none;
+}
+
+.return-sweep {
+  animation: return-sweep ease-in-out both;
+}
+
+@keyframes return-sweep {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(900px);
+  }
+}
+
+.return-mark {
+  opacity: 0;
+  animation: return-mark 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes return-mark {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.return-ring {
+  fill: rgb(255 236 180 / 0.6);
+  stroke: #e8a93a;
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: appear-ring 1.1s ease-out 2;
+  animation-delay: inherit;
+}
+
+.return-spark {
+  fill: #f4c063;
+}
+
+.return-leaf {
+  fill: #6fae5b;
+}
+
+.return-seed {
+  fill: #b5803e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .return-sweep {
+    display: none;
+  }
+}
+
+.welcome-report {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.welcome-report li {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: rgb(255 244 214 / 0.9);
+  font-size: 0.85rem;
+  animation: fade-in 0.8s ease both;
+}
+
+.welcome-report li:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.welcome-report li:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.welcome-report li:nth-child(n + 4) {
+  animation-delay: 0.9s;
+}
+
+/* The guided first minute (§10.6): a golden halo breathes on the next gesture, without a word. */
+[data-guide='true'] {
+  position: relative;
+  animation: guide-halo 1.8s ease-in-out infinite;
+}
+
+.flower-button[data-guide='true'] {
+  border-radius: 50%;
+}
+
+@keyframes guide-halo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgb(244 192 99 / 0.9),
+      0 0 0 0 rgb(244 192 99 / 0.6);
+  }
+
+  60% {
+    box-shadow:
+      0 0 0 2px rgb(244 192 99 / 0.9),
+      0 0 0 14px rgb(244 192 99 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-guide='true'] {
+    animation: none;
+    box-shadow: 0 0 0 3px rgb(244 192 99 / 0.7);
+  }
+}

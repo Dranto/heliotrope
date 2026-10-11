@@ -283,6 +283,8 @@ Les effets des parcelles et des projets s'ajoutent aux formules du §8 : les mul
 
 Le pilier « Élégant et lumineux » (§1) promettait des sons discrets. Ils sont synthétisés dans le navigateur (Web Audio, aucun fichier audio) et accordés sur une même gamme pentatonique, pour ne jamais sonner faux quand ils se superposent : une note pincée à chaque clic, qui change de hauteur d'un clic à l'autre ; un petit accord à chaque bâtiment ; un scintillement pour une amélioration ; un arpège pour une parcelle restaurée ; une cloche pour un projet ; un trille pour le Papillon doré ; deux notes pour un Jalon ; un accord lent pour une nouvelle Saison. À partir de la phase 2, des oiseaux chantent de temps en temps quand l'onglet est visible. Quand plusieurs choses arrivent ensemble, seul le son le plus rare joue. Les Options règlent le volume (50 % par défaut) et coupent le son. Code dans `src/ui/sound.ts` et `src/ui/useSounds.ts`.
 
+**La musique du quartier (M17).** Une musique d'ambiance **générative**, synthétisée de la même façon sur la même gamme pentatonique, une octave plus bas, pour que les sons s'y posent toujours juste. Au Balcon, quelques notes lentes et graves (une chance sur cinq de se taire à chaque temps fort) ; la phase 2 ajoute une mélodie clairsemée, la phase 3 des cloches aiguës ; chaque quartier voisin restauré (§6.4) ajoute une voix discrète, tour à tour médium, grave et aiguë ; les zones humides de la Biorégion (§7.4) ajoutent des gouttes qui glissent vers le bas, la forêt ancienne un bourdon grave (do et sol) qui gonfle lentement. Le tempo suit la saison visuelle (un temps de 0,8 s en été, 0,9 s au printemps, 1,05 s en automne, 1,3 s en hiver) et ralentit le soir (×1,15) et la nuit (×1,35) ; un filtre adoucit la couleur en hiver et la nuit. Elle se tait quand l'onglet est caché. Les Options ont un réglage **Musique** séparé (35 % par défaut sur ordinateur, **coupée par défaut sur téléphone** tant que le joueur ne l'a pas réglée) ; « Couper le son » coupe aussi la musique. Code dans `src/ui/music.ts` et `src/ui/useMusic.ts`.
+
 
 ### 6.4 Les quartiers voisins (M12)
 
@@ -661,6 +663,7 @@ Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorat
 
 - Au retour, le jeu calcule la production pendant l'absence à **100 %** de la production/s au moment du départ, **plafonnée à 8 h** *(à valider)*, ou 10 h une fois la Rivière retrouvée (§6.1).
 - Une fenêtre « Pendant ton absence… » résume le gain.
+- **Le retour en images (M17).** Sous le gain, une pastille par bâtiment qui a grandi pendant l'absence (achats des Coopératives, §7.2) avec son **nombre actuel**, les cultures prêtes du potager (§9.7), les Graines devenues mûres (leur nombre actuel) et les Saisons relancées par le semoir (§7.1). Sur la carte, la scène rejoue l'absence en accéléré, une fois au chargement : le soleil balaie la ville une fois par heure d'absence (au plus quatre), puis un anneau doré s'ouvre tour à tour sur chaque bâtiment qui a grandi, chaque carré mûri et l'héliotrope si ses Graines ont mûri. Rien quand les animations sont réduites. Code dans `src/game/offline.ts` (`offlineReport`), `src/ui/returnMap.ts` et `src/ui/ReturnReplay.tsx`.
 - Les événements temporaires (Papillon doré) ne comptent pas hors ligne.
 
 ### 9.2 Papillon doré
@@ -897,6 +900,12 @@ Le confort en attente depuis M5 (roadmap, « Confort à glisser au fil de l'eau 
 - **Raccourcis clavier.** Les touches 1 à 8 achètent le bâtiment de ce rang (s'il est découvert) dans la quantité choisie ; M passe à Max, puis revient à ×1. Aucune touche ne clique la fleur, pour ne pas encourager l'autoclic. Les raccourcis se taisent dans un champ de texte et quand une fenêtre est ouverte.
 - **Courbe de la production.** Dans les Statistiques, la Lumière par seconde au fil de chaque Saison, pour les six dernières (celle en cours comprise), sur une échelle logarithmique pour que la première et la dernière tiennent ensemble. La Saison en cours est le trait vert foncé, les précédentes en vert sauge, de plus en plus pâles avec l'âge, avec leur nom en légende. Pointer la courbe lit la production de chaque Saison à ce moment. Un point toutes les 30 s de Saison ; à 120 points, l'intervalle double, pour garder toute la Saison en peu de place. Une longue absence dessine un plateau à la production du retour, sans inventer de forme. Les courbes sont dans la sauvegarde (version 12) ; une sauvegarde plus ancienne commence la sienne à la Saison en cours.
 - **Installation en application.** Le jeu s'installe comme une application (manifeste et icônes) et se recharge sans connexion une fois chargé : un service worker sert la page depuis le réseau s'il y en a un, sinon depuis son cache, et garde les fichiers du jeu (au plus 80, les plus anciens partant en premier). La sauvegarde reste dans le navigateur, comme avant.
+
+### 10.6 L'accueil et les rappels (M17)
+
+- **Première minute guidée, sans texte.** Pendant la toute première Saison, un halo doré respire sur le geste suivant : la fleur tant qu'on ne l'a pas cliquée, puis le bouton d'achat de l'Héliotrope en pot dès qu'on peut se l'offrir, puis la première amélioration abordable. Il disparaît dès que le geste est fait et ne revient plus après la première amélioration achetée, ni après la première Saison. Aucune bulle d'explication. Code dans `src/game/guide.ts`.
+- **Rappels facultatifs (décision D8).** Dans les Options, « Rappels », **désactivés par défaut** : une fois le navigateur autorisé, une notification quand les Graines deviennent mûres ou qu'une culture du potager est prête, seulement quand le jeu est ouvert dans un onglet caché ou une fenêtre d'application en arrière-plan. Le jeu ne pousse jamais à revenir à heure fixe (§1). Code dans `src/ui/useReminders.ts`.
+- **Sauvegarde.** Version 19 : le volume de la musique (vide tant que le joueur ne l'a pas réglé) et les rappels (désactivés).
 
 ---
 

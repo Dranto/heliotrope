@@ -22,7 +22,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 18;
+export const STATE_VERSION = 19;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -46,6 +46,13 @@ export interface Settings {
   muted: boolean;
   /** §14 Q1: language of the interface, French by default. */
   language: Language;
+  /**
+   * §6.3: volume of the music of the neighbourhood, from 0 to 1; null until the player sets it,
+   * which plays it softly on a computer and keeps it off on a phone.
+   */
+  music: number | null;
+  /** §10.6: notify when the Seeds are ripe or a crop is ready, off by default (decision D8). */
+  reminders: boolean;
 }
 
 export interface GameState {
@@ -153,6 +160,8 @@ export const DEFAULT_SETTINGS: Settings = {
   volume: 0.5,
   muted: false,
   language: 'fr',
+  music: null,
+  reminders: false,
 };
 
 export function createInitialState(now: number): GameState {

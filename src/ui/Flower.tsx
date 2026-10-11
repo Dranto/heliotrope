@@ -28,6 +28,7 @@ import {
   type Leaf,
 } from './flower';
 import { clickLevel } from './neighbourhood';
+import { guideStep } from '../game/guide';
 import { useGameState, useGameStore } from './useGame';
 import { COROLLAS } from './decorMap';
 
@@ -346,6 +347,7 @@ export function Flower() {
       <button
         type="button"
         className="flower-button"
+        data-guide={guideStep(state)?.kind === 'flower' || undefined}
         aria-label={t.clickFlower}
         onPointerMove={follow}
         onPointerLeave={() => setTilt(0)}
