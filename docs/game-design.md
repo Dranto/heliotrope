@@ -628,14 +628,14 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
 - **Améliorations** (dans une même Saison) : 10, 25, 50, 75 améliorations ; « Fil doré » (une première synergie entre bâtiments), « Toile dorée » (les 18 synergies entre bâtiments), « Mains d'or » (les 10 améliorations du clic).
 - **La fleur** : 10, 100, 1 000, 10 000, 100 000 clics ; un clic qui vaut 1 000 puis 1 M Lumière ; caché : « Graine qui dort » (récolter 1 000 Lumière dans une Saison sans aucun bâtiment).
 - **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
-- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
+- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 1, 25, 250 récoltes du potager, « Croisement » et « Grainothèque » (§9.7, M14) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
 - **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
 
 Les jalons sont conservés d'une Saison à l'autre. Chaque jalon atteint **éclot** en haut de l'écran : un médaillon dont l'anneau doré se dessine, une couronne de laurier qui pousse feuille à feuille, des pétales lilas qui s'ouvrent, avec le nom du jalon, sa condition et « Production +1 % » ; il s'efface après environ 4 s. Plusieurs jalons atteints ensemble éclosent l'un après l'autre (au-delà de trois d'un coup, un seul médaillon les compte). Le compteur du bouton « Jalons » scintille à chaque nouveau jalon. Pas de texte d'ambiance : seulement le nom et la condition. Avec les animations réduites, le médaillon apparaît et disparaît sans mouvement. Les lecteurs d'écran entendent « Jalon atteint : nom ».
@@ -681,6 +681,36 @@ Le quartier restauré raconte ses temps forts sans un mot (§1, §6) : de temps 
 - **Jalons (4).** Portes ouvertes (accueillir chaque visiteur au moins une fois), Bon voisinage (10 fois les voisins), Après la pluie (10 averses), Escale (10 nuées). 113 jalons en tout avec ceux de M11.
 - **Équilibrage.** Le simulateur ne joue pas les visites, comme il ne compte qu'une part des Papillons : leurs gains restent un bonus pour le joueur attentif et ne déplacent pas les cibles du §8.
 - **Le soir et la nuit.** Décor seulement, d'après l'horloge de l'appareil : de 18 h à 21 h un voile chaud, de 21 h à 6 h un voile bleu, et les lanternes s'allument au pied d'un arbre de rue sur quatre. La production ne change jamais (roadmap §5 : on ne punit pas le joueur qui joue la nuit).
+
+### 9.7 Le potager de la cour (M14)
+
+Une boucle de soin **à temps réel**, à côté de la Lumière : dans la cour, au pied de l'héliotrope, entre les deux rangées de pots, des **carrés de potager** où le joueur sème une culture, la regarde pousser sur la carte, puis la récolte d'un clic. Semer ne coûte rien : seul le temps fait mûrir. Code dans `src/game/garden.ts` et `src/game/seedBank.ts`, dessins dans `src/ui/GardenArt.tsx`.
+
+| Culture | Dès | Pousse en | Récolte |
+|---|---|---|---|
+| Radis | le 1ᵉʳ Héliotrope en pot | 3 min | Une bouffée de Lumière : 2 min de production (au moins 50) |
+| Tournesols | 10 Héliotropes en pot ou la 2ᵉ Saison | 20 min | Le Papillon doré vient dans les 10 s (s'il n'est pas déjà là) |
+| Haricots grimpants | la 2ᵉ Saison | 1 h | Potagers et Serres ×2 pendant 20 min (effet en cours, comme l'Averse) |
+| Courges | la Biorégion (3ᵉ Saison) | 4 h | 30 min de production de Lumière et d'Eau |
+
+- **Les carrés.** Trois au début, à gauche de la fleur ; un de plus après la 1ʳᵉ Saison, avec 4 parcelles restaurées, puis avec la Biorégion, à droite : **6 au plus** (la feuille de route en prévoyait jusqu'à 9, mais la cour n'a pas plus de place sans couvrir les pots). Les carrés et leurs cultures restent d'une Saison à l'autre et après un Cycle de l'eau.
+- **Le temps.** Une culture pousse à chaque pas de simulation, en ligne comme hors ligne, et **ne fane jamais** : mûre, elle attend le joueur (§1). L'Averse d'été (§9.6) la fait pousser deux fois plus vite tant qu'elle dure (en ligne seulement, comme tous les effets), les Jardins de pluie (§6.1) ×1,25 toujours.
+- **La grainothèque.** Récolter une culture dont un carré voisin (du même côté de la fleur) porte une culture différente a **une chance sur quatre** de donner la **variété** de ces deux cultures, si elle n'est pas encore trouvée. Six variétés, une par paire, chacune un bonus gardé pour toujours, lié à l'existant :
+
+| Variété | Cultures | Bonus |
+|---|---|---|
+| Radis flamboyant | Radis et Tournesols | Clic ×1,5 |
+| Radis noir | Radis et Haricots | Héliotropes en pot ×1,5 |
+| Navet boule d'or | Radis et Courges | Potagers sur le toit ×1,5 |
+| Haricot violet | Tournesols et Haricots | Serres ×1,5 |
+| Tournesol rouge | Tournesols et Courges | Le Papillon doré revient 5 % plus vite |
+| Les trois sœurs | Haricots et Courges | Biodiversité ×1,25 |
+
+- **Sur la carte.** Chaque carré est un bac de terre bordé de bois, avec trois plants qui passent par quatre stades (graine, pousse, plant, culture mûre : bulbes roses des radis, capitules jaunes, gousses violettes, courges orange). Un carré mûr est entouré d'un anneau doré qui respire ; un clic (ou Entrée) le récolte.
+- **Panneau.** « Le potager de la cour », après les Coopératives (onglet Récolter sur mobile) : chaque carré avec sa culture, une jauge et le temps avant maturité, le bouton Récolter, ou les cultures à semer dans un carré libre ; puis la grainothèque, avec les variétés trouvées et, pour les autres, les deux cultures qui les donnent. Une notification annonce chaque récolte et chaque variété.
+- **Équilibrage.** Le simulateur ne joue pas le potager : ses récoltes restent un bonus pour le joueur qui revient, et les cibles du §8 ne bougent pas.
+- **Jalons (5).** Premier radis (1 récolte), Main verte (25), Jardin nourricier (250), Croisement (1 variété), Grainothèque (les 6). 125 jalons en tout.
+- **Sauvegarde.** Version 16 : les carrés, le nombre de récoltes et les variétés, tout nu pour une sauvegarde plus ancienne.
 
 ---
 

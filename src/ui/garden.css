@@ -1,0 +1,237 @@
+/* The courtyard garden (§9.7): beds on the map and its panel. */
+
+.bed-edge {
+  fill: #b98a5a;
+  stroke: #8a6239;
+  stroke-width: 0.4;
+}
+
+.bed-soil {
+  fill: #7a5537;
+}
+
+.bed-furrow {
+  stroke: rgb(255 240 220 / 0.18);
+  stroke-width: 0.5;
+  stroke-dasharray: 1 1.4;
+}
+
+.plant-seed {
+  fill: #d9c29a;
+}
+
+.garden .leaf,
+.crop-art .leaf {
+  fill: #6fa35a;
+  stroke: #3f7a3c;
+  stroke-width: 0.15;
+}
+
+.plant-sprout path:first-child {
+  stroke: #3f7a3c;
+  stroke-width: 0.3;
+}
+
+.plant-radish .fruit {
+  fill: #e0627a;
+}
+
+.plant-sunflower .petal {
+  fill: #f2c335;
+}
+
+.plant-sunflower .heart {
+  fill: #7a4a24;
+}
+
+.garden .bud,
+.crop-art .bud {
+  fill: #9cc47f;
+}
+
+.plant-beans .pole {
+  stroke: #a77b4c;
+  stroke-width: 0.45;
+  stroke-linecap: round;
+}
+
+.plant-beans .vine {
+  fill: none;
+  stroke: #3f7a3c;
+  stroke-width: 0.3;
+}
+
+.plant-beans .pod {
+  fill: none;
+  stroke: #8a5bb8;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+}
+
+.plant-squash .fruit ellipse {
+  fill: #ec8c2e;
+}
+
+.plant-squash .rib {
+  fill: none;
+  stroke: rgb(140 70 20 / 0.45);
+  stroke-width: 0.25;
+}
+
+.bed-ripe {
+  cursor: pointer;
+  pointer-events: auto;
+  outline: none;
+}
+
+.bed-ring {
+  fill: rgb(244 192 99 / 0.22);
+  stroke: var(--gold);
+  stroke-width: 0.6;
+  stroke-dasharray: 1.4 1.4;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: bed-ring 2.4s ease-in-out infinite;
+}
+
+.bed-ripe:focus-visible .bed-ring {
+  stroke: var(--leaf);
+  stroke-dasharray: none;
+}
+
+@keyframes bed-ring {
+  50% {
+    transform: scale(1.1);
+    opacity: 0.65;
+  }
+}
+
+/* ---------- Panel ---------- */
+
+.garden-beds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.garden-bed {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.5);
+}
+
+.garden-bed[data-state='ripe'] {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgb(255 244 214 / 0.95), rgb(255 255 255 / 0.55));
+}
+
+.garden-bed[data-state='locked'] {
+  opacity: 0.55;
+}
+
+.garden-bed-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+}
+
+.garden-bed-head strong {
+  font-size: 0.92rem;
+}
+
+.crop-art {
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 70%, #8a6240 0 46%, transparent 47%);
+}
+
+.garden-meter {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgb(31 42 36 / 0.08);
+  overflow: hidden;
+}
+
+.garden-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--sage), var(--leaf));
+}
+
+.garden-crops {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.garden-crop {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border: 1px solid rgb(31 42 36 / 0.1);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.6);
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.garden-crop:hover,
+.garden-crop:focus-visible {
+  border-color: var(--leaf);
+}
+
+.garden-crop .crop-art {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.garden-crop small {
+  display: block;
+  color: var(--ink-soft);
+}
+
+.garden-bank {
+  margin-top: 0.6rem;
+}
+
+.garden-bank h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.02rem;
+}
+
+.garden-varieties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.garden-variety {
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  border: 1px dashed rgb(31 42 36 / 0.25);
+  color: var(--ink-soft);
+}
+
+.garden-variety[data-found='true'] {
+  border: 1px solid var(--gold);
+  background: rgb(255 244 214 / 0.9);
+  color: var(--ink);
+}

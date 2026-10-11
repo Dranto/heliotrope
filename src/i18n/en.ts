@@ -1,4 +1,5 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
+import type { CropId, VarietyId } from '../game/seedBank';
 import type { CanopyId } from '../game/talents';
 import type { Texts, UpgradeText } from './fr';
 
@@ -78,6 +79,7 @@ export const en: Texts = {
       pollination: (seconds: string) => `Pollination ×100 · ${seconds}`,
       shower: (seconds: string) => `Summer shower ×2 · ${seconds}`,
       birds: (seconds: string) => `Migrating birds ×2 · ${seconds}`,
+      beans: (seconds: string) => `Beans ×2 · ${seconds}`,
     },
   },
   visits: {
@@ -191,6 +193,11 @@ export const en: Texts = {
       'canopy.18': 'Thick canopy',
       crown: 'Treetop',
       selfSown: 'Self-sown',
+      'harvests.1': 'First radish',
+      'harvests.25': 'Green fingers',
+      'harvests.250': 'Feeding garden',
+      firstVariety: 'Crossing',
+      seedBank: 'Seed bank',
       'species.1': 'First return',
       'species.10': 'The neighbourhood hums',
       'species.18': 'Complete herbarium',
@@ -275,6 +282,12 @@ export const en: Texts = {
         count === 1 ? 'Sow a first level in the Canopy' : `Sow ${count} levels in the Canopy`,
       fullCanopy: 'Bring every talent of the Canopy to its last level',
       sowerSeasons: (count: number) => `Let the sower start ${count} Seasons`,
+      harvests: (count: number) =>
+        count === 1 ? 'Harvest the courtyard garden' : `Harvest the garden ${count} times`,
+      varieties: (count: number) =>
+        count === 1
+          ? 'Find a first variety for the seed bank'
+          : `Gather the ${count} varieties of the seed bank`,
       cooperativePurchases: (count: string) => `Let the cooperatives make ${count} purchases`,
       playHours: (hours: number) => (hours === 1 ? 'Play for an hour' : `Play for ${hours} hours`),
       swiftSeason: (seeds: number, minutes: number) =>
@@ -387,7 +400,50 @@ export const en: Texts = {
       pollination: 'Pollination',
       shower: 'The Summer shower',
       birds: 'The Migrating flock',
+      beans: 'The Climbing beans',
     },
+  },
+  garden: {
+    title: 'The courtyard garden',
+    hint: 'Sow, come back when it is ripe: nothing wilts, everything waits for you.',
+    crops: {
+      radish: { name: 'Radishes', effect: 'A puff of Light: 2 min of production' },
+      sunflower: { name: 'Sunflowers', effect: 'The Golden Butterfly comes at once' },
+      beans: { name: 'Climbing beans', effect: 'Rooftop gardens and greenhouses ×2 for 20 min' },
+      squash: { name: 'Squashes', effect: '30 min of Light and Water production' },
+    } satisfies Record<CropId, { name: string; effect: string }>,
+    plot: (index: number) => `Bed ${index}`,
+    bare: 'Bare bed',
+    locked: 'Bed to come',
+    choose: 'What to sow?',
+    sow: 'Sow',
+    sowLabel: (crop: string, plot: string) => `Sow ${crop} in ${plot.toLowerCase()}`,
+    grows: (time: string) => `Grows in ${time}`,
+    growing: (time: string) => `Ripe in ${time}`,
+    ripe: 'Ripe',
+    harvest: 'Harvest',
+    harvestLabel: (crop: string) => `Harvest ${crop}`,
+    plotLabel: (plot: string, crop: string, state: string) => `${plot}: ${crop}, ${state}`,
+    seedBank: 'The seed bank',
+    seedBankHint: 'Two different crops side by side sometimes give a variety.',
+    varieties: {
+      flameRadish: 'Flame radish',
+      blackRadish: 'Black radish',
+      goldenTurnip: 'Golden ball turnip',
+      purpleBean: 'Purple bean',
+      redSunflower: 'Red sunflower',
+      threeSisters: 'The three sisters',
+    } satisfies Record<VarietyId, string>,
+    unknownVariety: (first: string, second: string) => `${first} and ${second} side by side`,
+    harvested: {
+      light: (light: string) => `Garden harvest! +${light} Light.`,
+      lightWater: (light: string, water: string) =>
+        `Garden harvest! +${light} Light, +${water} Water.`,
+      butterfly: 'The sunflowers draw the Golden Butterfly.',
+      effect: (seconds: string) =>
+        `Climbing beans! Rooftop gardens and greenhouses ×2 for ${seconds}.`,
+    },
+    variety: (name: string) => `New variety: ${name}!`,
   },
   herbier: {
     open: 'Herbarium',

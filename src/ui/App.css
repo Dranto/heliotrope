@@ -261,6 +261,10 @@ button {
   order: 4;
 }
 
+.side .garden-panel {
+  order: 5;
+}
+
 /* Folding a panel keeps only its title, so the others and the map get the room. */
 .panel-title {
   margin: 0;
@@ -2774,8 +2778,8 @@ button {
 
   /* §10.3: one section at a time, picked in the tab bar. */
   .app[data-tab='harvest'] :is(.upgrades, .generators, .bioregion, .cooperatives),
-  .app[data-tab='build'] :is(.upgrades, .restoration, .cooperatives),
-  .app[data-tab='improve'] :is(.generators, .bioregion, .restoration),
+  .app[data-tab='build'] :is(.upgrades, .restoration, .garden-panel, .cooperatives),
+  .app[data-tab='improve'] :is(.generators, .bioregion, .restoration, .garden-panel),
   .app[data-tab='more'] .layout {
     display: none;
   }

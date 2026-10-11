@@ -51,8 +51,10 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
     if (bonus.generator === id) typeBonus += bonus.bonus * typesOwned(state);
   }
   // §9.6: the summer shower waters the rooftop gardens and the greenhouses.
-  if (id === 'rooftopGarden' || id === 'greenhouse')
-    factor *= effectFactor(state.effects, 'shower');
+  // §9.7: so do the climbing beans of the courtyard garden.
+  if (id === 'rooftopGarden' || id === 'greenhouse') {
+    factor *= effectFactor(state.effects, 'shower') * effectFactor(state.effects, 'beans');
+  }
   return (
     factor *
     (1 + synergyBonus * factorOf(state, 'synergyFactor')) *

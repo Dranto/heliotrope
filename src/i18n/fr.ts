@@ -12,6 +12,7 @@ import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
 import type { CanopyId, TalentBranch, TalentId } from '../game/talents';
+import type { CropId, VarietyId } from '../game/seedBank';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
 export interface GeneratorText {
@@ -120,6 +121,7 @@ export const fr = {
       pollination: (seconds: string) => `Pollinisation ×100 · ${seconds}`,
       shower: (seconds: string) => `Averse d’été ×2 · ${seconds}`,
       birds: (seconds: string) => `Migrateurs ×2 · ${seconds}`,
+      beans: (seconds: string) => `Haricots ×2 · ${seconds}`,
     },
   },
   visits: {
@@ -234,6 +236,11 @@ export const fr = {
       'canopy.18': 'Canopée touffue',
       crown: 'Cime',
       selfSown: 'Semis spontané',
+      'harvests.1': 'Premier radis',
+      'harvests.25': 'Main verte',
+      'harvests.250': 'Jardin nourricier',
+      firstVariety: 'Croisement',
+      seedBank: 'Grainothèque',
       'species.1': 'Premier retour',
       'species.10': 'Le quartier bourdonne',
       'species.18': 'Herbier complet',
@@ -324,6 +331,12 @@ export const fr = {
           : `Semer ${count} niveaux dans la Canopée`,
       fullCanopy: 'Mener chaque talent de la Canopée à son dernier niveau',
       sowerSeasons: (count: number) => `Laisser le semoir commencer ${count} Saisons`,
+      harvests: (count: number) =>
+        count === 1 ? 'Récolter le potager de la cour' : `Récolter ${count} fois le potager`,
+      varieties: (count: number) =>
+        count === 1
+          ? 'Trouver une première variété pour la grainothèque'
+          : `Réunir les ${count} variétés de la grainothèque`,
       cooperativePurchases: (count: string) => `Laisser les coopératives faire ${count} achats`,
       playHours: (hours: number) => (hours === 1 ? 'Jouer une heure' : `Jouer ${hours} heures`),
       swiftSeason: (seeds: number, minutes: number) =>
@@ -442,7 +455,50 @@ export const fr = {
       pollination: 'La Pollinisation',
       shower: 'L’Averse d’été',
       birds: 'La Nuée de migrateurs',
+      beans: 'Les Haricots grimpants',
     },
+  },
+  garden: {
+    title: 'Le potager de la cour',
+    hint: 'Semez, revenez quand c’est mûr\u00a0: rien ne fane, tout vous attend.',
+    crops: {
+      radish: { name: 'Radis', effect: 'Une bouffée de Lumière\u00a0: 2 min de production' },
+      sunflower: { name: 'Tournesols', effect: 'Le Papillon doré vient aussitôt' },
+      beans: { name: 'Haricots grimpants', effect: 'Potagers et Serres ×2 pendant 20 min' },
+      squash: { name: 'Courges', effect: '30 min de production de Lumière et d’Eau' },
+    } satisfies Record<CropId, { name: string; effect: string }>,
+    plot: (index: number) => `Carré ${index}`,
+    bare: 'Carré libre',
+    locked: 'Carré à venir',
+    choose: 'Que semer\u00a0?',
+    sow: 'Semer',
+    sowLabel: (crop: string, plot: string) => `Semer ${crop} dans le ${plot.toLowerCase()}`,
+    grows: (time: string) => `Pousse en ${time}`,
+    growing: (time: string) => `Mûr dans ${time}`,
+    ripe: 'Mûr',
+    harvest: 'Récolter',
+    harvestLabel: (crop: string) => `Récolter ${crop}`,
+    plotLabel: (plot: string, crop: string, state: string) => `${plot}\u00a0: ${crop}, ${state}`,
+    seedBank: 'La grainothèque',
+    seedBankHint: 'Deux cultures différentes côte à côte donnent parfois une variété.',
+    varieties: {
+      flameRadish: 'Radis flamboyant',
+      blackRadish: 'Radis noir',
+      goldenTurnip: 'Navet boule d’or',
+      purpleBean: 'Haricot violet',
+      redSunflower: 'Tournesol rouge',
+      threeSisters: 'Les trois sœurs',
+    } satisfies Record<VarietyId, string>,
+    unknownVariety: (first: string, second: string) => `${first} et ${second} côte à côte`,
+    harvested: {
+      light: (light: string) => `Récolte du potager\u00a0! +${light} Lumière.`,
+      lightWater: (light: string, water: string) =>
+        `Récolte du potager\u00a0! +${light} Lumière, +${water} Eau.`,
+      butterfly: 'Les tournesols attirent le Papillon doré.',
+      effect: (seconds: string) =>
+        `Haricots grimpants\u00a0! Potagers et Serres ×2 pendant ${seconds}.`,
+    },
+    variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
   },
   herbier: {
     open: 'Herbier',

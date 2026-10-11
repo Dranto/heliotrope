@@ -5,6 +5,7 @@ import { bonusesOf } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
+import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
 import { canopyLevels, isCanopyComplete } from './talents';
 import { CLICK_UPGRADE_IDS, SYNERGY_IDS, type UpgradeId } from './upgrades';
@@ -60,6 +61,10 @@ export type AchievementCondition =
   | { kind: 'fullCanopy' }
   /** Seasons the sower started (§7.1). */
   | { kind: 'sowerSeasons'; count: number }
+  /** Harvests of the courtyard garden (§9.7). */
+  | { kind: 'harvests'; count: number }
+  /** Varieties in the garden's seed bank (§9.7). */
+  | { kind: 'varieties'; count: number }
   /** Species of the Herbier back, kept across Seasons (§9.5). */
   | { kind: 'species'; count: number }
   /** Challenge Seasons won (§7.3). */
@@ -116,6 +121,7 @@ const DISTRICT_STEPS = [1, 4, 8] as const;
 const PROJECT_STEPS = [1, 8, 15] as const;
 const TALENT_STEPS = [1, 9, 17] as const;
 const CANOPY_STEPS = [1, 18] as const;
+const HARVEST_STEPS = [1, 25, 250] as const;
 const COOPERATIVE_STEPS = [100, 1_000] as const;
 const SPECIES_STEPS = [1, 10, 18] as const;
 const CHALLENGE_STEPS = [1, 4] as const;
@@ -141,6 +147,9 @@ export type AchievementId =
   | `canopy.${(typeof CANOPY_STEPS)[number]}`
   | 'crown'
   | 'selfSown'
+  | `harvests.${(typeof HARVEST_STEPS)[number]}`
+  | 'firstVariety'
+  | 'seedBank'
   | `cooperatives.${(typeof COOPERATIVE_STEPS)[number]}`
   | `species.${(typeof SPECIES_STEPS)[number]}`
   | `challenges.${(typeof CHALLENGE_STEPS)[number]}`
@@ -292,6 +301,18 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     id: 'selfSown',
     family: 'neighbourhood',
     condition: { kind: 'sowerSeasons', count: SOWER_MILESTONE_SEASONS },
+  },
+  // The courtyard garden (§9.7).
+  ...HARVEST_STEPS.map((count) => ({
+    id: `harvests.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'harvests', count } as const,
+  })),
+  { id: 'firstVariety', family: 'neighbourhood', condition: { kind: 'varieties', count: 1 } },
+  {
+    id: 'seedBank',
+    family: 'neighbourhood',
+    condition: { kind: 'varieties', count: VARIETY_IDS.length },
   },
   ...COOPERATIVE_STEPS.map((count) => ({
     id: `cooperatives.${count}` as const,
@@ -455,6 +476,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return isCanopyComplete(state);
     case 'sowerSeasons':
       return state.canopy.sowerSeasons >= condition.count;
+    case 'harvests':
+      return state.garden.harvests >= condition.count;
+    case 'varieties':
+      return state.garden.varieties.length >= condition.count;
     case 'species':
       return state.species.length >= condition.count;
     case 'challenges':
