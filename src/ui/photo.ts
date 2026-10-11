@@ -61,6 +61,9 @@ export async function takePhoto(map: HTMLElement): Promise<Blob | null> {
     const box = element.getBoundingClientRect();
     const source = element instanceof HTMLCanvasElement ? element : images[i];
     if (!source) return;
+    // A layer that blends with what lies beneath (the night veil) is drawn the same way.
+    const blend = getComputedStyle(element).mixBlendMode;
+    context.globalCompositeOperation = blend === 'multiply' ? 'multiply' : 'source-over';
     context.drawImage(source, box.left - frame.left, box.top - frame.top, box.width, box.height);
   });
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));

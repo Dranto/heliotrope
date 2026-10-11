@@ -7,7 +7,7 @@ import { memo, type KeyboardEvent } from 'react';
 import type { VisitKind } from '../game/visits';
 import { t } from '../i18n';
 import type { Daylight } from './daylight';
-import { TREES, WORLD } from './neighbourhood';
+import { TREES } from './neighbourhood';
 import './visits.css';
 
 /**
@@ -297,26 +297,57 @@ export const VisitLayer = memo(function VisitLayer({
 const LANTERNS = TREES.filter((_, i) => i % 4 === 0).map(({ x, y }) => [x + 5, y + 3] as const);
 
 /**
- * Evening and night over the map (§9.6), from the player's clock: a warm, then a blue veil, and
- * the lanterns of the streets lit. Decoration only: production does not change.
+ * Evening and night over the map (§9.6), from the player's clock. Two layers over the whole map,
+ * so both renderers get them: a veil that darkens what lies beneath (multiply, warm in the evening,
+ * deep blue at night) and, above it, the lanterns of the streets, which the veil leaves lit.
+ * Decoration only: production does not change.
  */
-export const NightLights = memo(function NightLights({ daylight }: { daylight: Daylight }) {
+export const NightLights = memo(function NightLights({
+  daylight,
+  camera,
+  width,
+  height,
+}: {
+  daylight: Daylight;
+  camera: string;
+  width: number;
+  height: number;
+}) {
   if (daylight === 'day') return null;
   return (
-    <g className="night" data-daylight={daylight} aria-hidden="true">
-      <rect
+    <>
+      <svg
         className="night-veil"
-        x={-WORLD.width}
-        y={-WORLD.height}
-        width={WORLD.width * 3}
-        height={WORLD.height * 3}
-      />
-      {LANTERNS.map(([x, y]) => (
-        <g key={`${x},${y}`} transform={`translate(${x} ${y})`}>
-          <circle className="night-lantern-glow" r="6" />
-          <circle className="night-lantern" r="1.3" />
+        data-daylight={daylight}
+        viewBox="0 0 10 10"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <rect width="10" height="10" />
+      </svg>
+      <svg
+        className="night"
+        data-daylight={daylight}
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="night-lantern-glow">
+            <stop offset="0" stopColor="#ffd98a" stopOpacity="0.75" />
+            <stop offset="0.35" stopColor="#ffc46b" stopOpacity="0.32" />
+            <stop offset="1" stopColor="#ffb85c" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <g className="camera" style={{ transform: camera }}>
+          {LANTERNS.map(([x, y]) => (
+            <g key={`${x},${y}`} transform={`translate(${x} ${y})`}>
+              <circle className="night-lantern-glow" r="9" fill="url(#night-lantern-glow)" />
+              <circle className="night-lantern" r="1.1" />
+            </g>
+          ))}
         </g>
-      ))}
-    </g>
+      </svg>
+    </>
   );
 });

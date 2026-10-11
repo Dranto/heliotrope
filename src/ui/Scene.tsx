@@ -28,6 +28,7 @@ import { useLayoutPref } from './layoutPrefs';
 import {
   PLANTER,
   WORLD,
+  cameraTransform,
   fitCamera,
   flowerFrame,
   furthestView,
@@ -285,7 +286,6 @@ export function Scene({
         <CorridorLayer corridors={corridors} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
-        <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
@@ -314,7 +314,6 @@ export function Scene({
       onPick,
       districtReady,
       restoreNeighbour,
-      daylight,
       projects,
       species,
       bikes,
@@ -424,6 +423,12 @@ export function Scene({
         ) : (
           svgMap
         )}
+        <NightLights
+          daylight={daylight}
+          camera={cameraTransform(camera, width, height)}
+          width={width}
+          height={height}
+        />
         <div className="map-flower" style={{ left: flower.x, top: flower.y, width: flower.width }}>
           <Flower />
         </div>
