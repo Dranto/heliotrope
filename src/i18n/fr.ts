@@ -11,6 +11,7 @@ import type { ChallengeId } from '../game/challenges';
 import type { CycleChallengeId } from '../game/cycleChallenges';
 import type { DecorId, FlowerColour } from '../game/decor';
 import type { DeltaId } from '../game/delta';
+import type { WorkId } from '../game/greatWorks';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
@@ -339,6 +340,8 @@ export const fr = {
       floodTide: 'Grandes eaux',
       'delta.1': 'Premier bras',
       'delta.6': 'Delta ouvert',
+      'works.1': 'Première pierre',
+      'works.4': 'Grands travaux',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -438,6 +441,8 @@ export const fr = {
       deltaLevels: (count: number) =>
         count === 1 ? 'Ouvrir un premier bras du delta' : `Ouvrir les ${count} niveaux du delta`,
       lockCycles: (count: number) => `Laisser l’éclusier commencer ${count} Cycles`,
+      worksBuilt: (count: number) =>
+        count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
     },
@@ -537,6 +542,9 @@ export const fr = {
         `Toute la production +${percent}\u00a0% par type de bâtiment possédé`,
       water: (factor: string) => `Eau récoltée ×${factor} (Biorégion)`,
       visitInterval: (percent: string) => `Les visites reviennent ${percent}\u00a0% plus vite`,
+      perDistrict: (percent: string) =>
+        `Production +${percent}\u00a0% par quartier voisin restauré`,
+      gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
       cuttingsGift: (units: number) =>
         units === 1
           ? 'Les voisins apportent une bouture de plus'
@@ -553,6 +561,34 @@ export const fr = {
       fireflies: 'Les Lucioles',
       fleaMarket: 'La Brocante solaire',
     },
+  },
+  greatWorks: {
+    title: 'Les grands chantiers',
+    hint: 'Chaque étape se paie en Lumière, en Eau et en paniers du potager. Ce qui est versé reste versé.',
+    baskets: (count: string) => `${count} paniers`,
+    basketsHint: 'Chaque récolte du potager remplit des paniers.',
+    names: {
+      tram: 'Le tram solaire',
+      river: 'La rivière rouverte',
+      hall: 'Les halles nourricières',
+      tower: 'La tour des semences',
+    } satisfies Record<WorkId, string>,
+    stages: {
+      tram: ['Les rails', 'Les caténaires fleuries', 'Les stations', 'Le premier tram'],
+      river: ['La dalle cassée', 'Les berges', 'Les passerelles', 'La baignade'],
+      hall: ['La charpente', 'Les étals', 'La cuisine commune'],
+      tower: ['Les fondations', 'Les étages cultivés', 'La grainothèque', 'Le belvédère'],
+    } satisfies Record<WorkId, readonly string[]>,
+    stage: (built: string, count: string) => `${built} étapes sur ${count}`,
+    next: (stage: string) => `Prochaine étape\u00a0: ${stage}`,
+    light: 'Lumière',
+    water: 'Eau',
+    basketsLabel: 'Paniers',
+    species: (have: string, need: string) => `Espèces de l’Herbier\u00a0: ${have} sur ${need}`,
+    contribute: 'Verser',
+    contributeLabel: (work: string) => `Verser pour ${work}`,
+    complete: 'Achevé',
+    built: 'Déjà bâti',
   },
   garden: {
     title: 'Le potager de la cour',

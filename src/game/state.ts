@@ -4,6 +4,7 @@ import type { ChallengeId } from './challenges';
 import type { CycleChallengeId } from './cycleChallenges';
 import { createDecorState, type DecorState } from './decor';
 import { createDeltaState, type DeltaState } from './delta';
+import { createGreatWorksState, type GreatWorksState } from './greatWorks';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -22,7 +23,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 21;
+export const STATE_VERSION = 22;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -127,6 +128,8 @@ export interface GameState {
   cycleChallenges: CycleChallengeId[];
   /** The courtyard garden's beds, harvests and seed bank (§9.7). Kept forever. */
   garden: GardenState;
+  /** Stages of the great works built and paid so far (§6.6, M20). Kept forever. */
+  greatWorks: GreatWorksState;
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -203,6 +206,7 @@ export function createInitialState(now: number): GameState {
     cycleChallenge: null,
     cycleChallenges: [],
     garden: createGardenState(),
+    greatWorks: createGreatWorksState(),
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     // Drawn from the same number as the butterfly, so a quick one comes with a slow visit.

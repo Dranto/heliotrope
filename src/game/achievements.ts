@@ -6,6 +6,7 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
+import { worksBuilt } from './greatWorks';
 import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
 import { canopyLevels, isCanopyComplete } from './talents';
@@ -86,6 +87,8 @@ export type AchievementCondition =
   | { kind: 'deltaLevels'; count: number }
   /** Cycles the lock keeper started (§7.5). */
   | { kind: 'lockCycles'; count: number }
+  /** Great works complete, kept forever (§6.6). */
+  | { kind: 'worksBuilt'; count: number }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -142,6 +145,7 @@ const COLLECTOR_STEPS = [10, 50] as const;
 const SITE_STEPS = [1, 10, 25] as const;
 const CYCLE_STEPS = [1, 3] as const;
 const DELTA_STEPS = [1, 6] as const;
+const WORK_STEPS = [1, 4] as const;
 const CYCLE_CHALLENGE_STEPS = [1, 3] as const;
 
 export type AchievementId =
@@ -172,6 +176,7 @@ export type AchievementId =
   | `sites.${(typeof SITE_STEPS)[number]}`
   | `cycles.${(typeof CYCLE_STEPS)[number]}`
   | `delta.${(typeof DELTA_STEPS)[number]}`
+  | `works.${(typeof WORK_STEPS)[number]}`
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -314,6 +319,12 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     condition: { kind: 'canopyLevels', count } as const,
   })),
   { id: 'crown', family: 'neighbourhood', condition: { kind: 'fullCanopy' } },
+  // The great works (§6.6).
+  ...WORK_STEPS.map((count) => ({
+    id: `works.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'worksBuilt', count } as const,
+  })),
   {
     id: 'selfSown',
     family: 'neighbourhood',
@@ -543,6 +554,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return deltaLevels(state) >= condition.count;
     case 'lockCycles':
       return state.delta.lockCycles >= condition.count;
+    case 'worksBuilt':
+      return worksBuilt(state) >= condition.count;
     case 'cycleChallenges':
       return state.cycleChallenges.length >= condition.count;
     case 'playSeconds':

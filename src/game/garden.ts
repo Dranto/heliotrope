@@ -5,6 +5,7 @@
 // Names live in src/i18n, the drawings in src/ui.
 import { unlockAchievements } from './achievements';
 import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
+import { factorOf } from './bonuses';
 import { effectSeconds } from './butterfly';
 import { effectFactor } from './effects';
 import { earnLight } from './light';
@@ -36,6 +37,9 @@ export const SUNFLOWER_BUTTERFLY_SECONDS = 10;
 /** Squashes: Light and Water worth this many seconds of production. */
 export const SQUASH_SECONDS = 30 * 60;
 
+/** Baskets each harvest fills for the great works (§6.6, M20): the longer the crop, the more. */
+export const BASKETS: Record<CropId, number> = { radish: 1, sunflower: 2, beans: 3, squash: 5 };
+
 /** Beds in the courtyard: three at first, one more for each step of the game reached. */
 export const MAX_PLOTS = 6;
 
@@ -56,6 +60,8 @@ export interface GardenState {
   harvests: number;
   /** Varieties of the seed bank, in order of discovery. */
   varieties: VarietyId[];
+  /** Baskets of harvests kept for the great works (§6.6, M20), spent there. */
+  baskets: number;
 }
 
 export function createGardenState(): GardenState {
@@ -63,6 +69,7 @@ export function createGardenState(): GardenState {
     plots: Array.from({ length: MAX_PLOTS }, () => ({ crop: null, grown: 0 })),
     harvests: 0,
     varieties: [],
+    baskets: 0,
   };
 }
 
@@ -112,7 +119,7 @@ export function openPlots(state: GameState): number {
 export function growthSpeed(state: GameState): number {
   const shower = effectFactor(state.effects, 'shower');
   const rain = state.parcels.includes('rainGardens') ? 1.25 : 1;
-  return shower * rain;
+  return shower * rain * factorOf(state, 'gardenGrowth');
 }
 
 export function isRipe(plot: Plot): boolean {
@@ -273,6 +280,7 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
     garden: {
       ...next.garden,
       harvests: next.garden.harvests + 1,
+      baskets: next.garden.baskets + BASKETS[crop],
       varieties: variety ? [...next.garden.varieties, variety] : next.garden.varieties,
     },
   };

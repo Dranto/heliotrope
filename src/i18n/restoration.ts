@@ -51,6 +51,10 @@ export function bonusText(bonus: Bonus): string {
       return b.visitInterval(formatPercent(1 - bonus.factor));
     case 'cuttingsGift':
       return b.cuttingsGift(bonus.units);
+    case 'perDistrict':
+      return b.perDistrict(formatPercent(bonus.bonus));
+    case 'gardenGrowth':
+      return b.gardenGrowth(factor(bonus.factor));
   }
 }
 
