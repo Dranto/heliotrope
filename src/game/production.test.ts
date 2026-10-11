@@ -76,6 +76,17 @@ describe('generator production', () => {
     expect(generatorMultiplier(state, 'greenhouse')).toBe(1);
   });
 
+  it('sums every generator, the global multiplier applied once, like generatorProduction', () => {
+    const state = withState({
+      generators: owned({ pot: 40, balconyPanel: 30, greenhouse: 25, mirrorPlant: 15 }),
+      upgrades: ['pot.1', 'sunnyPots', 'greenhouse.1', 'recoveredHeat'],
+      seeds: 12,
+    });
+    const sum = GENERATOR_IDS.reduce((total, id) => total + generatorProduction(state, id), 0);
+    expect(lightPerSecond(state) / sum).toBeCloseTo(1, 12);
+    expect(lightPerSecond(withState({}))).toBe(0);
+  });
+
   it('multiplies ×2 upgrades with the synergy bonus', () => {
     const state = withState({
       generators: owned({ greenhouse: 25, mirrorPlant: 15 }),

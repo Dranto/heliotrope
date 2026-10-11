@@ -126,11 +126,18 @@ export function generatorProduction(state: GameState, id: GeneratorId): number {
   );
 }
 
-/** Total Light per second. */
+/**
+ * Total Light per second. Same sum as generatorProduction over every type, with the global
+ * multiplier computed once instead of once per type: it is the costly part, and this runs on every
+ * tick and many times per render.
+ */
 export function lightPerSecond(state: GameState): number {
   let total = 0;
-  for (const id of GENERATOR_IDS) total += generatorProduction(state, id);
-  return total;
+  for (const id of GENERATOR_IDS) {
+    const owned = state.generators[id];
+    if (owned > 0) total += GENERATORS[id].baseProduction * owned * generatorMultiplier(state, id);
+  }
+  return total === 0 ? 0 : total * globalMultiplier(state);
 }
 
 /**
