@@ -160,9 +160,39 @@ des Saisons. C'est la plus grosse extension, à faire quand les Saisons sont ric
 - **Satisfaction :** une nouvelle couche relance la découverte pour les joueurs de long terme.
 - **Effort :** élevé : nouvelle ressource, nouveaux écrans, nouvel équilibrage, migration de sauvegarde.
 
+### P9 — Le quartier vit : des visites sur la carte
+
+Le Papillon doré est aujourd'hui le seul événement en jeu. Le quartier restauré peut en raconter davantage, sans un
+mot : des **visites** qui traversent la carte de temps en temps, chacune à un endroit lié à ce que le joueur a bâti,
+et qu'un clic transforme en petit coup de pouce. Les voisins qui apportent des boutures (une remorque de plants qui
+arrive dans la cour), une averse d'été (un nuage qui arrose les potagers et les serres), une nuée d'oiseaux migrateurs
+(qui se pose sur les arbres et les toits vivants). Chaque visite se lie à l'existant par une synergie (une parcelle,
+un projet ou une espèce la rend plus fréquente ou plus forte) plutôt que d'ajouter un multiplicateur isolé. En toile
+de fond, une lumière de jour et de nuit purement décorative (§5) : fenêtres et lanternes qui s'allument le soir,
+sans effet sur la production.
+
+- **Thème :** les temps forts du récit (§6 du design : « les voisins apportent des boutures ») deviennent des
+  événements en jeu, comme le veut la règle d'Antoine.
+- **Satisfaction :** des surprises régulières, chacune visible et cliquable, qui récompensent l'œil attentif.
+- **Effort :** moyen : un planificateur pur comme celui du Papillon, des animations sur la carte (SVG et PixiJS).
+
+### P10 — Les quartiers voisins
+
+Autour de la ville, la périphérie reste grise et voilée depuis M5. Une fois le quartier entièrement restauré, ses
+**îlots voisins** s'ouvrent un à un : le joueur les restaure contre de la Lumière, une fois pour toutes (comme les
+parcelles, décision D2), et la vue « La Ville » s'agrandit à mesure qu'ils reverdissent. Chaque quartier voisin a
+son caractère (les tanneries devenues jardins d'eau, la gare de triage devenue forêt linéaire, la zone commerciale
+devenue verger…) et apporte une **règle** ou un **choix** plutôt que de la vitesse pure : une Coopérative de plus,
+une synergie nouvelle entre deux bâtiments, une espèce de l'Herbier. Le but est de donner aux Saisons tardives des
+objectifs lointains et variés sans aggraver l'emballement des Saisons (corrigé à part dans le §7 du design).
+
+- **Thème :** « d'autres quartiers verdissent », promis par le pitch, devient visible et jouable.
+- **Satisfaction :** un objectif lointain qui grandit la carte elle-même, Saison après Saison.
+- **Effort :** élevé : de nouvelles illustrations pour chaque quartier, sur la carte SVG et PixiJS.
+
 ### Confort à glisser au fil de l'eau
 
-Petits ajouts sans jalon dédié, à placer dans la PR la plus proche :
+Petits ajouts restés en attente depuis M5, regroupés dans **M10** :
 
 - **Temps avant achat** affiché sur les générateurs et améliorations hors de portée (« dans 2 min 10 »).
 - **Prochain objectif** rappelé sous le compteur (la règle d'or du §2 rendue visible).
@@ -175,7 +205,8 @@ Petits ajouts sans jalon dédié, à placer dans la PR la plus proche :
 
 ## 4. Jalons proposés
 
-Chaque jalon reste livrable et jouable seul, comme M1 à M4.
+Chaque jalon reste livrable et jouable seul, comme M1 à M4. M10 à M12 ont été ajoutés le 2026-10-11, après la
+livraison de M9, à la demande d'Antoine (« continue la roadmap ») ; ils se construisent dans l'ordre.
 
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
@@ -184,6 +215,9 @@ Chaque jalon reste livrable et jouable seul, comme M1 à M4.
 | **M7 — La terre se souvient** *(livré)* | P2 Arbre des Saisons, P3 Coopératives — voir game-design §7.1 et §7.2 | Donne des choix à chaque Saison et retire la répétition des débuts |
 | **M8 — Le vivant revient** *(livré)* | P5 Herbier, P7 Saisons à défis, version anglaise — voir game-design §9.5, §7.3 et §14 Q1 | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
 | **M9 — La Biorégion** *(livré)* | P8 Eau, collecteurs et sites de la biorégion, deuxième prestige (le Cycle de l'eau), vue Biorégion sur la carte — voir game-design §7.4 | La grosse extension, une fois la boucle longue riche |
+| **M10 — Le jeu se lit d'un coup d'œil** | Le confort en attente : temps avant achat, prochain objectif sous le compteur, raccourcis clavier, courbe de la production Saison par Saison, installation en application (PWA) | Petit et sans risque pour l'équilibrage, il rend chaque palier plus lisible avant d'ajouter du contenu |
+| **M11 — Le quartier vit** | P9 Visites sur la carte (boutures, averse d'été, oiseaux migrateurs), leurs synergies et Jalons, lumière de jour et de nuit en décor | Raconte enfin les temps forts par des événements, sur la carte déjà riche de M6 à M9 |
+| **M12 — Les quartiers voisins** | P10 Les îlots de la périphérie à restaurer pour toujours, chacun avec sa règle, la vue « La Ville » qui s'agrandit | Le grand objectif lointain des Saisons tardives, une fois leur rythme corrigé |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Pour adoucir l'équilibrage, on ajoute **beaucoup de synergies**,
 entre bâtiments et entre améliorations, plutôt que de retoucher les valeurs de base. Le fil d'équilibrage s'en charge
