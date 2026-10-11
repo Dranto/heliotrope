@@ -1,6 +1,15 @@
 // The Cooperatives (docs/game-design.md §7.2): neighbours who buy for the player once a talent of
 // the Tree of Seasons brings them in. Each one looks after some buildings, the council after the
-// upgrades. Pure: `runCooperatives` returns new state, called by every tick.
+// upgrades, the fountaineers (from the Canopy, §7.1) after the water collectors of the
+// Bioregion. Pure: `runCooperatives` returns new state, called by every tick.
+import {
+  buyCollector,
+  canBuyCollector,
+  COLLECTOR_IDS,
+  collectorCost,
+  isCollectorRevealed,
+  type CollectorId,
+} from './bioregion';
 import { generatorLimit } from './challenges';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import {
@@ -10,18 +19,26 @@ import {
   isGeneratorRevealed,
 } from './production';
 import type { GameState } from './state';
-import { TALENT_LIST } from './talents';
+import { CANOPY_LIST, TALENT_LIST } from './talents';
 
-export const COOPERATIVE_IDS = ['gardeners', 'roofers', 'farmers', 'foresters', 'council'] as const;
+export const COOPERATIVE_IDS = [
+  'gardeners',
+  'roofers',
+  'farmers',
+  'foresters',
+  'council',
+  'fountaineers',
+] as const;
 export type CooperativeId = (typeof COOPERATIVE_IDS)[number];
 
-/** Buildings each cooperative buys; the council buys upgrades instead. */
+/** Buildings each cooperative buys; the council buys upgrades, the fountaineers collectors. */
 export const COOPERATIVE_GENERATORS: Record<CooperativeId, readonly GeneratorId[]> = {
   gardeners: ['pot', 'balconyPanel'],
   roofers: ['rooftopGarden', 'greenhouse'],
   farmers: ['verticalFarm', 'mirrorPlant'],
   foresters: ['urbanCanopy', 'arcology'],
   council: [],
+  fountaineers: [],
 };
 
 /** "Garder une réserve": a purchase may then cost at most this share of the Light in reserve. */
@@ -54,9 +71,15 @@ export function isCooperativeId(value: unknown): value is CooperativeId {
   return typeof value === 'string' && (COOPERATIVE_IDS as readonly string[]).includes(value);
 }
 
-/** A cooperative joins once the talent that brings it in is learnt (from the 2nd Season, D3). */
+/**
+ * A cooperative joins once the talent that brings it in is learnt (from the 2nd Season, D3), or
+ * its canopy talent sown.
+ */
 export function isCooperativeUnlocked(state: GameState, id: CooperativeId): boolean {
-  return TALENT_LIST.some((t) => t.cooperative === id && state.talents.includes(t.id));
+  return (
+    TALENT_LIST.some((t) => t.cooperative === id && state.talents.includes(t.id)) ||
+    CANOPY_LIST.some((c) => c.cooperative === id && state.canopy.levels[c.id] > 0)
+  );
 }
 
 export function isCooperativeActive(state: GameState, id: CooperativeId): boolean {
@@ -98,7 +121,24 @@ function payback(state: GameState, id: GeneratorId): number {
 type Purchase = { cooperative: CooperativeId } & (
   | { kind: 'generator'; id: GeneratorId; cost: number }
   | { kind: 'upgrade'; id: GameState['upgrades'][number]; cost: number }
+  | { kind: 'collector'; id: CollectorId; cost: number }
 );
+
+/**
+ * The fountaineers build the cheapest water collector shown, once it costs at most a tenth of the
+ * Light in reserve: the Bioregion grows on the side and never holds back the buildings.
+ */
+function nextCollector(state: GameState): Purchase | null {
+  if (!isCooperativeActive(state, 'fountaineers')) return null;
+  let best: { id: CollectorId; cost: number } | null = null;
+  for (const id of COLLECTOR_IDS) {
+    if (!isCollectorRevealed(state, id) || !canBuyCollector(state, id)) continue;
+    const cost = collectorCost(state, id);
+    if (!best || cost < best.cost) best = { id, cost };
+  }
+  if (!best || best.cost > state.resources.light * THRIFTY_SHARE) return null;
+  return { cooperative: 'fountaineers', kind: 'collector', ...best };
+}
 
 /**
  * A building of a cooperative is a good deal when it pays back at most this many times slower
@@ -120,6 +160,8 @@ export const COUNCIL_PRIORITY = 30;
  * others wait for it while it is not much dearer than their next building.
  */
 function nextPurchase(state: GameState): Purchase | null {
+  const collector = nextCollector(state);
+  if (collector) return collector;
   const scores = new Map<GeneratorId, number>();
   for (const id of GENERATOR_IDS) {
     if (isGeneratorRevealed(state, id) && state.generators[id] < generatorLimit(state, id)) {
@@ -158,15 +200,25 @@ export function runCooperatives(state: GameState): GameState {
   for (let i = 0; i < MAX_PURCHASES_PER_TICK; i++) {
     const purchase = nextPurchase(next);
     if (!purchase) break;
-    const light = Math.max(0, next.resources.light - purchase.cost);
     const { purchases } = next.cooperatives;
+    const counted = {
+      ...next.cooperatives,
+      purchases: { ...purchases, [purchase.cooperative]: purchases[purchase.cooperative] + 1 },
+    };
+    if (purchase.kind === 'collector') {
+      // Kept as the player's purchase would, except for the time since the last purchase.
+      next = {
+        ...buyCollector(next, purchase.id),
+        idleSeconds: next.idleSeconds,
+        cooperatives: counted,
+      };
+      continue;
+    }
+    const light = Math.max(0, next.resources.light - purchase.cost);
     next = {
       ...next,
       resources: { ...next.resources, light },
-      cooperatives: {
-        ...next.cooperatives,
-        purchases: { ...purchases, [purchase.cooperative]: purchases[purchase.cooperative] + 1 },
-      },
+      cooperatives: counted,
       ...(purchase.kind === 'generator'
         ? { generators: { ...next.generators, [purchase.id]: next.generators[purchase.id] + 1 } }
         : { upgrades: [...next.upgrades, purchase.id] }),

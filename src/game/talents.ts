@@ -182,17 +182,149 @@ export function isTalentId(value: unknown): value is TalentId {
   return typeof value === 'string' && Object.hasOwn(TALENTS, value);
 }
 
-/** Seeds spent in the tree. */
+/** Seeds spent on the talents of the tree. */
 export function seedsSpent(talents: readonly TalentId[]): number {
   return talents.reduce((sum, id) => sum + TALENTS[id].cost, 0);
 }
 
+// The Canopy (§7.1 "La Canopée", M13): above the crown, levelled talents that open once the 17
+// talents are learnt, so the Seeds of the late Seasons always have a use.
+
+export const CANOPY_IDS = [
+  'rootsBough',
+  'pollinatorsBough',
+  'memoryBough',
+  'nursery',
+  'sower',
+  'fountaineers',
+] as const;
+export type CanopyId = (typeof CANOPY_IDS)[number];
+
+export interface CanopyDef {
+  id: CanopyId;
+  /** Seeds of the first level; each next level costs `growth` times more. */
+  baseCost: number;
+  growth: number;
+  maxLevel: number;
+  /** Bonuses in force at `level` (1 or more). */
+  bonuses: (level: number) => readonly Bonus[];
+  /** Cooperative that starts working for the player at level 1 (§7.2). */
+  cooperative?: CooperativeId;
+}
+
+export const CANOPY_LIST: readonly CanopyDef[] = [
+  {
+    id: 'rootsBough',
+    baseCost: 5,
+    growth: 1.5,
+    maxLevel: 10,
+    bonuses: (level) => [{ kind: 'synergyFactor', factor: 1 + 0.05 * level }],
+  },
+  {
+    id: 'pollinatorsBough',
+    baseCost: 5,
+    growth: 1.5,
+    maxLevel: 10,
+    bonuses: (level) => [{ kind: 'butterflyInterval', factor: 1 - 0.03 * level }],
+  },
+  {
+    id: 'memoryBough',
+    baseCost: 5,
+    growth: 1.5,
+    maxLevel: 10,
+    bonuses: (level) => [{ kind: 'visitInterval', factor: 1 - 0.03 * level }],
+  },
+  {
+    id: 'nursery',
+    baseCost: 10,
+    growth: 2,
+    maxLevel: 4,
+    // Replaces the 10% of the Boutures: the best share in force is kept.
+    bonuses: (level) => [{ kind: 'keepGenerators', fraction: 0.1 + 0.1 * level }],
+  },
+  { id: 'sower', baseCost: 15, growth: 1, maxLevel: 1, bonuses: () => [] },
+  {
+    id: 'fountaineers',
+    baseCost: 15,
+    growth: 1,
+    maxLevel: 1,
+    bonuses: () => [],
+    cooperative: 'fountaineers',
+  },
+];
+
+export const CANOPY = Object.fromEntries(CANOPY_LIST.map((c) => [c.id, c])) as Record<
+  CanopyId,
+  CanopyDef
+>;
+
+/** The sower's settings: relaunch the Season once its ripe Seeds multiply the ones owned. */
+export const SOWER_FACTORS = [1.5, 2, 3, 5] as const;
+export const DEFAULT_SOWER_FACTOR = 2;
+
+export interface CanopyState {
+  /** Level of each canopy talent, 0 when not sown. Kept across Seasons and Cycles. */
+  levels: Record<CanopyId, number>;
+  /** Factor the sower waits for, 0 when the player switched it off (the default). */
+  sowerFactor: number;
+  /** Seasons the sower started (Milestone "Semis spontané"). */
+  sowerSeasons: number;
+}
+
+export function createCanopyState(): CanopyState {
+  return {
+    levels: Object.fromEntries(CANOPY_IDS.map((id) => [id, 0])) as Record<CanopyId, number>,
+    sowerFactor: 0,
+    sowerSeasons: 0,
+  };
+}
+
+export function isCanopyId(value: unknown): value is CanopyId {
+  return typeof value === 'string' && Object.hasOwn(CANOPY, value);
+}
+
+/** Seeds asked for the level after `level` of a canopy talent. */
+export function canopyLevelCost(id: CanopyId, level: number): number {
+  const { baseCost, growth } = CANOPY[id];
+  return Math.round(baseCost * growth ** level);
+}
+
+/** Seeds spent on the levels reached in the canopy. */
+export function canopySeedsSpent(levels: Readonly<Record<CanopyId, number>>): number {
+  let spent = 0;
+  for (const id of CANOPY_IDS) {
+    for (let level = 0; level < levels[id]; level++) spent += canopyLevelCost(id, level);
+  }
+  return spent;
+}
+
+/** Bonuses of the canopy levels reached. */
+export function canopyBonuses(levels: Readonly<Record<CanopyId, number>>): Bonus[] {
+  return CANOPY_LIST.flatMap((c) => (levels[c.id] > 0 ? c.bonuses(levels[c.id]) : []));
+}
+
+/** Levels reached over the whole canopy. */
+export function canopyLevels(state: Pick<GameState, 'canopy'>): number {
+  return CANOPY_IDS.reduce((sum, id) => sum + state.canopy.levels[id], 0);
+}
+
+/** Every canopy talent at its last level. */
+export function isCanopyComplete(state: Pick<GameState, 'canopy'>): boolean {
+  return CANOPY_LIST.every((c) => state.canopy.levels[c.id] >= c.maxLevel);
+}
+
+/** Seeds spent in the whole tree, talents and canopy. */
+export function treeSeedsSpent(state: Pick<GameState, 'talents' | 'canopy'>): number {
+  return seedsSpent(state.talents) + canopySeedsSpent(state.canopy.levels);
+}
+
 /**
  * Seeds left to spend in the tree. The +5% bonus still counts every Seed obtained. The talents
- * learnt before a Cycle of water (§7.4) are rooted: their Seeds are not asked for again.
+ * and canopy levels learnt before a Cycle of water (§7.4) are rooted: their Seeds are not asked
+ * for again.
  */
 export function availableSeeds(state: GameState): number {
-  return Math.max(0, state.seeds + state.rootedSeeds - seedsSpent(state.talents));
+  return Math.max(0, state.seeds + state.rootedSeeds - treeSeedsSpent(state));
 }
 
 export function hasTalent(state: GameState, id: TalentId): boolean {
@@ -215,6 +347,63 @@ export function learnTalent(state: GameState, id: TalentId): GameState {
   return { ...state, talents: [...state.talents, id] };
 }
 
+/** The canopy opens once every talent of the tree is learnt, and stays open. */
+export function isCanopyOpen(state: { talents: readonly TalentId[] }): boolean {
+  return state.talents.length >= TALENT_LIST.length;
+}
+
+/** Seeds asked for the next level of a canopy talent; null at its last level. */
+export function nextCanopyCost(state: GameState, id: CanopyId): number | null {
+  const level = state.canopy.levels[id];
+  return level >= CANOPY[id].maxLevel ? null : canopyLevelCost(id, level);
+}
+
+export function canRaiseCanopy(state: GameState, id: CanopyId): boolean {
+  const cost = nextCanopyCost(state, id);
+  return isCanopyOpen(state) && cost !== null && availableSeeds(state) >= cost;
+}
+
+/** Player action: sow one more level of a canopy talent, kept in every later Season and Cycle. */
+export function raiseCanopy(state: GameState, id: CanopyId): GameState {
+  if (!canRaiseCanopy(state, id)) return state;
+  const { levels } = state.canopy;
+  return { ...state, canopy: { ...state.canopy, levels: { ...levels, [id]: levels[id] + 1 } } };
+}
+
+/** Player action: the factor the sower waits for, or 0 to switch it off. */
+export function setSowerFactor(state: GameState, factor: number): GameState {
+  if (factor !== 0 && !(SOWER_FACTORS as readonly number[]).includes(factor)) return state;
+  return { ...state, canopy: { ...state.canopy, sowerFactor: factor } };
+}
+
+/** The sower works once sown and switched on. */
+export function isSowerWorking(state: GameState): boolean {
+  return state.canopy.levels.sower > 0 && state.canopy.sowerFactor > 0;
+}
+
+/**
+ * Keep only canopy levels a save can legitimately hold: within each talent's levels, with the
+ * whole tree learnt, and paid for by the Seeds left after the talents.
+ */
+export function validCanopyLevels(
+  raw: unknown,
+  talents: readonly TalentId[],
+  seeds: number,
+): Record<CanopyId, number> {
+  const levels = createCanopyState().levels;
+  if (typeof raw !== 'object' || raw === null || !isCanopyOpen({ talents })) return levels;
+  const data = raw as Record<string, unknown>;
+  for (const id of CANOPY_IDS) {
+    const value = data[id];
+    if (Number.isInteger(value) && (value as number) > 0) {
+      levels[id] = Math.min(value as number, CANOPY[id].maxLevel);
+    }
+  }
+  return canopySeedsSpent(levels) + seedsSpent(talents) <= seeds
+    ? levels
+    : createCanopyState().levels;
+}
+
 /**
  * Keep only talents a save can legitimately hold: known, learnt after their parent, and paid
  * for by the Seeds obtained.
@@ -231,4 +420,12 @@ export function validTalents(ids: readonly unknown[], seeds: number): TalentId[]
     spent += cost;
   }
   return kept;
+}
+
+/** Something in the tree can be sown now: a talent, or a level of the canopy. */
+export function canSowInTree(state: GameState): boolean {
+  return (
+    TALENT_LIST.some((talent) => canLearnTalent(state, talent.id)) ||
+    CANOPY_IDS.some((id) => canRaiseCanopy(state, id))
+  );
 }

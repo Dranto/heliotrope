@@ -11,7 +11,7 @@ import type { ChallengeId } from '../game/challenges';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
-import type { TalentBranch, TalentId } from '../game/talents';
+import type { CanopyId, TalentBranch, TalentId } from '../game/talents';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
 
 export interface GeneratorText {
@@ -230,6 +230,10 @@ export const fr = {
       'talents.1': 'Première racine',
       'talents.9': 'Ramure',
       'talents.17': 'Grand arbre',
+      'canopy.1': 'Jeune canopée',
+      'canopy.18': 'Canopée touffue',
+      crown: 'Cime',
+      selfSown: 'Semis spontané',
       'species.1': 'Premier retour',
       'species.10': 'Le quartier bourdonne',
       'species.18': 'Herbier complet',
@@ -314,6 +318,12 @@ export const fr = {
         count === 1
           ? 'Semer une première Graine dans l’Arbre des Saisons'
           : `Apprendre ${count} talents de l’Arbre des Saisons`,
+      canopyLevels: (count: number) =>
+        count === 1
+          ? 'Semer un premier niveau dans la Canopée'
+          : `Semer ${count} niveaux dans la Canopée`,
+      fullCanopy: 'Mener chaque talent de la Canopée à son dernier niveau',
+      sowerSeasons: (count: number) => `Laisser le semoir commencer ${count} Saisons`,
       cooperativePurchases: (count: string) => `Laisser les coopératives faire ${count} achats`,
       playHours: (hours: number) => (hours === 1 ? 'Jouer une heure' : `Jouer ${hours} heures`),
       swiftSeason: (seeds: number, minutes: number) =>
@@ -520,6 +530,13 @@ export const fr = {
   },
   menu: 'Menu',
   seeds: {
+    sower: {
+      title: 'Le semoir',
+      hint: 'Relance une Saison libre dès que ses Graines mûres multiplient les vôtres par\u00a0:',
+      off: 'Éteint',
+      factor: (factor: string) => `×${factor}`,
+      sown: (count: string) => `${count} Saisons semées par le semoir`,
+    },
     open: 'Saisons',
     openWithGain: (seeds: string) => `Saisons, ${seeds} Graines à gagner`,
     title: 'Les Saisons',
@@ -615,6 +632,27 @@ export const fr = {
     nodeLabel: (name: string, state: string) => `${name}, ${state}`,
     noSeed: 'Les Graines se récoltent en commençant une nouvelle Saison.',
     fromSeasons: 'Semer mes Graines dans l’Arbre',
+    canopy: {
+      title: 'La Canopée',
+      hint: 'Au-dessus de la ramure, des talents à niveaux pour les Graines des Saisons tardives.',
+      locked: (count: number) =>
+        `La Canopée s’ouvre quand les ${count} talents de l’Arbre sont appris.`,
+      names: {
+        rootsBough: 'Rameau des racines',
+        pollinatorsBough: 'Rameau des pollinisateurs',
+        memoryBough: 'Rameau de la mémoire',
+        nursery: 'Pépinière',
+        sower: 'Le semoir',
+        fountaineers: 'Les fontainiers',
+      } satisfies Record<CanopyId, string>,
+      sowerEffect:
+        'Relance la Saison tout seul quand ses Graines mûres multiplient les vôtres (réglé dans l’écran des Saisons)',
+      level: (level: number, max: number) => `Niveau ${level} / ${max}`,
+      now: (effect: string) => `Aujourd’hui\u00a0: ${effect}`,
+      next: (effect: string) => `Au niveau suivant\u00a0: ${effect}`,
+      maxed: 'Dernier niveau',
+      raiseLabel: (name: string, cost: string) => `Semer un niveau de ${name} pour ${cost}`,
+    },
   },
   water: 'Eau',
   bioregion: {
@@ -707,8 +745,10 @@ export const fr = {
       farmers: 'Les ingénieurs du soleil',
       foresters: 'Les forestiers',
       council: 'Le conseil de quartier',
+      fountaineers: 'Les fontainiers',
     } satisfies Record<CooperativeId, string>,
     upgrades: 'Les améliorations',
+    collectors: 'Les collecteurs d’eau',
     buys: (buys: string) => `Achète ${buys}`,
     and: (first: string, second: string) => `${first} et ${second}`,
     purchases: (count: string) => `${count} achats`,

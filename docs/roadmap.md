@@ -200,7 +200,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
 | M5 à M12 | *Livrés* : carte, parcelles, projets, sons, Arbre, Coopératives, Herbier, défis, anglais, Biorégion, confort, visites, quartiers voisins (voir §7) | — |
-| **M13 — L'Arbre s'étend** | P11 : la Canopée (talents à niveaux), le semoir (relance automatique de la Saison), les fontainiers, la Pépinière ; leurs Jalons | Règle d'abord ce qui s'essouffle chez le joueur avancé : les Graines sans usage et les relances répétées, juste après l'allongement des Saisons (PR #35) |
+| **M13 — L'Arbre s'étend** *(livré)* | P11 : la Canopée (talents à niveaux), le semoir (relance automatique de la Saison), les fontainiers, la Pépinière ; leurs Jalons — voir game-design §7.1 | Règle d'abord ce qui s'essouffle chez le joueur avancé : les Graines sans usage et les relances répétées, juste après l'allongement des Saisons (PR #35) |
 | **M14 — Le potager de la cour** | P12 : les carrés de la cour, cultures à temps réel, Grainothèque et variétés, synergies avec l'Averse, l'Eau et l'Herbier | Une boucle neuve pour tous les joueurs, dès la 1ʳᵉ Saison, qui donne des rendez-vous sans punir l'absence |
 | **M15 — Le delta des Sources** | P13 : les Sources à dépenser, les bras du delta, le site des Coteaux, l'éclusier, 3 Cycles à défi et leurs espèces | Donne ses choix à la deuxième couche, une fois que la première (M13) a montré le modèle |
 | **M16 — Un quartier à son image** | P14 : deux avenirs par parcelle, le décor à poser, le mode photo | Après le fil des assets PixiJS, pour dessiner les variantes sur les nouveaux dessins |

@@ -1,4 +1,5 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
+import type { CanopyId } from '../game/talents';
 import type { Texts, UpgradeText } from './fr';
 
 /** English quotation marks. */
@@ -186,6 +187,10 @@ export const en: Texts = {
       'talents.1': 'First root',
       'talents.9': 'Branches',
       'talents.17': 'Great tree',
+      'canopy.1': 'Young canopy',
+      'canopy.18': 'Thick canopy',
+      crown: 'Treetop',
+      selfSown: 'Self-sown',
       'species.1': 'First return',
       'species.10': 'The neighbourhood hums',
       'species.18': 'Complete herbarium',
@@ -266,6 +271,10 @@ export const en: Texts = {
         count === 1
           ? 'Sow a first Seed in the Tree of Seasons'
           : `Learn ${count} talents of the Tree of Seasons`,
+      canopyLevels: (count: number) =>
+        count === 1 ? 'Sow a first level in the Canopy' : `Sow ${count} levels in the Canopy`,
+      fullCanopy: 'Bring every talent of the Canopy to its last level',
+      sowerSeasons: (count: number) => `Let the sower start ${count} Seasons`,
       cooperativePurchases: (count: string) => `Let the cooperatives make ${count} purchases`,
       playHours: (hours: number) => (hours === 1 ? 'Play for an hour' : `Play for ${hours} hours`),
       swiftSeason: (seeds: number, minutes: number) =>
@@ -466,6 +475,13 @@ export const en: Texts = {
   },
   menu: 'Menu',
   seeds: {
+    sower: {
+      title: 'The sower',
+      hint: 'Starts a free Season as soon as its ripe Seeds multiply yours by:',
+      off: 'Off',
+      factor: (factor: string) => `×${factor}`,
+      sown: (count: string) => `${count} Seasons sown by the sower`,
+    },
     open: 'Seasons',
     openWithGain: (seeds: string) => `Seasons, ${seeds} Seeds to gain`,
     title: 'The Seasons',
@@ -560,6 +576,27 @@ export const en: Texts = {
     nodeLabel: (name: string, state: string) => `${name}, ${state}`,
     noSeed: 'Seeds are harvested by starting a new Season.',
     fromSeasons: 'Sow my Seeds in the Tree',
+    canopy: {
+      title: 'The Canopy',
+      hint: 'Above the crown, levelled talents for the Seeds of the late Seasons.',
+      locked: (count: number) =>
+        `The Canopy opens once the ${count} talents of the Tree are learnt.`,
+      names: {
+        rootsBough: 'Bough of the roots',
+        pollinatorsBough: 'Bough of the pollinators',
+        memoryBough: 'Bough of memory',
+        nursery: 'Nursery',
+        sower: 'The sower',
+        fountaineers: 'The fountaineers',
+      } satisfies Record<CanopyId, string>,
+      sowerEffect:
+        'Starts the next Season by itself once its ripe Seeds multiply yours (set in the Seasons screen)',
+      level: (level: number, max: number) => `Level ${level} / ${max}`,
+      now: (effect: string) => `Now: ${effect}`,
+      next: (effect: string) => `Next level: ${effect}`,
+      maxed: 'Last level',
+      raiseLabel: (name: string, cost: string) => `Sow a level of ${name} for ${cost}`,
+    },
   },
   water: 'Water',
   bioregion: {
@@ -642,8 +679,10 @@ export const en: Texts = {
       farmers: 'The sun engineers',
       foresters: 'The foresters',
       council: 'The neighbourhood council',
+      fountaineers: 'The fountaineers',
     },
     upgrades: 'The upgrades',
+    collectors: 'The water collectors',
     buys: (buys: string) => `Buys ${buys}`,
     and: (first: string, second: string) => `${first} and ${second}`,
     purchases: (count: string) => `${count} purchases`,

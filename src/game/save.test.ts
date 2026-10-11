@@ -39,7 +39,14 @@ function playedState(): GameState {
     cooperatives: {
       paused: ['roofers'],
       thrifty: true,
-      purchases: { gardeners: 40, roofers: 7, farmers: 0, foresters: 0, council: 0 },
+      purchases: {
+        gardeners: 40,
+        roofers: 7,
+        farmers: 0,
+        foresters: 0,
+        council: 0,
+        fountaineers: 0,
+      },
     },
     butterflies: 3,
     butterfly: { nextIn: 0, visible: 4.5 },
@@ -421,6 +428,7 @@ describe('export and import', () => {
       farmers: 0,
       foresters: 0,
       council: 0,
+      fountaineers: 0,
     });
   });
 

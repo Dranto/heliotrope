@@ -12,6 +12,7 @@ import { completeChallenge, generatorLimit } from './challenges';
 import { runCooperatives } from './cooperatives';
 import type { GeneratorId } from './generators';
 import { recordProduction } from './history';
+import { runSower } from './seasons';
 import { earnLight } from './light';
 import { unlockSpecies } from './species';
 import { advanceVisit } from './visits';
@@ -51,20 +52,23 @@ export function unlockProgress(state: GameState): GameState {
 
 /**
  * Advance the simulation by dtSeconds of play. Pure: returns a new state. The collectors of the
- * Bioregion gather Water (§7.4), then the Cooperatives (§7.2) buy what the Light earned affords.
+ * Bioregion gather Water (§7.4), then the Cooperatives (§7.2) buy what the Light earned affords,
+ * and the sower (§7.1) starts the next Season when its Seeds are ripe and plentiful enough.
  */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
   const watered = earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds);
   const next = runCooperatives(advanceVisit(advanceButterfly(watered, dtSeconds), dtSeconds));
-  return unlockProgress(
-    recordProduction({
-      ...next,
-      playSeconds: state.playSeconds + dtSeconds,
-      seasonSeconds: state.seasonSeconds + dtSeconds,
-      idleSeconds: state.idleSeconds + dtSeconds,
-      lastUpdate: state.lastUpdate + dtSeconds * 1000,
-    }),
+  return runSower(
+    unlockProgress(
+      recordProduction({
+        ...next,
+        playSeconds: state.playSeconds + dtSeconds,
+        seasonSeconds: state.seasonSeconds + dtSeconds,
+        idleSeconds: state.idleSeconds + dtSeconds,
+        lastUpdate: state.lastUpdate + dtSeconds * 1000,
+      }),
+    ),
   );
 }
 

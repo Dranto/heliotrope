@@ -21,7 +21,7 @@ import {
 } from '../game/seasons';
 import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
-import { availableSeeds, canLearnTalent, TALENT_LIST } from '../game/talents';
+import { availableSeeds, canSowInTree } from '../game/talents';
 import { challengeRulesText, challengeTitle, speciesName } from '../i18n/herbier';
 import { setLanguage, t } from '../i18n';
 import { Achievements } from './Achievements';
@@ -197,7 +197,7 @@ export function App() {
   const challengeProgress = challenge ? Math.min(1, state.totalLight / challenge.goal) : 0;
   const gain = seedsToGain(state);
   const seedsToSow = availableSeeds(state);
-  const canSow = TALENT_LIST.some((talent) => canLearnTalent(state, talent.id));
+  const canSow = canSowInTree(state);
   const sourceGain = sourcesToGain(state);
 
   const menu = (

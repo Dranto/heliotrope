@@ -10,7 +10,7 @@ import { BUTTERFLY_VISIBLE_SECONDS, effectSeconds } from './butterfly';
 import { isParcelId, type ParcelId } from './parcels';
 import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
-import { validTalents } from './talents';
+import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
 import { isChallengeId, type ChallengeId } from './challenges';
 import { isSpeciesId, type SpeciesId } from './species';
@@ -70,6 +70,9 @@ const migrations: Record<number, Migration> = {
   12: (raw) => ({ ...raw, version: 13 }),
   // v14 adds the neighbouring districts (§6.4): none restored yet.
   13: (raw) => ({ ...raw, version: 14 }),
+  // v15 adds the Canopy above the Tree of Seasons and its sower (§7.1, M13), and the fountaineers'
+  // purchases: nothing sown yet, the sower off.
+  14: (raw) => ({ ...raw, version: 15 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -178,6 +181,14 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.talents)) {
     state.talents = validTalents(data.talents, state.seeds + state.rootedSeeds);
   }
+  const canopy = data.canopy as Record<string, unknown> | undefined;
+  state.canopy = {
+    levels: validCanopyLevels(canopy?.levels, state.talents, state.seeds + state.rootedSeeds),
+    sowerFactor: (SOWER_FACTORS as readonly unknown[]).includes(canopy?.sowerFactor)
+      ? (canopy!.sowerFactor as number)
+      : 0,
+    sowerSeasons: isCount(canopy?.sowerSeasons) ? canopy.sowerSeasons : 0,
+  };
   const cooperatives = data.cooperatives as Record<string, unknown> | undefined;
   if (Array.isArray(cooperatives?.paused)) {
     state.cooperatives.paused = [...new Set(cooperatives.paused.filter(isCooperativeId))];

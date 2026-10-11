@@ -5,6 +5,7 @@ import { generatorLimit, offeredChallenges, type ChallengeId } from './challenge
 import { GENERATOR_IDS } from './generators';
 import { startCurve } from './history';
 import { createInitialState, type GameState } from './state';
+import { isSowerWorking } from './talents';
 
 /** §7.4: each Source makes every Seed worth one point more. Here so cycles.ts can import this module. */
 export const SOURCE_SEED_BONUS = 0.01;
@@ -156,4 +157,25 @@ export function startNewSeason(state: GameState, challenge: ChallengeId | null =
   // Milestone "Moisson tardive": a single Season that brings many Seeds at once.
   if (seedsToGain(state) >= LATE_HARVEST_SEEDS) next = unlockAchievement(next, 'lateHarvest');
   return unlockAchievements(next);
+}
+
+/**
+ * The sower (§7.1, Canopy) relaunches a free Season once its ripe Seeds bring the Seeds owned to
+ * `sowerFactor` times as many; it never interrupts a challenge Season still running.
+ */
+export function isSowerReady(state: GameState): boolean {
+  if (!isSowerWorking(state) || state.challenge !== null || !canStartNewSeason(state)) {
+    return false;
+  }
+  return state.seeds + seedsToGain(state) >= state.seeds * state.canopy.sowerFactor;
+}
+
+/** Let the sower start the next Season when it is ready. Called by every tick. */
+export function runSower(state: GameState): GameState {
+  if (!isSowerReady(state)) return state;
+  const next = startNewSeason(state);
+  return unlockAchievements({
+    ...next,
+    canopy: { ...next.canopy, sowerSeasons: next.canopy.sowerSeasons + 1 },
+  });
 }

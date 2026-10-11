@@ -6,8 +6,12 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import type { GameState } from './state';
+import { canopyLevels, isCanopyComplete } from './talents';
 import { CLICK_UPGRADE_IDS, SYNERGY_IDS, type UpgradeId } from './upgrades';
 import { VISIT_KINDS, type VisitKind } from './visits';
+
+/** Seasons the sower starts for its Milestone "Semis spontané" (§7.1). */
+export const SOWER_MILESTONE_SEASONS = 10;
 
 /** Visits of one kind welcomed for their Milestone (§9.6). */
 export const VISIT_MILESTONE_COUNT = 10;
@@ -50,6 +54,12 @@ export type AchievementCondition =
   | { kind: 'districts'; count: number }
   /** Talents learnt in the Tree of Seasons (§7.1). */
   | { kind: 'talents'; count: number }
+  /** Levels sown in the Canopy above the tree, all together (§7.1). */
+  | { kind: 'canopyLevels'; count: number }
+  /** Every Canopy talent at its last level (§7.1). */
+  | { kind: 'fullCanopy' }
+  /** Seasons the sower started (§7.1). */
+  | { kind: 'sowerSeasons'; count: number }
   /** Species of the Herbier back, kept across Seasons (§9.5). */
   | { kind: 'species'; count: number }
   /** Challenge Seasons won (§7.3). */
@@ -105,6 +115,7 @@ const PARCEL_STEPS = [1, 4, 8] as const;
 const DISTRICT_STEPS = [1, 4, 8] as const;
 const PROJECT_STEPS = [1, 8, 15] as const;
 const TALENT_STEPS = [1, 9, 17] as const;
+const CANOPY_STEPS = [1, 18] as const;
 const COOPERATIVE_STEPS = [100, 1_000] as const;
 const SPECIES_STEPS = [1, 10, 18] as const;
 const CHALLENGE_STEPS = [1, 4] as const;
@@ -127,6 +138,9 @@ export type AchievementId =
   | `districts.${(typeof DISTRICT_STEPS)[number]}`
   | `projects.${(typeof PROJECT_STEPS)[number]}`
   | `talents.${(typeof TALENT_STEPS)[number]}`
+  | `canopy.${(typeof CANOPY_STEPS)[number]}`
+  | 'crown'
+  | 'selfSown'
   | `cooperatives.${(typeof COOPERATIVE_STEPS)[number]}`
   | `species.${(typeof SPECIES_STEPS)[number]}`
   | `challenges.${(typeof CHALLENGE_STEPS)[number]}`
@@ -268,6 +282,17 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'neighbourhood' as const,
     condition: { kind: 'talents', count } as const,
   })),
+  ...CANOPY_STEPS.map((count) => ({
+    id: `canopy.${count}` as const,
+    family: 'neighbourhood' as const,
+    condition: { kind: 'canopyLevels', count } as const,
+  })),
+  { id: 'crown', family: 'neighbourhood', condition: { kind: 'fullCanopy' } },
+  {
+    id: 'selfSown',
+    family: 'neighbourhood',
+    condition: { kind: 'sowerSeasons', count: SOWER_MILESTONE_SEASONS },
+  },
   ...COOPERATIVE_STEPS.map((count) => ({
     id: `cooperatives.${count}` as const,
     family: 'neighbourhood' as const,
@@ -424,6 +449,12 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.projects.length >= condition.count;
     case 'talents':
       return state.talents.length >= condition.count;
+    case 'canopyLevels':
+      return canopyLevels(state) >= condition.count;
+    case 'fullCanopy':
+      return isCanopyComplete(state);
+    case 'sowerSeasons':
+      return state.canopy.sowerSeasons >= condition.count;
     case 'species':
       return state.species.length >= condition.count;
     case 'challenges':

@@ -1,4 +1,4 @@
-// Effects of restored parcels and neighbouring districts, neighbourhood projects, talents of the Tree of Seasons and won
+// Effects of restored parcels and neighbouring districts, neighbourhood projects, talents and canopy of the Tree of Seasons and won
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
@@ -8,7 +8,7 @@ import { CHALLENGES, type ChallengeId } from './challenges';
 import { DISTRICTS, type DistrictId } from './districts';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
-import { TALENTS, type TalentId } from './talents';
+import { canopyBonuses, TALENTS, type CanopyState, type TalentId } from './talents';
 
 export type Bonus =
   /** Multiplies one generator's production. */
@@ -67,6 +67,8 @@ export interface BonusSource {
   districts?: readonly DistrictId[];
   projects: readonly ProjectId[];
   talents: readonly TalentId[];
+  /** Levels of the Canopy above the tree (§7.1); absent where none can be. */
+  canopy?: Pick<CanopyState, 'levels'>;
   /** Challenge Seasons won (§7.3). */
   challenges: readonly ChallengeId[];
   seasons: number;
@@ -74,14 +76,15 @@ export interface BonusSource {
 }
 
 /**
- * Every bonus in force: parcels, then neighbouring districts, then projects, then talents, then
- * challenges won.
+ * Every bonus in force: parcels, then neighbouring districts, then projects, then talents and the
+ * canopy, then challenges won.
  */
 export function activeBonuses({
   parcels,
   districts = [],
   projects,
   talents,
+  canopy,
   challenges,
 }: BonusSource): Bonus[] {
   return [
@@ -89,6 +92,7 @@ export function activeBonuses({
     ...districts.flatMap((id) => DISTRICTS[id].bonuses),
     ...projects.flatMap((id) => PROJECTS[id].bonuses),
     ...talents.flatMap((id) => TALENTS[id].bonuses),
+    ...(canopy ? canopyBonuses(canopy.levels) : []),
     ...challenges.flatMap((id) => CHALLENGES[id].bonuses),
   ];
 }
