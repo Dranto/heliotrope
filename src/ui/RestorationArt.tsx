@@ -80,39 +80,90 @@ function Unveil({ id, children }: { id: ParcelId; children: ReactNode }) {
   );
 }
 
+/** Wild flowers scattered over a box: petals of four colours, each with its heart. */
 function Flowers({ box: [x, y, w, h], count, salt }: { box: Box; count: number; salt: number }) {
   return (
     <>
-      {Array.from({ length: count }, (_, i) => (
-        <circle
-          key={i}
-          cx={x + 1.5 + noise(i, salt) * (w - 3)}
-          cy={y + 1.5 + noise(i, salt + 1) * (h - 3)}
-          r={0.9 + noise(i, salt + 2) * 0.8}
-          className={FLOWER_CLASSES[i % FLOWER_CLASSES.length]}
-        />
-      ))}
+      {Array.from({ length: count }, (_, i) => {
+        const cx = x + 1.5 + noise(i, salt) * (w - 3);
+        const cy = y + 1.5 + noise(i, salt + 1) * (h - 3);
+        const r = 0.9 + noise(i, salt + 2) * 0.8;
+        return (
+          <g key={i}>
+            <circle cx={cx} cy={cy} r={r} className={FLOWER_CLASSES[i % FLOWER_CLASSES.length]} />
+            <circle cx={cx} cy={cy} r={r * 0.38} className="bloom-heart" />
+          </g>
+        );
+      })}
     </>
   );
 }
 
-/** Rue jardin: the avenue becomes a paved garden street with planted islands and benches. */
+/** Tufts of grass over a box, so the green is never a flat colour. */
+function Tufts({ box: [x, y, w, h], count, salt }: { box: Box; count: number; salt: number }) {
+  const d = Array.from({ length: count }, (_, i) => {
+    const tx = x + 1 + noise(i, salt + 5) * (w - 2);
+    const ty = y + 2.5 + noise(i, salt + 6) * (h - 3);
+    return `M${tx - 1} ${ty}l.4 -2M${tx} ${ty}v-2.4M${tx + 1} ${ty}l-.3 -2`;
+  }).join('');
+  return <path d={d} className="tuft" />;
+}
+
+/** A textured surface: the colour, then a pattern of grass, mowing stripes or joints over it. */
+function Surface({
+  box: [x, y, w, h],
+  rx = 0,
+  className,
+  texture,
+}: {
+  box: Box;
+  rx?: number;
+  className: string;
+  texture: 'meadow-texture' | 'lawn-stripes' | 'paving-joints';
+}) {
+  return (
+    <>
+      <rect x={x} y={y} width={w} height={h} rx={rx} className={className} />
+      <rect x={x} y={y} width={w} height={h} rx={rx} fill={`url(#${texture})`} />
+    </>
+  );
+}
+
+/**
+ * Rue jardin: the avenue becomes a paved garden street, a cycle lane down its middle, planted
+ * islands of grasses and flowers with a young tree each, and benches facing them.
+ */
 function GardenStreet() {
   const [x, y, w, h] = PARCEL_PLACES.gardenStreet;
   const islands = 5;
   const gap = w / islands;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} className="paving" />
+      <Surface box={[x, y, w, h]} className="paving" texture="paving-joints" />
       <path d={`M${x} ${y + 3} H${x + w} M${x} ${y + h - 3} H${x + w}`} className="paving-edge" />
       {Array.from({ length: islands }, (_, i) => {
         const ix = x + gap * i + 6;
         const box: Box = [ix, y + 6, gap - 12, h - 12];
         return (
           <g key={i}>
-            <rect x={ix} y={y + 6} width={gap - 12} height={h - 12} rx="5" className="meadow" />
+            <rect
+              x={ix - 0.6}
+              y={y + 5.4}
+              width={gap - 10.8}
+              height={h - 10.8}
+              rx="5.4"
+              className="kerb"
+            />
+            <Surface box={box} rx={5} className="meadow" texture="meadow-texture" />
+            <Tufts box={box} count={6} salt={i * 3} />
             <Flowers box={box} count={9} salt={i * 7} />
-            <rect x={ix + gap - 6.9} y={y + 8} width="1.8" height="6" rx="0.9" className="bench" />
+            <Tree
+              x={ix + (gap - 12) * (i % 2 ? 0.7 : 0.3)}
+              y={y + h / 2}
+              r={3.6}
+              bloom={i % 2 === 0}
+            />
+            <Bench x={ix + gap - 6.9} y={y + 8} vertical />
           </g>
         );
       })}
@@ -120,7 +171,10 @@ function GardenStreet() {
   );
 }
 
-/** Jardins de pluie: two planted swales catch the rain along the avenue. */
+/**
+ * Jardins de pluie: two planted swales catch the rain along the avenue, stepping stones across
+ * them, reeds and irises on their banks.
+ */
 function RainGardens() {
   const [x, y, w, h] = PARCEL_PLACES.rainGardens;
   const wave = (cy: number, phase: number) => {
@@ -134,29 +188,82 @@ function RainGardens() {
   };
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} className="paving" />
-      <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} rx="6" className="meadow" />
-      <path d={wave(y + h / 2 - 3, 0)} className="swale" />
-      <path d={wave(y + h / 2 + 3, 1)} className="swale" />
+      <Surface box={[x, y, w, h]} className="paving" texture="paving-joints" />
+      <Surface
+        box={[x + 3, y + 3, w - 6, h - 6]}
+        rx={6}
+        className="meadow"
+        texture="meadow-texture"
+      />
+      {[0, 1].map((k) => (
+        <g key={k}>
+          <path d={wave(y + h / 2 + (k ? 3 : -3), k)} className="swale-bed" />
+          <path d={wave(y + h / 2 + (k ? 3 : -3), k)} className="swale" />
+          <path d={wave(y + h / 2 + (k ? 3 : -3), k)} className="swale-glint" />
+        </g>
+      ))}
+      {[0.22, 0.5, 0.78].map((f) => (
+        <g key={f}>
+          {[-3, 0, 3].map((dy) => (
+            <ellipse
+              key={dy}
+              cx={x + w * f + dy * 0.3}
+              cy={y + h / 2 + dy}
+              rx="1.4"
+              ry="1"
+              className="stepping-stone"
+            />
+          ))}
+        </g>
+      ))}
       {Array.from({ length: 26 }, (_, i) => (
         <path
           key={i}
-          d={`M${x + 8 + i * ((w - 16) / 25)} ${y + (i % 2 ? h - 5 : 5)} v-2.4`}
+          d={`M${x + 8 + i * ((w - 16) / 25)} ${y + (i % 2 ? h - 5 : 5)} l-.8 -2.2M${x + 8 + i * ((w - 16) / 25)} ${y + (i % 2 ? h - 5 : 5)} v-2.8M${x + 8 + i * ((w - 16) / 25)} ${y + (i % 2 ? h - 5 : 5)} l.8 -2.2`}
           className="reed"
+        />
+      ))}
+      {Array.from({ length: 9 }, (_, i) => (
+        <circle
+          key={i}
+          cx={x + 12 + i * ((w - 24) / 8)}
+          cy={y + (i % 2 ? h - 7.6 : 7.6)}
+          r="0.9"
+          className="iris"
         />
       ))}
     </g>
   );
 }
 
-/** Corridor des pollinisateurs: a wildflower meadow along a whole street. */
+/**
+ * Corridor des pollinisateurs: a wildflower meadow along a whole street, tall grasses, a mown
+ * path down the middle, and insect hotels for the bees.
+ */
 function PollinatorStrip() {
   const [x, y, w, h] = PARCEL_PLACES.pollinatorStrip;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} className="meadow" />
+      <Surface box={[x, y, w, h]} className="meadow" texture="meadow-texture" />
+      <Tufts box={[x, y, w, h]} count={70} salt={2} />
       <path d={`M${x + w / 2} ${y} V${y + h}`} className="mown-path" />
       <Flowers box={[x, y, w, h]} count={150} salt={11} />
+      {[0.2, 0.55, 0.85].map((f) => (
+        <g key={f}>
+          <rect
+            x={x + w / 2 - 2.6}
+            y={y + h * f}
+            width="5.2"
+            height="3.6"
+            rx="0.5"
+            className="insect-hotel"
+          />
+          <path
+            d={`M${x + w / 2 - 1.8} ${y + h * f + 1.2}h3.6M${x + w / 2 - 1.8} ${y + h * f + 2.4}h3.6`}
+            className="insect-hotel-lines"
+          />
+        </g>
+      ))}
     </g>
   );
 }
@@ -186,7 +293,10 @@ function River() {
   );
 }
 
-/** Parc du parking: a lawn with a pond, a winding path and clumps of trees. */
+/**
+ * Parc du parking: a mown lawn with a pond and its water lilies, a winding gravel path with
+ * benches, a flower bed, and clumps of trees.
+ */
 function Park() {
   const [x, y, w, h] = PARCEL_PLACES.park;
   const clumps: [number, number, number][] = [
@@ -196,60 +306,79 @@ function Park() {
     [x + w - 30, y + h - 12, 7],
     [x + 14, y + h - 22, 8],
   ];
+  const path = `M${x} ${y + h * 0.7} C${x + w * 0.3} ${y + h * 0.75} ${x + w * 0.4} ${y + h * 0.2} ${x + w} ${y + h * 0.3}`;
+  const [px, py] = [x + w * 0.62, y + h * 0.58];
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx="4" className="lawn" />
-      <path
-        d={`M${x} ${y + h * 0.7} C${x + w * 0.3} ${y + h * 0.75} ${x + w * 0.4} ${y + h * 0.2} ${x + w} ${y + h * 0.3}`}
-        className="park-path"
-      />
-      <ellipse cx={x + w * 0.62} cy={y + h * 0.58} rx="17" ry="12" className="pond" />
-      <ellipse cx={x + w * 0.62} cy={y + h * 0.58} rx="11" ry="7" className="pond-light" />
-      <Flowers box={[x + w * 0.2, y + h * 0.42, w * 0.22, h * 0.14]} count={18} salt={5} />
-      {clumps.map(([cx, cy, r], i) => (
+      <Surface box={[x, y, w, h]} rx={4} className="lawn" texture="lawn-stripes" />
+      <path d={path} className="park-path-edge" />
+      <path d={path} className="park-path" />
+      <ellipse cx={px} cy={py} rx="18.4" ry="13.2" className="pond-bank" />
+      <ellipse cx={px} cy={py} rx="17" ry="12" className="pond" />
+      <ellipse cx={px - 2} cy={py - 2} rx="11" ry="7" className="pond-light" />
+      {[
+        [px + 7, py + 4, 1.8],
+        [px + 10, py + 1, 1.3],
+        [px - 9, py + 5, 1.5],
+      ].map(([lx, ly, lr], i) => (
         <g key={i}>
-          <circle cx={cx + r * 0.35} cy={cy + r * 0.35} r={r} className="tree-shadow" />
-          <circle cx={cx} cy={cy} r={r} className="foliage" opacity="0.9" />
-          <circle cx={cx - r * 0.3} cy={cy - r * 0.3} r={r * 0.6} className="foliage-light" />
+          <circle cx={lx} cy={ly} r={lr} className="lily-pad" />
+          {i === 0 && <circle cx={lx! + 0.3} cy={ly! - 0.2} r="0.6" className="bloom-rose" />}
         </g>
+      ))}
+      <ellipse
+        cx={x + w * 0.31}
+        cy={y + h * 0.49}
+        rx={w * 0.12}
+        ry={h * 0.08}
+        className="flower-bed"
+      />
+      <Flowers box={[x + w * 0.2, y + h * 0.42, w * 0.22, h * 0.14]} count={22} salt={5} />
+      <Bench x={x + w * 0.5} y={y + h * 0.3} />
+      <Bench x={x + w * 0.16} y={y + h * 0.62} />
+      {clumps.map(([cx, cy, r], i) => (
+        <Tree key={i} x={cx} y={cy} r={r} bloom={i === 1} />
       ))}
     </g>
   );
 }
 
-/** Verger de l'entrepôt: the warehouse opens its roof to rows of fruit trees. */
+/** Verger de l'entrepôt: the warehouse opens its roof to rows of fruit trees in the grass. */
 function Orchard() {
   const [x, y, w, h] = PARCEL_PLACES.orchard;
   const columns = 11;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx="2" className="lawn" />
+      <Surface box={[x, y, w, h]} rx={2} className="lawn" texture="lawn-stripes" />
+      <Tufts box={[x, y, w, h]} count={30} salt={8} />
       {Array.from({ length: columns * 2 }, (_, i) => {
         const col = i % columns;
         const row = Math.floor(i / columns);
         const cx = x + 9 + col * ((w - 18) / (columns - 1)) + (row ? 4 : 0);
         const cy = y + 10 + row * 14;
-        return (
-          <g key={i}>
-            <circle cx={cx + 1.6} cy={cy + 1.6} r="5" className="tree-shadow" />
-            <circle cx={cx} cy={cy} r="5" className="foliage" opacity="0.9" />
-            <circle cx={cx - 1.4} cy={cy - 1.4} r="2.8" className="foliage-light" />
-            <circle cx={cx + 2} cy={cy + 0.6} r="0.9" className="fruit" />
-            <circle cx={cx - 0.6} cy={cy + 2.2} r="0.9" className="fruit" />
-          </g>
-        );
+        return <Tree key={i} x={cx} y={cy} r={5} fruit={i % 4 !== 3} bloom={i % 4 === 3} />;
       })}
     </g>
   );
 }
 
-/** Toits vivants: every grey roof is planted with sedum and wild flowers. */
+/** Toits vivants: every grey roof is planted with drifts of sedum and wild flowers. */
 function LivingRoofs() {
   return (
     <g>
       {LIVING_ROOFS.map(([x, y, w, h], i) => (
         <g key={i}>
           <rect x={x + 2} y={y + 2} width={w - 4} height={h - 4} rx="2" className="sedum" />
+          {Array.from({ length: Math.max(3, Math.round((w * h) / 90)) }, (_, k) => (
+            <ellipse
+              key={k}
+              cx={x + 4 + noise(k, i + 40) * (w - 8)}
+              cy={y + 4 + noise(k, i + 41) * (h - 8)}
+              rx={2 + noise(k, i + 42) * 3}
+              ry={1.5 + noise(k, i + 43) * 2}
+              className={`sedum-drift drift-${k % 3}`}
+            />
+          ))}
           <rect
             x={x + 2}
             y={y + 2}
@@ -272,18 +401,23 @@ function Squares() {
       {CROSSROADS.map(([x, y]) => (
         <g key={`${x},${y}`}>
           <circle cx={x} cy={y} r="13" className="paving" />
+          <circle cx={x} cy={y} r="13" fill="url(#paving-joints)" />
+          <circle cx={x} cy={y} r="10.6" className="square-setts" />
           <circle cx={x} cy={y} r="13" className="square-ring" />
           <circle cx={x} cy={y} r="8" className="meadow" />
-          <circle cx={x + 2} cy={y + 2} r="5.5" className="tree-shadow" />
-          <circle cx={x} cy={y} r="5.5" className="foliage" />
-          <circle cx={x - 1.5} cy={y - 1.5} r="3" className="foliage-light" />
-          {[0, 2.1, 4.2].map((a) => (
-            <circle
+          <circle cx={x} cy={y} r="8" fill="url(#meadow-texture)" />
+          <Flowers box={[x - 6, y - 6, 12, 12]} count={6} salt={x} />
+          <Tree x={x} y={y} r={5.5} bloom />
+          {[0.6, 2.2, 3.8, 5.4].map((a) => (
+            <rect
               key={a}
-              cx={x + Math.cos(a) * 3.2}
-              cy={y + Math.sin(a) * 3.2}
-              r="0.9"
-              className="blossom"
+              x={x + Math.cos(a) * 11 - 1.6}
+              y={y + Math.sin(a) * 11 - 0.6}
+              width="3.2"
+              height="1.2"
+              rx="0.4"
+              transform={`rotate(${(a * 180) / Math.PI + 90} ${x + Math.cos(a) * 11} ${y + Math.sin(a) * 11})`}
+              className="bench"
             />
           ))}
         </g>
@@ -292,13 +426,81 @@ function Squares() {
   );
 }
 
-/** A round tree seen from above, with its shadow, as on the other parcels. */
-function Tree({ x, y, r }: { x: number; y: number; r: number }) {
+/**
+ * A tree seen from above, as on the other parcels: its shadow, a lobed crown, the shade on its
+ * far side, clumps of leaves catching the sun, and fruit or blossom when asked.
+ */
+function Tree({
+  x,
+  y,
+  r,
+  fruit = false,
+  bloom = false,
+}: {
+  x: number;
+  y: number;
+  r: number;
+  fruit?: boolean;
+  bloom?: boolean;
+}) {
+  const salt = Math.round(x * 3 + y * 7);
   return (
     <g>
       <circle cx={x + r * 0.35} cy={y + r * 0.35} r={r} className="tree-shadow" />
-      <circle cx={x} cy={y} r={r} className="foliage" opacity="0.9" />
-      <circle cx={x - r * 0.3} cy={y - r * 0.3} r={r * 0.6} className="foliage-light" />
+      {Array.from({ length: 6 }, (_, i) => {
+        const a = (i / 6) * Math.PI * 2 + noise(salt, 1);
+        return (
+          <circle
+            key={i}
+            cx={x + Math.cos(a) * r * 0.42}
+            cy={y + Math.sin(a) * r * 0.42}
+            r={r * (0.55 + noise(i, salt) * 0.12)}
+            className="foliage"
+          />
+        );
+      })}
+      <circle cx={x + r * 0.22} cy={y + r * 0.25} r={r * 0.72} className="crown-shade" />
+      {[
+        [-0.38, -0.3, 0.36],
+        [0.05, -0.45, 0.28],
+        [-0.45, 0.12, 0.26],
+        [0.1, 0.05, 0.22],
+      ].map(([dx, dy, k], i) => (
+        <circle key={i} cx={x + dx! * r} cy={y + dy! * r} r={r * k!} className="foliage-light" />
+      ))}
+      <circle cx={x - r * 0.42} cy={y - r * 0.38} r={r * 0.14} className="leaf-glint" />
+      {fruit && (
+        <>
+          <circle cx={x + r * 0.4} cy={y + r * 0.12} r={r * 0.17} className="fruit" />
+          <circle cx={x - r * 0.12} cy={y + r * 0.45} r={r * 0.17} className="fruit" />
+          <circle cx={x + r * 0.05} cy={y - r * 0.5} r={r * 0.15} className="fruit" />
+        </>
+      )}
+      {bloom &&
+        [0, 2.1, 4.2].map((a) => (
+          <circle
+            key={a}
+            cx={x + Math.cos(a) * r * 0.55}
+            cy={y + Math.sin(a) * r * 0.55}
+            r={r * 0.16}
+            className="blossom"
+          />
+        ))}
+    </g>
+  );
+}
+
+/** A wooden bench seen from above: seat slats and a back rest. */
+function Bench({ x, y, vertical = false }: { x: number; y: number; vertical?: boolean }) {
+  return vertical ? (
+    <g>
+      <rect x={x} y={y} width="2.2" height="6" rx="0.5" className="bench" />
+      <path d={`M${x + 0.4} ${y + 0.6}v4.8`} className="bench-back" />
+    </g>
+  ) : (
+    <g>
+      <rect x={x} y={y} width="6" height="2.2" rx="0.5" className="bench" />
+      <path d={`M${x + 0.6} ${y + 0.4}h4.8`} className="bench-back" />
     </g>
   );
 }
@@ -311,7 +513,7 @@ function PlayStreet() {
   const cells = 6;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} className="paving" />
+      <Surface box={[x, y, w, h]} className="paving" texture="paving-joints" />
       <path d={`M${x} ${y + 3} H${x + w} M${x} ${y + h - 3} H${x + w}`} className="paving-edge" />
       {[0.12, 0.62].map((f) => (
         <g key={f}>
@@ -346,8 +548,13 @@ function StormPond() {
   const [x, y, w, h] = PARCEL_PLACES.rainGardens;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} className="paving" />
-      <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} rx="7" className="meadow" />
+      <Surface box={[x, y, w, h]} className="paving" texture="paving-joints" />
+      <Surface
+        box={[x + 3, y + 3, w - 6, h - 6]}
+        rx={7}
+        className="meadow"
+        texture="meadow-texture"
+      />
       <rect x={x + 9} y={y + 6} width={w - 18} height={h - 12} rx="5" className="pond" />
       <rect x={x + 14} y={y + 8.5} width={w - 28} height={h - 17} rx="3" className="pond-light" />
       {[0.3, 0.5, 0.7].map((f) =>
@@ -379,7 +586,8 @@ function Hedgerow() {
   const shrubs = 28;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} className="meadow" />
+      <Surface box={[x, y, w, h]} className="meadow" texture="meadow-texture" />
+      <Tufts box={[x, y, w, h]} count={40} salt={6} />
       <path d={`M${x + 3} ${y} V${y + h}`} className="mown-path" />
       {Array.from({ length: shrubs }, (_, i) => {
         const cy = y + 8 + i * ((h - 16) / (shrubs - 1));
@@ -455,7 +663,7 @@ function Market() {
   const awnings = 5;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx="4" className="paving" />
+      <Surface box={[x, y, w, h]} rx={4} className="paving" texture="paving-joints" />
       <rect x={x + 14} y={y + 22} width={w - 28} height={h - 44} rx="3" className="market-shadow" />
       <rect x={x + 12} y={y + 20} width={w - 28} height={h - 44} rx="3" className="market-roof" />
       <path d={`M${x + 12} ${y + h / 2} H${x + w - 16}`} className="market-ridge" />
@@ -499,7 +707,7 @@ function Glasshouses() {
   const bw = (w - 8) / bays;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx="2" className="paving" />
+      <Surface box={[x, y, w, h]} rx={2} className="paving" texture="paving-joints" />
       {Array.from({ length: bays }, (_, i) => (
         <g key={i}>
           <rect
@@ -566,6 +774,7 @@ function FountainSquares() {
       {CROSSROADS.map(([x, y]) => (
         <g key={`${x},${y}`}>
           <circle cx={x} cy={y} r="13" className="paving" />
+          <circle cx={x} cy={y} r="13" fill="url(#paving-joints)" />
           <circle cx={x} cy={y} r="13" className="square-ring" />
           <circle cx={x} cy={y} r="8.4" className="fountain-rim" />
           <circle cx={x} cy={y} r="7" className="pond" />
@@ -602,10 +811,33 @@ const PARCEL_ART: Record<ParcelId, () => ReactNode> = {
 /** Patterns the parcels are painted with. */
 export function ParcelPatterns() {
   return (
-    <pattern id="sedum-texture" width="4" height="4" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="0.7" className="sedum-dot" />
-      <circle cx="3" cy="3" r="0.5" className="sedum-dot" />
-    </pattern>
+    <>
+      <pattern id="sedum-texture" width="4" height="4" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="0.7" className="sedum-dot" />
+        <circle cx="3" cy="3" r="0.5" className="sedum-dot" />
+      </pattern>
+      <pattern id="meadow-texture" width="7" height="6" patternUnits="userSpaceOnUse">
+        <path
+          d="M1.5 5l-.5 -1.6M1.5 5l.2 -1.9M1.5 5l1 -1.3M5 2.4l-.4 -1.5M5 2.4l.6 -1.4"
+          className="meadow-blade"
+        />
+        <circle cx="4.2" cy="5.1" r="0.35" className="meadow-speck" />
+        <circle cx="6.3" cy="0.9" r="0.28" className="meadow-speck-light" />
+      </pattern>
+      <pattern
+        id="lawn-stripes"
+        width="12"
+        height="12"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(-24)"
+      >
+        <rect width="6" height="12" className="lawn-stripe" />
+        <path d="M8 3l-.3 -1.2M10 9l.3 -1.2" className="meadow-blade" />
+      </pattern>
+      <pattern id="paving-joints" width="4.2" height="3.2" patternUnits="userSpaceOnUse">
+        <path d="M0 3.1H4.2M2.1 0V1.6M0 1.6H4.2M4.1 1.6V3.2" className="paving-joint" />
+      </pattern>
+    </>
   );
 }
 

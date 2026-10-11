@@ -26,8 +26,21 @@ function Tree({
   return (
     <g transform={`translate(${x} ${y})`}>
       <circle className="d-tree-shadow" cx={1.5} cy={2} r={r} />
-      <circle className="d-tree" r={r} />
-      <circle className="d-tree-light" cx={-r * 0.3} cy={-r * 0.3} r={r * 0.45} />
+      {[0, 1, 2, 3, 4].map((i) => {
+        const a = ((i + (x + y) * 0.07) / 5) * Math.PI * 2;
+        return (
+          <circle
+            key={i}
+            className="d-tree"
+            cx={Math.cos(a) * r * 0.4}
+            cy={Math.sin(a) * r * 0.4}
+            r={r * 0.62}
+          />
+        );
+      })}
+      <circle className="d-tree-shade" cx={r * 0.2} cy={r * 0.25} r={r * 0.7} />
+      <circle className="d-tree-light" cx={-r * 0.3} cy={-r * 0.3} r={r * 0.4} />
+      <circle className="d-tree-light" cx={r * 0.15} cy={-r * 0.45} r={r * 0.24} />
       {blossom && <circle className="d-fruit" cx={r * 0.35} cy={r * 0.1} r={r * 0.2} />}
     </g>
   );

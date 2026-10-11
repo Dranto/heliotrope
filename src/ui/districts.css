@@ -114,3 +114,7 @@
   stroke-width: 3;
   stroke-dasharray: 3 2;
 }
+
+.d-tree-shade {
+  fill: rgb(31 42 36 / 0.14);
+}
