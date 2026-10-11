@@ -662,7 +662,7 @@ La ville natale, une fois quittée, envoie **+3 % de production**. Chaque ville 
 | Les échanges | 12 | Le réseau envoie deux fois plus |
 
 - **Écran.** Les Savoirs et leur bonus, la carte de la région (la ville natale au centre, les villes fondées autour, reliées par des fils dorés, la ville actuelle cerclée), la règle de la ville actuelle, le réseau, les trois paysages avec leur règle, leur réseau et le bouton « Essaimer », puis l'atelier.
-- **Simulateur.** `npm run simulate` essaime vers la plaine à la fin de la partie mesurée, puis joue trois Cycles de la ville sœur (voir §8, « La fin de partie »).
+- **Simulateur.** `npm run simulate` essaime vers la plaine à la fin de la partie mesurée (après le 6ᵉ Cycle, 59 Sources dont 34 hors du delta) : **8 Savoirs** (3 par les Sources, 5 par les 130 000 Graines), puis il joue la ville sœur. Son premier Cycle est conseillé après **19 min**, contre 2 h 48 pour la ville natale : tout ce qui reste (delta, Savoirs, Jalons, Herbier) fait repartir vite, et les 25 Sources de la ville suivante demandent ensuite quelques heures, comme les Cycles 2 à 4 de la ville natale.
 - **Jalons (2).** « Essaimage » (une ville sœur), « Les villes sœurs » (trois). 138 jalons en tout.
 - **Sauvegarde.** Version 24 : la ville actuelle, les villes quittées, les Savoirs, l'atelier, et les Sources et l'Eau de la fondation, à zéro pour une sauvegarde plus ancienne.
 
@@ -759,15 +759,15 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 |---|---|---|---|---|
 | 1ᵉʳ (conseillé) | ~2 h 45 | 2 h 46 | une dizaine | 5 |
 | 2ᵉ | ~35 min | 36 min | 3 de 12 min | 9 |
-| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 14 |
-| 4ᵉ | ~45 min | 43 min | 4, de 10 à 13 min | 22 |
-| 5ᵉ | (~1 h) | 1 h | 5, de 10 à 15 min | 36 |
-| 6ᵉ | (~1 h 10) | 1 h 09 | 5, la dernière de 30 min | 55 |
+| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 15 |
+| 4ᵉ | ~45 min | 45 min | 4, de 10 à 15 min | 25 |
+| 5ᵉ | (~1 h) | 55 min | 5, de 10 à 15 min | 38 |
+| 6ᵉ | (~1 h 10) | 1 h 08 | 5, la dernière de 28 min | 59 |
 
 Ce qu'en tire la feuille de route (décision D11) :
 
 - **Les Cycles s'allongent doucement** (35 min → 1 h 10) et les Sources croissent d'environ ×1,6 par Cycle : le delta (26 Sources) est ouvert au 6ᵉ Cycle, puis ses élargissements (§7.5) prennent le relais pendant de nombreux Cycles (environ 2 300 Sources pour tout élargir). La troisième couche (M23) se justifie : après une dizaine d'heures, chaque Cycle n'apporte plus qu'un bonus plat de plus.
-- **La Canopée est complète dès le 2ᵉ Cycle** (~1 900 Graines quand une Saison en rapporte des milliers, 120 000 au 6ᵉ Cycle) : les Graines retrouvent un bonus plat. M20 à M24 devront leur rendre un usage (D12 garde les grands chantiers hors Graines ; les villes sœurs ou les alliances pourront s'en charger).
+- **La Canopée est complète dès le 2ᵉ Cycle** (~1 900 Graines quand une Saison en rapporte des milliers, 120 000 au 6ᵉ Cycle) : les Graines retrouvent un bonus plat. Depuis M23, les Graines du Cycle comptent dans les Savoirs d'un essaimage (§7.6), et les grands chantiers restent hors Graines (D12).
 - **Les nombres restent loin de la limite** : 3 × 10²¹ de Lumière au total au 6ᵉ Cycle, très loin de 10³⁰⁸. Pas besoin de bibliothèque de grands nombres.
 
 ### Affichage des nombres
