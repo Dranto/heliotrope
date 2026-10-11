@@ -1,4 +1,5 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
+import type { AllianceId } from '../game/alliances';
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FruitId } from '../game/fruits';
@@ -303,6 +304,8 @@ export const en: Texts = {
       oldOrchard: 'Old orchards',
       'cities.1': 'Swarming',
       'cities.3': 'Sister cities',
+      firstAlliance: 'Hand in hand',
+      grandBloom: 'The grand bloom',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -398,6 +401,9 @@ export const en: Texts = {
         count === 1 ? 'Complete a great work' : `Complete all ${count} great works`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Pick a first fruit in the orchard' : `Pick fruit ${count} times`,
+      alliances: 'Make an alliance work',
+      grandBloom:
+        'Restore the whole region: the four great works, the Herbier, every site at level 5',
       sisterCities: (count: number) =>
         count === 1 ? 'Found a sister city' : `Found ${count} sister cities`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
@@ -586,6 +592,44 @@ export const en: Texts = {
         `Climbing beans! Rooftop gardens and greenhouses ×2 for ${seconds}.`,
     },
     variety: (name: string) => `New variety: ${name}!`,
+  },
+  alliances: {
+    title: 'The alliances',
+    hint: 'An alliance links two things you have grown. It wakes once both reach their threshold, and works only while it holds a slot. One can be taken out per Cycle of water.',
+    slots: (used: string, total: string) => `Slots: ${used} of ${total}`,
+    slotsHint:
+      'Three slots at first, one more with two great works complete, with each sister city and with the grand bloom.',
+    names: {
+      orchardBees: 'The orchard’s bees',
+      tramMarket: 'The tram market',
+      nourishingRiver: 'The nourishing river',
+      travellingSeeds: 'Travelling seeds',
+      villageFeast: 'The village feast',
+      deepRoots: 'Deep roots',
+    } satisfies Record<AllianceId, string>,
+    sides: {
+      hives: 'Hives',
+      pollinators: 'Pollinators in the Herbier',
+      tram: 'Tram stages',
+      districts: 'Neighbouring districts',
+      blueCorridor: 'Blue corridor',
+      hillsArm: 'Hillsides arm',
+      sisterCities: 'Sister cities',
+      varieties: 'Garden varieties',
+      cityVisits: 'Visits of the city',
+      hall: 'Food hall stages',
+      canopy: 'Canopy levels',
+      widths: 'Delta widenings',
+    } as Record<string, string>,
+    side: (name: string, have: string, need: string) => `${name}: ${have} of ${need}`,
+    awake: 'Awake',
+    asleep: 'Asleep',
+    choose: 'Choose',
+    chooseLabel: (name: string) => `Choose the alliance: ${name}`,
+    takeOut: 'Take out',
+    takeOutLabel: (name: string) => `Take out the alliance: ${name}`,
+    takenOut: 'An alliance was already taken out this Cycle',
+    full: 'Every slot is taken',
   },
   cities: {
     open: 'Sister cities',

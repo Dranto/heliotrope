@@ -1,5 +1,6 @@
 // French texts, the reference language (docs/game-design.md §14 Q1). Every other language
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
+import type { AllianceId } from '../game/alliances';
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FruitId } from '../game/fruits';
@@ -350,6 +351,8 @@ export const fr = {
       oldOrchard: 'Vieux vergers',
       'cities.1': 'Essaimage',
       'cities.3': 'Les villes sœurs',
+      firstAlliance: 'Main dans la main',
+      grandBloom: 'La grande floraison',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -453,6 +456,9 @@ export const fr = {
         count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Cueillir un premier fruit au verger' : `Cueillir ${count} fois au verger`,
+      alliances: 'Faire jouer une alliance',
+      grandBloom:
+        'Restaurer toute la région\u00a0: les quatre chantiers, l’Herbier, chaque site au niveau 5',
       sisterCities: (count: number) =>
         count === 1 ? 'Fonder une ville sœur' : `Fonder ${count} villes sœurs`,
       fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
@@ -645,6 +651,44 @@ export const fr = {
         `Haricots grimpants\u00a0! Potagers et Serres ×2 pendant ${seconds}.`,
     },
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
+  },
+  alliances: {
+    title: 'Les alliances',
+    hint: 'Une alliance relie deux choses que vous avez fait grandir. Elle s’éveille quand les deux atteignent leur seuil, et ne joue que si elle occupe une place. On peut en retirer une par Cycle de l’eau.',
+    slots: (used: string, total: string) => `Places\u00a0: ${used} sur ${total}`,
+    slotsHint:
+      'Trois places au début, une de plus avec deux grands chantiers achevés, avec chaque ville sœur et avec la grande floraison.',
+    names: {
+      orchardBees: 'Les abeilles du verger',
+      tramMarket: 'Le marché du tram',
+      nourishingRiver: 'La rivière nourricière',
+      travellingSeeds: 'Les graines voyageuses',
+      villageFeast: 'La fête au village',
+      deepRoots: 'Les racines profondes',
+    } satisfies Record<AllianceId, string>,
+    sides: {
+      hives: 'Ruches',
+      pollinators: 'Pollinisateurs de l’Herbier',
+      tram: 'Étapes du tram',
+      districts: 'Quartiers voisins',
+      blueCorridor: 'Trame bleue',
+      hillsArm: 'Bras des coteaux',
+      sisterCities: 'Villes sœurs',
+      varieties: 'Variétés du potager',
+      cityVisits: 'Visites de la ville',
+      hall: 'Étapes des halles',
+      canopy: 'Niveaux de la Canopée',
+      widths: 'Élargissements du delta',
+    } as Record<string, string>,
+    side: (name: string, have: string, need: string) => `${name}\u00a0: ${have} sur ${need}`,
+    awake: 'Éveillée',
+    asleep: 'Endormie',
+    choose: 'Choisir',
+    chooseLabel: (name: string) => `Choisir l’alliance\u00a0: ${name}`,
+    takeOut: 'Retirer',
+    takeOutLabel: (name: string) => `Retirer l’alliance\u00a0: ${name}`,
+    takenOut: 'Déjà une alliance retirée ce Cycle',
+    full: 'Toutes les places sont prises',
   },
   cities: {
     open: 'Villes sœurs',

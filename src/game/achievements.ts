@@ -6,6 +6,7 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
+import { workingAlliances } from './alliances';
 import { FRUIT_IDS } from './fruits';
 import { worksBuilt } from './greatWorks';
 import { VARIETY_IDS } from './seedBank';
@@ -95,6 +96,9 @@ export type AchievementCondition =
   | { kind: 'fruitVarieties'; count: number }
   /** Sister cities founded (§7.6). */
   | { kind: 'sisterCities'; count: number }
+  /** Alliances chosen and awake (§9.9), and the grand bloom. */
+  | { kind: 'alliances'; count: number }
+  | { kind: 'grandBloom' }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -187,6 +191,8 @@ export type AchievementId =
   | 'firstFruit'
   | 'oldOrchard'
   | `cities.${(typeof CITY_STEPS)[number]}`
+  | 'firstAlliance'
+  | 'grandBloom'
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -341,6 +347,9 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'seasons' as const,
     condition: { kind: 'sisterCities', count } as const,
   })),
+  // The alliances and the grand bloom (§9.9).
+  { id: 'firstAlliance', family: 'neighbourhood', condition: { kind: 'alliances', count: 1 } },
+  { id: 'grandBloom', family: 'neighbourhood', condition: { kind: 'grandBloom' } },
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
   {
@@ -581,6 +590,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return worksBuilt(state) >= condition.count;
     case 'sisterCities':
       return state.city.founded.length >= condition.count;
+    case 'alliances':
+      return workingAlliances(state).length >= condition.count;
+    case 'grandBloom':
+      return state.alliances.bloomed;
     case 'fruitHarvests':
       return state.orchard.harvests >= condition.count;
     case 'fruitVarieties':
