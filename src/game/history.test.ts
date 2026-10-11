@@ -1,5 +1,5 @@
 import { CURVE_FIRST_STEP, CURVE_MAX_POINTS, CURVES_KEPT, emptyCurve, startCurve } from './history';
-import { startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
 
@@ -40,7 +40,7 @@ describe('production curves (§10.5)', () => {
 
   it('opens a new curve with each Season and keeps the last few', () => {
     let state = withState({ totalLight: 1e9, allTimeLight: 1e9 });
-    state = tick(state, 60);
+    state = tick(state, SEED_RIPENING_SECONDS);
     state = startNewSeason(state);
     expect(state.history.map((c) => c.season)).toEqual([1, 2]);
     expect(state.history[1]).toEqual(emptyCurve(2));

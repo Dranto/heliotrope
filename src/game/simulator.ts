@@ -301,7 +301,7 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
 }
 
 /** §7.4 pacing target: the first Cycle of water advisable, in seconds of play. */
-export const ADVISED_CYCLE_TARGET = 2.75 * 3600;
+export const ADVISED_CYCLE_TARGET = (3 + 10 / 60) * 3600;
 
 /** §8 pacing targets for a first active playthrough, in seconds. */
 export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
