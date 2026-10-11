@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { guideStep } from '../game/guide';
 import { generatorLimit } from '../game/challenges';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from '../game/generators';
@@ -57,6 +58,7 @@ export function Generators() {
   const revealed = GENERATOR_IDS.filter((id) => isGeneratorRevealed(state, id));
   const next = GENERATOR_IDS.find((id) => !isGeneratorRevealed(state, id));
   const biodiversity = biodiversityBonus(state);
+  const guide = guideStep(state);
 
   // §10.5: keys 1 to 8 buy the generator of that rank with the chosen amount; M toggles Max.
   // No key clicks the heliotrope, so the keyboard never stands in for an autoclicker.
@@ -147,6 +149,7 @@ export function Generators() {
               <button
                 type="button"
                 className="buy"
+                data-guide={(guide?.kind === 'building' && guide.generator === id) || undefined}
                 disabled={!affordable}
                 aria-label={t.buyLabel(text.name, cost, units)}
                 aria-keyshortcuts={String(rank)}

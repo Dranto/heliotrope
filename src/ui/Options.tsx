@@ -4,8 +4,10 @@ import { exportSave } from '../game/save';
 import type { Settings } from '../game/state';
 import { t } from '../i18n';
 import { Dialog } from './Dialog';
+import { DEFAULT_MUSIC } from './music';
 import { setMapRenderer, useMapRenderer } from './rendererPref';
 import { useGameState, useGameStore } from './useGame';
+import { askReminders, canNotify } from './useReminders';
 
 type ResetStep = 'idle' | 'confirm' | 'final';
 
@@ -21,6 +23,20 @@ export function Options({ onClose }: { onClose: () => void }) {
   const [importText, setImportText] = useState('');
   const [message, setMessage] = useState('');
   const [resetStep, setResetStep] = useState<ResetStep>('idle');
+
+  // The music follows the device until the player sets it (§6.3): softly on a computer, off on
+  // a phone.
+  const phone = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  const musicLevel = Math.round((settings.music ?? (phone ? 0 : DEFAULT_MUSIC)) * 100);
+
+  async function toggleReminders(on: boolean) {
+    if (!on) {
+      change({ reminders: false });
+      return;
+    }
+    if (await askReminders()) change({ reminders: true });
+    else setMessage(t.options.remindersDenied);
+  }
 
   async function copy() {
     try {
@@ -138,6 +154,35 @@ export function Options({ onClose }: { onClose: () => void }) {
           {t.options.muted}
         </label>
         <p className="hint">{t.options.soundHint}</p>
+        <label className="range">
+          {t.options.music}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={musicLevel}
+            disabled={settings.muted}
+            onChange={(event) => change({ music: Number(event.target.value) / 100 })}
+          />
+          <span className="range-value" aria-hidden="true">
+            {musicLevel}
+          </span>
+        </label>
+        <p className="hint">{t.options.musicHint}</p>
+        {canNotify() && (
+          <>
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={settings.reminders}
+                onChange={(event) => void toggleReminders(event.target.checked)}
+              />
+              {t.options.reminders}
+            </label>
+            <p className="hint">{t.options.remindersHint}</p>
+          </>
+        )}
       </section>
 
       <section>

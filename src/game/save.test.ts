@@ -58,6 +58,8 @@ function playedState(): GameState {
       volume: 0.3,
       muted: true,
       language: 'en',
+      music: 0.2,
+      reminders: true,
     },
   };
 }

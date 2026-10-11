@@ -583,6 +583,18 @@ export const en: Texts = {
   welcomeTitle: 'While you were away…',
   welcomeBack: (light: string, duration: string) =>
     `While you were away (${duration}), the neighbourhood harvested ${light} Light.`,
+  welcomeReport: {
+    label: 'What grew while you were away',
+    crops: (count: number) => (count > 1 ? `${count} crops ready` : '1 crop ready'),
+    seeds: (count: string) => `Ripe Seeds: ${count}`,
+    seasons: (count: number) =>
+      count > 1 ? `${count} Seasons started by the sower` : '1 Season started by the sower',
+  },
+  reminders: {
+    seeds: 'The Heliotrope Seeds are ripe',
+    crops: 'A crop of the garden is ready',
+    body: 'The neighbourhood is waiting for you.',
+  },
   dismiss: 'Close',
   /** A duration in seconds, at most two units: "42 s", "12 min", "2 h 05", "3 d 4 h". */
   duration: (seconds: number) => {
@@ -921,6 +933,13 @@ export const en: Texts = {
     soundTitle: 'Sound',
     volume: 'Volume',
     muted: 'Mute',
+    music: 'Music',
+    musicHint:
+      'Soft music that grows richer as the city comes back to life. Off by default on phones.',
+    reminders: 'Reminders',
+    remindersHint:
+      'A notification when the Seeds are ripe or a crop is ready, while the game is open in the background.',
+    remindersDenied: 'The browser blocks notifications for this site.',
     soundHint:
       'Discreet sounds accompany harvesting, purchases and the neighbourhood’s restoration.',
     reducedMotionHint:

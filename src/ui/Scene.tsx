@@ -53,6 +53,8 @@ import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
+import { ReturnReplay } from './ReturnReplay';
+import { replaySeconds, returnMarks, returnSweeps } from './returnMap';
 import { encodeDecor } from './decorMap';
 import { DecorToolbar, PhotoToolbar, type PhotoLook } from './MapTools';
 import { useGameState, useGameStore } from './useGame';
@@ -187,6 +189,21 @@ export function Scene({
       store.dispatch((s) => placeDecor(s, slot, nextDecor(s, s.decor.slots[slot] ?? null))),
     [store],
   );
+  // The return in images (§9.1): what grew while away, replayed once after loading.
+  const [replay] = useState(() =>
+    store.offlineSeconds >= 60
+      ? { marks: returnMarks(store.offlineReport), sweeps: returnSweeps(store.offlineSeconds) }
+      : null,
+  );
+  const [replaying, setReplaying] = useState(replay !== null && replay.marks.length > 0);
+  useEffect(() => {
+    if (!replaying || !replay) return;
+    const timer = setTimeout(
+      () => setReplaying(false),
+      replaySeconds(replay.marks.length, replay.sweeps) * 1000,
+    );
+    return () => clearTimeout(timer);
+  }, [replaying, replay]);
   const welcome = useCallback(() => {
     const result = welcomeVisit(store.getState());
     if (!result) return;
@@ -238,6 +255,9 @@ export function Scene({
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <GardenBeds beds={beds} onHarvest={onHarvest} />
         <DecorLayer slots={decor} editing={editing} onSlot={setDecor} />
+        {replaying && replay && !reduced && (
+          <ReturnReplay marks={replay.marks} sweeps={replay.sweeps} />
+        )}
         <VisitLayer kind={visitor} onWelcome={welcome} />
         <ParcelOffers
           offered={split(offered)}
@@ -264,6 +284,8 @@ export function Scene({
       decor,
       editing,
       setDecor,
+      replaying,
+      replay,
       offered,
       affordable,
       highlight,

@@ -204,7 +204,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | **M14 — Le potager de la cour** *(livré)* | P12 : les carrés de la cour, cultures à temps réel, Grainothèque et variétés, synergies avec l'Averse, l'Eau et les parcelles — voir game-design §9.7 | Une boucle neuve pour tous les joueurs, dès la 1ʳᵉ Saison, qui donne des rendez-vous sans punir l'absence |
 | **M15 — Le delta des Sources** *(livré)* | P13 : les Sources à dépenser, les bras du delta, le site des Coteaux, l'éclusier, 3 Cycles à défi et leurs espèces — voir game-design §7.5 | Donne ses choix à la deuxième couche, une fois que la première (M13) a montré le modèle |
 | **M16 — Un quartier à son image** *(livré)* | P14 : deux avenirs par parcelle, le décor à poser, le mode photo — voir game-design §6.5 | Après le fil des assets PixiJS, pour dessiner les variantes sur les nouveaux dessins |
-| **M17 — L'accueil et le retour** | P15 : première minute guidée, retour hors ligne en images, rappels facultatifs ; P16 : la musique du quartier | Du soin pour tous, peu risqué pour l'équilibrage ; peut glisser plus tôt si Antoine le préfère |
+| **M17 — L'accueil et le retour** *(livré)* | P15 : première minute guidée, retour hors ligne en images, rappels facultatifs ; P16 : la musique du quartier — voir game-design §6.3, §9.1, §10.6 | Du soin pour tous, peu risqué pour l'équilibrage ; peut glisser plus tôt si Antoine le préfère |
 | **M18 — La ville en fête** | P17 : quatre visites nouvelles liées à la Biorégion et aux quartiers voisins, leurs espèces et leurs Jalons | Fait revivre la fin de partie une fois tout le reste en place |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Comme en v1, chaque nouvelle mécanique se lie à l'existant (une

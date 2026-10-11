@@ -641,6 +641,18 @@ export const fr = {
   welcomeTitle: 'Pendant votre absence…',
   welcomeBack: (light: string, duration: string) =>
     `Pendant votre absence (${duration}), le quartier a récolté ${light} Lumière.`,
+  welcomeReport: {
+    label: 'Ce qui a poussé pendant votre absence',
+    crops: (count: number) => (count > 1 ? `${count} cultures prêtes` : '1 culture prête'),
+    seeds: (count: string) => `Graines mûres\u00a0: ${count}`,
+    seasons: (count: number) =>
+      count > 1 ? `${count} Saisons relancées par le semoir` : '1 Saison relancée par le semoir',
+  },
+  reminders: {
+    seeds: 'Les Graines d’Héliotrope sont mûres',
+    crops: 'Une culture du potager est prête',
+    body: 'Le quartier vous attend.',
+  },
   dismiss: 'Fermer',
   /** A duration in seconds, at most two units: "42 s", "12 min", "2 h 05", "3 j 4 h". */
   duration: (seconds: number) => {
@@ -996,6 +1008,13 @@ export const fr = {
     soundTitle: 'Son',
     volume: 'Volume',
     muted: 'Couper le son',
+    music: 'Musique',
+    musicHint:
+      'Une musique douce qui s’enrichit à mesure que la ville revit. Coupée d’office sur téléphone.',
+    reminders: 'Rappels',
+    remindersHint:
+      'Une notification quand les Graines sont mûres ou qu’une culture est prête, pendant que le jeu est ouvert en arrière-plan.',
+    remindersDenied: 'Le navigateur refuse les notifications pour ce site.',
     soundHint:
       'Des sons discrets accompagnent la récolte, les achats et la restauration du quartier.',
     reducedMotionHint:

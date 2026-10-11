@@ -1,4 +1,4 @@
-import { applyOfflineProgress } from './offline';
+import { applyOfflineProgress, offlineReport, type OfflineReport } from './offline';
 import { clearSave, importSave, loadGame, saveGame } from './save';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
@@ -22,6 +22,8 @@ export class GameStore {
   readonly offlineSeconds: number;
   /** Light produced during those offline seconds. */
   readonly offlineLight: number;
+  /** What grew during those offline seconds (§9.1, M17). */
+  readonly offlineReport: OfflineReport;
 
   constructor(
     private readonly storage: Storage = localStorage,
@@ -33,10 +35,12 @@ export class GameStore {
       this.state = result.state;
       this.offlineSeconds = result.elapsedSeconds;
       this.offlineLight = result.state.totalLight - loaded.totalLight;
+      this.offlineReport = offlineReport(loaded, result.state);
     } else {
       this.state = createInitialState(this.now());
       this.offlineSeconds = 0;
       this.offlineLight = 0;
+      this.offlineReport = { built: [], ripened: [], seedsRipened: false, seasons: 0 };
     }
   }
 

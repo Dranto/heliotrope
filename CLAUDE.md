@@ -81,6 +81,8 @@ a design decision changes, update that document in the same PR.
   the generators from `art.ts`; `sources.tsx` takes parcels, the Bioregion and the collectors from
   their SVG components, so their art is changed in those SVG files only.
   `sound.ts` synthesises the discreet sounds and `useSounds.ts` plays them from state changes.
+  `music.ts` and `useMusic.ts` the generative music, `useReminders.ts` the optional notifications,
+  `ReturnReplay.tsx` and `returnMap.ts` the return in images; `src/game/guide.ts` the guided start.
   Read state with `useGameState()`, change it with `store.dispatch((s) => action(s))`.
 
 ## Conventions

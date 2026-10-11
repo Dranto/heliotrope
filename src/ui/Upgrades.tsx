@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { guideStep } from '../game/guide';
 import { upgradesAllowed } from '../game/challenges';
 import { formatCost } from '../game/format';
 import { availableUpgrades } from '../game/production';
@@ -26,6 +27,7 @@ export function Upgrades() {
   const [open, toggle] = usePanelOpen('upgrades');
   const selected = available.find((u) => u.id === selectedId) ?? available[0];
   const wild = !upgradesAllowed(state);
+  const guide = guideStep(state);
   // Nothing to show before the first upgrade unlocks.
   if (selected === undefined && state.upgrades.length === 0 && !wild) return null;
 
@@ -56,6 +58,9 @@ export function Upgrades() {
                     title={label}
                     aria-pressed={upgrade.id === selected.id}
                     data-affordable={affordable}
+                    data-guide={
+                      (guide?.kind === 'upgrade' && guide.upgrade === upgrade.id) || undefined
+                    }
                     onClick={() => setSelectedId(upgrade.id)}
                   >
                     <UpgradeIcon upgrade={upgrade} />
