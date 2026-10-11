@@ -2,6 +2,7 @@ import type { AchievementId } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
 import type { ChallengeId } from './challenges';
 import type { CycleChallengeId } from './cycleChallenges';
+import { createDecorState, type DecorState } from './decor';
 import { createDeltaState, type DeltaState } from './delta';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
@@ -12,6 +13,7 @@ import { createGardenState, type GardenState } from './garden';
 import { emptyCurve, type SeasonCurve } from './history';
 import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
+import { createFuturesState, type FuturesState } from './restoration';
 import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { SpeciesId } from './species';
@@ -20,7 +22,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 17;
+export const STATE_VERSION = 18;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -80,6 +82,10 @@ export interface GameState {
   parcels: ParcelId[];
   /** Neighbouring districts restored, in order (§6.4). Kept across Seasons and Cycles. */
   districts: DistrictId[];
+  /** The future chosen for each restored parcel (§6.5). Kept forever. */
+  futures: FuturesState;
+  /** The decor set on the map and the colour of the heliotrope (§6.5). Kept forever. */
+  decor: DecorState;
   /** Neighbourhood projects carried out this Season, in order (§6.2). */
   projects: ProjectId[];
   /** Talents of the Tree of Seasons learnt, in order (§7.1). Kept across Seasons. */
@@ -169,6 +175,8 @@ export function createInitialState(now: number): GameState {
     achievements: [],
     parcels: [],
     districts: [],
+    futures: createFuturesState(),
+    decor: createDecorState(),
     projects: [],
     talents: [],
     canopy: createCanopyState(),

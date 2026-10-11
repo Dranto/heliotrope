@@ -7,19 +7,29 @@ import {
   type DistrictDef,
 } from '../game/districts';
 import { formatCost } from '../game/format';
-import { PARCEL_IDS, type ParcelDef, type ParcelId } from '../game/parcels';
+import { useState } from 'react';
+import {
+  PARCEL_IDS,
+  parcelBonuses,
+  type Future,
+  type ParcelDef,
+  type ParcelId,
+} from '../game/parcels';
 import type { ProjectDef } from '../game/projects';
 import {
   canCarryOutProject,
+  canChangeFuture,
   canRestoreParcel,
   carryOutProject,
+  changeFuture,
+  futureOf,
   offeredParcels,
   offeredProjects,
   restoreParcel,
 } from '../game/restoration';
 import { t } from '../i18n';
 import { Eta } from './Goals';
-import { bonusesText } from '../i18n/restoration';
+import { bonusesText, parcelName } from '../i18n/restoration';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
@@ -66,10 +76,47 @@ type Offer =
 /** Offers listed at once under the map. */
 const MAX_OFFERS = 4;
 
+/** The two futures of a parcel to choose from (§6.5): their names and effects. */
+interface FutureChoice {
+  id: ParcelId;
+  chosen: Future;
+  onChoose: (future: Future) => void;
+}
+
+function FuturePills({
+  id,
+  chosen,
+  onChoose,
+  disabled = false,
+}: FutureChoice & { disabled?: boolean }) {
+  return (
+    <span
+      className="future-pills"
+      role="radiogroup"
+      aria-label={t.restoration.futureLabel(parcelName(id, chosen))}
+    >
+      {([0, 1] as const).map((future) => (
+        <button
+          key={future}
+          type="button"
+          role="radio"
+          aria-checked={chosen === future}
+          disabled={disabled && chosen !== future}
+          title={bonusesText(parcelBonuses(id, future))}
+          onClick={() => onChoose(future)}
+        >
+          {parcelName(id, future)}
+        </button>
+      ))}
+    </span>
+  );
+}
+
 interface CardProps {
   kind: Offer['kind'];
   name: string;
   effect: string;
+  future?: FutureChoice;
   cost: number;
   affordable: boolean;
   onBuy: () => void;
@@ -77,7 +124,7 @@ interface CardProps {
   onBlur?: () => void;
 }
 
-function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: CardProps) {
+function Card({ kind, name, effect, future, cost, affordable, onBuy, onFocus, onBlur }: CardProps) {
   const price = formatCost(cost);
   const Icon = ICONS[kind];
   return (
@@ -93,6 +140,7 @@ function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: 
       </span>
       <span className="restoration-text">
         <span className="restoration-name">{name}</span>
+        {future && <FuturePills {...future} />}
         <span className="restoration-effect">{effect}</span>
       </span>
       <button
@@ -127,6 +175,8 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
   const store = useGameStore();
   const state = useGameState();
   const [open, toggle] = usePanelOpen('restoration');
+  // The future picked on each offered parcel's card before restoring it.
+  const [picks, setPicks] = useState<Partial<Record<ParcelId, Future>>>({});
   // The cheapest few, so the list stays short under the map; the next ones follow.
   const offers: Offer[] = [
     ...offeredParcels(state).map((def) => ({ kind: 'parcel', def }) as const),
@@ -194,12 +244,17 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
               <Card
                 key={offer.def.id}
                 kind="parcel"
-                name={t.restoration.parcelNames[offer.def.id]}
-                effect={bonusesText(offer.def.bonuses)}
+                name={parcelName(offer.def.id, picks[offer.def.id] ?? 0)}
+                effect={bonusesText(parcelBonuses(offer.def.id, picks[offer.def.id] ?? 0))}
+                future={{
+                  id: offer.def.id,
+                  chosen: picks[offer.def.id] ?? 0,
+                  onChoose: (future) => setPicks((p) => ({ ...p, [offer.def.id]: future })),
+                }}
                 cost={offer.def.cost}
                 affordable={canRestoreParcel(state, offer.def.id)}
                 onBuy={() => {
-                  store.dispatch((s) => restoreParcel(s, offer.def.id));
+                  store.dispatch((s) => restoreParcel(s, offer.def.id, picks[offer.def.id] ?? 0));
                   onHighlight(null);
                 }}
                 onFocus={() => onHighlight(offer.def.id)}
@@ -218,6 +273,31 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
             ),
           )}
         </ul>
+      )}
+      {state.parcels.length > 0 && (
+        <details className="futures">
+          <summary>{t.restoration.futuresTitle}</summary>
+          <p className="hint">{t.restoration.futuresHint}</p>
+          <ul>
+            {PARCEL_IDS.filter((id) => state.parcels.includes(id)).map((id) => {
+              const locked = !canChangeFuture(state, id);
+              return (
+                <li key={id} data-parcel={id}>
+                  <FuturePills
+                    id={id}
+                    chosen={futureOf(state, id)}
+                    disabled={locked}
+                    onChoose={(future) => store.dispatch((s) => changeFuture(s, id, future))}
+                  />
+                  <span className="restoration-effect">
+                    {bonusesText(parcelBonuses(id, futureOf(state, id)))}
+                    {locked && ` · ${t.restoration.futureLocked}`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
       )}
     </section>
   );

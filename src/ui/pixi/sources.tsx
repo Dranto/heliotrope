@@ -42,6 +42,8 @@ export interface Source {
 
 export interface SourceProps {
   parcels: readonly ParcelId[];
+  /** Parcels in their second future (§6.5): all of them are drawn in SVG. */
+  seconds?: readonly ParcelId[];
   sites: Record<SiteId, number>;
   collectors: Record<CollectorId, number>;
   bioregion: boolean;
@@ -52,15 +54,24 @@ export const LAND_GROUND_RES = 0.75;
 export const LAND_RES = 2;
 
 /** Every drawing taken from the SVG scene for this state, in drawing order within each layer. */
-export function mapSources({ parcels, sites, collectors, bioregion }: SourceProps): Source[] {
+export function mapSources({
+  parcels,
+  seconds = [],
+  sites,
+  collectors,
+  bioregion,
+}: SourceProps): Source[] {
   const sources: Source[] = [];
   for (const id of GROUND_ORDER) {
-    if (!parcels.includes(id) || PIXI_PARCELS.includes(id)) continue;
+    const second = seconds.includes(id);
+    // The renderer draws the living roofs itself in both futures, on the buildings' roofs.
+    if (!parcels.includes(id) || (PIXI_PARCELS.includes(id) && !second) || id === 'livingRoofs')
+      continue;
     sources.push({
-      key: `parcel:${id}`,
+      key: second ? `parcel:${id}:2` : `parcel:${id}`,
       group: 'parcels',
       scope: 'parcels',
-      node: <ParcelArt id={id} />,
+      node: <ParcelArt id={id} future={second ? 1 : 0} />,
       entrance: { at: PARCEL_PINS[id], size: 40, unveil: reach(id) },
     });
   }

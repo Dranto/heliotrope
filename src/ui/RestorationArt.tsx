@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { ParcelId } from '../game/parcels';
+import type { Future, ParcelId } from '../game/parcels';
 import type { ProjectId } from '../game/projects';
 import { Appear } from './Neighbourhood';
 import { STREETS, WORLD, type Box } from './neighbourhood';
@@ -292,6 +292,302 @@ function Squares() {
   );
 }
 
+/** A round tree seen from above, with its shadow, as on the other parcels. */
+function Tree({ x, y, r }: { x: number; y: number; r: number }) {
+  return (
+    <g>
+      <circle cx={x + r * 0.35} cy={y + r * 0.35} r={r} className="tree-shadow" />
+      <circle cx={x} cy={y} r={r} className="foliage" opacity="0.9" />
+      <circle cx={x - r * 0.3} cy={y - r * 0.3} r={r * 0.6} className="foliage-light" />
+    </g>
+  );
+}
+
+// The second futures of the parcels (§6.5, M16): another drawing on the same place.
+
+/** Rue des enfants: the avenue becomes a play street, hopscotch, sandpits and shade trees. */
+function PlayStreet() {
+  const [x, y, w, h] = PARCEL_PLACES.gardenStreet;
+  const cells = 6;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} className="paving" />
+      <path d={`M${x} ${y + 3} H${x + w} M${x} ${y + h - 3} H${x + w}`} className="paving-edge" />
+      {[0.12, 0.62].map((f) => (
+        <g key={f}>
+          {Array.from({ length: cells }, (_, i) => (
+            <rect
+              key={i}
+              x={x + w * f + i * 5.2}
+              y={y + 7 + (i % 3 === 1 ? -2.6 : 0)}
+              width="4.6"
+              height={i % 3 === 1 ? 4 : 8}
+              rx="0.6"
+              className={`play-paint paint-${i % 3}`}
+            />
+          ))}
+        </g>
+      ))}
+      {[0.44, 0.92].map((f) => (
+        <g key={f}>
+          <circle cx={x + w * f} cy={y + h / 2} r="6.5" className="sand-edge" />
+          <circle cx={x + w * f} cy={y + h / 2} r="5.4" className="sand" />
+        </g>
+      ))}
+      {[0.04, 0.34, 0.54, 0.82].map((f) => (
+        <Tree key={f} x={x + w * f + 4} y={y + h / 2} r={4.6} />
+      ))}
+    </g>
+  );
+}
+
+/** Bassin d'orage: a long pond holds the storms, crossed by stepping stones. */
+function StormPond() {
+  const [x, y, w, h] = PARCEL_PLACES.rainGardens;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} className="paving" />
+      <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} rx="7" className="meadow" />
+      <rect x={x + 9} y={y + 6} width={w - 18} height={h - 12} rx="5" className="pond" />
+      <rect x={x + 14} y={y + 8.5} width={w - 28} height={h - 17} rx="3" className="pond-light" />
+      {[0.3, 0.5, 0.7].map((f) =>
+        [-3.6, 0, 3.6].map((dy) => (
+          <ellipse
+            key={`${f}${dy}`}
+            cx={x + w * f + dy * 0.4}
+            cy={y + h / 2 + dy}
+            rx="1.8"
+            ry="1.3"
+            className="stepping-stone"
+          />
+        )),
+      )}
+      {Array.from({ length: 18 }, (_, i) => (
+        <path
+          key={i}
+          d={`M${x + 12 + i * ((w - 24) / 17)} ${y + (i % 2 ? h - 4.6 : 4.6)} v-2.4`}
+          className="reed"
+        />
+      ))}
+    </g>
+  );
+}
+
+/** Haie bocagère: a mixed hedge runs down the street, berries for the birds. */
+function Hedgerow() {
+  const [x, y, w, h] = PARCEL_PLACES.pollinatorStrip;
+  const shrubs = 28;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} className="meadow" />
+      <path d={`M${x + 3} ${y} V${y + h}`} className="mown-path" />
+      {Array.from({ length: shrubs }, (_, i) => {
+        const cy = y + 8 + i * ((h - 16) / (shrubs - 1));
+        const cx = x + w / 2 + 2 + (noise(i, 4) - 0.5) * 4;
+        const r = 4.4 + noise(i, 5) * 2;
+        return (
+          <g key={i}>
+            <circle cx={cx + 1.4} cy={cy + 1.4} r={r} className="tree-shadow" />
+            <circle cx={cx} cy={cy} r={r} className="hedge" />
+            <circle cx={cx - 1.2} cy={cy - 1.2} r={r * 0.5} className="foliage-light" />
+            {i % 3 === 0 && <circle cx={cx + 1.6} cy={cy + 0.8} r="0.8" className="berry" />}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** Rivière baignade: the river widens into pools with wooden decks. */
+function BathingRiver() {
+  const [x, y, w, h] = PARCEL_PLACES.river;
+  const [north, south] = STREETS.horizontal;
+  const pools: [number, number][] = [
+    [y + 6, north - 6],
+    [north + STREETS.width + 6, south - 6],
+    [south + STREETS.width + 6, y + h - 6],
+  ];
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} className="bank" />
+      {pools.map(([top, bottom]) => (
+        <g key={top}>
+          <rect x={x + 2} y={top} width={w - 4} height={bottom - top} rx="6" className="pool" />
+          <rect
+            x={x + 5}
+            y={top + 4}
+            width={w - 10}
+            height={bottom - top - 8}
+            rx="4"
+            className="pond-light"
+          />
+          <rect
+            x={x + 1}
+            y={(top + bottom) / 2 - 5}
+            width="5"
+            height="10"
+            rx="0.6"
+            className="deck"
+          />
+          <rect
+            x={x + w - 6}
+            y={top + (bottom - top) * 0.7 - 4}
+            width="5"
+            height="8"
+            rx="0.6"
+            className="deck"
+          />
+        </g>
+      ))}
+      {STREETS.horizontal.map((sy) => (
+        <g key={sy} className="footbridge">
+          <rect x={x - 1} y={sy + 6} width={w + 2} height={STREETS.width - 12} rx="1" />
+          <path d={`M${x} ${sy + 6.6} H${x + w} M${x} ${sy + STREETS.width - 6.6} H${x + w}`} />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** Marché couvert: the car park gets a long market hall, its awnings out on the square. */
+function Market() {
+  const [x, y, w, h] = PARCEL_PLACES.park;
+  const awnings = 5;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx="4" className="paving" />
+      <rect x={x + 14} y={y + 22} width={w - 28} height={h - 44} rx="3" className="market-shadow" />
+      <rect x={x + 12} y={y + 20} width={w - 28} height={h - 44} rx="3" className="market-roof" />
+      <path d={`M${x + 12} ${y + h / 2} H${x + w - 16}`} className="market-ridge" />
+      {Array.from({ length: 7 }, (_, i) => (
+        <path
+          key={i}
+          d={`M${x + 18 + i * ((w - 40) / 6)} ${y + 22} V${y + h - 26}`}
+          className="market-rib"
+        />
+      ))}
+      {Array.from({ length: awnings }, (_, i) => (
+        <g key={i}>
+          <rect
+            x={x + 12 + i * ((w - 28) / awnings) + 1}
+            y={y + 8}
+            width={(w - 28) / awnings - 2}
+            height="8"
+            rx="1"
+            className={`awning paint-${i % 3}`}
+          />
+          <rect
+            x={x + 12 + i * ((w - 28) / awnings) + 1}
+            y={y + h - 16}
+            width={(w - 28) / awnings - 2}
+            height="8"
+            rx="1"
+            className={`awning paint-${(i + 1) % 3}`}
+          />
+        </g>
+      ))}
+      <Tree x={x + 6} y={y + 8} r={5} />
+      <Tree x={x + w - 7} y={y + h - 9} r={5.5} />
+    </g>
+  );
+}
+
+/** Serres de l'entrepôt: the warehouse roof turns into rows of glasshouses. */
+function Glasshouses() {
+  const [x, y, w, h] = PARCEL_PLACES.orchard;
+  const bays = 8;
+  const bw = (w - 8) / bays;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx="2" className="paving" />
+      {Array.from({ length: bays }, (_, i) => (
+        <g key={i}>
+          <rect
+            x={x + 4 + i * bw + 0.8}
+            y={y + 3}
+            width={bw - 1.6}
+            height={h - 6}
+            rx="1.2"
+            className="glass"
+          />
+          <path d={`M${x + 4 + i * bw + bw / 2} ${y + 3} V${y + h - 3}`} className="glass-ridge" />
+          {[0.3, 0.55, 0.8].map((f) => (
+            <circle
+              key={f}
+              cx={x + 4 + i * bw + bw / 2 + (f === 0.55 ? 2.4 : -2.4)}
+              cy={y + h * f}
+              r="1.6"
+              className="foliage"
+            />
+          ))}
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** Toits potagers: rows of vegetables on every grey roof. */
+function KitchenRoofs() {
+  return (
+    <g>
+      {LIVING_ROOFS.map(([x, y, w, h], i) => {
+        const horizontal = w >= h;
+        const rows = Math.max(2, Math.floor((horizontal ? h : w) / 6));
+        return (
+          <g key={i}>
+            <rect x={x + 2} y={y + 2} width={w - 4} height={h - 4} rx="2" className="roof-soil" />
+            {Array.from({ length: rows }, (_, r) => {
+              const f = (r + 0.5) / rows;
+              return horizontal ? (
+                <path
+                  key={r}
+                  d={`M${x + 4} ${y + 2 + (h - 4) * f} H${x + w - 4}`}
+                  className={`roof-crop crop-${(r + i) % 3}`}
+                />
+              ) : (
+                <path
+                  key={r}
+                  d={`M${x + 2 + (w - 4) * f} ${y + 4} V${y + h - 4}`}
+                  className={`roof-crop crop-${(r + i) % 3}`}
+                />
+              );
+            })}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** Places des fontaines: each crossroads around home gets a round fountain. */
+function FountainSquares() {
+  return (
+    <g>
+      {CROSSROADS.map(([x, y]) => (
+        <g key={`${x},${y}`}>
+          <circle cx={x} cy={y} r="13" className="paving" />
+          <circle cx={x} cy={y} r="13" className="square-ring" />
+          <circle cx={x} cy={y} r="8.4" className="fountain-rim" />
+          <circle cx={x} cy={y} r="7" className="pond" />
+          <circle cx={x} cy={y} r="3.6" className="fountain-ripple" />
+          <circle cx={x} cy={y} r="1.4" className="fountain-jet" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+const SECOND_ART: Record<ParcelId, () => ReactNode> = {
+  livingRoofs: KitchenRoofs,
+  gardenStreet: PlayStreet,
+  rainGardens: StormPond,
+  pollinatorStrip: Hedgerow,
+  river: BathingRiver,
+  squares: FountainSquares,
+  park: Market,
+  orchard: Glasshouses,
+};
+
 const PARCEL_ART: Record<ParcelId, () => ReactNode> = {
   livingRoofs: LivingRoofs,
   gardenStreet: GardenStreet,
@@ -314,17 +610,21 @@ export function ParcelPatterns() {
 }
 
 /** One restored parcel, without its entrance: the enriched map turns it into a texture. */
-export function ParcelArt({ id }: { id: ParcelId }) {
-  const Art = PARCEL_ART[id];
+export function ParcelArt({ id, future = 0 }: { id: ParcelId; future?: Future }) {
+  const Art = future === 1 ? SECOND_ART[id] : PARCEL_ART[id];
   return <Art />;
 }
 
-/** Restored parcels, drawn over the grey city and under the generators. */
+/** Restored parcels, drawn over the grey city and under the generators, in their futures. */
 export const ParcelGround = memo(function ParcelGround({
   parcels,
+  seconds = '',
 }: {
   parcels: readonly ParcelId[];
+  /** The parcels in their second future (§6.5), joined with commas. */
+  seconds?: string;
 }) {
+  const second = new Set(seconds.split(','));
   const live = useRef(false);
   useEffect(() => {
     live.current = true;
@@ -336,9 +636,11 @@ export const ParcelGround = memo(function ParcelGround({
           <ParcelPatterns />
         </defs>
         {GROUND_ORDER.filter((id) => parcels.includes(id)).map((id) => {
-          const Art = PARCEL_ART[id];
+          const future: Future = second.has(id) ? 1 : 0;
+          const Art = future === 1 ? SECOND_ART[id] : PARCEL_ART[id];
           return (
-            <Unveil key={id} id={id}>
+            // A new future plays the unveiling again.
+            <Unveil key={`${id}:${future}`} id={id}>
               <Art />
             </Unveil>
           );

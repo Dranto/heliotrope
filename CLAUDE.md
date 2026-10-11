@@ -45,6 +45,7 @@ a design decision changes, update that document in the same PR.
   - `parcels.ts`, `projects.ts`: parcels to restore (kept across Seasons) and neighbourhood
     projects (per Season), data tables (§6.1, §6.2); `bonuses.ts` reads their shared effect
     shape for the formulas; `restoration.ts` holds when they are offered and the buy actions
+    and the two futures of each parcel (§6.5); `decor.ts`: the decor pieces and flower colours
   - `delta.ts`, `cycleChallenges.ts`: the delta of the Sources (§7.5), arms bought with Sources
     and kept forever, and the challenge Cycles of water
   - `species.ts`: the Herbier (§9.5), species that return on game conditions and add biodiversity;
@@ -69,6 +70,8 @@ a design decision changes, update that document in the same PR.
   rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
   the restored parcels and project marks, `Restoration.tsx` is their panel in the side menu.
   `Scene.tsx` frames the map with the view switch (`fitCamera`) and stands the clickable `Flower.tsx` in the courtyard (`flowerFrame`);
+  `DecorArt.tsx` and `decorMap.ts` draw the decor, `MapTools.tsx` holds the decor and photo toolbars,
+  `photo.ts` composes the photo PNG.
   `PanelTitle.tsx` and `layoutPrefs.ts` fold the panels and remember layout choices per browser.
   `Herbier.tsx` is the Herbier screen, `speciesDrawings.tsx` the species drawings, `SpeciesLife.tsx`
   and `speciesMap.ts` the species on the map.

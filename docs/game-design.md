@@ -305,6 +305,40 @@ Autour de la ville, la périphérie grise (§6) s'ouvre quand le quartier est **
 - **Jalons (3).** Par-delà la rocade (1 quartier voisin), La ville déborde (4), Ville jardin (8). 116 jalons en tout.
 - **Sauvegarde.** Version 14 : la liste des quartiers restaurés, vide pour une sauvegarde plus ancienne.
 
+### 6.5 Un quartier à son image (M16)
+
+Le quartier restauré ressemble au joueur : chaque parcelle a **deux avenirs**, des pièces de **décor** se posent sur la carte, et un **mode photo** garde une image du quartier. Rien ici n'ajoute de vitesse : les deux avenirs d'une parcelle se valent, ils orientent le jeu autrement. Données dans `src/game/parcels.ts` (champ `second`), `src/game/restoration.ts` et `src/game/decor.ts` ; dessins dans `src/ui/RestorationArt.tsx`, `src/ui/DecorArt.tsx`, `src/ui/decorMap.ts`, barres d'outils dans `src/ui/MapTools.tsx`, image dans `src/ui/photo.ts`.
+
+**Les deux avenirs.** Avant de restaurer une parcelle, le panneau « Le quartier » propose ses deux avenirs (pastilles) : le premier est celui du §6.1, le second a un autre dessin et un autre effet. Une parcelle restaurée peut **changer d'avenir une fois par Cycle de l'eau** (décision D7), gratuitement, dans la liste repliable « Les avenirs des parcelles » du même panneau. Le changement reste d'une Saison à l'autre.
+
+| Parcelle (1ᵉʳ avenir) | Second avenir | Dessin | Effet du second avenir |
+|---|---|---|---|
+| Rue jardin | Rue des enfants | Marelle, bacs à sable, arbres d'alignement | Héliotropes en pot ×2, Panneaux de balcon ×2 (au lieu du clic ×2) |
+| Jardins de pluie | Bassin d'orage | Un grand bassin en gradins, roseaux | Héliotropes en pot ×1,5, Panneaux de balcon ×2, Eau ×1,25 ; l'Averse dure ×2 |
+| Corridor des pollinisateurs | Haie bocagère | Une haie continue d'arbustes | Les visites reviennent 30 % plus vite, le Papillon 10 % |
+| Rivière retrouvée | Rivière baignade | Un ponton et des baigneurs | Eau ×1,75, +1 h de plafond hors ligne |
+| Parc du parking | Marché couvert | Une halle aux toits rayés et ses étals | +1,25 % de production par parcelle restaurée (+10 % avec les huit) |
+| Verger de l'entrepôt | Serres de l'entrepôt | Des serres vitrées | Fermes verticales ×1,5, Centrales à miroirs ×1,5 |
+| Toits vivants | Toits potagers | Des rangs de cultures sur les toits | Biodiversité ×1,5, Potagers sur le toit ×2 |
+| Places plantées | Places des fontaines | Une fontaine au centre de chaque place | +1,5 % par Saison achevée (au lieu de +1 % de plus par Jalon) |
+
+**Le décor.** Des pièces purement décoratives se gagnent avec les Jalons et l'Herbier, pour toujours. Le bouton « Décorer » de la carte s'ouvre avec la première pièce : huit emplacements cerclés apparaissent dans la cour et les rues ; un clic sur un emplacement fait défiler les pièces gagnées puis le vide. La barre d'outils montre les pièces gagnées, celles à gagner et leur condition, et la couleur des fleurs de l'héliotrope.
+
+| Pièce | Condition | Couleur de l'héliotrope | Condition |
+|---|---|---|---|
+| Banc | 10 Jalons | Lilas | dès le début |
+| Jardinière | 3 espèces | Or | 20 Jalons |
+| Guirlande de lampions | 30 Jalons | Rose | 6 espèces |
+| Nichoir | 8 espèces | Bleu | 12 espèces |
+| Fresque au sol | 50 Jalons | Blanc | 60 Jalons |
+| Fontaine | 75 Jalons | | |
+| Hôtel à insectes | 15 espèces | | |
+
+**Le mode photo.** Le bouton « Photo » de la carte la met en plein écran sans menus, avec une barre pour choisir le moment du jour (jour, soir, nuit) et la saison visuelle (§6), puis « Enregistrer l'image » : la carte (les deux rendus, §10.4) et ses dessins sont composés en une image PNG deux fois plus fine que l'écran, téléchargée sur l'appareil. Rien n'est envoyé ailleurs.
+
+- **Sur la carte (PixiJS).** Les seconds avenirs ont leur dessin dans les deux rendus ; les toits potagers sont dessinés par le rendu PixiJS sur ses propres bâtiments (`art.ts`), comme les toits vivants.
+- **Sauvegarde.** Version 18 : les avenirs choisis (le premier par défaut), le Cycle du dernier changement, les huit emplacements de décor et la couleur des fleurs (lilas).
+
 ---
 
 ## 7. Prestige : les Saisons

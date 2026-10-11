@@ -79,14 +79,22 @@ import {
   type Palette,
   type Sun,
 } from './model';
+import { mapPicture } from '../mapPicture';
 import { Snapshots } from './snapshot';
 import { mapSources, type SourceGroup } from './sources';
+
+/** A restored parcel this renderer draws itself: in its first future, one of PIXI_PARCELS. */
+function drawsItself(props: MapProps, id: ParcelId): boolean {
+  return props.parcels.includes(id) && !props.seconds?.includes(id);
+}
 
 /** Everything the map shows, as the SVG scene receives it. */
 export interface MapProps {
   generators: Record<GeneratorId, number>;
   upgrades: readonly UpgradeId[];
   parcels: readonly ParcelId[];
+  /** Parcels in their second future (§6.5): taken from the SVG scene, like the others. */
+  seconds?: readonly ParcelId[];
   phase: Phase;
   season: VisualSeason | null;
   greenness: number;
@@ -479,6 +487,8 @@ export class MapRenderer {
       return false;
     }
     this.ready = true;
+    // The photo mode reads the canvas right after drawing it (§6.5).
+    mapPicture.renderNow = () => this.app.render();
     this.app.stage.eventMode = 'none';
     host.appendChild(this.app.canvas);
     this.build();
@@ -638,6 +648,7 @@ export class MapRenderer {
       props.generators,
       props.upgrades,
       props.parcels,
+      props.seconds,
       props.phase,
       props.season,
       props.greenness,
@@ -664,7 +675,7 @@ export class MapRenderer {
 
   /** Lists every element the map shows for `props`, with its drawing and its shadow. */
   private itemsFor(props: MapProps, ctx: ArtContext): Item[] {
-    const { generators, upgrades, parcels } = props;
+    const { generators, upgrades } = props;
     const level = (id: GeneratorId) => upgradeLevel(upgrades, id);
     const gardens = visibleElements(generators.rooftopGarden, GARDEN_ROOFS.length);
     const greenhouses = visibleElements(generators.greenhouse, GREENHOUSE_SITES.length);
@@ -674,7 +685,8 @@ export class MapRenderer {
     const mirrors = visibleElements(generators.mirrorPlant, MIRRORS.length, 2);
     const trees = visibleElements(generators.urbanCanopy, TREES.length, 4);
     const rings = ARCOLOGY_RINGS.filter((owned) => generators.arcology >= owned).length;
-    const sedum = parcels.includes('livingRoofs');
+    const sedum = drawsItself(props, 'livingRoofs');
+    const kitchen = props.parcels.includes('livingRoofs') && !sedum;
     const items: Item[] = [];
     const gardenRoofs = GARDEN_ROOFS.slice(0, gardens);
 
@@ -683,7 +695,7 @@ export class MapRenderer {
       items.push({
         key: `b:${box.join()}`,
         group: 'buildings',
-        art: () => buildingArt(ctx, box, storeys, { bare, sedum }),
+        art: () => buildingArt(ctx, box, storeys, { bare, sedum, kitchen }),
         shadow: { kind: 'box', box, height: storeys },
       });
     }
@@ -784,7 +796,7 @@ export class MapRenderer {
         ring: tree.r + 3,
       });
     }
-    if (parcels.includes('river')) {
+    if (drawsItself(props, 'river')) {
       items.push({ key: 'river', group: 'river', art: () => riverBanksArt(ctx) });
       for (const sy of STREETS.horizontal) {
         items.push({
@@ -1000,7 +1012,7 @@ export class MapRenderer {
     this.sparkles = [];
     // Each pool is drawn at a width: its muddy bed, then its water a little narrower.
     const pools: { draw: (g: Graphics, grow: number) => void; points: [number, number][] }[] = [];
-    if (props.parcels.includes('river')) {
+    if (drawsItself(props, 'river')) {
       pools.push({
         draw: (g, grow) => {
           g.svg(
@@ -1514,6 +1526,7 @@ export class MapRenderer {
     cancelAnimationFrame(this.pending);
     if (!this.ready) return;
     this.ready = false;
+    mapPicture.renderNow = null;
     this.app.destroy(true, { children: true, texture: true, textureSource: true });
     for (const entry of this.textures.values()) {
       entry.promise.then((texture) => texture.destroy(true)).catch(() => undefined);

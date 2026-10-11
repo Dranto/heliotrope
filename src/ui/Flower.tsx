@@ -29,6 +29,7 @@ import {
 } from './flower';
 import { clickLevel } from './neighbourhood';
 import { useGameState, useGameStore } from './useGame';
+import { COROLLAS } from './decorMap';
 
 interface Floater {
   id: number;
@@ -357,11 +358,7 @@ export function Flower() {
               <stop offset="60%" className="halo-b" />
               <stop offset="100%" className="halo-c" />
             </radialGradient>
-            {[
-              ['#E6DAF5', '#B79AD6', '#8E6CBB'],
-              ['#D9C6F0', '#A486CB', '#7A58A8'],
-              ['#F0E6FA', '#C6ADE2', '#9B7CC6'],
-            ].map(([a, b, c], i) => (
+            {COROLLAS[state.decor.flower].map(([a, b, c], i) => (
               <radialGradient key={i} id={`corolla-${i}`} cx="50%" cy="50%" r="55%">
                 <stop offset="0%" stopColor={a} />
                 <stop offset="55%" stopColor={b} />

@@ -8,7 +8,7 @@ import { CHALLENGES, type ChallengeId } from './challenges';
 import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
 import { hillsidesBonuses } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
-import { PARCELS, type ParcelId } from './parcels';
+import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
 import { canopyBonuses, TALENTS, type CanopyState, type TalentId } from './talents';
@@ -66,6 +66,8 @@ type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
  */
 export interface BonusSource {
   parcels: readonly ParcelId[];
+  /** The second futures chosen for parcels (§6.5); absent where none can be. */
+  futures?: { chosen: Readonly<Partial<Record<ParcelId, Future>>> };
   /** Neighbouring districts restored (§6.4); absent where none can be. */
   districts?: readonly DistrictId[];
   projects: readonly ProjectId[];
@@ -91,6 +93,7 @@ export interface BonusSource {
  */
 export function activeBonuses({
   parcels,
+  futures,
   districts = [],
   projects,
   talents,
@@ -101,7 +104,7 @@ export function activeBonuses({
   sites,
 }: BonusSource): Bonus[] {
   return [
-    ...parcels.flatMap((id) => PARCELS[id].bonuses),
+    ...parcels.flatMap((id) => parcelBonuses(id, futures?.chosen[id])),
     ...districts.flatMap((id) => DISTRICTS[id].bonuses),
     ...projects.flatMap((id) => PROJECTS[id].bonuses),
     ...talents.flatMap((id) => TALENTS[id].bonuses),

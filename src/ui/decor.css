@@ -1,0 +1,309 @@
+/* The decor of the neighbourhood (docs/game-design.md §6.5, M16). */
+
+.decor .wood {
+  fill: #c39a6b;
+  stroke: #8d6a45;
+  stroke-width: 0.35;
+}
+
+.decor .iron,
+.decor-icon .iron {
+  stroke: #4a4f4c;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.decor .terracotta,
+.decor-icon .terracotta {
+  fill: var(--terracotta);
+}
+
+.decor .bloom-0,
+.decor-icon .bloom-0,
+.decor .lantern-0,
+.decor-icon .lantern-0,
+.decor .paint-0,
+.decor-icon .paint-0 {
+  fill: #e8a3b8;
+}
+
+.decor .bloom-1,
+.decor-icon .bloom-1,
+.decor .lantern-1,
+.decor-icon .lantern-1,
+.decor .paint-1,
+.decor-icon .paint-1 {
+  fill: #f4c063;
+}
+
+.decor .bloom-2,
+.decor-icon .bloom-2,
+.decor .lantern-2,
+.decor-icon .lantern-2,
+.decor .paint-2,
+.decor-icon .paint-2 {
+  fill: #b79ad6;
+}
+
+.decor .string,
+.decor-icon .string {
+  fill: none;
+  stroke: #6d6860;
+  stroke-width: 0.4;
+}
+
+.decor .post,
+.decor-icon .post {
+  fill: #4a4f4c;
+}
+
+.decor .lantern {
+  filter: drop-shadow(0 0 1px rgb(255 214 140 / 0.9));
+}
+
+.decor .shadow,
+.decor-icon .shadow {
+  fill: rgb(47 52 56 / 0.18);
+}
+
+.decor .roof-line,
+.decor-icon .roof-line {
+  stroke: #8d6a45;
+  stroke-width: 0.4;
+}
+
+.decor .hole,
+.decor-icon .hole {
+  fill: #3b3328;
+}
+
+.decor .bird,
+.decor-icon .bird {
+  fill: #6d5a4a;
+}
+
+.decor .ground,
+.decor-icon .ground {
+  fill: #f3ead6;
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.5;
+}
+
+.decor .petal-paint,
+.decor-icon .petal-paint {
+  opacity: 0.85;
+}
+
+.decor .heart-paint,
+.decor-icon .heart-paint {
+  fill: #8ec7d0;
+}
+
+.decor .stone,
+.decor-icon .stone {
+  fill: #e9e2d2;
+  stroke: #c9bfa8;
+  stroke-width: 0.4;
+}
+
+.decor .water,
+.decor-icon .water {
+  fill: #8ec7d0;
+}
+
+.decor .ripple,
+.decor-icon .ripple {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 0.4;
+}
+
+.decor .jet,
+.decor-icon .jet {
+  fill: #fff;
+}
+
+.decor .cell,
+.decor-icon .cell {
+  fill: #6d5a4a;
+}
+
+.decor-icon .wood {
+  fill: #c39a6b;
+  stroke: #8d6a45;
+  stroke-width: 0.35;
+}
+
+.decor-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* While decorating, each spot breathes a dashed golden ring. */
+.decor-slot {
+  cursor: pointer;
+}
+
+.decor-slot .slot-ring {
+  fill: rgb(255 248 228 / 0.35);
+  stroke: var(--gold);
+  stroke-width: 0.8;
+  stroke-dasharray: 2 1.6;
+}
+
+.decor-slot:hover .slot-ring,
+.decor-slot:focus-visible .slot-ring {
+  fill: rgb(255 238 190 / 0.6);
+  stroke-width: 1.2;
+}
+
+.decor-slot:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .decor-slot .slot-ring {
+    animation: slot-breathe 2.4s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes slot-breathe {
+  to {
+    stroke-dashoffset: -7;
+  }
+}
+
+/* The toolbars of decorating and of the photo mode, over the bottom of the map. */
+.map-toolbar {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 6;
+  display: grid;
+  gap: 0.5rem;
+  width: min(36rem, calc(100% - 2rem));
+  padding: 0.8rem 1rem;
+  transform: translateX(-50%);
+  border: 1px solid rgb(255 255 255 / 0.8);
+  border-radius: 1.2rem;
+  background: rgb(251 246 236 / 0.92);
+  box-shadow: 0 10px 30px rgb(31 42 36 / 0.16);
+  backdrop-filter: blur(6px);
+}
+
+.map-toolbar h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+}
+
+.map-toolbar .hint {
+  margin: 0;
+}
+
+.toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.toolbar-row > span:first-child {
+  min-width: 5rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.toolbar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgb(31 42 36 / 0.12);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.55);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.toolbar-pill[aria-checked='true'] {
+  border-color: var(--gold);
+  background: rgb(255 244 214 / 0.95);
+  font-weight: 600;
+}
+
+.toolbar-pill:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.colour-dot {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 1px solid rgb(31 42 36 / 0.2);
+}
+
+.decor-pieces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.decor-pieces li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem 0.15rem 0.2rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.5);
+  font-size: 0.8rem;
+}
+
+.decor-pieces li[data-won='false'] {
+  opacity: 0.55;
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* The photo mode: the map fills the window, everything else steps aside. */
+.scene[data-photo='true'] {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  margin: 0;
+  border-radius: 0;
+}
+
+.scene[data-photo='true'] .scene-caption,
+.scene[data-photo='true'] .butterfly {
+  display: none;
+}
+
+/* The caption buttons that open decorating and the photo mode. */
+.scene-tool {
+  padding: 0.25rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 0.8);
+  border-radius: 999px;
+  background: rgb(251 246 236 / 0.85);
+  backdrop-filter: blur(6px);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.scene-tool:hover,
+.scene-tool:focus-visible {
+  background: rgb(255 244 214 / 0.95);
+}

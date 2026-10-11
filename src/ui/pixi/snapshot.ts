@@ -16,15 +16,24 @@ const PAINT = [
   'stroke-linecap',
   'stroke-linejoin',
   'opacity',
+  'stop-color',
+  'stop-opacity',
 ] as const;
+
+/** Also kept for a photo of the whole map (§6.5): where CSS places and turns each element. */
+const PLACEMENT = ['transform', 'transform-origin', 'transform-box', 'visibility'] as const;
 
 /** `url("http://…/#id")` as computed by some browsers, back to the `url(#id)` a picture resolves. */
 export function localUrl(value: string): string {
   return value.replace(/url\((["']?)[^#)"']*(#[^)"']+)\1\)/g, 'url($2)');
 }
 
-/** The element and its children as SVG markup, styles inlined, titles and hidden parts left out. */
-export function inlineStyles(element: Element): string {
+/**
+ * The element and its children as SVG markup, styles inlined, titles and hidden parts left out.
+ * With `placement`, CSS transforms are kept too, for a picture of the scene as it stands.
+ */
+export function inlineStyles(element: Element, placement = false): string {
+  const properties: readonly string[] = placement ? [...PAINT, ...PLACEMENT] : PAINT;
   const clone = element.cloneNode(true) as Element;
   const originals = [element, ...element.querySelectorAll('*')];
   const copies = [clone, ...clone.querySelectorAll('*')];
@@ -39,7 +48,7 @@ export function inlineStyles(element: Element): string {
     copy.removeAttribute('data-source');
     copy.setAttribute(
       'style',
-      PAINT.map((name) => `${name}:${localUrl(style.getPropertyValue(name))}`).join(';'),
+      properties.map((name) => `${name}:${localUrl(style.getPropertyValue(name))}`).join(';'),
     );
   });
   return new XMLSerializer().serializeToString(clone);
