@@ -29,7 +29,7 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 describe('Milestone data (§9.3)', () => {
   it('has about 100 Milestones with unique ids', () => {
     expect(ACHIEVEMENT_LIST.length).toBeGreaterThanOrEqual(95);
-    expect(ACHIEVEMENT_LIST.length).toBeLessThanOrEqual(110);
+    expect(ACHIEVEMENT_LIST.length).toBeLessThanOrEqual(120);
     expect(new Set(ACHIEVEMENT_LIST.map((a) => a.id)).size).toBe(ACHIEVEMENT_LIST.length);
   });
 

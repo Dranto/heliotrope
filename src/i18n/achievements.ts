@@ -36,6 +36,10 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.clicks(round(condition.count));
     case 'butterflies':
       return describe.butterflies(condition.count);
+    case 'visits':
+      return describe.visits[condition.visit](condition.count);
+    case 'everyVisit':
+      return describe.everyVisit;
     case 'seasons':
       return describe.seasons(condition.count);
     case 'everyGenerator':
@@ -49,6 +53,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
         : describe.goldenHands(UPGRADE_SETS.clicks.length);
     case 'parcels':
       return describe.parcels(condition.count);
+    case 'districts':
+      return describe.districts(condition.count);
     case 'projects':
       return describe.projects(condition.count);
     case 'talents':

@@ -1,3 +1,11 @@
+import {
+  areDistrictsOpen,
+  canRestoreDistrict,
+  DISTRICT_IDS,
+  offeredDistrict,
+  restoreDistrict,
+  type DistrictDef,
+} from '../game/districts';
 import { formatCost } from '../game/format';
 import { PARCEL_IDS, type ParcelDef, type ParcelId } from '../game/parcels';
 import type { ProjectDef } from '../game/projects';
@@ -36,13 +44,30 @@ function ProjectIcon() {
   );
 }
 
-type Offer = { kind: 'parcel'; def: ParcelDef } | { kind: 'project'; def: ProjectDef };
+/** A neighbouring district (§6.4): blocks around a small tree. */
+function DistrictIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <circle cx="17.5" cy="17.5" r="3.5" />
+    </svg>
+  );
+}
+
+const ICONS = { parcel: ParcelIcon, project: ProjectIcon, district: DistrictIcon };
+
+type Offer =
+  | { kind: 'parcel'; def: ParcelDef }
+  | { kind: 'project'; def: ProjectDef }
+  | { kind: 'district'; def: DistrictDef };
 
 /** Offers listed at once under the map. */
 const MAX_OFFERS = 4;
 
 interface CardProps {
-  kind: 'parcel' | 'project';
+  kind: Offer['kind'];
   name: string;
   effect: string;
   cost: number;
@@ -54,6 +79,7 @@ interface CardProps {
 
 function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: CardProps) {
   const price = formatCost(cost);
+  const Icon = ICONS[kind];
   return (
     <li
       className="restoration-card"
@@ -63,7 +89,7 @@ function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: 
       onMouseLeave={onBlur}
     >
       <span className="restoration-icon">
-        {kind === 'parcel' ? <ParcelIcon /> : <ProjectIcon />}
+        <Icon />
       </span>
       <span className="restoration-text">
         <span className="restoration-name">{name}</span>
@@ -74,16 +100,16 @@ function Card({ kind, name, effect, cost, affordable, onBuy, onFocus, onBlur }: 
         className="buy"
         disabled={!affordable}
         aria-label={
-          kind === 'parcel'
-            ? t.restoration.restoreLabel(name, price)
-            : t.restoration.carryOutLabel(name, price)
+          kind === 'project'
+            ? t.restoration.carryOutLabel(name, price)
+            : t.restoration.restoreLabel(name, price)
         }
         onClick={onBuy}
         onFocus={onFocus}
         onBlur={onBlur}
       >
         <span className="buy-verb">
-          {kind === 'parcel' ? t.restoration.restore : t.restoration.carryOut}
+          {kind === 'project' ? t.restoration.carryOut : t.restoration.restore}
         </span>
         <span className="buy-cost">☀ {price}</span>
         <Eta cost={cost} />
@@ -105,6 +131,7 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
   const offers: Offer[] = [
     ...offeredParcels(state).map((def) => ({ kind: 'parcel', def }) as const),
     ...offeredProjects(state).map((def) => ({ kind: 'project', def }) as const),
+    ...[offeredDistrict(state)].flatMap((def) => (def ? [{ kind: 'district', def } as const] : [])),
   ]
     .sort((a, b) => a.def.cost - b.def.cost)
     .slice(0, MAX_OFFERS);
@@ -116,27 +143,54 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
         <PanelTitle id="restoration-title" open={open} onToggle={toggle}>
           {t.restoration.title}
         </PanelTitle>
-        <ol className="restored-dots" aria-label={t.restoration.parcels}>
-          {PARCEL_IDS.map((id) => {
-            const done = state.parcels.includes(id);
-            return (
-              <li
-                key={id}
-                data-done={done}
-                title={done ? t.restoration.parcelNames[id] : undefined}
-              >
-                <span className="visually-hidden">
-                  {done ? t.restoration.restored(t.restoration.parcelNames[id]) : '…'}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
+        {/* Once the neighbourhood is whole, the dots count the neighbouring districts (§6.4). */}
+        {areDistrictsOpen(state) ? (
+          <ol className="restored-dots" data-kind="district" aria-label={t.restoration.districts}>
+            {DISTRICT_IDS.map((id) => {
+              const done = state.districts.includes(id);
+              const name = t.restoration.districtNames[id];
+              return (
+                <li key={id} data-done={done} title={done ? name : undefined}>
+                  <span className="visually-hidden">
+                    {done ? t.restoration.districtRestored(name) : '…'}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <ol className="restored-dots" aria-label={t.restoration.parcels}>
+            {PARCEL_IDS.map((id) => {
+              const done = state.parcels.includes(id);
+              return (
+                <li
+                  key={id}
+                  data-done={done}
+                  title={done ? t.restoration.parcelNames[id] : undefined}
+                >
+                  <span className="visually-hidden">
+                    {done ? t.restoration.restored(t.restoration.parcelNames[id]) : '…'}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </header>
       {offers.length > 0 && (
         <ul className="restoration-list">
           {offers.map((offer) =>
-            offer.kind === 'parcel' ? (
+            offer.kind === 'district' ? (
+              <Card
+                key={offer.def.id}
+                kind="district"
+                name={t.restoration.districtNames[offer.def.id]}
+                effect={bonusesText(offer.def.bonuses)}
+                cost={offer.def.cost}
+                affordable={canRestoreDistrict(state, offer.def.id)}
+                onBuy={() => store.dispatch((s) => restoreDistrict(s, offer.def.id))}
+              />
+            ) : offer.kind === 'parcel' ? (
               <Card
                 key={offer.def.id}
                 kind="parcel"

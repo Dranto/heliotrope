@@ -42,13 +42,17 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
       { kind: 'generatorMultiplier', generator: 'pot', factor: 2 },
       { kind: 'generatorMultiplier', generator: 'balconyPanel', factor: 1.5 },
       { kind: 'water', factor: 1.25 },
+      { kind: 'effectDuration', effect: 'shower', factor: 2 },
     ],
   },
   {
     id: 'pollinatorStrip',
     cost: 1e5,
     phase: 2,
-    bonuses: [{ kind: 'butterflyInterval', factor: 0.8 }],
+    bonuses: [
+      { kind: 'butterflyInterval', factor: 0.8 },
+      { kind: 'visitInterval', factor: 0.8 },
+    ],
   },
   {
     id: 'river',

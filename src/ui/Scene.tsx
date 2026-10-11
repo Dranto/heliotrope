@@ -36,6 +36,17 @@ import {
 } from './neighbourhood';
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
+import { NightLights, VisitLayer } from './VisitArt';
+import { DistrictGround, DistrictOffer } from './DistrictArt';
+import { cityFrame } from './districtMap';
+import {
+  canRestoreDistrict,
+  offeredDistrict,
+  restoreDistrict,
+  type DistrictId,
+} from '../game/districts';
+import { daylightOf, type Daylight } from './daylight';
+import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { useGameState, useGameStore } from './useGame';
 
@@ -125,9 +136,11 @@ const CAPTION_ROOM = 52;
  */
 export function Scene({
   onCatch,
+  onVisit,
   highlight,
 }: {
   onCatch: (result: CatchResult) => void;
+  onVisit: (result: WelcomeResult) => void;
   highlight: ParcelId | null;
 }) {
   const store = useGameStore();
@@ -144,7 +157,21 @@ export function Scene({
     .filter((p) => canRestoreParcel(state, p.id))
     .map((p) => p.id)
     .join();
-  const { parcels, projects, species } = state;
+  const { parcels, projects, species, districts } = state;
+  const districtOffer = offeredDistrict(state)?.id ?? null;
+  const districtReady = districtOffer !== null && canRestoreDistrict(state, districtOffer);
+  const restoreNeighbour = useCallback(
+    (id: DistrictId) => store.dispatch((s) => restoreDistrict(s, id)),
+    [store],
+  );
+  const visitor = state.visit.kind;
+  const daylight = useDaylight();
+  const welcome = useCallback(() => {
+    const result = welcomeVisit(store.getState());
+    if (!result) return;
+    store.dispatch(() => result.state);
+    onVisit(result);
+  }, [store, onVisit]);
   // Encoded as one string so the bikes only redraw when a cooperative starts, stops or buys.
   const bikes = unlockedCooperatives(state)
     .map(
@@ -168,9 +195,13 @@ export function Scene({
   const marks = useMemo(
     () => (
       <>
+        <DistrictGround districts={districts} />
+        <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
+        <NightLights daylight={daylight} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
+        <VisitLayer kind={visitor} onWelcome={welcome} />
         <ParcelOffers
           offered={split(offered)}
           affordable={split(affordable)}
@@ -179,7 +210,23 @@ export function Scene({
         />
       </>
     ),
-    [projects, species, bikes, reduced, offered, affordable, highlight, restore],
+    [
+      districts,
+      districtOffer,
+      districtReady,
+      restoreNeighbour,
+      daylight,
+      projects,
+      species,
+      bikes,
+      reduced,
+      visitor,
+      welcome,
+      offered,
+      affordable,
+      highlight,
+      restore,
+    ],
   );
   const overlay = useMemo(
     () => (
@@ -206,8 +253,10 @@ export function Scene({
   // Kept as one object while nothing moves, so the map does not redraw at every tick.
   const camera = useMemo(() => {
     const top = width >= height ? 0 : CAPTION_ROOM;
-    return fitCamera(view, width, height, { top, left: 0, bottom: 0 });
-  }, [view, width, height]);
+    // The City view grows with the neighbouring districts restored (§6.4).
+    const frame = view === 3 ? cityFrame(districts) : undefined;
+    return fitCamera(view, width, height, { top, left: 0, bottom: 0 }, frame);
+  }, [view, width, height, districts]);
   // The heliotrope stands in the home courtyard, at the heart of the city, and follows the camera.
   const flower = flowerFrame(camera, width, height, PLANTER);
   const season = visualSeason(state);
@@ -292,6 +341,16 @@ export function Scene({
       </figcaption>
     </figure>
   );
+}
+
+/** Evening and night from the player's clock (§9.6), checked every minute. */
+function useDaylight(): Daylight {
+  const [daylight, setDaylight] = useState(() => daylightOf(new Date().getHours()));
+  useEffect(() => {
+    const timer = setInterval(() => setDaylight(daylightOf(new Date().getHours())), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+  return daylight;
 }
 
 /** The device asks for less motion; SMIL animations do not follow the CSS rule by themselves. */

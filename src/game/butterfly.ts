@@ -2,7 +2,7 @@
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
 import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
 import { effectDurationFactor, factorOf } from './bonuses';
-import { EFFECTS, type ActiveEffect, type EffectKind } from './effects';
+import { BIRDS_SECONDS_PER_SPECIES, EFFECTS, type ActiveEffect, type EffectKind } from './effects';
 import { earnLight } from './light';
 import { phaseOf } from './phases';
 import { lightPerSecond } from './production';
@@ -16,7 +16,7 @@ export const BUTTERFLY_VISIBLE_SECONDS = 12;
 export const HARVEST_RESERVE_SHARE = 0.15;
 export const HARVEST_PRODUCTION_SECONDS = 15 * 60;
 
-export type ButterflyOutcome = EffectKind | 'harvest';
+export type ButterflyOutcome = 'bloom' | 'pollination' | 'harvest';
 
 /** §9.2 odds: Floraison 50%, Récolte 40%, Pollinisation 10%. */
 export function butterflyOutcome(random: number): ButterflyOutcome {
@@ -50,9 +50,13 @@ function scheduleNext(state: GameState): GameState {
   return { ...state, rngSeed, butterfly: { nextIn, visible: 0 } };
 }
 
-/** How long an effect lasts when caught, with the parcels and projects in force. */
+/**
+ * How long an effect lasts when started, with the parcels and projects in force; the migrating
+ * birds stay longer for each species of the Herbier (§9.6).
+ */
 export function effectSeconds(state: GameState, kind: EffectKind): number {
-  return EFFECTS[kind].seconds * effectDurationFactor(state, kind);
+  const extra = kind === 'birds' ? state.species.length * BIRDS_SECONDS_PER_SPECIES : 0;
+  return (EFFECTS[kind].seconds + extra) * effectDurationFactor(state, kind);
 }
 
 /** Move the butterfly clock forward by dtSeconds of online play. */

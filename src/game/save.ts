@@ -1,5 +1,5 @@
 import { isAchievementId, type AchievementId } from './achievements';
-import type { ActiveEffect } from './effects';
+import { EFFECT_KINDS, type ActiveEffect, type EffectKind } from './effects';
 import { LANGUAGES, type Language } from './format';
 import { GENERATOR_IDS } from './generators';
 import { COLLECTOR_IDS, SITE_IDS } from './bioregion';
@@ -8,12 +8,18 @@ import { isUpgradeId, type UpgradeId } from './upgrades';
 import { BUTTERFLY_MAX_INTERVAL, createInitialState, STATE_VERSION, type GameState } from './state';
 import { BUTTERFLY_VISIBLE_SECONDS, effectSeconds } from './butterfly';
 import { isParcelId, type ParcelId } from './parcels';
+import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
 import { validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
 import { isChallengeId, type ChallengeId } from './challenges';
 import { isSpeciesId, type SpeciesId } from './species';
 import { emptyCurve, validHistory } from './history';
+import { VISIT_KINDS, VISIT_MAX_INTERVAL, VISIT_VISIBLE_SECONDS, type VisitKind } from './visits';
+
+function isVisitKind(value: string): value is VisitKind {
+  return (VISIT_KINDS as readonly string[]).includes(value);
+}
 
 export const SAVE_KEY = 'heliotrope.save';
 
@@ -59,6 +65,11 @@ const migrations: Record<number, Migration> = {
   // v12 adds the production curves of the Statistics (§10.5). Older saves start drawing from the
   // current Season on, with the default of the fresh state.
   11: (raw) => ({ ...raw, version: 12 }),
+  // v13 adds the visits to the neighbourhood (§9.6). Defaults from the fresh state: none welcomed
+  // yet, the first one on its way.
+  12: (raw) => ({ ...raw, version: 13 }),
+  // v14 adds the neighbouring districts (§6.4): none restored yet.
+  13: (raw) => ({ ...raw, version: 14 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -78,10 +89,11 @@ function isEffect(value: unknown, state: GameState): value is ActiveEffect {
   if (typeof value !== 'object' || value === null) return false;
   const { kind, remaining } = value as Record<string, unknown>;
   return (
-    (kind === 'bloom' || kind === 'pollination') &&
+    typeof kind === 'string' &&
+    (EFFECT_KINDS as readonly string[]).includes(kind) &&
     isFiniteNumber(remaining) &&
     remaining > 0 &&
-    remaining <= effectSeconds(state, kind)
+    remaining <= effectSeconds(state, kind as EffectKind)
   );
 }
 
@@ -157,6 +169,9 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.parcels)) {
     state.parcels = [...new Set<ParcelId>(data.parcels.filter(isParcelId))];
   }
+  if (Array.isArray(data.districts)) {
+    state.districts = [...new Set<DistrictId>(data.districts.filter(isDistrictId))];
+  }
   if (Array.isArray(data.projects)) {
     state.projects = [...new Set<ProjectId>(data.projects.filter(isProjectId))];
   }
@@ -223,6 +238,26 @@ export function deserialize(json: string, now: number): GameState | null {
     state.butterfly = {
       nextIn: Math.min(butterfly.nextIn, BUTTERFLY_MAX_INTERVAL),
       visible: Math.min(butterfly.visible, BUTTERFLY_VISIBLE_SECONDS),
+    };
+  }
+  const visits = data.visits as Record<string, unknown> | undefined;
+  for (const kind of VISIT_KINDS) {
+    const value = visits?.[kind];
+    if (isCount(value)) state.visits[kind] = value;
+  }
+  const visit = data.visit as Record<string, unknown> | undefined;
+  const visitor = visit?.kind;
+  if (
+    isFiniteNumber(visit?.nextIn) &&
+    isFiniteNumber(visit.visible) &&
+    visit.nextIn >= 0 &&
+    visit.visible >= 0 &&
+    (visitor === null || (typeof visitor === 'string' && isVisitKind(visitor)))
+  ) {
+    state.visit = {
+      nextIn: Math.min(visit.nextIn, VISIT_MAX_INTERVAL),
+      kind: visit.visible > 0 ? (visitor as VisitKind | null) : null,
+      visible: visitor === null ? 0 : Math.min(visit.visible, VISIT_VISIBLE_SECONDS),
     };
   }
   if (Array.isArray(data.effects)) {

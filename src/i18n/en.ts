@@ -73,7 +73,19 @@ export const en: Texts = {
     effect: {
       bloom: (seconds: string) => `Bloom ×3 · ${seconds}`,
       pollination: (seconds: string) => `Pollination ×100 · ${seconds}`,
+      shower: (seconds: string) => `Summer shower ×2 · ${seconds}`,
+      birds: (seconds: string) => `Migrating birds ×2 · ${seconds}`,
     },
+  },
+  visits: {
+    welcome: {
+      cuttings: 'Welcome the neighbours and their cuttings',
+      shower: 'Welcome the summer shower',
+      birds: 'Welcome the migrating flock',
+    },
+    cuttings: (units: number, generator: string) => `Cuttings! +${units} ${generator}.`,
+    shower: (seconds: string) => `Summer shower! Gardens, greenhouses and Water ×2 for ${seconds}.`,
+    birds: (seconds: string) => `Migrating flock! Biodiversity ×2 for ${seconds}.`,
   },
   achievements: {
     open: 'Milestones',
@@ -163,6 +175,9 @@ export const en: Texts = {
       'parcels.1': 'First paving stone lifted',
       'parcels.4': 'The neighbourhood breathes',
       'parcels.8': 'Soil regained',
+      'districts.1': 'Beyond the ring road',
+      'districts.4': 'The city overflows',
+      'districts.8': 'Garden city',
       'projects.1': 'A helping hand',
       'projects.8': 'Neighbourhood party',
       'projects.15': 'All together',
@@ -197,6 +212,10 @@ export const en: Texts = {
       'sites.10': 'Landscape returned',
       'sites.25': 'Land of springs',
       watershed: 'Watershed',
+      openDoors: 'Open doors',
+      goodNeighbours: 'Good neighbours',
+      afterRain: 'After the rain',
+      stopover: 'Stopover',
       'cycles.1': 'Back to the sea',
       'cycles.3': 'Great cycle',
       floodTide: 'High waters',
@@ -229,6 +248,8 @@ export const en: Texts = {
       goldenWeb: (count: number) => `Buy all ${count} synergies between buildings in one Season`,
       goldenHands: (count: number) => `Buy all ${count} click upgrades in one Season`,
       parcels: (count: number) => (count === 1 ? 'Restore a plot' : `Restore ${count} plots`),
+      districts: (count: number) =>
+        count === 1 ? 'Restore a neighbouring district' : `Restore ${count} neighbouring districts`,
       projects: (count: number) =>
         count === 1
           ? 'Carry out a neighbourhood project'
@@ -252,6 +273,12 @@ export const en: Texts = {
       goldenPollen: 'Pick the heliotrope’s light during a Pollination',
       justInTime: 'Catch a Golden Butterfly at the very last second',
       idle: 'Buy nothing for 10 minutes',
+      everyVisit: 'Welcome every visit to the neighbourhood at least once',
+      visits: {
+        cuttings: (count: number) => `Welcome the neighbours and their cuttings ${count} times`,
+        shower: (count: number) => `Welcome ${count} summer showers`,
+        birds: (count: number) => `Welcome ${count} migrating flocks`,
+      },
       earlySowing: 'Start a Season before the soil is ready',
       allTimeWater: (amount: string) => `Gather ${amount} Water in total`,
       collectors: (count: number) => `Own ${count} water collectors`,
@@ -285,6 +312,18 @@ export const en: Texts = {
       livingRoofs: 'Living roofs',
       squares: 'Planted squares',
     },
+    districts: 'Neighbouring districts',
+    districtNames: {
+      tanneries: 'Tannery water gardens',
+      railyard: 'Railyard forest',
+      mall: 'Mall orchard',
+      parkAndRide: 'Park-and-ride halls',
+      interchange: 'Interchange park',
+      offices: 'Office third place',
+      industrialZone: 'Solar workshops',
+      chimneys: 'Living towers',
+    },
+    districtRestored: (name: string) => `Neighbouring district restored: ${name}`,
     projectNames: {
       seedSwap: 'Seed swap',
       toolLibrary: 'Tool library',
@@ -326,8 +365,18 @@ export const en: Texts = {
       perSeason: (percent: string) => `All production +${percent}% per Season completed`,
       globalPerType: (percent: string) => `All production +${percent}% per building type owned`,
       water: (factor: string) => `Water gathered ×${factor} (Bioregion)`,
+      visitInterval: (percent: string) => `Visits come back ${percent}% sooner`,
+      cuttingsGift: (units: number) =>
+        units === 1
+          ? 'The neighbours bring one more cutting'
+          : `The neighbours bring ${units} more cuttings`,
     },
-    effectNames: { bloom: 'Bloom', pollination: 'Pollination' },
+    effectNames: {
+      bloom: 'Bloom',
+      pollination: 'Pollination',
+      shower: 'The Summer shower',
+      birds: 'The Migrating flock',
+    },
   },
   herbier: {
     open: 'Herbarium',

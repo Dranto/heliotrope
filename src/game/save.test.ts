@@ -236,6 +236,39 @@ describe('export and import', () => {
     expect(state.history).toEqual([{ season: 5, step: 30, points: [] }]);
   });
 
+  it('migrates a v12 save with no visit yet, and keeps a visitor on the map (§9.6)', () => {
+    const v12 = deserialize(JSON.stringify({ version: 12, resources: { light: 5 } }), 0)!;
+    expect(v12.version).toBe(STATE_VERSION);
+    expect(v12.visits).toEqual({ cuttings: 0, shower: 0, birds: 0 });
+    expect(v12.visit.kind).toBeNull();
+    const json = JSON.stringify({
+      version: STATE_VERSION,
+      visits: { cuttings: 3, shower: -1, birds: 2.5 },
+      visit: { nextIn: 0, kind: 'birds', visible: 12 },
+      effects: [
+        { kind: 'shower', remaining: 30 },
+        { kind: 'storm', remaining: 30 },
+      ],
+    });
+    const state = deserialize(json, 0)!;
+    expect(state.visits).toEqual({ cuttings: 3, shower: 0, birds: 0 });
+    expect(state.visit).toEqual({ nextIn: 0, kind: 'birds', visible: 12 });
+    expect(state.effects).toEqual([{ kind: 'shower', remaining: 30 }]);
+    const unknown = JSON.stringify({
+      version: STATE_VERSION,
+      visit: { nextIn: 10, kind: 'parade', visible: 5 },
+    });
+    expect(deserialize(unknown, 0)!.visit.kind).toBeNull();
+  });
+
+  it('keeps the neighbouring districts restored and drops unknown ones (§6.4)', () => {
+    const json = JSON.stringify({
+      version: 13,
+      districts: ['tanneries', 'moon', 'tanneries', 'railyard'],
+    });
+    expect(deserialize(json, 0)!.districts).toEqual(['tanneries', 'railyard']);
+  });
+
   it('keeps well-formed production curves and drops broken ones', () => {
     const curves = [
       { season: 1, step: 30, points: [1, 2] },

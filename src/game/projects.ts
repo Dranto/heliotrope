@@ -48,7 +48,10 @@ export const PROJECT_LIST: readonly ProjectDef[] = [
     id: 'seedSwap',
     cost: 250,
     condition: { owned: { pot: 5 } },
-    bonuses: [{ kind: 'clickPerUnit', generator: 'pot', amount: 0.2 }],
+    bonuses: [
+      { kind: 'clickPerUnit', generator: 'pot', amount: 0.2 },
+      { kind: 'cuttingsGift', units: 1 },
+    ],
   },
   {
     id: 'toolLibrary',

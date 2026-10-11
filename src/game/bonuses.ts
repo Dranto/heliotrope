@@ -1,10 +1,11 @@
-// Effects of restored parcels, neighbourhood projects, talents of the Tree of Seasons and won
+// Effects of restored parcels and neighbouring districts, neighbourhood projects, talents of the Tree of Seasons and won
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { CHALLENGES, type ChallengeId } from './challenges';
+import { DISTRICTS, type DistrictId } from './districts';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { TALENTS, type TalentId } from './talents';
@@ -47,7 +48,11 @@ export type Bonus =
   /** Adds `bonus` to global production per generator type owned. */
   | { kind: 'globalPerType'; bonus: number }
   /** Multiplies the Water every collector gathers (§7.4). */
-  | { kind: 'water'; factor: number };
+  | { kind: 'water'; factor: number }
+  /** Multiplies the time between two visits (§9.6). */
+  | { kind: 'visitInterval'; factor: number }
+  /** The neighbours bring `units` more of their building (§9.6). */
+  | { kind: 'cuttingsGift'; units: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -58,6 +63,8 @@ type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
  */
 export interface BonusSource {
   parcels: readonly ParcelId[];
+  /** Neighbouring districts restored (§6.4); absent where none can be. */
+  districts?: readonly DistrictId[];
   projects: readonly ProjectId[];
   talents: readonly TalentId[];
   /** Challenge Seasons won (§7.3). */
@@ -66,10 +73,20 @@ export interface BonusSource {
   generators: Readonly<Record<string, number>>;
 }
 
-/** Every bonus in force: parcels, then projects, then talents, then challenges won. */
-export function activeBonuses({ parcels, projects, talents, challenges }: BonusSource): Bonus[] {
+/**
+ * Every bonus in force: parcels, then neighbouring districts, then projects, then talents, then
+ * challenges won.
+ */
+export function activeBonuses({
+  parcels,
+  districts = [],
+  projects,
+  talents,
+  challenges,
+}: BonusSource): Bonus[] {
   return [
     ...parcels.flatMap((id) => PARCELS[id].bonuses),
+    ...districts.flatMap((id) => DISTRICTS[id].bonuses),
     ...projects.flatMap((id) => PROJECTS[id].bonuses),
     ...talents.flatMap((id) => TALENTS[id].bonuses),
     ...challenges.flatMap((id) => CHALLENGES[id].bonuses),
@@ -88,6 +105,7 @@ export function factorOf(
     | 'biodiversityFactor'
     | 'synergyFactor'
     | 'butterflyInterval'
+    | 'visitInterval'
     | 'harvestFactor',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);
