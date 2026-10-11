@@ -115,7 +115,20 @@ export const fr = {
     effect: {
       bloom: (seconds: string) => `Floraison ×3 · ${seconds}`,
       pollination: (seconds: string) => `Pollinisation ×100 · ${seconds}`,
+      shower: (seconds: string) => `Averse d’été ×2 · ${seconds}`,
+      birds: (seconds: string) => `Migrateurs ×2 · ${seconds}`,
     },
+  },
+  visits: {
+    welcome: {
+      cuttings: 'Accueillir les voisins et leurs boutures',
+      shower: 'Accueillir l’averse d’été',
+      birds: 'Accueillir la nuée de migrateurs',
+    },
+    cuttings: (units: number, generator: string) => `Boutures\u00a0! +${units} ${generator}.`,
+    shower: (seconds: string) =>
+      `Averse d’été\u00a0! Potagers, Serres et Eau ×2 pendant ${seconds}.`,
+    birds: (seconds: string) => `Nuée de migrateurs\u00a0! Biodiversité ×2 pendant ${seconds}.`,
   },
   achievements: {
     open: 'Jalons',
@@ -239,6 +252,10 @@ export const fr = {
       'sites.10': 'Paysage rendu',
       'sites.25': 'Terre de sources',
       watershed: 'Bassin versant',
+      openDoors: 'Portes ouvertes',
+      goodNeighbours: 'Bon voisinage',
+      afterRain: 'Après la pluie',
+      stopover: 'Escale',
       'cycles.1': 'Retour à la mer',
       'cycles.3': 'Grand cycle',
       floodTide: 'Grandes eaux',
@@ -298,6 +315,12 @@ export const fr = {
       goldenPollen: 'Cueillir la lumière de l’héliotrope pendant une Pollinisation',
       justInTime: 'Attraper un Papillon doré à la toute dernière seconde',
       idle: 'Ne rien acheter pendant 10 minutes',
+      everyVisit: 'Accueillir chaque visite du quartier au moins une fois',
+      visits: {
+        cuttings: (count: number) => `Accueillir ${count} fois les voisins et leurs boutures`,
+        shower: (count: number) => `Accueillir ${count} averses d’été`,
+        birds: (count: number) => `Accueillir ${count} nuées de migrateurs`,
+      },
       earlySowing: 'Commencer une Saison avant que la terre soit prête',
       allTimeWater: (amount: string) => `Recueillir ${amount} Eau au total`,
       collectors: (count: number) => `Posséder ${count} collecteurs d’eau`,
@@ -378,8 +401,18 @@ export const fr = {
       globalPerType: (percent: string) =>
         `Toute la production +${percent}\u00a0% par type de bâtiment possédé`,
       water: (factor: string) => `Eau récoltée ×${factor} (Biorégion)`,
+      visitInterval: (percent: string) => `Les visites reviennent ${percent}\u00a0% plus vite`,
+      cuttingsGift: (units: number) =>
+        units === 1
+          ? 'Les voisins apportent une bouture de plus'
+          : `Les voisins apportent ${units} boutures de plus`,
     },
-    effectNames: { bloom: 'La Floraison', pollination: 'La Pollinisation' },
+    effectNames: {
+      bloom: 'La Floraison',
+      pollination: 'La Pollinisation',
+      shower: 'L’Averse d’été',
+      birds: 'La Nuée de migrateurs',
+    },
   },
   herbier: {
     open: 'Herbier',

@@ -8,6 +8,7 @@ import {
   sourcesToGain,
 } from '../game/cycles';
 import type { CatchResult } from '../game/butterfly';
+import { VISIT_EFFECTS, type WelcomeResult } from '../game/visits';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { phaseOf } from '../game/phases';
 import { lightPerSecond } from '../game/production';
@@ -176,6 +177,18 @@ export function App() {
           ? t.butterfly.harvest(formatNumber(Math.floor(light)))
           : t.butterfly[outcome],
       );
+    },
+    [notify],
+  );
+
+  const onVisit = useCallback(
+    ({ state: next, kind, gift }: WelcomeResult) => {
+      if (kind === 'cuttings') {
+        if (gift) notify(t.visits.cuttings(gift.units, t.generators[gift.generator].name));
+        return;
+      }
+      const effect = next.effects.find((e) => e.kind === VISIT_EFFECTS[kind]);
+      notify(t.visits[kind](t.duration(Math.ceil(effect?.remaining ?? 0))));
     },
     [notify],
   );
@@ -435,7 +448,7 @@ export function App() {
 
       {/* Memoised drawings keep their texts until their props change: redraw on a new language. */}
       <main className="layout" key={language}>
-        <Scene onCatch={onCatch} highlight={highlight} />
+        <Scene onCatch={onCatch} onVisit={onVisit} highlight={highlight} />
         <aside className="side" aria-label={t.layout.panels}>
           <button
             type="button"

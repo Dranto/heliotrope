@@ -46,6 +46,10 @@ export function bonusText(bonus: Bonus): string {
       return b.globalPerType(formatPercent(bonus.bonus));
     case 'water':
       return b.water(factor(bonus.factor));
+    case 'visitInterval':
+      return b.visitInterval(formatPercent(1 - bonus.factor));
+    case 'cuttingsGift':
+      return b.cuttingsGift(bonus.units);
   }
 }
 

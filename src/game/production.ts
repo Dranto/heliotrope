@@ -50,6 +50,9 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
   for (const bonus of bonusesOf(state, 'perType')) {
     if (bonus.generator === id) typeBonus += bonus.bonus * typesOwned(state);
   }
+  // §9.6: the summer shower waters the rooftop gardens and the greenhouses.
+  if (id === 'rooftopGarden' || id === 'greenhouse')
+    factor *= effectFactor(state.effects, 'shower');
   return (
     factor *
     (1 + synergyBonus * factorOf(state, 'synergyFactor')) *
@@ -65,7 +68,7 @@ export function typesOwned(state: GameState): number {
 
 /**
  * §5.4: +2% global production per generator type at 10, 50 and 100 units owned, and per species
- * of the Herbier (§9.5); ×1.5 with the complete Herbier.
+ * of the Herbier (§9.5); ×1.5 with the complete Herbier, ×2 while migrating birds stay (§9.6).
  */
 export function biodiversityBonus(state: GameState): number {
   const thresholds = [
@@ -79,7 +82,9 @@ export function biodiversityBonus(state: GameState): number {
     }
   }
   const herbier = isHerbierComplete(state) ? HERBIER_COMPLETE_FACTOR : 1;
-  return steps * BIODIVERSITY_STEP * factorOf(state, 'biodiversityFactor') * herbier;
+  // §9.6: a flock of migrating birds doubles it while it stays.
+  const birds = effectFactor(state.effects, 'birds');
+  return steps * BIODIVERSITY_STEP * factorOf(state, 'biodiversityFactor') * herbier * birds;
 }
 
 /** §5.3: additive global bonus from the upgrades that grow with the other upgrades bought. */

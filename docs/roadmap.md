@@ -216,7 +216,7 @@ livraison de M9, à la demande d'Antoine (« continue la roadmap ») ; ils se co
 | **M8 — Le vivant revient** *(livré)* | P5 Herbier, P7 Saisons à défis, version anglaise — voir game-design §9.5, §7.3 et §14 Q1 | Contenu de fin de partie qui réutilise l'arbre, la carte et les parcelles |
 | **M9 — La Biorégion** *(livré)* | P8 Eau, collecteurs et sites de la biorégion, deuxième prestige (le Cycle de l'eau), vue Biorégion sur la carte — voir game-design §7.4 | La grosse extension, une fois la boucle longue riche |
 | **M10 — Le jeu se lit d'un coup d'œil** *(livré)* | Le confort en attente : temps avant achat, prochain objectif sous le compteur, raccourcis clavier, courbe de la production Saison par Saison, installation en application (PWA) — voir game-design §10.5 | Petit et sans risque pour l'équilibrage, il rend chaque palier plus lisible avant d'ajouter du contenu |
-| **M11 — Le quartier vit** | P9 Visites sur la carte (boutures, averse d'été, oiseaux migrateurs), leurs synergies et Jalons, lumière de jour et de nuit en décor | Raconte enfin les temps forts par des événements, sur la carte déjà riche de M6 à M9 |
+| **M11 — Le quartier vit** *(livré)* | P9 Visites sur la carte (boutures, averse d'été, oiseaux migrateurs), leurs synergies et Jalons, lumière de jour et de nuit en décor — voir game-design §9.6 | Raconte enfin les temps forts par des événements, sur la carte déjà riche de M6 à M9 |
 | **M12 — Les quartiers voisins** | P10 Les îlots de la périphérie à restaurer pour toujours, chacun avec sa règle, la vue « La Ville » qui s'agrandit | Le grand objectif lointain des Saisons tardives, une fois leur rythme corrigé |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Pour adoucir l'équilibrage, on ajoute **beaucoup de synergies**,

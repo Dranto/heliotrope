@@ -13,9 +13,10 @@ import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { SpeciesId } from './species';
 import type { TalentId } from './talents';
 import type { UpgradeId } from './upgrades';
+import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 12;
+export const STATE_VERSION = 13;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -100,7 +101,11 @@ export interface GameState {
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
-  /** Golden Butterfly effects running now. */
+  /** The next visit to the neighbourhood, or the one on the map (§9.6). */
+  visit: VisitState;
+  /** Visits welcomed over all Seasons, by kind (§9.6). */
+  visits: Record<VisitKind, number>;
+  /** Golden Butterfly and visit effects running now. */
   effects: ActiveEffect[];
   /** Production curves of the last Seasons, the current one last (§10.5). */
   history: SeasonCurve[];
@@ -161,6 +166,9 @@ export function createInitialState(now: number): GameState {
     cycles: 0,
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
+    // Drawn from the same number as the butterfly, so a quick one comes with a slow visit.
+    visit: createVisitState(1 - random),
+    visits: zeroes(VISIT_KINDS),
     effects: [],
     history: [emptyCurve(1)],
     rngSeed,
