@@ -17,7 +17,7 @@ describe('Restoration', () => {
   beforeEach(() => localStorage.clear());
 
   it('writes out what the other future of a restored parcel would give', () => {
-    saveGame({ ...createInitialState(), parcels: ['river'] });
+    saveGame({ ...createInitialState(0), parcels: ['river'] });
     renderRestoration();
     const group = screen.getByRole('radiogroup', { name: /Avenir de Rivière retrouvée/ });
     expect(group).toBeInTheDocument();
