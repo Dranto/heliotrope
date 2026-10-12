@@ -10,6 +10,7 @@ import { factorOf } from './bonuses';
 import { FRUIT_IDS, FRUITS, isFruitId, type FruitId } from './fruits';
 import { earnLight } from './light';
 import { lightPerSecond } from './production';
+import { sendFlights } from './pollen';
 import { nextRandom } from './random';
 import type { GameState } from './state';
 
@@ -39,6 +40,22 @@ export interface Tree {
   age: number | null;
   /** Seconds towards the next fruit, once grown. */
   fruit: number;
+  /** Fruit picked from this tree (M32): a tree picked often grows older. */
+  picks?: number;
+}
+
+/** Picks at which a tree grows a year older (M32): one more basket per pick at each. */
+export const TREE_AGE_PICKS = [5, 15, 30] as const;
+
+/** How many ages a tree has reached, from 0 to TREE_AGE_PICKS.length. */
+export function treeAge(tree: Tree): number {
+  const picks = tree.picks ?? 0;
+  return TREE_AGE_PICKS.filter((step) => picks >= step).length;
+}
+
+/** Baskets one pick of the tree gives: more as the tree grows older. */
+export function fruitBaskets(tree: Tree): number {
+  return FRUIT_BASKETS + treeAge(tree);
 }
 
 export interface OrchardState {
@@ -121,7 +138,7 @@ export function growOrchard(state: GameState, dtSeconds: number): GameState {
     // Growth left over once grown goes to the first fruit.
     const extra = Math.max(0, tree.age + step - TREE_SECONDS);
     const fruit = age >= TREE_SECONDS ? Math.min(FRUIT_SECONDS, tree.fruit + extra) : 0;
-    trees[id] = { age, fruit };
+    trees[id] = { ...tree, age, fruit };
   }
   const timer = orchard.honeyTimer + dtSeconds * orchard.hives;
   const jars = Math.floor(timer / HONEY_SECONDS);
@@ -180,15 +197,28 @@ export function pickFruit(state: GameState, id: FruitId): FruitHarvest | null {
   }
   next = {
     ...next,
-    garden: { ...next.garden, baskets: next.garden.baskets + FRUIT_BASKETS },
+    garden: { ...next.garden, baskets: next.garden.baskets + fruitBaskets(tree) },
     orchard: {
       ...next.orchard,
-      trees: { ...next.orchard.trees, [id]: { ...tree, fruit: 0 } },
+      trees: { ...next.orchard.trees, [id]: { ...tree, fruit: 0, picks: (tree.picks ?? 0) + 1 } },
       varieties: variety ? [...next.orchard.varieties, id] : next.orchard.varieties,
       harvests: next.orchard.harvests + 1,
     },
   };
   return { state: unlockAchievements(next), light, water, variety };
+}
+
+/** Player action (M32): a jar of honey sends a pollen flight over the city (§5.6). */
+export function canSpendHoney(state: GameState): boolean {
+  return isOrchardOpen(state) && state.orchard.honey > 0;
+}
+
+export function spendHoney(state: GameState): GameState {
+  if (!canSpendHoney(state)) return state;
+  return sendFlights(
+    { ...state, orchard: { ...state.orchard, honey: state.orchard.honey - 1 } },
+    1,
+  );
 }
 
 /** The baskets the next hive costs; null once every hive is set. */
@@ -223,9 +253,11 @@ export function validOrchard(raw: unknown): OrchardState {
     const age = tree?.age;
     if (typeof age !== 'number' || !Number.isFinite(age) || age < 0) continue;
     const fruit = typeof tree?.fruit === 'number' && Number.isFinite(tree.fruit) ? tree.fruit : 0;
+    const picks = tree?.picks;
     state.trees[id] = {
       age: Math.min(age, TREE_SECONDS),
       fruit: age >= TREE_SECONDS ? Math.min(Math.max(0, fruit), FRUIT_SECONDS) : 0,
+      picks: typeof picks === 'number' && Number.isInteger(picks) && picks >= 0 ? picks : 0,
     };
   }
   if (Array.isArray(data.varieties)) {

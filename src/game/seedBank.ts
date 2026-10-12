@@ -3,7 +3,7 @@
 // (bonuses.ts) can read it without depending on the garden logic.
 import type { Bonus } from './bonuses';
 
-export const CROP_IDS = ['radish', 'sunflower', 'beans', 'squash'] as const;
+export const CROP_IDS = ['radish', 'sunflower', 'beans', 'squash', 'strawberry'] as const;
 export type CropId = (typeof CROP_IDS)[number];
 
 export const VARIETY_IDS = [
@@ -13,6 +13,10 @@ export const VARIETY_IDS = [
   'purpleBean',
   'redSunflower',
   'threeSisters',
+  'woodStrawberry',
+  'gariguette',
+  'maraDesBois',
+  'pineberry',
 ] as const;
 export type VarietyId = (typeof VARIETY_IDS)[number];
 
@@ -53,6 +57,27 @@ export const VARIETIES: Record<VarietyId, VarietyDef> = {
     id: 'threeSisters',
     parents: ['beans', 'squash'],
     bonuses: [{ kind: 'biodiversityFactor', factor: 1.25 }],
+  },
+  // The strawberries' varieties (M32), each tied to a system of the later milestones.
+  woodStrawberry: {
+    id: 'woodStrawberry',
+    parents: ['radish', 'strawberry'],
+    bonuses: [{ kind: 'pollenFill', factor: 1.2 }],
+  },
+  gariguette: {
+    id: 'gariguette',
+    parents: ['sunflower', 'strawberry'],
+    bonuses: [{ kind: 'harvestFactor', factor: 1.25 }],
+  },
+  maraDesBois: {
+    id: 'maraDesBois',
+    parents: ['beans', 'strawberry'],
+    bonuses: [{ kind: 'effectDuration', effect: 'beans', factor: 1.25 }],
+  },
+  pineberry: {
+    id: 'pineberry',
+    parents: ['squash', 'strawberry'],
+    bonuses: [{ kind: 'orchardGrowth', factor: 1.1 }],
   },
 };
 

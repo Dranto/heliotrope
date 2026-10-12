@@ -72,6 +72,43 @@
   fill: #ec8c2e;
 }
 
+.plant-strawberry .berry {
+  fill: #e0384f;
+  stroke: rgb(120 20 30 / 0.35);
+  stroke-width: 0.15;
+}
+
+.plant-strawberry .calyx {
+  fill: none;
+  stroke: #3f7a3c;
+  stroke-width: 0.3;
+  stroke-linecap: round;
+}
+
+.plant-strawberry .blossom ellipse {
+  fill: #fffaf0;
+  stroke: rgb(180 160 120 / 0.5);
+  stroke-width: 0.08;
+}
+
+.plant-strawberry .blossom .heart {
+  fill: #f2c94c;
+}
+
+.garden-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.garden-rotated,
+.garden-weather {
+  color: #4f7a3c;
+}
+
 .plant-squash .rib {
   fill: none;
   stroke: rgb(140 70 20 / 0.45);

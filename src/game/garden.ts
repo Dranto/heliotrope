@@ -11,7 +11,17 @@ import { effectSeconds } from './butterfly';
 import { effectFactor } from './effects';
 import { earnLight } from './light';
 import { lightPerSecond } from './production';
-import { HIVE_VARIETY_CHANCE, pollination } from './orchard';
+import {
+  FRUIT_IDS,
+  HIVE_VARIETY_CHANCE,
+  pickFruit,
+  pollination,
+  treeStage,
+  type FruitHarvest,
+  type FruitId,
+} from './orchard';
+import { addPollen } from './pollen';
+import { isWeatherOpen, type WeatherId } from './weather';
 import { nextRandom } from './random';
 import { VARIETIES, type CropId, type VarietyId } from './seedBank';
 import type { GameState } from './state';
@@ -29,6 +39,7 @@ export const CROPS: Record<CropId, CropDef> = {
   sunflower: { id: 'sunflower', seconds: 20 * 60 },
   beans: { id: 'beans', seconds: 60 * 60 },
   squash: { id: 'squash', seconds: 4 * 3600 },
+  strawberry: { id: 'strawberry', seconds: 10 * 60 },
 };
 
 /** Radishes: a puff of Light worth this many seconds of production (at least RADISH_MIN). */
@@ -39,8 +50,32 @@ export const SUNFLOWER_BUTTERFLY_SECONDS = 10;
 /** Squashes: Light and Water worth this many seconds of production. */
 export const SQUASH_SECONDS = 30 * 60;
 
+/** Strawberries (M32): their scent fills a quarter of the pollen gauge (§5.6). */
+export const STRAWBERRY_POLLEN = 0.25;
+
 /** Baskets each harvest fills for the great works (§6.6, M20): the longer the crop, the more. */
-export const BASKETS: Record<CropId, number> = { radish: 1, sunflower: 2, beans: 3, squash: 5 };
+export const BASKETS: Record<CropId, number> = {
+  radish: 1,
+  sunflower: 2,
+  beans: 3,
+  squash: 5,
+  strawberry: 1,
+};
+
+/** The rotation (M32): a crop sown after a different one grows this much faster. */
+export const ROTATION_FACTOR = 1.2;
+
+/**
+ * Each crop has its weather (M32): grand soleil ripens the sunflowers, the wind the radishes,
+ * the mist the beans and the heat the squashes. The shower waters the whole garden (§9.10).
+ */
+export const CROP_WEATHER: Partial<Record<WeatherId, CropId>> = {
+  sun: 'sunflower',
+  wind: 'radish',
+  mist: 'beans',
+  heat: 'squash',
+};
+export const CROP_WEATHER_FACTOR = 1.5;
 
 /** Beds in the courtyard: three at first, one more for each step of the game reached. */
 export const MAX_PLOTS = 6;
@@ -53,7 +88,13 @@ export interface Plot {
   crop: CropId | null;
   /** Seconds of growth so far. */
   grown: number;
+  /** The crop last harvested in the bed (M32), sown again by "harvest all". */
+  last?: CropId | null;
+  /** The crop differs from the one before it: it grows faster (M32). */
+  rotated?: boolean;
 }
+
+const BARE: Plot = { crop: null, grown: 0, last: null, rotated: false };
 
 export interface GardenState {
   /** Every bed, the locked ones bare; MAX_PLOTS long. Kept across Seasons and Cycles. */
@@ -64,14 +105,17 @@ export interface GardenState {
   varieties: VarietyId[];
   /** Baskets of harvests kept for the great works (§6.6, M20), spent there. */
   baskets: number;
+  /** Harvests of a crop grown after a different one (M32, Milestones). */
+  rotations: number;
 }
 
 export function createGardenState(): GardenState {
   return {
-    plots: Array.from({ length: MAX_PLOTS }, () => ({ crop: null, grown: 0 })),
+    plots: Array.from({ length: MAX_PLOTS }, () => BARE),
     harvests: 0,
     varieties: [],
     baskets: 0,
+    rotations: 0,
   };
 }
 
@@ -89,7 +133,8 @@ export function isGardenOpen(state: GameState): boolean {
 
 /**
  * Crops the player can sow: radishes from the start, sunflowers once ten pots stand around the
- * courtyard, climbing beans from the second Season, squashes once the Bioregion is open.
+ * courtyard, climbing beans from the second Season, squashes once the Bioregion is open, and
+ * strawberries with the first hive of the orchard (M32).
  */
 export function isCropUnlocked(state: GameState, id: CropId): boolean {
   switch (id) {
@@ -101,6 +146,8 @@ export function isCropUnlocked(state: GameState, id: CropId): boolean {
       return state.seasons > 0;
     case 'squash':
       return isBioregionOpen(state);
+    case 'strawberry':
+      return state.orchard.hives > 0;
   }
 }
 
@@ -127,6 +174,21 @@ export function growthSpeed(state: GameState): number {
   return shower * rain * factorOf(state, 'gardenGrowth') * pollination(state);
 }
 
+/** How fast one bed grows: the garden's speed, the rotation and its crop's weather (M32). */
+export function plotSpeed(state: GameState, plot: Plot): number {
+  if (plot.crop === null) return 0;
+  const weather =
+    isWeatherOpen(state) && CROP_WEATHER[state.weather.current] === plot.crop
+      ? CROP_WEATHER_FACTOR
+      : 1;
+  return growthSpeed(state) * (plot.rotated ? ROTATION_FACTOR : 1) * weather;
+}
+
+/** The crop the weather favours now, if the sky is open. */
+export function weatherCrop(state: GameState): CropId | null {
+  return isWeatherOpen(state) ? (CROP_WEATHER[state.weather.current] ?? null) : null;
+}
+
 export function isRipe(plot: Plot): boolean {
   return plot.crop !== null && plot.grown >= CROPS[plot.crop].seconds;
 }
@@ -139,14 +201,13 @@ export function plotGrowth(plot: Plot): number {
 /** Seconds of play before a crop is ripe, at the speed in force now. */
 export function secondsToRipe(state: GameState, plot: Plot): number {
   if (plot.crop === null) return 0;
-  return Math.max(0, CROPS[plot.crop].seconds - plot.grown) / growthSpeed(state);
+  return Math.max(0, CROPS[plot.crop].seconds - plot.grown) / plotSpeed(state, plot);
 }
 
 /** Move the garden forward by dtSeconds: every crop grows, none ever wilts. */
 export function growGarden(state: GameState, dtSeconds: number): GameState {
   const { plots } = state.garden;
   if (!plots.some((p) => p.crop !== null && !isRipe(p))) return state;
-  const step = dtSeconds * growthSpeed(state);
   return {
     ...state,
     garden: {
@@ -154,7 +215,13 @@ export function growGarden(state: GameState, dtSeconds: number): GameState {
       plots: plots.map((plot) =>
         plot.crop === null || isRipe(plot)
           ? plot
-          : { ...plot, grown: Math.min(CROPS[plot.crop].seconds, plot.grown + step) },
+          : {
+              ...plot,
+              grown: Math.min(
+                CROPS[plot.crop].seconds,
+                plot.grown + dtSeconds * plotSpeed(state, plot),
+              ),
+            },
       ),
     },
   };
@@ -176,10 +243,14 @@ function withPlot(state: GameState, index: number, plot: Plot): GameState {
   return { ...state, garden: { ...state.garden, plots } };
 }
 
-/** Player action: sow a crop in a bare bed. Sowing is free; only time ripens it. */
+/**
+ * Player action: sow a crop in a bare bed. Sowing is free; only time ripens it. A crop that
+ * differs from the bed's last one is rotated and grows faster (M32).
+ */
 export function sow(state: GameState, index: number, crop: CropId): GameState {
   if (!canSow(state, index, crop)) return state;
-  return withPlot(state, index, { crop, grown: 0 });
+  const last = state.garden.plots[index]!.last ?? null;
+  return withPlot(state, index, { crop, grown: 0, last, rotated: last !== null && last !== crop });
 }
 
 /** The variety two crops can give, if they differ. */
@@ -213,7 +284,8 @@ export function possibleVarieties(state: GameState, index: number): VarietyId[] 
 export type HarvestGain =
   | { kind: 'light'; light: number; water: number }
   | { kind: 'butterfly' }
-  | { kind: 'effect'; seconds: number };
+  | { kind: 'effect'; seconds: number }
+  | { kind: 'pollen' };
 
 export interface HarvestResult {
   state: GameState;
@@ -228,7 +300,7 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
   const plot = state.garden.plots[index];
   if (!plot || !isRipe(plot) || plot.crop === null) return null;
   const crop = plot.crop;
-  let next = withPlot(state, index, { crop: null, grown: 0 });
+  let next = withPlot(state, index, { ...BARE, last: crop });
   let gain: HarvestGain;
   switch (crop) {
     case 'radish': {
@@ -271,6 +343,11 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
       gain = { kind: 'light', light, water };
       break;
     }
+    case 'strawberry': {
+      next = addPollen(next, STRAWBERRY_POLLEN);
+      gain = { kind: 'pollen' };
+      break;
+    }
   }
   let variety: VarietyId | null = null;
   const possible = possibleVarieties(state, index);
@@ -286,10 +363,52 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
       ...next.garden,
       harvests: next.garden.harvests + 1,
       baskets: next.garden.baskets + BASKETS[crop],
+      rotations: next.garden.rotations + Number(plot.rotated === true),
       varieties: variety ? [...next.garden.varieties, variety] : next.garden.varieties,
     },
   };
   return { state: unlockAchievements(next), crop, gain, variety };
+}
+
+export interface HarvestAllResult {
+  state: GameState;
+  /** Every crop harvested, in bed order. */
+  crops: HarvestResult[];
+  /** Every tree picked. */
+  fruits: (FruitHarvest & { id: FruitId })[];
+}
+
+/** Something is ripe in the garden or the orchard: "harvest all" has work to do. */
+export function hasRipe(state: GameState): boolean {
+  return (
+    state.garden.plots.some(isRipe) ||
+    FRUIT_IDS.some((id) => treeStage(state.orchard.trees[id]) === 'ripe')
+  );
+}
+
+/**
+ * Player action (M32, decision D24): harvest every ripe crop and sow the same one again in its
+ * bed, then pick every ripe tree. Returns null when nothing is ripe.
+ */
+export function harvestAll(state: GameState): HarvestAllResult | null {
+  if (!hasRipe(state)) return null;
+  let next = state;
+  const crops: HarvestResult[] = [];
+  const fruits: HarvestAllResult['fruits'] = [];
+  next.garden.plots.forEach((plot, index) => {
+    if (!isRipe(plot) || plot.crop === null) return;
+    const result = harvest(next, index);
+    if (!result) return;
+    crops.push(result);
+    next = sow(result.state, index, plot.crop);
+  });
+  for (const id of FRUIT_IDS) {
+    const result = pickFruit(next, id);
+    if (!result) continue;
+    fruits.push({ ...result, id });
+    next = result.state;
+  }
+  return { state: next, crops, fruits };
 }
 
 /** Keep only what a save can hold: known crops, growth within the crop's time. */
@@ -298,11 +417,17 @@ export function validPlots(raw: unknown): Plot[] {
   if (!Array.isArray(raw)) return plots;
   return plots.map((bare, i) => {
     const plot = raw[i] as Record<string, unknown> | undefined;
+    const last = isCropId(plot?.last) ? plot.last : null;
     const crop = plot?.crop;
     const grown = plot?.grown;
     if (!isCropId(crop) || typeof grown !== 'number' || !Number.isFinite(grown) || grown < 0) {
-      return bare;
+      return { ...bare, last };
     }
-    return { crop, grown: Math.min(grown, CROPS[crop].seconds) };
+    return {
+      crop,
+      grown: Math.min(grown, CROPS[crop].seconds),
+      last,
+      rotated: plot?.rotated === true && last !== null && last !== crop,
+    };
   });
 }

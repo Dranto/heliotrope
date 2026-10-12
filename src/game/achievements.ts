@@ -11,6 +11,7 @@ import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
 import { workingAlliances } from './alliances';
 import { bouquetSize } from './effects';
 import { FRUIT_IDS } from './fruits';
+import { TREE_AGE_PICKS, treeAge } from './orchard';
 import { worksBuilt } from './greatWorks';
 import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
@@ -23,6 +24,9 @@ export const SOWER_MILESTONE_SEASONS = 10;
 
 /** Visits of one kind welcomed for their Milestone (§9.6). */
 export const VISIT_MILESTONE_COUNT = 10;
+
+/** Harvests after a different crop for the Milestone of the rotation (M32). */
+export const ROTATION_MILESTONE = 25;
 
 /** Effects running at once for the Milestones of the bouquet (§5.7). */
 export const BOUQUET_MILESTONES = [3, 5] as const;
@@ -100,6 +104,10 @@ export type AchievementCondition =
   /** Fruit picked in the orchard, and old varieties found there (§9.8). */
   | { kind: 'fruitHarvests'; count: number }
   | { kind: 'fruitVarieties'; count: number }
+  /** Harvests of a crop sown after a different one (M32). */
+  | { kind: 'rotations'; count: number }
+  /** A fruit tree at its last age (M32). */
+  | { kind: 'oldTree' }
   /** Sister cities founded (§7.6). */
   | { kind: 'sisterCities'; count: number }
   /** Alliances chosen and awake (§9.9), and the grand bloom. */
@@ -206,6 +214,8 @@ export type AchievementId =
   | `works.${(typeof WORK_STEPS)[number]}`
   | 'firstFruit'
   | 'oldOrchard'
+  | 'rotation'
+  | 'oldTree'
   | `cities.${(typeof CITY_STEPS)[number]}`
   | 'firstAlliance'
   | 'grandBloom'
@@ -414,6 +424,13 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     id: 'oldOrchard',
     family: 'neighbourhood',
     condition: { kind: 'fruitVarieties', count: FRUIT_IDS.length },
+  },
+  // The lighter garden and orchard (M32).
+  { id: 'oldTree', family: 'neighbourhood', condition: { kind: 'oldTree' } },
+  {
+    id: 'rotation',
+    family: 'neighbourhood',
+    condition: { kind: 'rotations', count: ROTATION_MILESTONE },
   },
   {
     id: 'selfSown',
@@ -654,6 +671,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.alliances.bloomed;
     case 'paths':
       return pathsWorking(state) >= condition.count;
+    case 'rotations':
+      return state.garden.rotations >= condition.count;
+    case 'oldTree':
+      return FRUIT_IDS.some((id) => treeAge(state.orchard.trees[id]) === TREE_AGE_PICKS.length);
     case 'flights':
       return state.pollen.flights >= condition.count;
     case 'bouquet':

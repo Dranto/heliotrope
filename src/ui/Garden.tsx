@@ -2,6 +2,8 @@ import { useState } from 'react';
 import {
   canSow,
   CROP_IDS,
+  hasRipe,
+  weatherCrop,
   CROPS,
   isCropUnlocked,
   isGardenOpen,
@@ -26,7 +28,13 @@ import { useGameState, useGameStore } from './useGame';
  * The courtyard garden (docs/game-design.md §9.7): each bed with what grows in it, the crops to
  * sow in a bare one, the harvest button of a ripe one, and the seed bank's varieties.
  */
-export function Garden({ onHarvest }: { onHarvest: (index: number) => void }) {
+export function Garden({
+  onHarvest,
+  onHarvestAll,
+}: {
+  onHarvest: (index: number) => void;
+  onHarvestAll: () => void;
+}) {
   const store = useGameStore();
   const state = useGameState();
   const [open, toggle] = usePanelOpen('garden');
@@ -38,6 +46,7 @@ export function Garden({ onHarvest }: { onHarvest: (index: number) => void }) {
   const firstBare = plots.findIndex((p, i) => i < opened && p.crop === null);
   const picking = choosing !== null && plots[choosing]?.crop === null ? choosing : firstBare;
   const crops = CROP_IDS.filter((id) => isCropUnlocked(state, id));
+  const favoured = weatherCrop(state);
   const plant = (index: number, crop: CropId) => {
     store.dispatch((s) => sow(s, index, crop));
     setChoosing(null);
@@ -49,6 +58,19 @@ export function Garden({ onHarvest }: { onHarvest: (index: number) => void }) {
         {t.garden.title}
       </PanelTitle>
       <p className="hint">{t.garden.hint}</p>
+      {favoured && (
+        <p className="hint garden-weather">{t.garden.weatherCrop(t.garden.crops[favoured].name)}</p>
+      )}
+      {hasRipe(state) && (
+        <button
+          type="button"
+          className="buy garden-all"
+          title={t.garden.harvestAllHint}
+          onClick={onHarvestAll}
+        >
+          <span className="buy-verb">{t.garden.harvestAll}</span>
+        </button>
+      )}
       <ul className="garden-beds">
         {plots.slice(0, MAX_PLOTS).map((plot, i) => {
           const name = t.garden.plot(i + 1);
@@ -113,6 +135,12 @@ export function Garden({ onHarvest }: { onHarvest: (index: number) => void }) {
                   <strong>{crop}</strong>
                   <br />
                   <span className="hint">{status}</span>
+                  {plot.rotated && !ripe && (
+                    <>
+                      <br />
+                      <span className="hint garden-rotated">{t.garden.rotated}</span>
+                    </>
+                  )}
                 </span>
               </span>
               {ripe ? (
