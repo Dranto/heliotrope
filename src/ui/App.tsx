@@ -11,7 +11,8 @@ import {
 import type { CatchResult } from '../game/butterfly';
 import { VISIT_EFFECTS, type WelcomeResult } from '../game/visits';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
-import { phaseOf } from '../game/phases';
+import { arrivedFeature } from '../game/introductions';
+import { isAchievementsScreenOpen, isHerbierOpen, isTreeOpen } from '../game/onboarding';
 import { fleaMarketGenerator, lightPerSecond } from '../game/production';
 import { NextGoal } from './Goals';
 import {
@@ -195,16 +196,6 @@ function CitiesIcon() {
   );
 }
 
-/** The Tree of Seasons opens with the first Seed (§7.1). */
-function treeUnlocked(state: GameState): boolean {
-  return state.seeds > 0;
-}
-
-/** The Herbier opens with the first species back (§9.5), or after the first Season. */
-function herbierUnlocked(state: GameState): boolean {
-  return state.species.length > 0 || state.seasons > 0;
-}
-
 /** A pressed leaf, the mark of the Herbier. */
 function LeafIcon() {
   return (
@@ -212,11 +203,6 @@ function LeafIcon() {
       <path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14ZM5 19l9-9M9 15h3.5M12 12V8.5" />
     </svg>
   );
-}
-
-/** The Milestones screen opens from phase 2 (§10.2), or as soon as one is unlocked. */
-function achievementsUnlocked(state: GameState): boolean {
-  return phaseOf(state) >= 2 || state.achievements.length > 0 || state.seasons > 0;
 }
 
 let nextToastId = 0;
@@ -353,10 +339,10 @@ export function App() {
 
   const menu = (
     <nav className="menu" aria-label={t.menu}>
-      {achievementsUnlocked(state) && (
+      {isAchievementsScreenOpen(state) && (
         <button
           type="button"
-          className="ghost menu-button"
+          className="ghost menu-button achievements-button"
           aria-haspopup="dialog"
           onClick={() => setScreen('achievements')}
         >
@@ -371,10 +357,10 @@ export function App() {
           </span>
         </button>
       )}
-      {herbierUnlocked(state) && (
+      {isHerbierOpen(state) && (
         <button
           type="button"
-          className="ghost menu-button"
+          className="ghost menu-button herbier-button"
           aria-haspopup="dialog"
           onClick={() => setScreen('herbier')}
         >
@@ -403,7 +389,7 @@ export function App() {
           )}
         </button>
       )}
-      {treeUnlocked(state) && (
+      {isTreeOpen(state) && (
         <button
           type="button"
           className="ghost menu-button tree-button"
@@ -483,6 +469,7 @@ export function App() {
       data-layer={layer}
       data-side={sideOpen ? 'open' : 'closed'}
       data-motion={state.settings.reducedMotion ? 'reduced' : undefined}
+      data-arrived={arrivedFeature(state) ?? undefined}
     >
       <header className="topbar">
         <h1 className="brand">

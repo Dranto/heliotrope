@@ -14,10 +14,13 @@ import {
   WEATHER_SECONDS,
   type WeatherId,
 } from './weather';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A state in its second Season, when the sky has opened. */
 function opened(): GameState {
-  return { ...createInitialState(0), seasons: 1 };
+  return { ...openGame(0), seasons: 1 };
 }
 
 function under(weather: WeatherId, state = opened()): GameState {
@@ -26,7 +29,7 @@ function under(weather: WeatherId, state = opened()): GameState {
 
 describe('the weather (§9.10, M28)', () => {
   it('stays still and gives nothing during the first Season', () => {
-    const first = createInitialState(0);
+    const first = openGame(0);
     expect(advanceWeather(first, 5000)).toBe(first);
     expect(generatorMultiplier(first, 'balconyPanel')).toBe(
       generatorMultiplier(under('wind'), 'balconyPanel'),
@@ -79,7 +82,7 @@ describe('the weather (§9.10, M28)', () => {
   });
 
   it('brings a Milestone per weather lived, and the snail under the shower', () => {
-    expect(tick(createInitialState(0), 1).achievements).not.toContain('weather.sun');
+    expect(tick(openGame(0), 1).achievements).not.toContain('weather.sun');
     expect(tick(opened(), 1).achievements).toContain('weather.sun');
     let state = opened();
     for (const id of WEATHER_IDS) {
@@ -98,7 +101,7 @@ describe('the weather (§9.10, M28)', () => {
     expect(validWeather({ ...state.weather, forecast: ['sun', 'sun', 'rain'] }, fallback)).toBe(
       fallback,
     );
-    const { weather: _weather, ...old } = JSON.parse(serialize(createInitialState(0)));
+    const { weather: _weather, ...old } = JSON.parse(serialize(openGame(0)));
     const loaded = deserialize(JSON.stringify({ ...old, version: 28 }), 0)!;
     expect(WEATHER_IDS).toContain(loaded.weather.current);
     expect(loaded.weather.forecast).toHaveLength(FORECAST_LENGTH);

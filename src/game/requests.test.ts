@@ -21,10 +21,13 @@ import {
 import { deserialize, serialize } from './save';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A state in its second Season, when the neighbours start asking. */
 function opened(): GameState {
-  return { ...createInitialState(0), seasons: 1 };
+  return { ...openGame(0), seasons: 1 };
 }
 
 function asking(request: Request, state = opened()): GameState {
@@ -40,7 +43,7 @@ const harvests: Request = {
 
 describe('the neighbours’ requests (§9.11, M29)', () => {
   it('only come from the second Season, one every few minutes, three at most', () => {
-    const first = createInitialState(0);
+    const first = openGame(0);
     expect(advanceRequests(first, 10_000)).toBe(first);
     const state = opened();
     expect(advanceRequests(state, REQUEST_INTERVAL / 2 - 1).requests.open).toHaveLength(0);
@@ -165,7 +168,7 @@ describe('the neighbours’ requests (§9.11, M29)', () => {
     expect(cleaned.open).toEqual([]);
     expect(cleaned.hands).toEqual(['quarter']);
     expect(cleaned.bonds).toEqual({ railyard: 2 });
-    const { requests: _requests, ...old } = JSON.parse(serialize(createInitialState(0)));
+    const { requests: _requests, ...old } = JSON.parse(serialize(openGame(0)));
     const loaded = deserialize(JSON.stringify({ ...old, version: 29 }), 0)!;
     expect(loaded.requests.open).toEqual([]);
     expect(loaded.requests.served).toBe(0);

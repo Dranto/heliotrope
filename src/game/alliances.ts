@@ -4,6 +4,7 @@
 // slots are free; taking one out is allowed once per Cycle of water. The grand bloom comes when
 // the whole region is restored: it opens the last slot and is celebrated on the map, without
 // text, and nothing starts again.
+import { isIntroduced } from './introductions';
 import type { Bonus } from './bonuses';
 import { longestCorridor } from './corridors';
 import { worksBuilt } from './greatWorks';
@@ -131,7 +132,10 @@ export function isAwake(state: GameState, id: AllianceId): boolean {
 
 /** The alliances show once one is awake, and stay. */
 export function areAlliancesOpen(state: GameState): boolean {
-  return state.alliances.chosen.length > 0 || ALLIANCE_IDS.some((id) => isAwake(state, id));
+  return (
+    isIntroduced(state, 'alliances') &&
+    (state.alliances.chosen.length > 0 || ALLIANCE_IDS.some((id) => isAwake(state, id)))
+  );
 }
 
 export function allianceSlots(state: GameState): number {

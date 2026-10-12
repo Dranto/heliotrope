@@ -23,9 +23,12 @@ import { generatorMultiplier, lightPerSecond } from './production';
 import { deserialize, serialize } from './save';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function started(extra: Partial<GameState> = {}): GameState {
-  const fresh = createInitialState(0);
+  const fresh = openGame(0);
   return { ...fresh, generators: { ...fresh.generators, pot: 1 }, ...extra };
 }
 
@@ -41,7 +44,7 @@ describe('Courtyard garden (§9.7, M14)', () => {
     expect(openPlots(started())).toBe(3);
     expect(openPlots(started({ seasons: 1 }))).toBe(4);
     expect(openPlots(started({ seasons: 2 }))).toBe(5);
-    expect(canSow(createInitialState(0), 0, 'radish')).toBe(false);
+    expect(canSow(openGame(0), 0, 'radish')).toBe(false);
     expect(canSow(started(), 3, 'radish')).toBe(false);
   });
 

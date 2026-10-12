@@ -23,13 +23,16 @@ import {
 } from './restoration';
 import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function withState(patch: Partial<GameState>): GameState {
-  return { ...createInitialState(0), ...patch };
+  return { ...openGame(0), ...patch };
 }
 
 const owned = (patch: Partial<GameState['generators']>) => ({
-  ...createInitialState(0).generators,
+  ...openGame(0).generators,
   ...patch,
 });
 

@@ -19,10 +19,13 @@ import { deserialize, serialize } from './save';
 import { SPECIES_IDS } from './species';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A player whose orchard bees and deep roots are awake. */
 function grown(extra: Partial<GameState> = {}): GameState {
-  const fresh = createInitialState(0);
+  const fresh = openGame(0);
   return {
     ...fresh,
     orchard: { ...fresh.orchard, hives: 1 },
@@ -45,7 +48,7 @@ function allWorks(state: GameState): GameState['greatWorks'] {
 
 describe('the alliances (§9.9)', () => {
   it('wake once both sides have grown, and show from then on', () => {
-    const fresh = createInitialState(0);
+    const fresh = openGame(0);
     expect(ALLIANCE_IDS.some((id) => isAwake(fresh, id))).toBe(false);
     expect(areAlliancesOpen(fresh)).toBe(false);
     const state = grown();

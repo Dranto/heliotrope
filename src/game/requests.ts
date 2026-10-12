@@ -4,6 +4,7 @@
 // played when the player wants (decision D20). Requests wait without limit; one can be declined
 // for another. The neighbouring districts restored (§6.4) send their own, and serving them
 // strengthens a bond. The requests draw from their own seed, like the weather (§9.10).
+import { isIntroduced } from './introductions';
 import { isButterflyUnlocked, startEffect } from './butterfly';
 import type { Bonds } from './bonds';
 import { DISTRICT_IDS, type DistrictId } from './districts';
@@ -66,8 +67,8 @@ export function createRequestsState(seed: number): RequestsState {
 }
 
 /** The neighbours start asking with the second Season, like the weather. */
-export function areRequestsOpen(state: Pick<GameState, 'seasons' | 'cycles'>): boolean {
-  return state.seasons > 0 || state.cycles > 0;
+export function areRequestsOpen(state: Pick<GameState, 'seasons' | 'cycles' | 'intro'>): boolean {
+  return isIntroduced(state, 'requests') && (state.seasons > 0 || state.cycles > 0);
 }
 
 function counter(state: GameState, need: Need): number {

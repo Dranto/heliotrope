@@ -498,7 +498,7 @@ export function Scene({
         {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
         {weather && <WeatherForecast now={weather} next={forecast.split(',') as WeatherId[]} />}
         {mode === 'play' && isDecorOpen(state) && (
-          <button type="button" className="scene-tool" onClick={() => setMode('decor')}>
+          <button type="button" className="scene-tool decor-tool" onClick={() => setMode('decor')}>
             {t.decor.open}
           </button>
         )}
