@@ -16,6 +16,7 @@ import { buildReadyStages } from './greatWorks';
 import type { GeneratorId } from './generators';
 import { growGarden } from './garden';
 import { growOrchard } from './orchard';
+import { decayPollen, pollinate } from './pollen';
 import { runBuilders } from './cities';
 import { checkBloom } from './alliances';
 import { recordProduction } from './history';
@@ -68,8 +69,14 @@ export function unlockProgress(state: GameState): GameState {
  */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const watered = growOrchard(
-    growGarden(earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds), dtSeconds),
+  const watered = decayPollen(
+    growOrchard(
+      growGarden(
+        earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds),
+        dtSeconds,
+      ),
+      dtSeconds,
+    ),
     dtSeconds,
   );
   const next = runBuilders(
@@ -92,7 +99,7 @@ export function tick(state: GameState, dtSeconds: number): GameState {
 
 /** Player action: click the heliotrope. */
 export function clickHeliotrope(state: GameState): GameState {
-  const next = { ...earnLight(state, clickValue(state)), clicks: state.clicks + 1 };
+  const next = pollinate({ ...earnLight(state, clickValue(state)), clicks: state.clicks + 1 });
   // Milestone "Pollen d'or" (§9.3): a click during a Pollinisation.
   const pollinating = state.effects.some((effect) => effect.kind === 'pollination');
   return pollinating ? unlockAchievement(next, 'goldenPollen') : next;

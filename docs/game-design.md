@@ -208,7 +208,7 @@ Roadmap P25. Chaque bâtiment prend **trois formes** à **50, 100 et 200 exempla
 
 | Bâtiment | 50 exemplaires | 100 exemplaires | 200 exemplaires |
 |---|---|---|---|
-| Héliotrope en pot | Jardinière fleurie : clic +0,25 par pot · ou le Potager sur le toit +0,25 % par pot | Mur de pots : pots ×1,5 · ou le potager de la cour pousse ×1,15 plus vite | Cascade de pots : pots +5 % par espèce de l'Herbier · ou toute la production +2 % |
+| Héliotrope en pot | Jardinière fleurie : clic +0,25 par pot · ou le Potager sur le toit +0,25 % par pot | Mur de pots : pots ×1,5 · ou le potager de la cour pousse ×1,15 plus vite | Cascade de pots : pots +5 % par espèce de l'Herbier · ou la jauge de pollen (§5.6) se remplit ×1,25 plus vite |
 | Panneau de balcon | Pergola solaire : clic +1 par panneau · ou la Serre +0,25 % par panneau | Treille photovoltaïque : panneaux ×1,5 · ou la Floraison dure ×1,25 | Façade solaire : panneaux ×1,5 · ou panneaux +5 % par parcelle restaurée |
 | Potager sur le toit | Potager en terrasses : le potager de la cour pousse ×1,15 plus vite · ou potagers +4 % par parcelle | Toit nourricier : potagers ×1,5 · ou la Ferme verticale +0,2 % par potager | Jardin suspendu : Récolte du Papillon ×1,5 · ou potagers +2,5 % par espèce |
 | Serre communautaire | Serre à étages : serres ×1,25 · ou le Potager sur le toit +0,5 % par serre | Jardin d'hiver : le potager pousse ×1,2 plus vite · ou serres +2,5 % par espèce | Palais de verre : serres ×1,5 · ou toute la production +2 % |
@@ -225,6 +225,20 @@ Les liens entre bâtiments (« +0,25 % par pot ») s'ajoutent aux synergies du �
 - **Simulateur.** Le joueur de référence prend la première voie partout, choisie à l'avance (`withReferencePaths`). La 1ʳᵉ Saison conseillée passe de 74 à 72 min (cible 80 min), la Centrale à miroirs de 23 à 22 min : un adoucissement par synergies, comme voulu (§5.3). Les voies restent modestes (×1,25 à ×1,5) parce qu'elles jouent dans toutes les Saisons suivantes : deux fois plus fortes, elles faisaient tenir le 2ᵉ Cycle en 2 Saisons au lieu de 3 (24 min pour une cible de 35). Avec ces valeurs, ses Sources atteignent 7,4 sur 8 au bout de 2 Saisons avec la première voie partout, 7,9 avec la seconde. Le simulateur compte aussi le premier exemplaire acheté par une Coopérative (§7.2).
 - **Jalons (2).** « Première voie » (une voie qui joue), « La ville aux mille formes » (12 voies qui jouent). 142 jalons en tout.
 - **Sauvegarde.** Version 27 : les voies et la Saison du dernier changement de chaque bâtiment, vides pour une sauvegarde plus ancienne.
+
+### 5.6 Le pollen (M27)
+
+Roadmap P26. Le clic redevient un geste tout au long de la partie. Code dans `src/game/pollen.ts`, jauge dans `src/ui/Flower.tsx`, vague sur la carte dans `src/ui/PollenWave.tsx`.
+
+- **La jauge.** Chaque clic sur la fleur remplit d'1/200 un arc doré autour de sa couronne ; chaque amélioration de clic achetée dans la Saison le remplit 5 % plus vite, et la seconde voie de la Cascade de pots (§5.5) ×1,25. Sans clic, la jauge redescend de 0,4 % par seconde (une jauge pleine se vide en un peu plus de 4 min) ; elle ne retire jamais rien d'autre. Elle reste d'une Saison à l'autre.
+- **L'envolée.** Pleine, la jauge repart de zéro et lance une **envolée** : un anneau doré et des grains de pollen partent de la cour et traversent la carte, et **toute la ville produit ×1,5 pendant 10 s**. Deux envolées de suite ajoutent leurs secondes, jusqu'à 60 s. L'effet s'affiche avec les autres effets en cours.
+- **Synergies.** Une envolée fait avancer chaque culture du potager de la cour (§9.7) d'une minute de pousse. Un Papillon doré attrapé pendant une envolée (§9.2) donne une Floraison, une Pollinisation ou une Averse qui dure ×1,5.
+- **Rythme.** À 2,5 clics par seconde, et avec la jauge qui redescend pendant qu'on clique, une envolée toutes les 2 min environ en début de partie, un peu plus d'une par minute avec les dix améliorations de clic. La roadmap visait 2 à 3 envolées par minute à ×2 pendant 20 s : mesuré, cela raccourcissait la 1ʳᵉ Saison conseillée de 72 à 54 min, sous la marge de ±30 %. Avec ces valeurs, elle passe de 72 à 66 min (cible 80 min) et toutes les cibles du §8 tiennent. Le joueur qui ne clique pas ne perd rien.
+- **Simulateur.** Les clics groupés du joueur de référence remplissent la jauge comme des clics un à un (`pollinate`).
+- **Animations réduites.** Sans anneau ni grains : la cour garde seulement une lueur dorée pendant l'envolée.
+- **Accessibilité.** La jauge est un `meter` lu par les lecteurs d'écran (« Jauge de pollen : 40 % »).
+- **Jalons (2).** « Première envolée » (une envolée), « Tempête de pollen » (100 envolées), famille Clics. 144 jalons en tout.
+- **Sauvegarde.** Version 28 : la jauge et le nombre d'envolées, vides pour une sauvegarde plus ancienne.
 
 ## 6. Phases de progression
 
@@ -847,7 +861,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).

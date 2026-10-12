@@ -9,10 +9,12 @@ import {
   type PointerEvent,
   type RefObject,
 } from 'react';
-import { formatNumber } from '../game/format';
+import { formatNumber, formatPercent } from '../game/format';
 import { visualSeason } from '../game/phases';
 import { clickValue } from '../game/production';
 import { clickHeliotrope } from '../game/tick';
+import { isFlying } from '../game/pollen';
+import './pollen.css';
 import { t } from '../i18n';
 import {
   ARCH_ORNAMENTS,
@@ -45,6 +47,9 @@ interface Floater {
 let nextFloaterId = 0;
 
 /** The arbour's hoop, on the line where the click upgrades' sprigs hang (`ARCH_ORNAMENTS`). */
+/** Radius of the pollen gauge around the crown (§5.6). */
+const POLLEN_RADIUS = 36;
+
 const ARBOUR = 'M20 256 V100 C20 40 60 8 100 8 C140 8 180 40 180 100 V256';
 
 /** Leaves of the vine climbing the arbour: [x, y, angle], up both posts and over the top. */
@@ -286,6 +291,7 @@ export function Flower() {
   const stage = flowerStage(state.totalLight);
   const season = visualSeason(state);
   const reduced = state.settings.reducedMotion;
+  const flying = isFlying(state);
 
   // The plant stretches and glows once when it reaches a new stage during play.
   const previous = useRef(stage);
@@ -347,7 +353,16 @@ export function Flower() {
       aria-label={t.light}
       data-season={season ?? 'none'}
       data-stage={stage}
+      data-flight={flying || undefined}
     >
+      <div
+        className="visually-hidden"
+        role="meter"
+        aria-label={t.pollen(formatPercent(state.pollen.gauge))}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(state.pollen.gauge * 100)}
+      />
       <button
         type="button"
         className="flower-button"
@@ -391,6 +406,19 @@ export function Flower() {
             className="halo"
             style={{ opacity: 0.4 + stage * 0.08 }}
           />
+          {/* The pollen gauge (§5.6): a golden arc around the crown, filling with the clicks. */}
+          <g transform={`rotate(-90 100 ${headY})`}>
+            <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="pollen-track" />
+            <circle
+              cx="100"
+              cy={headY}
+              r={POLLEN_RADIUS}
+              className="pollen-fill"
+              pathLength={1}
+              strokeDasharray="1 1"
+              strokeDashoffset={flying ? 0 : 1 - state.pollen.gauge}
+            />
+          </g>
           {/* A garden arbour over the courtyard bed: a climbing vine on a fine gilded hoop, where
               the click upgrades hang their sprigs. */}
           <g className="arbour">

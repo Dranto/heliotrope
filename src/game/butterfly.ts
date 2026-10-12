@@ -1,5 +1,6 @@
 // The Golden Butterfly (docs/game-design.md §9.2): a random visitor that grants a temporary
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
+import { FLIGHT_BUTTERFLY_FACTOR } from './pollen';
 import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
 import { effectDurationFactor, factorOf } from './bonuses';
 import {
@@ -85,10 +86,12 @@ export function advanceButterfly(state: GameState, dtSeconds: number): GameState
 }
 
 function startEffect(state: GameState, kind: EffectKind): ActiveEffect[] {
-  // Catching the same effect again restarts it rather than stacking it.
+  // Catching the same effect again restarts it rather than stacking it. Caught during the
+  // pollen's flight (§5.6), it lasts longer.
+  const flying = state.effects.some((e) => e.kind === 'flight');
   return [
     ...state.effects.filter((e) => e.kind !== kind),
-    { kind, remaining: effectSeconds(state, kind) },
+    { kind, remaining: effectSeconds(state, kind) * (flying ? FLIGHT_BUTTERFLY_FACTOR : 1) },
   ];
 }
 

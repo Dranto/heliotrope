@@ -56,6 +56,8 @@ import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
 import { GrowthLayer } from './GrowthArt';
+import { PollenWave } from './PollenWave';
+import { isFlying } from '../game/pollen';
 import { encodeGrowth } from './growthMap';
 import { reachedTiers } from '../game/growth';
 import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
@@ -249,6 +251,8 @@ export function Scene({
     ) as Parameters<typeof encodeStages>[0],
   );
   // The buildings that grow (§5.5), encoded so the layer only redraws when a form or path changes.
+  const flights = state.pollen.flights;
+  const flying = isFlying(state);
   const growth = encodeGrowth(
     Object.fromEntries(GENERATOR_IDS.map((id) => [id, reachedTiers(state, id)])) as Record<
       GeneratorId,
@@ -306,6 +310,7 @@ export function Scene({
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <GrowthLayer growth={growth} />
+        <PollenWave flights={flights} flying={flying} reduced={reduced} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
@@ -329,6 +334,8 @@ export function Scene({
       works,
       worksOpen,
       growth,
+      flights,
+      flying,
       corridors,
       working,
       bloomed,

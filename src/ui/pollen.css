@@ -1,0 +1,95 @@
+/* The pollen (§5.6, M27): the gauge around the flower and the flight across the map. */
+.pollen-glow {
+  fill: rgb(246 213 143 / 0.22);
+  animation: pollen-breathe 2.4s ease-in-out infinite;
+}
+
+.pollen-wave[data-reduced] .pollen-glow {
+  animation: none;
+}
+
+.pollen-ring {
+  fill: none;
+  stroke: rgb(233 169 59 / 0.75);
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pollen-ring 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.pollen-ring-late {
+  stroke: rgb(255 236 179 / 0.8);
+  stroke-width: 1.5;
+  animation-delay: 0.35s;
+  opacity: 0;
+}
+
+.pollen-grain {
+  fill: #f6c75a;
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.4;
+  animation: pollen-drift 3.6s ease-out forwards;
+}
+
+@keyframes pollen-ring {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(14);
+    opacity: 0;
+  }
+}
+
+@keyframes pollen-drift {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(-1 * var(--reach)));
+    opacity: 0;
+  }
+}
+
+@keyframes pollen-breathe {
+  50% {
+    fill: rgb(246 213 143 / 0.38);
+  }
+}
+
+/* The gauge: a golden arc around the flower's crown, filling with the clicks. */
+.pollen-track {
+  fill: none;
+  stroke: rgb(246 213 143 / 0.25);
+  stroke-width: 3;
+}
+
+.pollen-fill {
+  fill: none;
+  stroke: #e9a93b;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.25s ease-out;
+}
+
+.flower-panel[data-flight] .pollen-fill {
+  stroke: #ffd36b;
+  filter: drop-shadow(0 0 4px rgb(255 211 107 / 0.9));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pollen-ring,
+  .pollen-grain,
+  .pollen-glow {
+    animation: none;
+  }
+  .pollen-ring,
+  .pollen-grain {
+    display: none;
+  }
+}

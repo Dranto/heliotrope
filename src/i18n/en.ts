@@ -18,6 +18,7 @@ export const en: Texts = {
   light: 'Light',
   perSecond: '/ s',
   clickFlower: 'Harvest the heliotrope’s light',
+  pollen: (percent: string) => `Pollen gauge: ${percent}%`,
   generatorsTitle: 'Build',
   owned: 'owned',
   produces: 'produces',
@@ -154,6 +155,7 @@ export const en: Texts = {
       festival: (seconds: string) => `Harvest festival ×2 · ${seconds}`,
       fireflies: (seconds: string) => `Fireflies, click ×3 · ${seconds}`,
       fleaMarket: (seconds: string) => `Flea market, half price · ${seconds}`,
+      flight: (seconds: string) => `Pollen flight ×1.5 · ${seconds}`,
     },
   },
   visits: {
@@ -332,6 +334,8 @@ export const en: Texts = {
       grandBloom: 'The grand bloom',
       firstPath: 'First path',
       manyPaths: 'A city of a thousand shapes',
+      firstFlight: 'First flight',
+      pollenStorm: 'Pollen storm',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -436,6 +440,8 @@ export const en: Texts = {
         count === 1
           ? 'Pick the path of a growing building'
           : `Have ${count} building paths at work`,
+      flights: (count: number) =>
+        count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
@@ -542,6 +548,7 @@ export const en: Texts = {
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}: +${percent}% per restored parcel`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
+      pollenFill: (factor: string) => `The pollen gauge fills ×${factor} faster`,
       cuttingsGift: (units: number) =>
         units === 1
           ? 'The neighbours bring one more cutting'
@@ -557,6 +564,7 @@ export const en: Texts = {
       festival: 'The Harvest festival',
       fireflies: 'The Fireflies',
       fleaMarket: 'The Solar flea market',
+      flight: 'The Pollen flight',
     },
   },
   greatWorks: {
