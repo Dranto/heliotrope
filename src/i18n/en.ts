@@ -446,6 +446,7 @@ export const en: Texts = {
     futuresTitle: 'The futures of the parcels',
     futuresHint: 'Each parcel can change its future once per Cycle of water.',
     futureLocked: 'Changed this Cycle',
+    otherFuture: (parcel: string, effect: string) => `Or ${parcel}: ${effect}`,
     futureLabel: (parcel: string) => `Future of ${parcel}`,
     chooseFuture: 'Choose its future',
     districts: 'Neighbouring districts',

@@ -116,6 +116,19 @@ function FuturePills({
   );
 }
 
+/**
+ * The future not chosen and what it would give, written out under the chosen one's effect: the
+ * pills' titles only show on hover, and a parcel changes its future once per Cycle.
+ */
+function OtherFuture({ id, chosen }: { id: ParcelId; chosen: Future }) {
+  const other: Future = chosen === 0 ? 1 : 0;
+  return (
+    <span className="future-other">
+      {t.restoration.otherFuture(parcelName(id, other), futureTitle(id, other))}
+    </span>
+  );
+}
+
 /** The effect of a future, and the corridor family it joins (§6.7). */
 function futureTitle(id: ParcelId, future: Future): string {
   const family = FAMILIES[id][future];
@@ -177,6 +190,7 @@ function Card({ kind, name, effect, future, cost, affordable, onBuy, onFocus, on
         <span className="restoration-name">{name}</span>
         {future && <FuturePills {...future} />}
         <span className="restoration-effect">{effect}</span>
+        {future && <OtherFuture id={future.id} chosen={future.chosen} />}
       </span>
       <button
         type="button"
@@ -329,6 +343,7 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
                     {bonusesText(parcelBonuses(id, futureOf(state, id)))}
                     {locked && ` · ${t.restoration.futureLocked}`}
                   </span>
+                  {!locked && <OtherFuture id={id} chosen={futureOf(state, id)} />}
                 </li>
               );
             })}
