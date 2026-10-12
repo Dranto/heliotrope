@@ -672,7 +672,7 @@ Dans l'écran du Cycle, chaque bras élargissable montre sous son effet son éla
 
 La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par les mesures de M19). Code dans `src/game/cities.ts` et `src/game/cityData.ts`, écran `src/ui/Cities.tsx` (bouton « Villes sœurs » du menu), carte de la région `src/ui/RegionMap.tsx`, paysages sur la carte `src/ui/LandscapeArt.tsx`.
 
-**Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit, et ni Saison ni Cycle à défi en cours. Le joueur choisit parmi **trois paysages** (décision D14) et fonde une ville sœur :
+**Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit, et ni Saison ni Cycle à défi en cours. Le joueur choisit parmi **cinq paysages** (décision D14 ; la forêt et le marais depuis M30, décision D21) et fonde une ville sœur :
 
 - **Recommence :** tout ce qu'un Cycle remet à zéro (Lumière, bâtiments, améliorations, projets, Graines, Eau, collecteurs, sites), plus **l'Arbre des Saisons et la Canopée** (« relancer les Saisons ») et les **Sources non dépensées**.
 - **Reste :** le **delta** (ses bras et élargissements, gardés pour toujours, et les Sources qui les ont payés), l'Herbier, les Jalons, les parcelles et les quartiers voisins, le décor, les grands chantiers, le potager, le verger et les villes déjà fondées.
@@ -685,24 +685,30 @@ La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par 
 | Le littoral | Eau ×2, Panneaux de balcon ×0,5 | Eau ×1,1 | Une baie et sa plage à l'est, entre les deux collines |
 | La montagne | Papillon et visites 25 % plus fréquents, Eau ×0,75 | Papillon 5 % plus fréquent | Une crête de sommets enneigés au nord, entre les collines |
 | La plaine | Bâtiments 15 % moins chers, clic ×0,5 | Bâtiments 3 % moins chers | Des champs de blé au sud, entre les collines |
+| La forêt (M30) | +4 % de production par parcelle restaurée (les arbres des parcelles comptent double), verger ×1,5 plus vite, Centrale à miroirs ×0,5 | Verger ×1,1 plus vite | Un bois profond à l'ouest, feuillus et sapins, entre les collines |
+| Le marais (M30) | Biodiversité ×1,5 (les espèces comptent plus), Eau ×1,5, Fermes verticales ×0,5 | Biodiversité ×1,05 | Des mares, des nénuphars et des roseaux au sud, le long de la rivière |
 
 Le paysage fait partie du sol de la Biorégion (vue « La Biorégion ») : les deux rendus le dessinent, le rendu PixiJS le prenant au dessin SVG comme le reste de la terre (§10.4).
 
 La ville natale, une fois quittée, envoie **+3 % de production**. Chaque ville quittée fait aussi apporter **2 boutures de plus** aux voisins qui visitent (§9.6, Troc de graines). Il n'y a pas de serveur : le réseau est dans la sauvegarde.
 
-**L'atelier des Savoirs.** Des règles achetées une fois, pour toutes les villes à venir :
+**L'atelier des Savoirs.** Des règles apprises pour toutes les villes à venir. Depuis M30 (roadmap P29, décision D21), certaines s'approfondissent **niveau par niveau**, le prix doublant à chaque niveau, comme la Canopée et les bras du delta : les Savoirs gardent un usage. Deux règles s'ajoutent, les puits partagés et les écoles.
 
-| Règle | Savoirs | Effet |
+| Règle | Savoirs par niveau | Effet par niveau |
 |---|---|---|
-| La mémoire des eaux | 5 | Une nouvelle ville garde un quart des Sources non dépensées |
+| La mémoire des eaux | 5, 10, 20 | Une nouvelle ville garde un quart des Sources non dépensées (les trois quarts au niveau 3) |
 | Les semis voyageurs | 6 | L'Arbre des Saisons et la Canopée restent en essaimant |
 | Les bâtisseurs | 8 | Les sites de la Biorégion s'élèvent seuls, les moins chers d'abord, quand l'Eau suffit (3 niveaux par pas au plus) |
-| Les échanges | 12 | Le réseau envoie deux fois plus |
+| Les échanges | 12, 24, 48 | Le réseau envoie une fois plus (×2, ×3, ×4) |
+| Les puits partagés (M30) | 6, 12, 24 | Une nouvelle ville garde un tiers des collecteurs d'eau (tous au niveau 3) |
+| Les écoles (M30) | 10, 20, 40, 80, 160 | Chaque Savoir gagné donne +1 % de production de plus (+3 % à +8 %) |
 
-- **Écran.** Les Savoirs et leur bonus, la carte de la région (la ville natale au centre, les villes fondées autour, reliées par des fils dorés, la ville actuelle cerclée), la règle de la ville actuelle, le réseau, les trois paysages avec leur règle, leur réseau et le bouton « Essaimer », puis l'atelier.
+La roadmap proposait aussi que les quartiers voisins restent en essaimant (c'est déjà le cas) et une place d'alliance de plus (les villes sœurs en donnent déjà jusqu'au plafond) : les puits et les écoles les remplacent.
+
+- **Écran.** Les Savoirs et leur bonus, la carte de la région (la ville natale au centre, les villes fondées autour, reliées par des fils dorés, la ville actuelle cerclée), la règle de la ville actuelle, le réseau, les cinq paysages avec leur règle, leur réseau et le bouton « Essaimer », puis l'atelier, avec le niveau de chaque règle et le prix du suivant (« Approfondir »).
 - **Simulateur.** `npm run simulate` essaime vers la plaine à la fin de la partie mesurée (après le 6ᵉ Cycle, 59 Sources dont 34 hors du delta) : **8 Savoirs** (3 par les Sources, 5 par les 130 000 Graines), puis il joue la ville sœur. Son premier Cycle est conseillé après **19 min**, contre 2 h 48 pour la ville natale : tout ce qui reste (delta, Savoirs, Jalons, Herbier) fait repartir vite, et les 25 Sources de la ville suivante demandent ensuite quelques heures, comme les Cycles 2 à 4 de la ville natale.
 - **Jalons (2).** « Essaimage » (une ville sœur), « Les villes sœurs » (trois). 138 jalons en tout (140 avec M24, §9.9).
-- **Sauvegarde.** Version 24 : la ville actuelle, les villes quittées, les Savoirs, l'atelier, et les Sources et l'Eau de la fondation, à zéro pour une sauvegarde plus ancienne.
+- **Sauvegarde.** Version 24 : la ville actuelle, les villes quittées, les Savoirs, l'atelier, et les Sources et l'Eau de la fondation, à zéro pour une sauvegarde plus ancienne. Version 31 (M30) : le niveau de chaque règle de l'atelier ; une règle apprise avant compte comme son premier niveau.
 
 ---
 
@@ -807,6 +813,19 @@ Ce qu'en tire la feuille de route (décision D11) :
 - **Les Cycles s'allongent doucement** (35 min → 1 h 10) et les Sources croissent d'environ ×1,6 par Cycle : le delta (26 Sources) est ouvert au 6ᵉ Cycle, puis ses élargissements (§7.5) prennent le relais pendant de nombreux Cycles (environ 2 300 Sources pour tout élargir). La troisième couche (M23) se justifie : après une dizaine d'heures, chaque Cycle n'apporte plus qu'un bonus plat de plus.
 - **La Canopée est complète dès le 2ᵉ Cycle** (~1 900 Graines quand une Saison en rapporte des milliers, 120 000 au 6ᵉ Cycle) : les Graines retrouvent un bonus plat. Depuis M23, les Graines du Cycle comptent dans les Savoirs d'un essaimage (§7.6), et les grands chantiers restent hors Graines (D12).
 - **Les nombres restent loin de la limite** : 3 × 10²¹ de Lumière au total au 6ᵉ Cycle, très loin de 10³⁰⁸. Pas besoin de bibliothèque de grands nombres.
+
+### Toute la partie (M30)
+
+Roadmap P29 : le simulateur joue enfin tout (`src/game/wholeGame.ts`, `simulateWholeGame`, et la fin de `npm run simulate`). Le joueur de référence joue par **séances d'une heure**, puis s'absente **trois heures** pendant lesquelles le jeu continue hors ligne (§9.1) : quatre heures de temps réel par heure de jeu. À chaque départ et à chaque retour, il s'occupe des petites boucles : il récolte et ressème le potager (haricots, courges et tournesols en alternance, pour les variétés), cueille le verger, plante les arbres et pose les ruches dès que les paniers suffisent, paie une étape de grand chantier quand il peut la payer en entier (sa Lumière en moins de 10 min de production), choisit les alliances éveillées, sert les demandes remplies et lance aussitôt leurs coups de main. Les voies (§5.5), le pollen (§5.6) et le temps (§9.10) jouent comme avant. Il essaime dès que c'est permis, vers la plaine puis la forêt, et apprend à chaque fois les règles de l'atelier dans l'ordre mémoire, semis, bâtisseurs, écoles, puits, échanges. Un test (`src/game/wholeGame.test.ts`) vérifie les deux essaimages à ±30 % de leur cible.
+
+| Étape | Cible (heures de jeu) | Simulé | Temps réel | Cycles dans la ville |
+|---|---|---|---|---|
+| 1ʳᵉ ville sœur | ~4 h | 4,0 h | 16 h | 4 après le premier |
+| 2ᵉ ville sœur | ~5 h | 5,0 h | 20 h | 2 après le premier |
+
+- **Plus court que sans les boucles.** Sans les absences ni les petites boucles, il fallait 6 Cycles après le premier pour essaimer (M23) ; avec trois heures hors ligne par heure de jeu, les grands chantiers et les alliances, il en faut 4. La ville sœur, qui garde le delta, les Savoirs et le reste, ne prend ensuite qu'une heure de jeu.
+- **La grande floraison n'a pas de cible.** Elle demande l'Herbier complet, donc toutes les Saisons et tous les Cycles à défi, les visites de la ville et la trame bleue, que le joueur de référence ne joue pas. Au 2ᵉ essaimage, il a bâti deux étapes de chaque chantier et ramené 16 espèces sur 28. Écart avec la roadmap, qui proposait une trentaine d'heures pour la floraison : elle reste l'objectif de très long terme, sans test.
+- **Plus rapide.** La production par seconde est gardée pour chaque état du jeu (`lightPerSecond`), qui ne change jamais : le simulateur va presque deux fois plus vite, sans rien changer au jeu.
 
 ### Affichage des nombres
 

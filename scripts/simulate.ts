@@ -17,6 +17,7 @@ import {
   simulateSeasonsAfterCycle,
   simulateTwoSeasons,
 } from '../src/game/simulator';
+import { simulateWholeGame, WHOLE_GAME_TARGETS } from '../src/game/wholeGame';
 
 const clicksPerSecond = Number(process.argv[2] ?? REFERENCE_CLICKS_PER_SECOND);
 const { first, second } = simulateTwoSeasons({ clicksPerSecond });
@@ -155,3 +156,37 @@ if (canSwarm(endgame.state)) {
 } else {
   console.log('\nNo swarming yet: Sources of the city', citySources(endgame.state));
 }
+
+// The whole game (§8, M30): sessions of an hour of play and three hours away, the small loops
+// tended at each coming and going, from the first click to the second sister city.
+const whole = simulateWholeGame({ clicksPerSecond });
+const hours = (seconds: number) => `${(seconds / 3600).toFixed(1)} h`;
+console.log('\nWhole game      Target play   Play       Real time');
+whole.swarms.forEach((moment, i) => {
+  const target = WHOLE_GAME_TARGETS[i];
+  console.log(
+    `Sister city ${i + 1}`.padEnd(16),
+    (target === undefined ? '—' : hours(target)).padStart(11),
+    hours(moment.played).padStart(9),
+    hours(moment.real).padStart(12),
+  );
+});
+console.log(
+  'Cities:',
+  whole.cities.map((c) => `${hours(c.seconds)} (${c.cycles} Cycles)`).join(' · '),
+);
+const end = whole.state;
+console.log(
+  'Then: great works',
+  JSON.stringify(
+    Object.fromEntries(Object.entries(end.greatWorks.works).map(([id, w]) => [id, w.stage])),
+  ),
+  '· species',
+  end.species.length,
+  '· alliances',
+  end.alliances.chosen.join(', '),
+  '· requests served',
+  end.requests.served,
+  '· workshop',
+  JSON.stringify(end.city.workshop),
+);

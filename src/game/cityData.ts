@@ -1,9 +1,9 @@
-// The sister cities' data (docs/game-design.md §7.6, M23): the three landscapes a new city can
+// The sister cities' data (docs/game-design.md §7.6, M23, M30): the five landscapes a new city can
 // take, the bonus each city left behind sends to the network, and the Savoirs' workshop. Pure
 // data and the bonus formula, read by bonuses.ts; the swarming itself lives in cities.ts.
 import type { Bonus } from './bonuses';
 
-export const LANDSCAPE_IDS = ['coast', 'mountain', 'plain'] as const;
+export const LANDSCAPE_IDS = ['coast', 'mountain', 'plain', 'forest', 'marsh'] as const;
 export type LandscapeId = (typeof LANDSCAPE_IDS)[number];
 /** A city left behind: the home city, or a sister city of a landscape. */
 export type CityKind = 'home' | LandscapeId;
@@ -45,6 +45,28 @@ export const LANDSCAPES: Record<LandscapeId, LandscapeDef> = {
     ],
     network: [{ kind: 'discount', fraction: 0.03 }],
   },
+  // The forest (M30): the trees of the parcels count double and the orchard grows faster, but
+  // the mirrors stand in the shade.
+  forest: {
+    id: 'forest',
+    rule: [
+      { kind: 'perParcel', bonus: 0.04 },
+      { kind: 'orchardGrowth', factor: 1.5 },
+      { kind: 'generatorMultiplier', generator: 'mirrorPlant', factor: 0.5 },
+    ],
+    network: [{ kind: 'orchardGrowth', factor: 1.1 }],
+  },
+  // The marsh (M30): the species count more and the Water flows, but the vertical farms sink in
+  // the soft ground.
+  marsh: {
+    id: 'marsh',
+    rule: [
+      { kind: 'biodiversityFactor', factor: 1.5 },
+      { kind: 'water', factor: 1.5 },
+      { kind: 'generatorMultiplier', generator: 'verticalFarm', factor: 0.5 },
+    ],
+    network: [{ kind: 'biodiversityFactor', factor: 1.05 }],
+  },
 };
 
 /** What the home city sends once left: a little of everything. */
@@ -56,22 +78,48 @@ export const NETWORK_CUTTINGS = 2;
 /** Each Savoir ever earned adds this to global production. */
 export const SAVOIR_BONUS = 0.03;
 
-export const WORKSHOP_IDS = ['memory', 'seedlings', 'builders', 'trade'] as const;
+/** Each Savoir ever earned adds this much more per level of the schools. */
+export const SCHOOL_BONUS = 0.01;
+
+export const WORKSHOP_IDS = [
+  'memory',
+  'seedlings',
+  'builders',
+  'trade',
+  'wells',
+  'schools',
+] as const;
 export type WorkshopId = (typeof WORKSHOP_IDS)[number];
+/** The level learnt of each rule of the workshop; a rule not learnt is absent. */
+export type Workshop = Partial<Record<WorkshopId, number>>;
 
 /**
- * The Savoirs' workshop: rules that change for every city to come, bought once.
- * memory: a new city starts with a quarter of the Sources left unspent in the delta;
+ * The Savoirs' workshop: rules that change for every city to come, learnt level by level (M30),
+ * one price per level.
+ * memory: a new city starts with a quarter of the Sources left unspent per level;
  * seedlings: the Tree of Seasons and its Canopy are kept when swarming;
  * builders: the Bioregion's sites are raised on their own when the Water allows;
- * trade: the network sends twice as much.
+ * trade: the network sends one time more per level;
+ * wells: a new city keeps a third of the water collectors per level;
+ * schools: each Savoir ever earned adds 1% more production per level.
  */
-export const WORKSHOP_COSTS: Record<WorkshopId, number> = {
-  memory: 5,
-  seedlings: 6,
-  builders: 8,
-  trade: 12,
+export const WORKSHOP_COSTS: Record<WorkshopId, readonly number[]> = {
+  memory: [5, 10, 20],
+  seedlings: [6],
+  builders: [8],
+  trade: [12, 24, 48],
+  wells: [6, 12, 24],
+  schools: [10, 20, 40, 80, 160],
 };
+
+export function workshopLevel(workshop: Workshop, id: WorkshopId): number {
+  return workshop[id] ?? 0;
+}
+
+/** The price of the next level of a rule, or null once it is learnt to the end. */
+export function nextWorkshopCost(workshop: Workshop, id: WorkshopId): number | null {
+  return WORKSHOP_COSTS[id][workshopLevel(workshop, id)] ?? null;
+}
 
 export function isLandscapeId(value: unknown): value is LandscapeId {
   return typeof value === 'string' && Object.hasOwn(LANDSCAPES, value);
@@ -107,15 +155,20 @@ export interface CitySource {
   landscape: LandscapeId | null;
   founded: readonly CityKind[];
   earned: number;
-  workshop: readonly WorkshopId[];
+  workshop: Workshop;
+}
+
+/** What the Savoirs ever earned add to production, with the workshop's schools. */
+export function savoirBonus(city: Pick<CitySource, 'earned' | 'workshop'>): number {
+  return (SAVOIR_BONUS + SCHOOL_BONUS * workshopLevel(city.workshop, 'schools')) * city.earned;
 }
 
 /** The rule of the city lived in, the network of the cities left, and the Savoirs earned. */
 export function cityBonuses(city: CitySource): Bonus[] {
-  const scale = city.workshop.includes('trade') ? 2 : 1;
+  const scale = 1 + workshopLevel(city.workshop, 'trade');
   return [
     ...(city.landscape ? LANDSCAPES[city.landscape].rule : []),
     ...city.founded.flatMap((kind) => networkBonuses(kind, scale)),
-    ...(city.earned > 0 ? [{ kind: 'global', bonus: SAVOIR_BONUS * city.earned } as const] : []),
+    ...(city.earned > 0 ? [{ kind: 'global', bonus: savoirBonus(city) } as const] : []),
   ];
 }

@@ -1,4 +1,4 @@
-import { cityBonuses, LANDSCAPES, networkBonuses, SAVOIR_BONUS } from '../game/cityData';
+import { cityBonuses, LANDSCAPES, networkBonuses, savoirBonus } from '../game/cityData';
 import {
   buyWorkshop,
   canBuyWorkshop,
@@ -8,8 +8,10 @@ import {
   savoirsToGain,
   swarm,
   SWARM_SOURCES,
+  nextWorkshopCost,
   WORKSHOP_COSTS,
   WORKSHOP_IDS,
+  workshopLevel,
   type CityKind,
   type LandscapeId,
 } from '../game/cities';
@@ -27,7 +29,7 @@ function cityName(kind: CityKind | null): string {
 }
 
 /**
- * The sister cities (docs/game-design.md §7.6): the region with the cities founded, the three
+ * The sister cities (docs/game-design.md §7.6): the region with the cities founded, the five
  * landscapes to swarm to, and the Savoirs' workshop.
  */
 export function Cities({ onClose }: { onClose: () => void }) {
@@ -46,7 +48,7 @@ export function Cities({ onClose }: { onClose: () => void }) {
       <p className="cities-summary">
         <strong>{t.cities.savoirs(formatNumber(city.savoirs))}</strong>
         {city.earned > 0 &&
-          ` · ${t.cities.earned(formatNumber(city.earned), formatPercent(SAVOIR_BONUS * city.earned))}`}
+          ` · ${t.cities.earned(formatNumber(city.earned), formatPercent(savoirBonus(city)))}`}
       </p>
       <p className="hint">{t.cities.hint}</p>
       <RegionMap founded={city.founded} landscape={city.landscape} />
@@ -106,15 +108,20 @@ export function Cities({ onClose }: { onClose: () => void }) {
       <p className="hint">{t.cities.workshopHint}</p>
       <ul className="cities-workshop">
         {WORKSHOP_IDS.map((id) => {
-          const learnt = city.workshop.includes(id);
+          const level = workshopLevel(city.workshop, id);
+          const max = WORKSHOP_COSTS[id].length;
+          const cost = nextWorkshopCost(city.workshop, id);
           return (
-            <li key={id} className="cities-rule" data-learnt={learnt}>
+            <li key={id} className="cities-rule" data-learnt={cost === null} data-level={level}>
               <span>
                 <strong>{t.cities.workshopNames[id]}</strong>
+                {max > 1 && level > 0 && (
+                  <span className="cities-level"> · {t.cities.level(level, max)}</span>
+                )}
                 <br />
                 <span className="hint">{t.cities.workshopEffects[id]}</span>
               </span>
-              {learnt ? (
+              {cost === null ? (
                 <span className="cities-learnt">{t.cities.learnt}</span>
               ) : (
                 <button
@@ -123,10 +130,8 @@ export function Cities({ onClose }: { onClose: () => void }) {
                   disabled={!canBuyWorkshop(state, id)}
                   onClick={() => store.dispatch((s) => buyWorkshop(s, id))}
                 >
-                  <span className="buy-verb">{t.cities.learn}</span>
-                  <span className="buy-cost">
-                    {t.cities.savoirs(formatNumber(WORKSHOP_COSTS[id]))}
-                  </span>
+                  <span className="buy-verb">{level > 0 ? t.cities.deepen : t.cities.learn}</span>
+                  <span className="buy-cost">{t.cities.savoirs(formatNumber(cost))}</span>
                 </button>
               )}
             </li>

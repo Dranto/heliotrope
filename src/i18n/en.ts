@@ -605,6 +605,7 @@ export const en: Texts = {
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}: +${percent}% per restored parcel`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
+      orchardGrowth: (factor: string) => `The orchard grows ×${factor} faster`,
       pollenFill: (factor: string) => `The pollen gauge fills ×${factor} faster`,
       cuttingsGift: (units: number) =>
         units === 1
@@ -752,6 +753,8 @@ export const en: Texts = {
       coast: 'The coast',
       mountain: 'The mountain',
       plain: 'The plain',
+      forest: 'The forest',
+      marsh: 'The marsh',
     } satisfies Record<LandscapeId, string>,
     home: 'The home city',
     living: (name: string) => `Current city: ${name}`,
@@ -770,15 +773,21 @@ export const en: Texts = {
       seedlings: 'Travelling seedlings',
       builders: 'The builders',
       trade: 'Trade',
+      wells: 'Shared wells',
+      schools: 'The schools',
     } satisfies Record<WorkshopId, string>,
     workshopEffects: {
-      memory: 'A new city keeps a quarter of the unspent Sources.',
+      memory: 'A new city keeps a quarter of the unspent Sources per level.',
       seedlings: 'The Tree of Seasons and the Canopy stay when swarming.',
       builders: 'The Bioregion’s sites rise on their own, cheapest first, when the Water allows.',
-      trade: 'The network sends twice as much.',
+      trade: 'The network sends once more per level.',
+      wells: 'A new city keeps a third of the water collectors per level.',
+      schools: 'Each Savoir earned gives +1% more production per level.',
     } satisfies Record<WorkshopId, string>,
     learn: 'Learn',
+    deepen: 'Deepen',
     learnt: 'Learnt',
+    level: (level: number, max: number) => `Level ${level}/${max}`,
   },
   orchard: {
     title: 'The orchard and the hives',

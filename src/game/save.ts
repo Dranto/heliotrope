@@ -118,6 +118,9 @@ const migrations: Record<number, Migration> = {
   28: (raw) => ({ ...raw, version: 29 }),
   // v30 adds the neighbours' requests (§9.11, M29): none yet, no hand in reserve.
   29: (raw) => ({ ...raw, version: 30 }),
+  // v31 learns the workshop's rules level by level (§7.6, M30): validCity turns the old list into
+  // first levels.
+  30: (raw) => ({ ...raw, version: 31 }),
 };
 
 function isLanguage(value: string): value is Language {

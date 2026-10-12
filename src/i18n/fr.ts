@@ -666,6 +666,7 @@ export const fr = {
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}\u00a0: +${percent}\u00a0% par parcelle restaurée`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
+      orchardGrowth: (factor: string) => `Le verger pousse ×${factor} plus vite`,
       pollenFill: (factor: string) => `La jauge de pollen se remplit ×${factor} plus vite`,
       cuttingsGift: (units: number) =>
         units === 1
@@ -813,6 +814,8 @@ export const fr = {
       coast: 'Le littoral',
       mountain: 'La montagne',
       plain: 'La plaine',
+      forest: 'La forêt',
+      marsh: 'Le marais',
     } satisfies Record<LandscapeId, string>,
     home: 'La ville natale',
     living: (name: string) => `Ville actuelle\u00a0: ${name}`,
@@ -833,16 +836,22 @@ export const fr = {
       seedlings: 'Les semis voyageurs',
       builders: 'Les bâtisseurs',
       trade: 'Les échanges',
+      wells: 'Les puits partagés',
+      schools: 'Les écoles',
     } satisfies Record<WorkshopId, string>,
     workshopEffects: {
-      memory: 'Une nouvelle ville garde un quart des Sources non dépensées.',
+      memory: 'Une nouvelle ville garde un quart des Sources non dépensées par niveau.',
       seedlings: 'L’Arbre des Saisons et la Canopée restent en essaimant.',
       builders:
         'Les sites de la Biorégion s’élèvent seuls, les moins chers d’abord, quand l’Eau suffit.',
-      trade: 'Le réseau envoie deux fois plus.',
+      trade: 'Le réseau envoie une fois plus par niveau.',
+      wells: 'Une nouvelle ville garde un tiers des collecteurs d’eau par niveau.',
+      schools: 'Chaque Savoir gagné donne +1\u00a0% de production de plus par niveau.',
     } satisfies Record<WorkshopId, string>,
     learn: 'Apprendre',
+    deepen: 'Approfondir',
     learnt: 'Appris',
+    level: (level: number, max: number) => `Niveau ${level}/${max}`,
   },
   orchard: {
     title: 'Le verger et les ruches',

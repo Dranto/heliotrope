@@ -55,6 +55,8 @@ export function bonusText(bonus: Bonus): string {
       return b.perDistrict(formatPercent(bonus.bonus));
     case 'gardenGrowth':
       return b.gardenGrowth(factor(bonus.factor));
+    case 'orchardGrowth':
+      return b.orchardGrowth(factor(bonus.factor));
     case 'pollenFill':
       return b.pollenFill(factor(bonus.factor));
     case 'feeds':

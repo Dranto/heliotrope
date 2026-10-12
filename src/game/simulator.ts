@@ -59,6 +59,11 @@ export interface SimulationOptions {
   butterflyCatchRate?: number;
   /** Stop as soon as a new Season would bring this many Seeds. */
   stopAtSeeds?: number;
+  /**
+   * Called after every stretch of play with its length: what the player does besides buying,
+   * such as tending the small loops of the whole game (M30). Returns the state to go on with.
+   */
+  tend?: (state: GameState, dtSeconds: number) => GameState;
 }
 
 export interface SimulationResult {
@@ -171,6 +176,7 @@ export function simulate({
   maxStepSeconds = 10,
   butterflyCatchRate = REFERENCE_BUTTERFLY_CATCH_RATE,
   stopAtSeeds = Infinity,
+  tend,
 }: SimulationOptions = {}): SimulationResult {
   let state = withReferencePaths(start);
   let butterfliesSeen = 0;
@@ -222,6 +228,7 @@ export function simulate({
       const clicks = clicksPerSecond * dt;
       state = earnLight(tick(state, dt), clicks * clickValue(state));
       state = pollinate({ ...state, clicks: state.clicks + clicks }, clicks);
+      if (tend) state = tend(state, dt);
       seconds += dt;
       watchButterfly();
       noteFirstGenerators();
@@ -243,6 +250,7 @@ export function simulate({
         { ...state, clicks: state.clicks + clicksPerSecond * dt },
         clicksPerSecond * dt,
       );
+      if (tend) state = tend(state, dt);
       seconds += dt;
       watchButterfly();
       if (advisedSeason === undefined && state.totalLight >= ADVISED_SEASON_LIGHT) {

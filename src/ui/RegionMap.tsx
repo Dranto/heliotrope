@@ -68,6 +68,20 @@ export function CityGlyph({ kind }: { kind: CityKind }) {
           <path className="city-furrow" d="M-18 7h36M-18 10h36M-18 13h36" />
         </g>
       )}
+      {kind === 'forest' && (
+        <g className="city-wood">
+          <circle cx="-16" cy="-4" r="5" />
+          <circle cx="-9" cy="-7" r="4.4" />
+          <circle cx="12" cy="-6" r="4.6" />
+          <circle cx="18" cy="-2" r="4" />
+        </g>
+      )}
+      {kind === 'marsh' && (
+        <g className="city-marsh">
+          <ellipse cx="0" cy="10" rx="18" ry="3.6" />
+          <path className="city-reed" d="M-16 9v-9M-14 9v-7M15 9v-8M17 9v-6" />
+        </g>
+      )}
       {kind === 'home' && <circle className="city-flower" cx="0" cy="-8" r="3.4" />}
       <path className="city-house" d="M-11 6v-6l4-3 4 3v6Z" />
       <path className="city-house" d="M-2 6v-9l5-4 5 4v9Z" />

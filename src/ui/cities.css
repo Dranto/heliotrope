@@ -79,6 +79,26 @@
   stroke-width: 0.6;
 }
 
+.city-wood circle {
+  fill: #4f8a4a;
+}
+
+.city-marsh ellipse {
+  fill: #9cc9c0;
+}
+
+.city-reed {
+  fill: none;
+  stroke: #7c8f4a;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.cities-level {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
 .cities-landscapes {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
@@ -175,4 +195,61 @@
 .landscape-field {
   stroke: rgb(255 255 255 / 0.4);
   stroke-width: 3;
+}
+
+.landscape-undergrowth {
+  fill: #b9d39a;
+}
+
+.landscape-crown circle {
+  fill: #5f9a52;
+}
+
+.landscape-crown[data-tone='1'] circle {
+  fill: #4e8848;
+}
+
+.landscape-crown[data-tone='2'] circle {
+  fill: #74aa5c;
+}
+
+.landscape-crown .landscape-crown-light {
+  fill: rgb(255 255 255 / 0.16);
+}
+
+.landscape-pine path {
+  fill: #3f7a4c;
+}
+
+.landscape-pine[data-tone='1'] path {
+  fill: #356b44;
+}
+
+.landscape-wetland {
+  fill: #c9dfb4;
+}
+
+.landscape-pool {
+  fill: #9ccbc4;
+  stroke: #b6d6a6;
+  stroke-width: 10;
+}
+
+.landscape-pool-light {
+  fill: rgb(255 255 255 / 0.35);
+}
+
+.landscape-lily {
+  fill: #6fa35a;
+}
+
+.landscape-reed path {
+  fill: none;
+  stroke: #7c8f4a;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.landscape-cattail {
+  fill: #8a5a3a;
 }
