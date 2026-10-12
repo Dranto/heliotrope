@@ -212,7 +212,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | **M27 — Le pollen** *(livré)* | P26 : jauge de clic, envolée sur la carte, ses synergies | Petit jalon, rend le clic vivant ; se branche sur les voies de M26 |
 | **M28 — Le temps qu'il fait** *(livré)* | P27 : cinq temps, prévision en icônes, dessins des deux rendus, espèces et Jalons du temps | Donne du rythme d'heure en heure ; ses liens avec les voies et le pollen supposent M26-M27 |
 | **M29 — Les demandes des voisins** *(livré)* | P28 : bulles à icônes, coups de main en réserve, lien avec les quartiers voisins | Relie toutes les petites boucles, y compris le pollen et le temps |
-| **M30 — Mesurer toute la partie** | P29 : simulateur complet, cibles des villes sœurs, atelier à niveaux, forêt et marais | Clôt la v4 : mesure tout ce que la v3 et la v4 ont ajouté |
+| **M30 — Mesurer toute la partie** *(livré)* | P29 : simulateur complet, cibles des villes sœurs, atelier à niveaux, forêt et marais | Clôt la v4 : mesure tout ce que la v3 et la v4 ont ajouté |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Chaque mécanique se lie à l'existant (une voie au potager, une
 envolée au Papillon, un temps aux espèces, une demande au verger) plutôt que d'ajouter un multiplicateur isolé.

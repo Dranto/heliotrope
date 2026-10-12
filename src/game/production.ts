@@ -146,7 +146,19 @@ export function generatorProduction(state: GameState, id: GeneratorId): number {
  * multiplier computed once instead of once per type: it is the costly part, and this runs on every
  * tick and many times per render.
  */
+/** Production per state: a state never changes, and the formula is read many times per tick. */
+const lightCache = new WeakMap<GameState, number>();
+
 export function lightPerSecond(state: GameState): number {
+  let cached = lightCache.get(state);
+  if (cached === undefined) {
+    cached = computeLightPerSecond(state);
+    lightCache.set(state, cached);
+  }
+  return cached;
+}
+
+function computeLightPerSecond(state: GameState): number {
   let total = 0;
   for (const id of GENERATOR_IDS) {
     const owned = state.generators[id];

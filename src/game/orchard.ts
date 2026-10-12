@@ -5,6 +5,7 @@
 // give the tree's old variety, a bonus kept for good.
 import { unlockAchievements } from './achievements';
 import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
+import { factorOf } from './bonuses';
 import { FRUIT_IDS, FRUITS, isFruitId, type FruitId } from './fruits';
 import { earnLight } from './light';
 import { lightPerSecond } from './production';
@@ -76,6 +77,11 @@ export function pollination(state: Pick<GameState, 'orchard'>): number {
   return 1 + HIVE_POLLINATION * state.orchard.hives;
 }
 
+/** How fast the trees grow and bear: the hives, and the forest's rule and network (§7.6). */
+export function orchardSpeed(state: GameState): number {
+  return pollination(state) * factorOf(state, 'orchardGrowth');
+}
+
 export type TreeStage = 'none' | 'sapling' | 'flowering' | 'fruiting' | 'ripe';
 
 export function treeStage(tree: Tree): TreeStage {
@@ -88,7 +94,7 @@ export function treeStage(tree: Tree): TreeStage {
 /** Seconds of play before a tree's next step (flowers, fruit), at the speed in force now. */
 export function secondsToNext(state: GameState, id: FruitId): number {
   const tree = state.orchard.trees[id];
-  const speed = pollination(state);
+  const speed = orchardSpeed(state);
   if (tree.age === null) return 0;
   if (tree.age < TREE_SECONDS / 2) return (TREE_SECONDS / 2 - tree.age) / speed;
   if (tree.age < TREE_SECONDS) return (TREE_SECONDS - tree.age) / speed;
@@ -102,7 +108,7 @@ export function growOrchard(state: GameState, dtSeconds: number): GameState {
     (id) => orchard.trees[id].age !== null && treeStage(orchard.trees[id]) !== 'ripe',
   );
   if (!growing && orchard.hives === 0) return state;
-  const step = dtSeconds * pollination(state);
+  const step = dtSeconds * orchardSpeed(state);
   const trees = { ...orchard.trees };
   for (const id of FRUIT_IDS) {
     const tree = trees[id];

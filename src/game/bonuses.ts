@@ -67,6 +67,8 @@ export type Bonus =
   | { kind: 'perDistrict'; bonus: number }
   /** Multiplies how fast the courtyard garden's crops grow (§9.7, §6.6). */
   | { kind: 'gardenGrowth'; factor: number }
+  /** Multiplies how fast the orchard's trees grow and bear (§9.8, §7.6). */
+  | { kind: 'orchardGrowth'; factor: number }
   /** The pollen gauge fills faster (§5.6). */
   | { kind: 'pollenFill'; factor: number }
   /** The neighbours bring `units` more of their building (§9.6). */
@@ -204,6 +206,7 @@ export function factorOf(
     | 'visitInterval'
     | 'harvestFactor'
     | 'gardenGrowth'
+    | 'orchardGrowth'
     | 'pollenFill',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);

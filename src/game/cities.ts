@@ -10,9 +10,13 @@ import {
   isCityKind,
   isLandscapeId,
   isWorkshopId,
+  nextWorkshopCost,
   WORKSHOP_COSTS,
+  WORKSHOP_IDS,
+  workshopLevel,
   type CityKind,
   type LandscapeId,
+  type Workshop,
   type WorkshopId,
 } from './cityData';
 import { availableSources, deltaSourcesSpent, isDeltaComplete } from './delta';
@@ -23,8 +27,10 @@ import { createCanopyState } from './talents';
 export {
   LANDSCAPE_IDS,
   LANDSCAPES,
+  nextWorkshopCost,
   WORKSHOP_COSTS,
   WORKSHOP_IDS,
+  workshopLevel,
   type CityKind,
   type LandscapeId,
   type WorkshopId,
@@ -32,8 +38,10 @@ export {
 
 /** Sources a city must have earned before the player can swarm from it. */
 export const SWARM_SOURCES = 25;
-/** Share of the unspent Sources a new city keeps with the workshop's memory. */
+/** Share of the unspent Sources a new city keeps per level of the workshop's memory. */
 export const MEMORY_SOURCES = 0.25;
+/** Share of each water collector a new city keeps per level of the workshop's wells. */
+export const WELLS_SHARE = 1 / 3;
 /** The builders raise at most this many site levels per tick. */
 export const BUILDS_PER_TICK = 3;
 
@@ -46,7 +54,8 @@ export interface CityState {
   savoirs: number;
   /** Savoirs ever earned: each adds to production. */
   earned: number;
-  workshop: WorkshopId[];
+  /** The level of each rule learnt in the workshop. */
+  workshop: Workshop;
   /** Sources the city started with, and the all-time Water when it was founded. */
   sourcesBase: number;
   waterBase: number;
@@ -58,7 +67,7 @@ export function createCityState(): CityState {
     founded: [],
     savoirs: 0,
     earned: 0,
-    workshop: [],
+    workshop: {},
     sourcesBase: 0,
     waterBase: 0,
   };
@@ -100,11 +109,12 @@ export function swarm(state: GameState, landscape: LandscapeId): GameState {
   const gain = savoirsToGain(state);
   const { city } = state;
   const spent = deltaSourcesSpent(state.delta.levels, state.delta.widths);
-  const remembered = city.workshop.includes('memory')
-    ? Math.floor(availableSources(state) * MEMORY_SOURCES)
-    : 0;
+  const remembered = Math.floor(
+    availableSources(state) * MEMORY_SOURCES * workshopLevel(city.workshop, 'memory'),
+  );
   const sources = spent + remembered;
-  const keepTree = city.workshop.includes('seedlings');
+  const keepTree = workshopLevel(city.workshop, 'seedlings') > 0;
+  const kept = WELLS_SHARE * workshopLevel(city.workshop, 'wells');
   const replanted = replant(state, null, 0);
   const next: GameState = {
     ...replanted,
@@ -115,7 +125,9 @@ export function swarm(state: GameState, landscape: LandscapeId): GameState {
     talents: keepTree ? state.talents : [],
     canopy: keepTree ? state.canopy : { ...createCanopyState(), sowerFactor: 0 },
     resources: { light: 0, water: 0 },
-    collectors: Object.fromEntries(COLLECTOR_IDS.map((id) => [id, 0])) as GameState['collectors'],
+    collectors: Object.fromEntries(
+      COLLECTOR_IDS.map((id) => [id, Math.floor(state.collectors[id] * kept)]),
+    ) as GameState['collectors'],
     sites: Object.fromEntries(SITE_IDS.map((id) => [id, 0])) as GameState['sites'],
     cycleChallenge: null,
     lightBeforeCycle: state.allTimeLight,
@@ -135,22 +147,20 @@ export function swarm(state: GameState, landscape: LandscapeId): GameState {
 }
 
 export function canBuyWorkshop(state: GameState, id: WorkshopId): boolean {
-  return (
-    areCitiesOpen(state) &&
-    !state.city.workshop.includes(id) &&
-    state.city.savoirs >= WORKSHOP_COSTS[id]
-  );
+  const cost = nextWorkshopCost(state.city.workshop, id);
+  return areCitiesOpen(state) && cost !== null && state.city.savoirs >= cost;
 }
 
-/** Player action: buy a rule of the workshop with Savoirs, for every city to come. */
+/** Player action: learn the next level of a rule of the workshop, for every city to come. */
 export function buyWorkshop(state: GameState, id: WorkshopId): GameState {
   if (!canBuyWorkshop(state, id)) return state;
+  const { workshop } = state.city;
   return {
     ...state,
     city: {
       ...state.city,
-      savoirs: state.city.savoirs - WORKSHOP_COSTS[id],
-      workshop: [...state.city.workshop, id],
+      savoirs: state.city.savoirs - nextWorkshopCost(workshop, id)!,
+      workshop: { ...workshop, [id]: workshopLevel(workshop, id) + 1 },
     },
   };
 }
@@ -160,7 +170,7 @@ export function buyWorkshop(state: GameState, id: WorkshopId): GameState {
  * Water allows. Called by every tick; returns the same state when nothing is built.
  */
 export function runBuilders(state: GameState): GameState {
-  if (!state.city.workshop.includes('builders')) return state;
+  if (workshopLevel(state.city.workshop, 'builders') === 0) return state;
   let next = state;
   for (let i = 0; i < BUILDS_PER_TICK; i++) {
     const affordable = SITE_IDS.filter((id) => canRaiseSite(next, id));
@@ -182,7 +192,13 @@ export function validCity(raw: unknown): CityState {
   if (isLandscapeId(data.landscape)) city.landscape = data.landscape;
   if (Array.isArray(data.founded)) city.founded = data.founded.filter(isCityKind);
   if (Array.isArray(data.workshop)) {
-    city.workshop = [...new Set<WorkshopId>(data.workshop.filter(isWorkshopId))];
+    // Before M30 (save v30), the rules were learnt once: each counts as its first level.
+    for (const id of data.workshop.filter(isWorkshopId)) city.workshop[id] = 1;
+  } else if (typeof data.workshop === 'object' && data.workshop !== null) {
+    for (const id of WORKSHOP_IDS) {
+      const level = count((data.workshop as Record<string, unknown>)[id]);
+      if (level > 0) city.workshop[id] = Math.min(level, WORKSHOP_COSTS[id].length);
+    }
   }
   city.savoirs = count(data.savoirs);
   city.earned = Math.max(count(data.earned), city.savoirs);
