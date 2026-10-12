@@ -1,8 +1,8 @@
 # Heliotrope — Feuille de route
 
-> Statut : v3.1 (2026-10-11), validée par Antoine, sauf l'album, remplacé par les alliances (P23). La v1 (M5 à M12), la v2 (M13 à M18) et la v3 (M19 à M24) sont livrées ;
-> cette version propose la suite, de M19 à M24, à la demande d'Antoine (« établis un plan des nouvelles
-> fonctionnalités à mettre dans une nouvelle roadmap »).
+> Statut : v4.0 (2026-10-12), proposée à Antoine (« fais-moi une nouvelle roadmap pour ajouter des fonctionnalités /
+> peaufiner le jeu »), à valider. La v1 (M5 à M12), la v2 (M13 à M18) et la v3 (M19 à M24) sont livrées ; cette
+> version propose la suite, de M25 à M30.
 > Ce document classe les mécaniques à ajouter. Il ne fixe aucun chiffre : `docs/game-design.md` reste la référence pour
 > les mécaniques et l'équilibrage, et chaque mécanique retenue y sera décrite dans la PR qui l'implémente. Les valeurs
 > données ici sont des ordres de grandeur à confirmer avec le simulateur (§8).
@@ -15,44 +15,48 @@
 4. [Jalons](#4-jalons)
 5. [Ce qu'on écarte ou repousse](#5-ce-quon-écarte-ou-repousse)
 6. [Décisions d'Antoine](#6-décisions-dantoine)
-7. [Mécaniques déjà livrées (v1 et v2)](#7-mécaniques-déjà-livrées-v1-et-v2)
+7. [Mécaniques déjà livrées (v1 à v3)](#7-mécaniques-déjà-livrées-v1-à-v3)
 
 ---
 
 ## 1. État des lieux
 
-Ce que le jeu propose aujourd'hui (main au 2026-10-11, après les PR #40 à #46, sauvegarde version 20) :
+Ce que le jeu propose aujourd'hui (main au 2026-10-12, après les PR #49 à #59, sauvegarde version 25) :
 
 | Système | Contenu | Où (design doc) |
 |---|---|---|
 | Clic et générateurs | Héliotrope cliquable et ses améliorations, 8 bâtiments, achat ×1 / ×10 / ×100 / Max, temps avant achat | §4, §5.2, §10.5 |
-| Améliorations | ×2 par générateur, synergies entre bâtiments, avec le clic et entre améliorations, biodiversité | §5 |
-| Le quartier | 8 parcelles à deux avenirs chacune, 16 projets par Saison, 8 quartiers voisins, décor à poser, mode photo | §6.1, §6.2, §6.4, §6.5 |
-| Saisons | Graines qui mûrissent en 15 min, Arbre (17 talents) et Canopée à niveaux (~1 900 Graines), semoir, Coopératives, 4 Saisons à défi | §7 à §7.3 |
-| Biorégion | Eau, 4 collecteurs, 5 sites, Cycle de l'eau, delta des Sources (5 bras, 26 Sources), éclusier, 3 Cycles à défi | §7.4, §7.5 |
-| Le vivant | Herbier, Papillon doré, 7 visiteurs du quartier et de la ville, soir et nuit en décor | §9.2, §9.5, §9.6 |
-| Potager | 6 carrés de la cour, 4 cultures à temps réel, Grainothèque de 6 variétés | §9.7 |
-| Succès | 132 Jalons à +1 % chacun | §9.3 |
-| Accueil et ambiance | Première minute guidée sans texte, retour hors ligne en images, rappels facultatifs, musique générative | §6.3, §9.1, §10.6 |
-| Carte | Vue du dessus en PixiJS (SVG en secours), 4 vues du Balcon à la Biorégion, dessins retravaillés (PR #39, #46) | §6, §10.4 |
+| Améliorations | ×2 par générateur à 7 seuils, synergies entre bâtiments, avec le clic et entre améliorations | §5 |
+| Le quartier | 8 parcelles à deux avenirs, trames verte et bleue, 16 projets par Saison, 8 quartiers voisins, décor, photo | §6.1 à §6.5, §6.7 |
+| Grands chantiers | 4 ouvrages en étapes payés en Lumière, Eau, paniers, miel et espèces | §6.6 |
+| Saisons | Graines qui mûrissent, Arbre et Canopée, semoir, Coopératives, 4 Saisons à défi | §7 à §7.3 |
+| Biorégion | Eau, collecteurs, sites, Cycle de l'eau, delta à bras élargissables, éclusier, 3 Cycles à défi | §7.4, §7.5 |
+| Villes sœurs | 3ᵉ couche : essaimage parmi 3 paysages, Savoirs et leur atelier (4 règles), réseau | §7.6 |
+| Le vivant | Herbier, Papillon doré, visites du quartier et de la ville, soir et nuit en décor | §9.2, §9.5, §9.6 |
+| Potager et verger | 6 carrés, Grainothèque, 4 fruitiers sur deux jours, 2 ruches, miel | §9.7, §9.8 |
+| Alliances | 6 synergies entre systèmes à composer sur des places, grande floraison | §9.9 |
+| Succès | 140 Jalons à +1 % chacun | §9.3 |
+| Accueil et ambiance | Première minute guidée sans texte, retour en images, rappels facultatifs, musique générative | §6.3, §9.1, §10.6 |
 
-**Bilan.** Toutes les couches ont maintenant leurs choix et leur automatisation. Ce qui s'essouffle, c'est de
-nouveau **le très long terme**, et cette fois aussi **la mesure** de ce long terme :
+**Bilan.** La v2 et la v3 ont surtout nourri **la fin de partie** : Canopée, delta, chantiers, villes sœurs,
+alliances. Le jeu a maintenant un sommet. Ce qui s'essouffle, cette fois, c'est **le milieu et le geste**, et **la
+place que prend tout ce contenu** :
 
-- **Personne ne mesure la fin de partie.** Le simulateur s'arrête aux Saisons qui suivent le premier Cycle ; il ne
-  joue ni la Canopée, ni le delta, ni les Cycles suivants. La décision D9 (troisième couche) attendait justement cette
-  mesure. Et la Saison conseillée arrive déjà à −28 % de sa cible (1 h 12 pour 1 h 40), au bord de la marge de ±30 %.
-- **Les Sources redeviennent un bonus plat** une fois le delta ouvert (26 Sources, quelques Cycles) : le problème que
-  la Canopée a réglé pour les Graines revient une couche plus haut.
-- **Il n'y a pas de grand objectif qui relie tout.** Lumière, Eau, Graines, récoltes et espèces avancent chacune de
-  leur côté ; rien sur la carte ne se construit lentement avec toutes à la fois.
-- **Les choix du quartier ne se répondent pas.** Les deux avenirs d'une parcelle (M16) se valent et ne dépendent pas
-  des voisines : le joueur façonne la carte sans qu'elle réagisse à l'ensemble.
-- **Le potager plafonne vite.** Six carrés et six variétés : une fois la Grainothèque complète, la boucle de soin ne
-  donne plus que des bonus ponctuels.
-- **Les couches ne se parlent presque pas.** Les synergies relient des bâtiments, des améliorations et le clic, mais
-  presque jamais le potager à l'Herbier, un quartier voisin à une visite, ou une couche de prestige à une autre.
-- **Le jeu n'a pas de sommet.** Aucun moment ne fête la région entière restaurée.
+- **L'interface déborde.** Neuf panneaux dans le menu latéral (Améliorer, Le quartier, Potager, Verger, Grands
+  chantiers, Alliances, Bâtir, Biorégion, Coopératives) et huit écrans. Un joueur à la 3ᵉ Saison voit apparaître trois
+  panneaux d'un coup, sans repère pour savoir ce qui vient de s'ouvrir. Sur téléphone, le défilement est long.
+- **Les bâtiments ne changent plus après le premier soir.** Les huit générateurs gagnent des ×2 à des seuils fixes :
+  aucun choix, et leur dessin ne bouge plus une fois posés. C'est pourtant ce que le joueur regarde le plus.
+- **Le clic s'arrête tôt.** Après la 1ʳᵉ Saison, cliquer ne compte presque plus ; le Papillon est le seul moment
+  actif, et il est rare.
+- **Le quartier vit, mais ne demande rien.** Les visites passent et donnent, les récoltes servent aux chantiers, mais
+  personne ne demande jamais un panier, une espèce ou un coup de main : les petites boucles ne se répondent pas.
+- **Rien ne varie d'une heure à l'autre.** Le jour et la nuit sont du décor (décision ancienne, gardée) ; aucun
+  événement doux ne change l'intérêt d'un bâtiment plutôt que d'un autre pendant un moment.
+- **Les Savoirs deviennent un bonus plat.** L'atelier n'a que 4 règles (31 Savoirs) : après deux ou trois villes
+  sœurs, le problème des Graines (réglé par la Canopée) et des Sources (réglé par les élargissements) revient une
+  troisième fois. Et le simulateur ne joue ni le potager, ni le verger, ni les chantiers, ni les alliances : la
+  partie au-delà du 6ᵉ Cycle n'est pas mesurée.
 
 ---
 
@@ -60,139 +64,138 @@ nouveau **le très long terme**, et cette fois aussi **la mesure** de ce long te
 
 | Ce qui rend un incrémental satisfaisant sur la durée | Référence | Heliotrope aujourd'hui |
 |---|---|---|
-| Chaque couche garde un **puits à dépenser** | Cookie Clicker, Antimatter Dimensions | Delta épuisé à 26 Sources |
-| Une **troisième couche** qui change d'échelle et de règles | Antimatter Dimensions (Reality), Kittens Game | Deux couches (Saisons, Cycles) |
-| Un **grand projet** de longue haleine qui consomme toutes les ressources | Kittens Game (merveilles), Factorio (fusée) | Aucun |
-| Des **voisinages qui se répondent** : l'emplacement compte | Townscaper, Islanders | Chaque parcelle vaut seule |
-| Une **boucle lente** qui s'étoffe avec le temps | Melvor Idle, Cats & Soup | Potager complet en quelques jours |
-| Un **sommet** atteint, puis une partie libre | Universal Paperclips, A Dark Room | Pas de fin, pas de fête finale |
-| Des **synergies entre systèmes** que le joueur compose | Melvor Idle (synergies d'invocation), Path of Exile (arbre de passifs) | Synergies fixes, surtout entre bâtiments |
+| Une interface qui **s'ouvre au rythme du joueur** et dit sans mots ce qui est nouveau | Antimatter Dimensions, Melvor Idle | Panneaux empilés, rien de signalé |
+| Des **bâtiments qui évoluent** et des **choix** sur chacun | AdVenture Capitalist (paliers), Idle Slayer, Bloons TD (voies) | ×2 automatiques, pas de choix |
+| Un **clic qui reste un geste** tout au long de la partie | Cookie Clicker (frénésie), Clicker Heroes | Clic décisif seulement au début |
+| Des **demandes** qui relient les petites boucles | Cats & Soup, Stardew Valley (lots), Hay Day (commandes) | Les ressources ne servent qu'aux chantiers |
+| Un **temps qu'il fait** qui change l'intérêt des choix, sans punir | Kittens Game (saisons), Townscaper (ambiance) | Jour et nuit en décor seulement |
+| Chaque couche garde un **puits** et la partie entière est **mesurée** | Antimatter Dimensions, Kittens Game | Atelier des Savoirs épuisé, fin non mesurée |
 
 ---
 
 ## 3. Nouvelles mécaniques proposées, par priorité
 
-Mêmes critères que la v1 et la v2 : ce que la mécanique apporte au **thème solarpunk** (réparer un monde, ensemble)
-et à la **satisfaction du joueur**, et un effort relatif. Les règles d'Antoine valent pour toutes : chaque mécanique se
-lie à l'existant par une **synergie** plutôt qu'un multiplicateur isolé, rien n'est raconté par du texte, et on ne
-punit jamais le joueur absent.
+Mêmes critères que les versions précédentes : ce que la mécanique apporte au **thème solarpunk** (réparer un monde,
+ensemble) et à la **satisfaction du joueur**, et un effort relatif. Les règles d'Antoine valent pour toutes : chaque
+mécanique se lie à l'existant par une **synergie** plutôt qu'un multiplicateur isolé, rien n'est raconté par du texte,
+on ne punit jamais le joueur absent, et la carte reste ce qu'on regarde. Cette fois, la priorité va aux **premières
+heures et au milieu de partie**, que tous les joueurs traversent.
 
-### P18 — Mesurer la fin de partie, et le delta qui s'élargit
+### P24 — Une interface rangée, qui s'ouvre au rythme du joueur
 
-D'abord l'outil, puis le puits :
+Du peaufinage avant tout nouveau contenu, puisque chaque jalon suivant ajoute encore des panneaux :
 
-- **Le simulateur joue tout.** Il apprend la Canopée, le semoir, le delta, l'éclusier et les Coteaux, et enchaîne les
-  Cycles (par exemple jusqu'au 5ᵉ). Le design doc §8 reçoit des cibles pour les Cycles 2 à 5 (durée d'un Cycle, d'une
-  Saison tardive), vérifiées par un test comme les cibles de la 1ʳᵉ Saison. On en profite pour redonner de la marge à
-  la Saison conseillée (−28 %), par la cible ou par une synergie de début plus douce, selon ce que le simulateur
-  montre.
-- **Les bras s'élargissent.** Une fois les cinq bras ouverts, chacun s'**élargit** par niveaux, au prix qui grandit,
-  comme la Canopée : le bras des semences fait mûrir les Graines un peu plus vite (sans descendre sous 5 min), le bras
-  de la mémoire garde un peu plus des collecteurs, celui des coteaux relève les Coteaux, celui des crues renforce les
-  récompenses des Cycles à défi. Sur le dessin du delta, le bras s'élargit et sa mare grandit.
+- **Le menu par couches.** Les panneaux se rangent sous trois onglets à icône, dans l'ordre où le joueur les découvre :
+  **La ville** (Améliorer, Bâtir, Le quartier, Coopératives), **Le vivant** (Potager, Verger, Alliances) et **La
+  région** (Biorégion, Grands chantiers). Un onglet n'apparaît qu'avec son premier panneau. Sur grand écran, les deux
+  colonnes de §10.1 restent ; sur téléphone, un onglet à la fois, et le menu défile moins.
+- **Ce qui vient de s'ouvrir se voit.** Un système qui s'ouvre fait briller son onglet et son panneau d'une pastille
+  dorée, et le **halo du guide** (M17) désigne une fois son premier geste utile (planter, verser, choisir), sans
+  texte. Ce qui devient achetable dans un panneau replié se signale par un point sur son titre.
+- **Les écrans en un seul endroit.** Saisons, Arbre, Cycles, villes sœurs, Herbier, Jalons et statistiques se
+  rangent dans une barre d'icônes cohérente, chacune avec sa jauge (Graines mûres, Sources prêtes) pour savoir d'un
+  coup d'œil qu'une relance vaut la peine.
+- **Tenir sur un vrai téléphone.** Un budget mesuré dans un test : temps de chargement (découpage du code par écran),
+  temps d'une image de la carte PixiJS sur un appareil modeste, carte arrêtée quand l'onglet est caché. Les cibles
+  tactiles de la carte (arbres, papillon, visites) passent à 44 px au moins.
+- **Les sons des systèmes récents.** Verser à un chantier, cueillir, poser une ruche, éveiller une alliance n'ont pas
+  encore leur son discret (§6.3).
 
-- **Thème :** la rivière creuse son lit à mesure qu'on la laisse vivre.
-- **Satisfaction :** les Sources tardives gardent un usage, et les jalons suivants s'appuient sur des chiffres mesurés.
-- **Effort :** moyen : surtout le simulateur ; les bras à niveaux reprennent le modèle de la Canopée.
+- **Thème :** un jardin bien tenu, où chaque outil a sa place.
+- **Satisfaction :** le joueur sait toujours où regarder ; la richesse des v2 et v3 devient lisible.
+- **Effort :** moyen, surtout de l'interface ; aucune migration de sauvegarde.
 
-### P19 — Les grands chantiers
+### P25 — Les bâtiments qui grandissent
 
-Des ouvrages de toute la ville, **en plusieurs étapes**, gardés pour toujours (après une Saison comme après un
-Cycle), qui se paient chacun avec **plusieurs ressources à la fois** : Lumière, Eau, récoltes du potager, et des
-espèces présentes dans l'Herbier comme condition. Chaque étape se voit sur la carte, chantier puis ouvrage fini, et
-donne une synergie qui relie deux systèmes. Quatre chantiers, par exemple :
+Chacun des huit générateurs **évolue** à trois paliers de possession (par exemple 50, 100 et 200) : son dessin change
+sur la carte (le Panneau de balcon devient pergola solaire puis treille photovoltaïque ; la Serre s'agrandit en serre
+à étages puis en jardin d'hiver), et le joueur **choisit une voie** parmi deux à chaque palier. Les deux voies se
+valent ; elles orientent vers des synergies différentes, par exemple :
 
-| Chantier | Étapes (exemples) | Synergie à la fin |
+| Bâtiment, palier | Voie A | Voie B |
 |---|---|---|
-| **Le tram solaire** | Rails, caténaires végétalisées, stations, premier tram | Les quartiers voisins (§6.4) se renforcent entre eux |
-| **La rivière rouverte** | Dalle cassée, berges, passerelles, baignade | Eau ×, et les espèces de la rivière (§7.5) reviennent plus vite |
-| **Les halles nourricières** | Charpente, étals, cuisine commune | Les récoltes du potager durent plus longtemps |
-| **La tour des semences** | Fondations, étages de culture, grainothèque, belvédère | Graines ×, et la tour se voit de toutes les vues |
+| Panneau de balcon, 50 | Chaque Panneau ajoute un peu de Lumière au clic | Les Panneaux nourrissent la Serre (synergie plus forte) |
+| Potager sur le toit, 100 | Les récoltes du potager de la cour poussent plus vite | Le Potager produit davantage par parcelle restaurée |
+| Centrale à miroirs, 100 | Le Papillon doré dure plus longtemps | La Centrale renforce les collecteurs d'Eau |
+| Arcologie vivante, 200 | Chaque espèce de l'Herbier relève l'Arcologie | Les Coopératives achètent plus vite |
 
-- **Rythme :** une étape coûte environ une Saison tardive d'efforts ; un chantier complet, plusieurs Cycles. On peut
-  laisser une étape à moitié payée : ce qui est versé reste.
-- **Thème :** les grands ouvrages communs, bâtis lentement et ensemble, sont le cœur du solarpunk.
-- **Satisfaction :** un objectif lointain qui donne une raison d'être à chaque ressource, et la carte qui change
-  d'échelle.
-- **Effort :** moyen à élevé : données et écran simples, mais quatre ouvrages à dessiner en plusieurs états.
+- **Choix modifiable** à chaque nouvelle Saison (le palier se regagne vite), pour essayer sans regret.
+- Les ×2 de §5.1 restent ; les voies s'ajoutent aux synergies de §5.3 et le simulateur choisit une voie de référence.
+- **Thème :** la ville se densifie en vert, chaque bâtiment trouve sa forme.
+- **Satisfaction :** des décisions dès la 1ʳᵉ Saison, et la carte qui change sous les yeux à chaque palier.
+- **Effort :** moyen à élevé : 24 paliers à dessiner en SVG (repris par PixiJS), une table de voies, des tests.
 
-### P20 — Les trames verte et bleue
+### P26 — Le pollen
 
-Les choix de M16 se répondent : quand des parcelles **voisines** sur la carte prennent des avenirs **de la même
-famille** (vert : parc, prairie, verger ; bleu : jardins de pluie, mares, rivière), elles forment une **trame**. Une
-trame se dessine sur la carte (une haie continue, un ruisseau qui relie les parcelles), attire une espèce qui ne
-vient que par elle, et donne une petite synergie qui grandit avec sa longueur.
+Le clic redevient un geste tout au long de la partie. Cliquer la fleur remplit une **jauge de pollen** autour de la
+couronne ; pleine, elle déclenche une **envolée** : une vague de pollen doré part de la cour et traverse la carte, et
+chaque bâtiment qu'elle touche produit davantage pendant quelques secondes (de l'ordre de ×2 pendant 20 s). La jauge
+redescend doucement quand on ne clique plus, sans jamais rien retirer d'autre.
 
-- **Règle :** les avenirs gardent leur valeur propre ; la trame ajoute un bonus modeste et une espèce, jamais une
-  pénalité. Comme les avenirs (D7), on peut tout réarranger à chaque Cycle de l'eau.
-- **Thème :** les corridors écologiques, une vraie notion d'urbanisme vivant.
-- **Satisfaction :** l'emplacement compte enfin, un petit casse-tête sans erreur possible, lisible sur la carte.
-- **Effort :** faible à moyen : une table de voisinage des parcelles, quelques dessins de liaison.
+- **Synergies :** les améliorations de clic remplissent la jauge plus vite ; une envolée pollinise le potager (une
+  pousse avance) ; le Papillon attrapé pendant une envolée dure plus longtemps ; une voie de P25 et un talent de
+  l'Arbre peuvent s'y brancher.
+- **Équilibrage :** de l'ordre de 2 à 3 envolées par minute de clic soutenu ; le simulateur garde les rythmes du §8
+  au joueur qui clique 2,5 fois par seconde, et le joueur qui ne clique pas ne perd rien de ce qu'il a aujourd'hui.
+- **Thème :** la fleur pollinise la ville.
+- **Satisfaction :** une raison de cliquer en fin de partie, avec un retour visuel fort sur toute la carte.
+- **Effort :** faible à moyen : une jauge, un effet minuté (sur le modèle de `effects.ts`), une animation.
 
-### P21 — Le verger et les ruches
+### P27 — Le temps qu'il fait
 
-Le potager s'étend sur les toits et sur une parcelle, avec une boucle **encore plus lente** :
+Le ciel du quartier change toutes les 15 à 30 minutes environ : **grand soleil, averse, vent, brume, chaleur**.
+Chaque temps **favorise** une famille de bâtiments et de systèmes, jamais une pénalité :
 
-- **Le verger.** Quelques arbres fruitiers plantés une fois, qui mettent plusieurs jours de temps réel à grandir
-  (jeune plant, premières fleurs, premiers fruits), puis donnent une récolte à intervalle régulier. Comme les
-  cultures, ils ne meurent jamais et grandissent hors ligne.
-- **Les ruches.** Posées près des carrés, elles **pollinisent** les cultures voisines : pousse plus rapide, et une
-  chance de variété plus grande. Leur miel est une récolte rare, qui sert aux grands chantiers (P19).
-- **La Grainothèque s'agrandit** avec les fruitiers et leurs variétés anciennes (pomme reinette, poire curé…), une
-  nouvelle planche de l'Herbier.
+| Temps | Sur la carte | Favorise |
+|---|---|---|
+| Grand soleil | Ombres nettes, reflets sur les panneaux | Panneaux et Centrale à miroirs |
+| Averse | Pluie, flaques, parapluies des passants | Eau récoltée, le potager et le verger poussent plus vite |
+| Vent | Arbres qui ploient, éoliennes de balcon qui tournent | Coopératives et vélos-cargos plus rapides, le Papillon revient plus tôt |
+| Brume | Halo doux, lumières allumées | Les espèces de l'Herbier se montrent davantage, les visites aussi |
+| Chaleur | Air qui tremble, ombres recherchées | Les arbres des parcelles et la Canopée urbaine produisent plus |
 
-- **Thème :** planter des arbres pour plus tard, le geste de long terme par excellence.
-- **Satisfaction :** des rendez-vous de plusieurs jours, et une raison de revenir qui grandit avec le joueur.
-- **Effort :** moyen : un état par arbre et par ruche, des dessins à plusieurs stades sur SVG et PixiJS.
+- **Prévision sans texte :** les trois prochains temps en icônes à côté du sélecteur de vue, pour préparer un achat
+  ou une récolte. Les voies de P25 et certaines alliances se lient à un temps (une voie qui gagne double sous la pluie).
+- **Hors ligne :** le temps continue, et le retour en images (M17) montre ce qu'il a fait. Le hasard vient de la graine
+  de la sauvegarde, comme le Papillon.
+- Un **Jalon** par temps vécu, et des espèces qui ne reviennent que par un temps (l'escargot sous l'averse).
+- **Thème :** une ville qui vit avec son climat plutôt que contre lui.
+- **Satisfaction :** de la variété d'une heure à l'autre, et une carte encore plus vivante.
+- **Effort :** moyen : les effets sont simples, les dessins demandent du soin sur les deux rendus.
 
-### P22 — Les villes sœurs (troisième couche)
+### P28 — Les demandes des voisins
 
-La décision D9, à prendre avec les mesures de P18. Quand la Biorégion est restaurée, le joueur peut **essaimer** :
-fonder une **ville sœur** ailleurs dans la région, ce qui relance les Saisons, la Biorégion et le Cycle, mais garde
-l'Herbier, les Jalons, le décor, les grands chantiers et la carte des villes. La nouvelle monnaie, les **Savoirs**,
-se gagne selon les Sources obtenues.
+Les habitants qui passent sur la carte portent parfois une **bulle à icônes** : ce qu'ils demandent (3 radis et un
+pot de miel, 2 cueillettes de poires, 25 Serres, une espèce de l'Herbier, une envolée de pollen), et ce qu'ils
+offrent. Trois demandes au plus à la fois ; une demande **attend** sans limite de temps, et le joueur peut en refuser
+une pour en voir une autre.
 
-- **Un choix à chaque essaimage :** trois villes proposées, chacune avec son paysage et une règle propre (la ville
-  du littoral : l'Eau compte double mais les Panneaux moins ; la ville de montagne : le Papillon et les visites plus
-  fréquents ; la ville des plaines : les Coopératives plus rapides). Le paysage change les dessins de la carte, pas
-  seulement un chiffre.
-- **Le réseau :** les villes déjà fondées restent sur une carte de la région et échangent : chacune envoie un petit
-  bonus lié à sa règle, et des boutures (§7.1) au démarrage de la suivante. Aucun serveur : tout est simulé dans la
-  sauvegarde.
-- **Les Savoirs** se dépensent dans un atelier qui **change des règles** (comme le delta) et automatise la couche du
-  dessous : relancer la Biorégion, bâtir les sites tout seuls.
+- **Les récompenses** sont des **coups de main** gardés en réserve et lancés quand le joueur veut : une heure de
+  production immédiate, une Floraison du Papillon, une pousse qui mûrit d'un coup, une étape de chantier un peu moins
+  chère. Le joueur compose ainsi ses propres moments forts.
+- **Les quartiers voisins** (§6.4) envoient leurs habitants une fois restaurés, avec des demandes à leur image ; les
+  servir souvent fait grandir le lien avec ce quartier (un petit bonus gardé).
+- **Thème :** l'entraide de voisinage, le cœur de la ville réparée.
+- **Satisfaction :** les petites boucles (potager, verger, Herbier, pollen) se répondent ; une raison de revenir qui
+  n'oblige à rien.
+- **Effort :** moyen : une table de demandes, une bulle sur les passants existants, un panneau de coups de main.
 
-- **Thème :** le savoir-faire se partage de ville en ville, la réparation se propage.
-- **Satisfaction :** un changement d'échelle et un renouveau visuel complet, avec des choix qui comptent.
-- **Effort :** élevé : une couche entière, un nouvel écran, des variantes de carte. C'est le plus gros jalon.
+### P29 — Mesurer toute la partie, et le puits des Savoirs
 
-### P23 — Les alliances et la grande floraison
+Comme M19 pour la v3, la v4 se clôt par la mesure et un puits pour la couche la plus haute :
 
-- **Les alliances.** Une nouvelle famille de synergies, **entre systèmes** plutôt qu'entre bâtiments. Chaque alliance
-  relie deux choses que le joueur a déjà fait grandir, souvent de deux couches différentes, et s'éveille quand les
-  deux atteignent un seuil. Par exemple :
+- **Le simulateur joue tout** : potager, verger, grands chantiers, alliances, voies, pollen, temps, et deux villes
+  sœurs, avec un joueur de référence qui revient toutes les quelques heures pour récolter. Le §8 reçoit des cibles
+  pour la 1ʳᵉ ville sœur et la grande floraison (par exemple une trentaine d'heures de jeu), vérifiées par un test.
+- **L'atelier s'approfondit.** Ses règles gagnent des **niveaux** au prix qui grandit, comme la Canopée et les bras du
+  delta, et deux règles s'ajoutent (par exemple : les quartiers voisins restent restaurés en essaimant ; une place
+  d'alliance de plus).
+- **Deux paysages de plus** pour les villes sœurs, la **forêt** (les arbres des parcelles comptent double, le verger
+  pousse plus vite) et le **marais** (les espèces reviennent plus vite, l'Eau aussi), dessinés comme les trois autres.
 
-  | Alliance | Relie | Effet (ordre de grandeur) |
-  |---|---|---|
-  | Les abeilles du verger | Ruches (P21) et espèces pollinisatrices de l'Herbier | Le Papillon doré revient plus vite par espèce pollinisatrice |
-  | Le marché du tram | Tram solaire (P19) et quartiers voisins (§6.4) | Chaque quartier voisin relève le clic |
-  | La rivière nourricière | Trame bleue (P20) et Coteaux (§7.5) | L'Eau fait pousser le potager plus vite |
-  | Les graines voyageuses | Villes sœurs (P22) et Grainothèque (§9.7) | Chaque variété trouvée relève les Savoirs |
-  | La fête au village | Visites de la ville (§9.6) et halles nourricières (P19) | Une visite accueillie prolonge les récoltes en cours |
-  | Les racines profondes | Canopée (§7.1) et bras du delta (P18) | Les niveaux de l'une rendent l'autre moins chère |
-
-  Le joueur **choisit** quelles alliances sont actives : quelques places au début (par exemple 3), une de plus avec
-  certains chantiers et chaque ville sœur. Composer ses alliances devient la décision de fin de partie, et on peut les
-  changer à chaque Cycle de l'eau, comme les avenirs (D7). Sur la carte, chaque alliance active tend un **fil de
-  lumière dorée** entre les deux lieux qu'elle relie, qui pulse quand l'effet joue.
-- **La grande floraison.** Quand toute la région est restaurée (tous les sites, tous les chantiers, l'Herbier
-  complet), une animation sans texte fait fleurir toute la carte, des quartiers aux collines, puis le jeu continue
-  librement : rien ne se remet à zéro. Elle ouvre aussi la dernière place d'alliance.
-
-- **Thème :** la ville tient par ses liens ; on voit le réseau de l'entraide se tisser sur la carte.
-- **Satisfaction :** des choix de composition qui récompensent tout ce qui a été construit, et un sommet à viser.
-- **Effort :** moyen : une table d'alliances, un écran de choix, des fils animés sur la carte (SVG et PixiJS) ;
-  l'équilibrage passe par le simulateur de M19, chaque alliance restant modeste.
+- **Thème :** chaque ville apprend des précédentes.
+- **Satisfaction :** les Savoirs gardent un usage, et l'équilibre de tout le contenu v3 et v4 est vérifié.
+- **Effort :** moyen : surtout le simulateur ; l'atelier à niveaux reprend un modèle connu.
 
 ---
 
@@ -203,24 +206,22 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
-| M5 à M18 | *Livrés* : carte, parcelles, projets, Arbre, Coopératives, Herbier, défis, Biorégion, confort, visites, quartiers voisins, Canopée, potager, delta, avenirs et décor, accueil et musique, visites de la ville (voir §7) | — |
-| **M19 — Mesurer la fin de partie** *(livré)* | P18 : le simulateur joue la Canopée, le delta et les Cycles 2 à 5, cibles du §8 étendues et testées, marge rendue à la Saison conseillée ; les bras du delta à niveaux | Tout le reste s'équilibre sur ces mesures, et la décision D9 les attend |
-| **M20 — Les grands chantiers** *(livré)* | P19 : quatre chantiers en étapes payés avec Lumière, Eau, récoltes et espèces, leurs dessins sur la carte, leurs Jalons | Le grand objectif qui relie tous les systèmes existants, sans nouvelle couche |
-| **M21 — Les trames verte et bleue** *(livré)* | P20 : voisinage des parcelles, trames dessinées, espèces des trames | Petit jalon qui donne du sens aux avenirs de M16 ; peut s'échanger avec M22 |
-| **M22 — Le verger et les ruches** *(livré)* | P21 : arbres fruitiers sur plusieurs jours, ruches qui pollinisent, miel pour les chantiers, Grainothèque des fruitiers | Étoffe la boucle de soin pour tous les joueurs ; le miel nourrit M20 |
-| **M23 — Les villes sœurs** *(livré)* | P22 : essaimage, trois paysages au choix, carte de la région, Savoirs et leur atelier | La plus grosse pièce, une fois la fin de partie mesurée (M19) et les grands objectifs en place (M20) |
-| **M24 — Les alliances et la grande floraison** *(livré)* | P23 : synergies entre systèmes à choisir, leurs fils de lumière sur la carte, sommet de la région fêté sans texte | Clôt la v3 : les alliances relient tout ce que M19 à M23 ont construit, et le sommet n'a de sens qu'à la fin |
+| M5 à M24 | *Livrés* (voir §7) | — |
+| **M25 — Une interface rangée** | P24 : menu par couches, pastilles et halo pour ce qui s'ouvre, barre des écrans avec jauges, budget mobile mesuré, sons manquants | Chaque jalon suivant ajoute des panneaux : on range d'abord |
+| **M26 — Les bâtiments qui grandissent** | P25 : trois paliers par bâtiment, deux voies au choix, nouveaux dessins | Profite à tous les joueurs dès la 1ʳᵉ Saison ; les voies servent ensuite de points d'accroche à M27-M29 |
+| **M27 — Le pollen** | P26 : jauge de clic, envolée sur la carte, ses synergies | Petit jalon, rend le clic vivant ; se branche sur les voies de M26 |
+| **M28 — Le temps qu'il fait** | P27 : cinq temps, prévision en icônes, dessins des deux rendus, espèces et Jalons du temps | Donne du rythme d'heure en heure ; ses liens avec les voies et le pollen supposent M26-M27 |
+| **M29 — Les demandes des voisins** | P28 : bulles à icônes, coups de main en réserve, lien avec les quartiers voisins | Relie toutes les petites boucles, y compris le pollen et le temps |
+| **M30 — Mesurer toute la partie** | P29 : simulateur complet, cibles des villes sœurs, atelier à niveaux, forêt et marais | Clôt la v4 : mesure tout ce que la v3 et la v4 ont ajouté |
 
-**Synergies (décision d'Antoine, 2026-10-10).** Comme avant, chaque mécanique se lie à l'existant (un chantier aux
-quartiers voisins, une trame à l'Herbier, une ruche au potager, une ville sœur à une règle de la carte) plutôt que
-d'ajouter un multiplicateur isolé.
+**Synergies (décision d'Antoine, 2026-10-10).** Chaque mécanique se lie à l'existant (une voie au potager, une
+envolée au Papillon, un temps aux espèces, une demande au verger) plutôt que d'ajouter un multiplicateur isolé.
 
-**Récit par le jeu (décision d'Antoine, 2026-10-10).** Aucun jalon n'ajoute de journal ni de texte narratif : seuls
-les noms et les effets sont écrits ; les chantiers, les trames, les villes sœurs et la grande floraison se racontent
-par la carte et les animations.
+**Récit par le jeu (décision d'Antoine, 2026-10-10).** Aucun jalon n'ajoute de journal ni de texte narratif : les
+demandes sont des icônes, le temps se voit sur la carte, les voies se lisent par leur nom et leur effet.
 
-**Dessins.** M20, M22, M23 et M24 demandent beaucoup d'illustrations : elles partent des dessins retravaillés par le
-fil « Assets PixiJS de la carte » (PR #39, #46), dans les fichiers SVG partagés pour que les deux rendus suivent.
+**Dessins.** M26 et M28 demandent beaucoup d'illustrations (24 paliers de bâtiments, cinq temps) : elles partent des
+dessins du fil « Assets PixiJS de la carte », dans les fichiers partagés pour que les deux rendus suivent.
 
 ---
 
@@ -228,21 +229,20 @@ fil « Assets PixiJS de la carte » (PR #39, #46), dans les fichiers SVG partag�
 
 Repris des versions précédentes, toujours valables :
 
-- **Cycle jour / nuit avec production variable** : décor seulement (§9.6), on ne punit pas le joueur qui joue la nuit.
+- **Cycle jour / nuit avec production variable** : décor seulement (§9.6). Le temps qu'il fait (P27) ne fait que
+  favoriser, jamais retirer, et ne suit pas l'heure réelle.
 - **Classements en ligne et sauvegarde dans le nuage** : demandent un serveur ; le jeu reste statique sur GitHub Pages.
-  Les villes sœurs (P22) sont simulées dans la sauvegarde, sans échange entre joueurs.
 - **Événements à date réelle, récompense de connexion quotidienne** : ils poussent à se connecter à heure fixe (§1).
-- **Cultures qui fanent** : le potager attend ; le verger et les ruches (P21) non plus ne meurent jamais.
-- **Autoclic gagné** : le clic reste le geste du joueur.
-- **Revente de bâtiments**, **monétisation** : toujours non (§14 Q6).
+  Les demandes des voisins (P28) attendent sans limite de temps pour la même raison.
+- **Cultures qui fanent**, **autoclic gagné**, **revente de bâtiments**, **monétisation** : toujours non.
+- **Placer soi-même les bâtiments sur la carte** : les trames et les voies donnent le plaisir du choix sans cela.
+- **Un album ou un journal** : écartés par Antoine (2026-10-10 et 2026-10-11).
 
 Nouveaux :
 
-- **Placer soi-même les bâtiments sur la carte** : trop lourd pour huit générateurs comptés par centaines ; les
-  trames (P20) donnent le plaisir de l'emplacement à l'échelle des parcelles.
-- **Une fin qui remet tout à zéro** : la grande floraison (P23) est un sommet, pas une fin de partie forcée.
-- **Des nombres au-delà de 1e308** : à revoir seulement si le simulateur de M19 montre que les villes sœurs les
-  atteignent (CLAUDE.md : bibliothèque de grands nombres seulement si nécessaire).
+- **Une quatrième couche de prestige** : la v4 approfondit la troisième (P29) plutôt que d'en empiler une autre.
+- **Un tutoriel écrit** : les nouveautés se signalent par des pastilles et le halo (P24), jamais par des bulles de texte.
+- **Une météo qui pénalise** (gel, canicule qui abîme) : contraire à la règle de ne jamais punir.
 
 ---
 
@@ -267,24 +267,34 @@ Questions de la v2, livrée avec le choix recommandé (Antoine n'y a pas répond
 | D8 | Notifications de la PWA ? | Facultatives, désactivées par défaut |
 | D9 | Troisième couche de prestige ? | Plus tard : reprise en v3 par D11 |
 
-Questions de la v3 (Antoine a validé les jalons le 2026-10-11, sauf l'album). En attendant la réponse d'Antoine, les jalons appliqueront le choix recommandé.
+Questions de la v3 (jalons validés le 2026-10-11, sauf l'album), livrée avec le choix recommandé :
+
+| # | Question | Choix appliqué |
+|---|---|---|
+| D10 | Quoi d'abord : mesurer la fin de partie (M19) ou du contenu neuf ? | M19 d'abord |
+| D11 | Une troisième couche de prestige (les villes sœurs) ? | Oui, en M23 |
+| D12 | Les grands chantiers se paient-ils aussi en Graines ou en Sources ? | Non |
+| D13 | La grande floraison termine-t-elle la partie ? | Non : rien ne recommence |
+| D14 | Une ville sœur se choisit-elle parmi trois, ou est-elle imposée ? | Au choix parmi trois |
+| D15 | L'album ? | Pas d'album (2026-10-11) ; les alliances à la place |
+| D16 | Les alliances : toutes actives, ou des places à composer ? | Des places (3 au début), changeables à chaque Cycle |
+
+Questions de la v4, à trancher par Antoine. En attendant sa réponse, les jalons appliqueront le choix recommandé.
 
 | # | Question | Choix recommandé (appliqué par défaut) |
 |---|---|---|
-| D10 | Quoi d'abord : mesurer la fin de partie (M19) ou du contenu neuf (M20, chantiers) ? | **M19 d'abord** : c'est petit, et tout le reste s'équilibre dessus |
-| D11 | Une troisième couche de prestige (les villes sœurs) ? | **Oui, en M23**, si le simulateur de M19 confirme que le joueur atteint le bout du delta ; sinon M23 se réduit au réseau sans relance |
-| D12 | Les grands chantiers se paient-ils aussi en Graines ou en Sources ? | **Non** : Lumière, Eau, récoltes et espèces ; Graines et Sources restent à l'Arbre et au delta |
-| D13 | La grande floraison termine-t-elle la partie ? | **Non** : un sommet fêté, puis le jeu continue librement, sans remise à zéro |
-| D14 | Une ville sœur se choisit-elle parmi trois, ou est-elle imposée ? | **Au choix parmi trois**, chacune avec son paysage et sa règle |
-| D15 | ~~L'album~~ | **Décidé (2026-10-11) :** pas d'album ; M24 propose les alliances à la place (P23) |
-| D16 | Les alliances : toutes actives, ou un nombre de places à composer ? | **Des places à composer** (3 au début, plus avec chantiers, villes sœurs et floraison), changeables à chaque Cycle |
+| D17 | Quoi d'abord : ranger l'interface (M25) ou du contenu neuf (M26) ? | **M25 d'abord** : chaque jalon suivant ajoute des panneaux |
+| D18 | Les voies des bâtiments : choix définitif, ou modifiable ? | **Modifiable à chaque Saison**, pour essayer sans regret |
+| D19 | Le temps qu'il fait : purement au hasard, ou le joueur peut-il l'influencer ? | **Au hasard, avec trois temps de prévision** ; une règle de l'atelier (M30) pourra en choisir un |
+| D20 | Les récompenses des demandes : immédiates, ou en réserve ? | **En réserve** (coups de main), trois au plus, lancés quand le joueur veut |
+| D21 | Le puits des Savoirs : approfondir l'atelier, ou une quatrième couche ? | **Approfondir** : atelier à niveaux et deux paysages de plus |
 
 ---
 
-## 7. Mécaniques déjà livrées (v1 et v2)
+## 7. Mécaniques déjà livrées (v1 à v3)
 
-La v1 (2026-10-10) et la v2 (2026-10-11) proposaient dix-sept mécaniques, toutes livrées entre M5 et M18 ; leur
-détail est maintenant dans le design doc.
+La v1 (2026-10-10), la v2 et la v3 (2026-10-11) proposaient vingt-trois mécaniques, toutes livrées entre M5 et M24 ;
+leur détail est maintenant dans le design doc.
 
 | # | Mécanique | Jalon | Design doc |
 |---|---|---|---|
@@ -305,5 +315,11 @@ détail est maintenant dans le design doc.
 | P15 | Première minute guidée, retour en images, rappels facultatifs | M17 | §9.1, §10.6 |
 | P16 | La musique du quartier | M17 | §6.3 |
 | P17 | Les visites de la ville | M18 | §9.6 |
+| P18 | Le simulateur de fin de partie, les bras du delta à niveaux | M19 | §7.5, §8 |
+| P19 | Les grands chantiers | M20 | §6.6 |
+| P20 | Les trames verte et bleue | M21 | §6.7 |
+| P21 | Le verger et les ruches | M22 | §9.8 |
+| P22 | Les villes sœurs et les Savoirs | M23 | §7.6 |
+| P23 | Les alliances et la grande floraison | M24 | §9.9 |
 | — | Confort : temps avant achat, prochain objectif, raccourcis, courbes, PWA | M10 | §10.5 |
 | — | Vue du dessus animée et équilibrage plus doux par les synergies | M5 | §5.3, §6, §8 |
