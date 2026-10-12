@@ -535,4 +535,33 @@ export const SPECIES_ART: Record<SpeciesId, () => ReactNode> = {
       <circle cx="17.4" cy="6" r="0.6" fill="#e7d9a8" />
     </>
   ),
+  snail: () => (
+    <>
+      {/* The Burgundy snail of the shower (§9.10): a cream body and a banded ochre shell. */}
+      <path
+        d="M4 25c2-2 5-3 9-3h10c3 0 5 1 6 3 0 1-1 2-3 2H6c-2 0-3-1-2-2Z"
+        fill="#d8c8a8"
+        {...line}
+      />
+      <path d="M6 22 4.4 16M8 22l-.4-6.4" fill="none" {...line} stroke="#b8a582" strokeWidth={1} />
+      <circle cx="4.4" cy="15.6" r="0.9" fill="#5a4a38" />
+      <circle cx="7.6" cy="15.4" r="0.9" fill="#5a4a38" />
+      <circle cx="18" cy="16" r="8.4" fill="#c9954d" {...line} />
+      <path
+        d="M18 16c0-1.4 1.6-2 2.6-1 1.4 1.4.4 4-1.8 4.2-3 .3-4.8-2.6-3.8-5.2 1.2-3.2 5.4-4 8-1.8 3 2.6 2.4 7.6-1.2 9.4"
+        fill="none"
+        stroke="#7a5428"
+        strokeWidth={1.1}
+        strokeLinecap="round"
+      />
+      <path d="M12 12.4c2-2.6 6-3.4 9-1.8" fill="none" stroke="#e8c27f" strokeWidth={0.8} />
+      {[
+        [9, 27.6],
+        [13, 28.2],
+        [17, 28.4],
+      ].map(([x, y]) => (
+        <circle key={x} cx={x} cy={y} r="0.5" fill="rgb(160 200 220 / 0.8)" />
+      ))}
+    </>
+  ),
 };

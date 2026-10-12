@@ -1,5 +1,6 @@
 // Milestones ("Jalons", docs/game-design.md §9.3). Data table plus pure unlock checks; names
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
+import { WEATHER_IDS, type WeatherId } from './weather';
 import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
@@ -104,6 +105,8 @@ export type AchievementCondition =
   | { kind: 'paths'; count: number }
   /** Pollen flights sent over all Seasons (§5.6). */
   | { kind: 'flights'; count: number }
+  /** A weather lived at least once (§9.10). */
+  | { kind: 'weather'; weather: WeatherId }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -202,6 +205,11 @@ export type AchievementId =
   | 'manyPaths'
   | 'firstFlight'
   | 'pollenStorm'
+  | 'weather.sun'
+  | 'weather.shower'
+  | 'weather.wind'
+  | 'weather.mist'
+  | 'weather.heat'
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -365,6 +373,15 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   // The pollen (§5.6).
   { id: 'firstFlight', family: 'clicks', condition: { kind: 'flights', count: 1 } },
   { id: 'pollenStorm', family: 'clicks', condition: { kind: 'flights', count: 100 } },
+  // The weather (§9.10): one per weather lived.
+  ...WEATHER_IDS.map(
+    (weather) =>
+      ({
+        id: `weather.${weather}`,
+        family: 'neighbourhood',
+        condition: { kind: 'weather', weather },
+      }) as const,
+  ),
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
   {
@@ -613,6 +630,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return pathsWorking(state) >= condition.count;
     case 'flights':
       return state.pollen.flights >= condition.count;
+    case 'weather':
+      return state.weather.seen.includes(condition.weather);
     case 'fruitHarvests':
       return state.orchard.harvests >= condition.count;
     case 'fruitVarieties':

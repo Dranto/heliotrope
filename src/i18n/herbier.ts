@@ -38,6 +38,8 @@ export function speciesConditionText({ condition }: SpeciesDef): string {
       return describe.visit(t.visits.welcome[condition.visit], condition.count);
     case 'corridor':
       return describe.corridor(t.corridors.family[condition.family], condition.length);
+    case 'weather':
+      return describe.weather(t.weather.day[condition.weather]);
   }
 }
 

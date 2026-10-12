@@ -294,7 +294,7 @@ describe('App', () => {
     expect(document.querySelector('.species [data-species="frog"]')).not.toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /Herbier/ }));
     const dialog = await screen.findByRole('dialog', { name: 'L’Herbier' });
-    expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 27');
+    expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 28');
     expect(dialog.querySelector('[data-species="frog"]')).toHaveAttribute('data-found', 'true');
     expect(dialog.querySelector('[data-species="hedgehog"]')).toHaveTextContent(
       'Restaurer Parc du parking',
@@ -599,7 +599,7 @@ describe('App', () => {
       totalLight: 2e7,
       allTimeLight: 2e9,
       resources: { light: 2e6, water: 0 },
-      allTimeWater: 4e5,
+      allTimeWater: 5e5,
     });
     const store = renderApp();
     const panel = screen.getByRole('region', { name: 'La Biorégion' });

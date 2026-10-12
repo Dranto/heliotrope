@@ -11,6 +11,7 @@ import type { ProjectId } from './projects';
 import type { GameState } from './state';
 import type { TalentId } from './talents';
 import type { VisitKind } from './visits';
+import { isWeatherOpen, type WeatherId } from './weather';
 
 export const SPECIES_IDS = [
   'poppy',
@@ -40,6 +41,7 @@ export const SPECIES_IDS = [
   'redstart',
   'greenWoodpecker',
   'newt',
+  'snail',
 ] as const;
 export type SpeciesId = (typeof SPECIES_IDS)[number];
 
@@ -57,7 +59,9 @@ export type SpeciesCondition =
   /** Won by welcoming a visitor of the city (§9.6, M18) a few times. */
   | { kind: 'visit'; visit: VisitKind; count: number }
   /** A corridor of a family at least this long (§6.7, M21). */
-  | { kind: 'corridor'; family: CorridorFamily; length: number };
+  | { kind: 'corridor'; family: CorridorFamily; length: number }
+  /** Comes out only under one weather (§9.10, M28). */
+  | { kind: 'weather'; weather: WeatherId };
 
 export interface SpeciesDef {
   id: SpeciesId;
@@ -113,6 +117,8 @@ export const SPECIES_LIST: readonly SpeciesDef[] = [
     condition: { kind: 'corridor', family: 'green', length: SPECIES_LENGTH },
   },
   { id: 'newt', condition: { kind: 'corridor', family: 'blue', length: SPECIES_LENGTH } },
+  // The weather's species (§9.10, M28): the snail comes out under the shower.
+  { id: 'snail', condition: { kind: 'weather', weather: 'shower' } },
 ];
 
 /** The river species (§7.5), beyond the neighbourhood's Herbier. */
@@ -123,6 +129,9 @@ export const CITY_SPECIES: readonly SpeciesId[] = ['skylark', 'swallow', 'dragon
 
 /** The species of the corridors (§6.7, M21), outside the Herbier of the neighbourhood too. */
 export const CORRIDOR_SPECIES: readonly SpeciesId[] = ['greenWoodpecker', 'newt'];
+
+/** The species that come out under one weather (§9.10, M28): not needed for the complete Herbier. */
+export const WEATHER_SPECIES: readonly SpeciesId[] = ['snail'];
 
 export const SPECIES: Record<SpeciesId, SpeciesDef> = Object.fromEntries(
   SPECIES_LIST.map((s) => [s.id, s]),
@@ -152,6 +161,8 @@ function isMet(state: GameState, condition: SpeciesCondition): boolean {
       return state.visits[condition.visit] >= condition.count;
     case 'corridor':
       return longestCorridor(state, condition.family) >= condition.length;
+    case 'weather':
+      return isWeatherOpen(state) && state.weather.current === condition.weather;
   }
 }
 
@@ -170,6 +181,7 @@ export function isHerbierComplete(state: Pick<GameState, 'species'>): boolean {
       RIVER_SPECIES.includes(id) ||
       CITY_SPECIES.includes(id) ||
       CORRIDOR_SPECIES.includes(id) ||
+      WEATHER_SPECIES.includes(id) ||
       state.species.includes(id),
   );
 }

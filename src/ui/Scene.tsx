@@ -57,7 +57,9 @@ import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
 import { GrowthLayer } from './GrowthArt';
 import { PollenWave } from './PollenWave';
+import { WeatherForecast, WeatherLayer } from './WeatherArt';
 import { isFlying } from '../game/pollen';
+import { isWeatherOpen, type WeatherId } from '../game/weather';
 import { encodeGrowth } from './growthMap';
 import { reachedTiers } from '../game/growth';
 import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
@@ -252,6 +254,8 @@ export function Scene({
   );
   // The buildings that grow (§5.5), encoded so the layer only redraws when a form or path changes.
   const flights = state.pollen.flights;
+  const weather = isWeatherOpen(state) ? state.weather.current : null;
+  const forecast = state.weather.forecast.join(',');
   const flying = isFlying(state);
   const growth = encodeGrowth(
     Object.fromEntries(GENERATOR_IDS.map((id) => [id, reachedTiers(state, id)])) as Record<
@@ -302,6 +306,7 @@ export function Scene({
   const marks = useMemo(
     () => (
       <>
+        {weather && <WeatherLayer weather={weather} reduced={reduced} />}
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
         <CorridorLayer corridors={corridors} />
@@ -336,6 +341,7 @@ export function Scene({
       growth,
       flights,
       flying,
+      weather,
       corridors,
       working,
       bloomed,
@@ -482,6 +488,7 @@ export function Scene({
         )}
         {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
         {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
+        {weather && <WeatherForecast now={weather} next={forecast.split(',') as WeatherId[]} />}
         {mode === 'play' && isDecorOpen(state) && (
           <button type="button" className="scene-tool" onClick={() => setMode('decor')}>
             {t.decor.open}

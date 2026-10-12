@@ -126,4 +126,6 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   // The corridors' species (§6.7, M21), on the corridors they come along.
   greenWoodpecker: { spots: [[WEST + MID, 380]], motion: 'still', size: 16 },
   newt: { spots: [[EAST + MID, 330]], motion: 'hop', size: 13 },
+  // The weather's species (§9.10, M28): the snail on the courtyard's paving after the shower.
+  snail: { spots: [[352, 262]], motion: 'still', size: 12 },
 };

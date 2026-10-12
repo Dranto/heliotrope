@@ -12,7 +12,7 @@ import type { GameState } from './state';
 export { SOURCE_SEED_BONUS } from './seasons';
 
 /** §7.4: Sources earned in total = floor(sqrt(Water gathered over all Cycles / divisor)). */
-export const SOURCE_WATER_DIVISOR = 4e5;
+export const SOURCE_WATER_DIVISOR = 5e5;
 /** §7.4: each Source adds +10% to global production (its own multiplier). */
 export const SOURCE_BONUS = 0.1;
 /** §7.4: the interface advises waiting for this many Sources before the first Cycle. */
