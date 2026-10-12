@@ -278,6 +278,39 @@ export function lightenStage(state: GameState): GameState {
   return unlockAchievements(build(withWork(state, id, { stage: work.stage, paid }), id));
 }
 
+/** The beekeepers (M36) keep this many jars for the flights and the requests. */
+export const HONEY_RESERVE = 2;
+
+/** The work the beekeepers bring honey to: the unfinished one asking for the fewest jars. */
+export function honeyWork(state: GameState): WorkId | null {
+  if (!areGreatWorksOpen(state)) return null;
+  let best: WorkId | null = null;
+  let bestLeft = Infinity;
+  for (const id of WORK_IDS) {
+    const left = missing(state, id).honey;
+    if (left > 0 && left < bestLeft) [best, bestLeft] = [id, left];
+  }
+  return best;
+}
+
+/**
+ * The beekeepers (M36): the jars above HONEY_RESERVE go to the work in progress, as far as its
+ * stage asks. Returns the same state when nothing is carried.
+ */
+export function carryHoney(state: GameState): GameState {
+  const spare = state.orchard.honey - HONEY_RESERVE;
+  const id = spare > 0 ? honeyWork(state) : null;
+  if (!id) return state;
+  const jars = Math.min(spare, missing(state, id).honey);
+  const work = state.greatWorks.works[id];
+  const next = withWork(
+    { ...state, orchard: { ...state.orchard, honey: state.orchard.honey - jars } },
+    id,
+    { stage: work.stage, paid: { ...work.paid, honey: work.paid.honey + jars } },
+  );
+  return unlockAchievements(build(next, id));
+}
+
 /**
  * Build every stage that became ready on its own: its species came back after it was paid.
  * Called by every tick; returns the same state when nothing changes.

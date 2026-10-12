@@ -135,6 +135,9 @@ const migrations: Record<number, Migration> = {
   34: (raw) => ({ ...raw, version: 35 }),
   // v36 adds the species greeted on the map (M35): none yet.
   35: (raw) => ({ ...raw, version: 36 }),
+  // v37 adds the assembly and the growers to the Canopy, the growers and the beekeepers to the
+  // Cooperatives (M36): none yet.
+  36: (raw) => ({ ...raw, version: 37 }),
 };
 
 function isLanguage(value: string): value is Language {

@@ -2,8 +2,9 @@
 // plays from the first click to the second sister city, in sessions: an hour
 // of play, then three hours away while the game goes on offline (§9.1), as a player who comes
 // back every few hours. At each coming and going it tends the small loops: the courtyard garden,
-// the orchard and its hives, the great works, the alliances and the neighbours' requests. Pure
-// and headless, like the simulator it drives.
+// the orchard and its hives, the great works, the alliances and the neighbours' requests. Since
+// v5 (M36) it also rotates its crops with the strawberries, greets the species on the map and
+// brings the sun forward in the forecast. Pure and headless, like the simulator it drives.
 import { ALLIANCE_IDS, canChoose, chooseAlliance, isAwake } from './alliances';
 import { buyWorkshop, canSwarm, swarm, type LandscapeId, type WorkshopId } from './cities';
 import { CROP_IDS, canSow, harvest, isRipe, sow, type CropId } from './garden';
@@ -13,6 +14,8 @@ import { FRUIT_IDS } from './fruits';
 import { applyOfflineProgress } from './offline';
 import { lightPerSecond } from './production';
 import { canPlayHand, canServe, playHand, serveRequest } from './requests';
+import { canGreet, greetSpecies } from './greetings';
+import { canSwapForecast, swapForecast } from './weather';
 import {
   learnReferenceTalents,
   simulateCycles,
@@ -28,8 +31,11 @@ export const REFERENCE_SESSION_SECONDS = 3600;
 export const REFERENCE_AWAY_SECONDS = 3 * 3600;
 /** Light it gives a great work at once: at most this many seconds of production. */
 export const REFERENCE_WORK_BUDGET = 10 * 60;
-/** What the reference player sows in each bed, in turn: different neighbours for varieties. */
-export const REFERENCE_CROPS: readonly CropId[] = ['beans', 'squash', 'sunflower'];
+/**
+ * What the reference player sows in each bed, in turn: different neighbours for varieties, and
+ * each bed rotates through them (M32), the strawberries ripening while it is away.
+ */
+export const REFERENCE_CROPS: readonly CropId[] = ['beans', 'squash', 'sunflower', 'strawberry'];
 /** §8 whole-game targets (M30): seconds of play when each sister city is founded. */
 export const WHOLE_GAME_TARGETS: readonly number[] = [4 * 3600, 5 * 3600];
 /** The landscapes of the two sister cities the reference player founds, in order. */
@@ -44,17 +50,30 @@ export const REFERENCE_WORKSHOP: readonly WorkshopId[] = [
   'trade',
 ];
 
-/** Harvest every ripe bed and sow every bare one. */
+/** Harvest every ripe bed and sow every bare one, the crop after the bed's last one. */
 function tendGarden(state: GameState): GameState {
   let next = state;
   next.garden.plots.forEach((plot, i) => {
     if (plot.crop !== null && isRipe(plot)) next = harvest(next, i)?.state ?? next;
   });
-  next.garden.plots.forEach((_, i) => {
-    const wanted = REFERENCE_CROPS[i % REFERENCE_CROPS.length]!;
-    const crop = [wanted, ...CROP_IDS].find((c) => canSow(next, i, c));
+  next.garden.plots.forEach((plot, i) => {
+    const last = plot.last ? REFERENCE_CROPS.indexOf(plot.last) : -1;
+    const turn = last >= 0 ? last + 1 : i;
+    const wanted = Array.from(
+      { length: REFERENCE_CROPS.length },
+      (_, k) => REFERENCE_CROPS[(turn + k) % REFERENCE_CROPS.length]!,
+    ).filter((c) => c !== plot.last);
+    const crop = [...wanted, ...CROP_IDS].find((c) => canSow(next, i, c));
     if (crop) next = sow(next, i, crop);
   });
+  return next;
+}
+
+/** Greet every species back on the map (M35), and bring the sun forward once a Season (M33). */
+function tendSky(state: GameState): GameState {
+  let next = state.species.reduce((s, id) => (canGreet(s, id) ? greetSpecies(s, id) : s), state);
+  const sun = next.weather.forecast.indexOf('sun');
+  if (sun > 0 && canSwapForecast(next, sun)) next = swapForecast(next, sun);
   return next;
 }
 
@@ -110,7 +129,7 @@ function tendRequests(state: GameState): GameState {
 
 /** Everything the reference player does on a visit to the small loops. */
 export function tendLoops(state: GameState): GameState {
-  return tendRequests(tendAlliances(tendWorks(tendOrchard(tendGarden(state)))));
+  return tendRequests(tendAlliances(tendWorks(tendOrchard(tendSky(tendGarden(state))))));
 }
 
 /** Learn the reference rules of the workshop as far as the Savoirs go, cheapest level first. */

@@ -192,6 +192,16 @@
   --coop-soft: #d3e8f1;
 }
 
+[data-cooperative='growers'] {
+  --coop: #b5534a;
+  --coop-soft: #f2d6cf;
+}
+
+[data-cooperative='beekeepers'] {
+  --coop: #d9a21b;
+  --coop-soft: #f9ebbf;
+}
+
 /* ---------- Bikes on the map ---------- */
 
 .coop-bike .crate {
