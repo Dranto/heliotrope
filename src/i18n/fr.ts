@@ -501,6 +501,7 @@ export const fr = {
     futuresTitle: 'Les avenirs des parcelles',
     futuresHint: 'Chaque parcelle peut changer d’avenir une fois par Cycle de l’eau.',
     futureLocked: 'Changé ce Cycle',
+    otherFuture: (parcel: string, effect: string) => `Ou ${parcel}\u00a0: ${effect}`,
     futureLabel: (parcel: string) => `Avenir de ${parcel}`,
     chooseFuture: 'Choisir son avenir',
     districts: 'Quartiers voisins',
