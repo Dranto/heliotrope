@@ -1711,6 +1711,30 @@ button {
   outline-offset: 2px;
 }
 
+/* On a touch screen the dots stay small but catch a thumb: each one answers over a 2.2rem circle,
+   spaced so that two neighbours never overlap. */
+@media (pointer: coarse) {
+  .growth {
+    gap: 0.6rem;
+  }
+
+  .growth-pips {
+    gap: 1.1rem;
+    padding-inline-start: 0.3rem;
+  }
+
+  .growth-pip {
+    position: relative;
+  }
+
+  .growth-pip::after {
+    content: '';
+    position: absolute;
+    inset: -0.55rem;
+    border-radius: 50%;
+  }
+}
+
 .growth-fork {
   display: grid;
   grid-template-columns: 1fr 1fr;
