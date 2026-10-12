@@ -377,6 +377,8 @@ export const en: Texts = {
       'works.4': 'Great works',
       firstFruit: 'First fruit',
       oldOrchard: 'Old orchards',
+      rotation: 'The soil rests',
+      oldTree: 'Old tree',
       'cities.1': 'Swarming',
       'cities.3': 'Sister cities',
       firstAlliance: 'Hand in hand',
@@ -505,6 +507,8 @@ export const en: Texts = {
       flights: (count: number) =>
         count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
+      rotations: (count: number) => `Harvest ${count} crops sown after a different one`,
+      oldTree: 'Pick a fruit tree until it becomes an old tree',
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
     },
@@ -667,6 +671,7 @@ export const en: Texts = {
       sunflower: { name: 'Sunflowers', effect: 'The Golden Butterfly comes at once' },
       beans: { name: 'Climbing beans', effect: 'Rooftop gardens and greenhouses ×2 for 20 min' },
       squash: { name: 'Squashes', effect: '30 min of Light and Water production' },
+      strawberry: { name: 'Strawberries', effect: 'A quarter of the pollen gauge' },
     } satisfies Record<CropId, { name: string; effect: string }>,
     plot: (index: number) => `Bed ${index}`,
     bare: 'Bare bed',
@@ -689,6 +694,10 @@ export const en: Texts = {
       purpleBean: 'Purple bean',
       redSunflower: 'Red sunflower',
       threeSisters: 'The three sisters',
+      woodStrawberry: 'Wild strawberry',
+      gariguette: 'Gariguette',
+      maraDesBois: 'Mara des bois',
+      pineberry: 'Pineberry',
     } satisfies Record<VarietyId, string>,
     unknownVariety: (first: string, second: string) => `${first} and ${second} side by side`,
     harvested: {
@@ -698,7 +707,15 @@ export const en: Texts = {
       butterfly: 'The sunflowers draw the Golden Butterfly.',
       effect: (seconds: string) =>
         `Climbing beans! Rooftop gardens and greenhouses ×2 for ${seconds}.`,
+      pollen: 'The strawberries scent the flower: the pollen gauge fills.',
+      all: (crops: number, fruits: number) =>
+        `All harvested: ${crops} crop${crops === 1 ? '' : 's'} sown again, ${fruits} tree${fruits === 1 ? '' : 's'} picked.`,
     },
+    harvestAll: 'Harvest all and sow again',
+    harvestAllHint:
+      'Harvests everything ripe in the garden and the orchard, and sows the same crop again.',
+    rotated: 'Rotated: grows ×1.2',
+    weatherCrop: (crop: string) => `The weather favours: ${crop} ×1.5`,
     variety: (name: string) => `New variety: ${name}!`,
   },
   alliances: {
@@ -828,6 +845,11 @@ export const en: Texts = {
       'Each hive makes the garden and the orchard grow ×1.2 faster, makes a garden variety likelier and gives a jar of honey every 6 h, for the great works.',
     setHive: 'Set a hive',
     honey: (count: string) => `${count} jars of honey`,
+    found: (name: string) => `Old variety found: ${name}!`,
+    spendHoney: 'Send a flight',
+    spendHoneyCost: '1 jar of honey',
+    age: (age: number) => ['', 'Two-year-old tree', 'Five-year-old tree', 'Old tree'][age] ?? '',
+    basketsPerPick: (count: string) => `${count} baskets per pick`,
     varietiesTitle: 'Old varieties',
     unknownVariety: (tree: string) => `An old variety of the ${tree.toLowerCase()}`,
   },

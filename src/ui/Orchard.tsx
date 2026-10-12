@@ -2,6 +2,10 @@ import { formatNumber } from '../game/format';
 import {
   canPlant,
   canSetHive,
+  canSpendHoney,
+  fruitBaskets,
+  spendHoney,
+  treeAge,
   FRUIT_IDS,
   FRUITS,
   HIVE_COSTS,
@@ -14,6 +18,7 @@ import {
   treeStage,
 } from '../game/orchard';
 import { fruitVarietyBonuses } from '../game/fruits';
+import { hasRipe } from '../game/garden';
 import { t } from '../i18n';
 import { bonusesText } from '../i18n/restoration';
 import { usePanelOpen } from './layoutPrefs';
@@ -28,7 +33,7 @@ import './orchard.css';
  * its next one, the buttons to plant or pick it, the hives and their honey, and the old
  * varieties found.
  */
-export function Orchard() {
+export function Orchard({ onHarvestAll }: { onHarvestAll: () => void }) {
   const store = useGameStore();
   const state = useGameState();
   const [open, toggle] = usePanelOpen('orchard');
@@ -47,6 +52,16 @@ export function Orchard() {
         </span>
       </header>
       <p className="hint">{t.orchard.hint}</p>
+      {hasRipe(state) && (
+        <button
+          type="button"
+          className="buy garden-all"
+          title={t.garden.harvestAllHint}
+          onClick={onHarvestAll}
+        >
+          <span className="buy-verb">{t.garden.harvestAll}</span>
+        </button>
+      )}
       <ul className="orchard-trees">
         {FRUIT_IDS.map((id) => {
           const tree = orchard.trees[id];
@@ -66,6 +81,19 @@ export function Orchard() {
                       stage !== 'ripe' &&
                       ` · ${t.orchard.next(t.duration(Math.ceil(secondsToNext(state, id))))}`}
                   </span>
+                  {tree.age !== null && (
+                    <>
+                      <br />
+                      <span className="hint">
+                        {[
+                          t.orchard.age(treeAge(tree)),
+                          t.orchard.basketsPerPick(formatNumber(fruitBaskets(tree))),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </span>
+                    </>
+                  )}
                 </span>
               </span>
               {stage === 'none' && (
@@ -105,6 +133,17 @@ export function Orchard() {
           <br />
           <span className="hint">{t.orchard.hiveHint}</span>
         </span>
+        {orchard.hives > 0 && (
+          <button
+            type="button"
+            className="buy"
+            disabled={!canSpendHoney(state)}
+            onClick={() => store.dispatch((s) => spendHoney(s))}
+          >
+            <span className="buy-verb">{t.orchard.spendHoney}</span>
+            <span className="buy-cost">{t.orchard.spendHoneyCost}</span>
+          </button>
+        )}
         {hiveCost !== null && (
           <button
             type="button"

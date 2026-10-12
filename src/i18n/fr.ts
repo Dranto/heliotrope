@@ -427,6 +427,8 @@ export const fr = {
       'works.4': 'Grands travaux',
       firstFruit: 'Premier fruit',
       oldOrchard: 'Vieux vergers',
+      rotation: 'La terre se repose',
+      oldTree: 'Vieil arbre',
       'cities.1': 'Essaimage',
       'cities.3': 'Les villes sœurs',
       firstAlliance: 'Main dans la main',
@@ -565,6 +567,9 @@ export const fr = {
           ? 'Remplir la jauge de pollen et lancer une envolée'
           : `Lancer ${count} envolées de pollen`,
       fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
+      rotations: (count: number) =>
+        `Récolter ${count}\u00a0cultures semées après une culture différente`,
+      oldTree: 'Cueillir un fruitier jusqu’à ce qu’il devienne un vieil arbre',
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
     },
@@ -731,6 +736,7 @@ export const fr = {
       sunflower: { name: 'Tournesols', effect: 'Le Papillon doré vient aussitôt' },
       beans: { name: 'Haricots grimpants', effect: 'Potagers et Serres ×2 pendant 20 min' },
       squash: { name: 'Courges', effect: '30 min de production de Lumière et d’Eau' },
+      strawberry: { name: 'Fraises', effect: 'Un quart de la jauge de pollen' },
     } satisfies Record<CropId, { name: string; effect: string }>,
     plot: (index: number) => `Carré ${index}`,
     bare: 'Carré libre',
@@ -753,6 +759,10 @@ export const fr = {
       purpleBean: 'Haricot violet',
       redSunflower: 'Tournesol rouge',
       threeSisters: 'Les trois sœurs',
+      woodStrawberry: 'Fraise des bois',
+      gariguette: 'Gariguette',
+      maraDesBois: 'Mara des bois',
+      pineberry: 'Fraise ananas',
     } satisfies Record<VarietyId, string>,
     unknownVariety: (first: string, second: string) => `${first} et ${second} côte à côte`,
     harvested: {
@@ -762,7 +772,15 @@ export const fr = {
       butterfly: 'Les tournesols attirent le Papillon doré.',
       effect: (seconds: string) =>
         `Haricots grimpants\u00a0! Potagers et Serres ×2 pendant ${seconds}.`,
+      pollen: 'Les fraises parfument la fleur\u00a0: la jauge de pollen se remplit.',
+      all: (crops: number, fruits: number) =>
+        `Tout est récolté\u00a0: ${crops}\u00a0récolte${crops > 1 ? 's' : ''} ressemée${crops > 1 ? 's' : ''}, ${fruits}\u00a0cueillette${fruits > 1 ? 's' : ''}.`,
     },
+    harvestAll: 'Tout récolter et ressemer',
+    harvestAllHint:
+      'Récolte tout ce qui est mûr au potager et au verger, et ressème la même culture.',
+    rotated: 'En rotation\u00a0: pousse ×1,2',
+    weatherCrop: (crop: string) => `Le temps qu’il fait favorise\u00a0: ${crop} ×1,5`,
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
   },
   alliances: {
@@ -895,6 +913,11 @@ export const fr = {
       'Chaque ruche fait tout pousser ×1,2 plus vite au potager et au verger, rend une variété du potager plus probable et donne un pot de miel toutes les 6\u00a0h, pour les grands chantiers.',
     setHive: 'Poser une ruche',
     honey: (count: string) => `${count} pots de miel`,
+    found: (name: string) => `Variété ancienne retrouvée\u00a0: ${name}\u00a0!`,
+    spendHoney: 'Lancer une envolée',
+    spendHoneyCost: '1 pot de miel',
+    age: (age: number) => ['', 'Arbre de deux ans', 'Arbre de cinq ans', 'Vieil arbre'][age] ?? '',
+    basketsPerPick: (count: string) => `${count} paniers par cueillette`,
     varietiesTitle: 'Variétés anciennes',
     unknownVariety: (tree: string) => `Une variété ancienne du ${tree.toLowerCase()}`,
   },

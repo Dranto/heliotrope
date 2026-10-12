@@ -57,7 +57,7 @@ import { Orchard } from './Orchard';
 import { Requests } from './Requests';
 import { Alliances } from './Alliances';
 import { areCitiesOpen, canSwarm } from '../game/cities';
-import { harvest } from '../game/garden';
+import { harvest, harvestAll } from '../game/garden';
 import { Scene } from './Scene';
 import { SpeciesArt } from './SpeciesArt';
 import { Upgrades } from './Upgrades';
@@ -278,6 +278,7 @@ export function App() {
       store.dispatch(() => result.state);
       const { gain } = result;
       if (gain.kind === 'butterfly') notify(t.garden.harvested.butterfly);
+      else if (gain.kind === 'pollen') notify(t.garden.harvested.pollen);
       else if (gain.kind === 'effect') {
         notify(t.garden.harvested.effect(t.duration(Math.ceil(gain.seconds))));
       } else if (gain.water > 0) {
@@ -292,6 +293,20 @@ export function App() {
     },
     [store, notify],
   );
+
+  // M32: harvest everything ripe in the garden and the orchard, and sow the same crops again.
+  const onHarvestAll = useCallback(() => {
+    const result = harvestAll(store.getState());
+    if (!result) return;
+    store.dispatch(() => result.state);
+    notify(t.garden.harvested.all(result.crops.length, result.fruits.length));
+    for (const { variety } of result.crops) {
+      if (variety) notify(t.garden.variety(t.garden.varieties[variety]));
+    }
+    for (const fruit of result.fruits) {
+      if (fruit.variety) notify(t.orchard.found(t.orchard.varieties[fruit.id]));
+    }
+  }, [store, notify]);
 
   const onVisit = useCallback(
     ({ state: next, kind, gift }: WelcomeResult) => {
@@ -673,8 +688,8 @@ export function App() {
             <div className="side-column">
               <Upgrades />
               <Restoration onHighlight={setHighlight} />
-              <Garden onHarvest={onHarvest} />
-              <Orchard />
+              <Garden onHarvest={onHarvest} onHarvestAll={onHarvestAll} />
+              <Orchard onHarvestAll={onHarvestAll} />
               <Requests />
               <GreatWorks />
               <Alliances />

@@ -58,7 +58,7 @@ describe('Courtyard garden (§9.7, M14)', () => {
 
   it('grows a crop with elapsed time and never lets it wilt', () => {
     const sown = sow(started(), 0, 'radish');
-    expect(sown.garden.plots[0]).toEqual({ crop: 'radish', grown: 0 });
+    expect(sown.garden.plots[0]).toMatchObject({ crop: 'radish', grown: 0 });
     expect(sow(sown, 0, 'radish')).toBe(sown);
     const half = growGarden(sown, 90);
     expect(isRipe(half.garden.plots[0]!)).toBe(false);
@@ -139,7 +139,7 @@ describe('Courtyard garden (§9.7, M14)', () => {
     expect(varietyOf('squash', 'beans')).toBe('threeSisters');
     expect(new Set(VARIETY_IDS.map((id) => VARIETIES[id].parents.join()))).toHaveProperty(
       'size',
-      6,
+      10,
     );
   });
 

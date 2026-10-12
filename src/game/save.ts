@@ -125,6 +125,9 @@ const migrations: Record<number, Migration> = {
   30: (raw) => ({ ...raw, version: 31 }),
   // v32 introduces the mechanics one at a time (§10.8): an older save has all those it shows.
   31: (raw) => ({ ...raw, version: 32 }),
+  // v33 lightens the garden and the orchard (M32): each bed remembers its last crop and its
+  // rotation, the garden its rotated harvests and each tree its picks; none for an older save.
+  32: (raw) => ({ ...raw, version: 33 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -342,6 +345,7 @@ export function deserialize(json: string, now: number): GameState | null {
       ? [...new Set<VarietyId>(garden.varieties.filter(isVarietyId))]
       : [],
     baskets: isCount(garden?.baskets) ? garden.baskets : 0,
+    rotations: isCount(garden?.rotations) ? garden.rotations : 0,
   };
   state.greatWorks = validGreatWorks(data.greatWorks);
   state.orchard = validOrchard(data.orchard);

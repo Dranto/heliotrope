@@ -95,6 +95,44 @@ export function Plant({ crop, stage }: { crop: CropId; stage: CropStage }) {
           )}
         </g>
       );
+    case 'strawberry':
+      // M32: a low rosette of toothed leaves, white flowers, then red berries.
+      return (
+        <g className="plant-strawberry">
+          {[0, 120, 240].map((a) => (
+            <path
+              key={a}
+              className="leaf"
+              d="M0 0c-1-.4-1.6-1.4-1.2-2.4.4.4 1 .2 1.2.6.2-.4.8-.2 1.2-.6.4 1-.2 2-1.2 2.4z"
+              transform={`rotate(${a})`}
+            />
+          ))}
+          {ripe ? (
+            <g className="berries">
+              {[
+                [-1.3, 0.9],
+                [1.2, 1.1],
+                [0.1, -1.6],
+              ].map(([x, y]) => (
+                <g key={`${x},${y}`} transform={`translate(${x} ${y})`}>
+                  <path
+                    className="berry"
+                    d="M0 1.1c-.8-.3-1-1-.8-1.5.4-.4 1.2-.4 1.6 0 .2.5 0 1.2-.8 1.5z"
+                  />
+                  <path className="calyx" d="M-.5 -.5l.5.2.5-.2" />
+                </g>
+              ))}
+            </g>
+          ) : (
+            <g className="blossom">
+              {[0, 72, 144, 216, 288].map((a) => (
+                <ellipse key={a} cx="0" cy="-.6" rx=".35" ry=".5" transform={`rotate(${a})`} />
+              ))}
+              <circle className="heart" r=".3" />
+            </g>
+          )}
+        </g>
+      );
   }
 }
 

@@ -903,7 +903,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -1077,6 +1077,31 @@ Roadmap P28, décision D20 : les récompenses sont des coups de main gardés en 
 - **Équilibrage.** Les demandes sont facultatives et le joueur de référence ne les joue pas : le rythme mesuré ne change pas.
 - **Écarts avec la roadmap.** Une heure de production devient un quart d'heure, pour que lancer trois coups de main d'affilée ne saute pas une Saison ; l'étape de chantier moins chère et les demandes d'espèce de l'Herbier sont laissées pour plus tard ; l'envolée de pollen devient aussi un coup de main.
 - **Sauvegarde.** Version 30 : les demandes en attente, le délai avant la suivante, la graine, la réserve, le nombre de services et les liens ; une sauvegarde plus ancienne commence sans demande.
+
+
+### 9.12 Le potager et le verger allégés (M32)
+
+Roadmap P31, décision D24 : « Tout récolter » ressème la même culture. Les petites boucles gardent leur geste sans devenir une corvée, et le miel trouve un usage. Code dans `src/game/garden.ts` (rotation, temps, fraises, `harvestAll`), `src/game/seedBank.ts` (variétés) et `src/game/orchard.ts` (âge des arbres, miel).
+
+- **Tout récolter, ressemer pareil.** Dès que quelque chose est mûr au potager ou au verger, les panneaux du potager et du verger montrent un bouton « Tout récolter et ressemer » : il récolte chaque carré mûr et y ressème aussitôt la même culture, puis cueille chaque arbre mûr. Une seule notification résume la récolte, et une autre annonce chaque variété trouvée. Le carré par carré reste là pour choisir.
+- **La rotation.** Chaque carré se souvient de sa dernière culture. Une culture semée après une culture **différente** pousse **×1,2** plus vite, et le panneau l'affiche (« En rotation »). Ressemer la même culture ne retire rien, mais ne gagne pas ce bonus : c'est le choix entre le geste rapide et le jardinier attentif.
+- **Chaque culture a son temps** (une fois le ciel ouvert, §9.10). Le grand soleil fait pousser les tournesols ×1,5, le vent les radis, la brume les haricots, la chaleur les courges ; l'averse arrose toujours tout le potager (×1,25). Le panneau dit quelle culture le temps présent favorise.
+- **Les fraises.** Une cinquième culture, ouverte avec la **première ruche** (§9.8) : elles poussent en **10 min**, donnent un panier, et leur parfum remplit **un quart de la jauge de pollen** (§5.6). Sur la carte, une rosette de feuilles dentées, des fleurs blanches puis trois fraises rouges.
+- **Quatre variétés de plus** (une par paire avec les fraises), dix en tout :
+
+| Variété | Cultures | Bonus |
+|---|---|---|
+| Fraise des bois | Radis et Fraises | La jauge de pollen se remplit ×1,2 plus vite |
+| Gariguette | Tournesols et Fraises | Récolte du Papillon doré ×1,25 |
+| Mara des bois | Haricots et Fraises | Les haricots durent ×1,25 |
+| Fraise ananas | Courges et Fraises | Le verger pousse ×1,1 plus vite |
+
+- **Le miel sert.** Sous les ruches, « Lancer une envolée » dépense un pot de miel pour une envolée de pollen (§5.6). Les grands chantiers gardent leur usage du miel ; c'est un choix, jamais une perte.
+- **Les arbres qui vieillissent.** Un fruitier cueilli souvent prend de l'âge : arbre de deux ans à 5 cueillettes, de cinq ans à 15, vieil arbre à 30. Chaque âge donne **un panier de plus** par cueillette (8, puis 9, 10 et 11). Le panneau du verger montre l'âge et les paniers par cueillette. Un arbre oublié ne perd rien.
+- **Jalons (2).** « La terre se repose » (25 récoltes semées après une culture différente) et « Vieil arbre » (un fruitier à son dernier âge), famille du quartier. « Grainothèque » demande désormais les dix variétés. 155 jalons en tout.
+- **Équilibrage.** Le potager et le verger restent des bonus pour le joueur qui revient. Le joueur de référence de la partie complète (§8), qui alterne déjà ses cultures, profite de la rotation et du temps, mais aucune cible ne bouge : 1ʳᵉ Saison 66 min, 1ᵉʳ Cycle 2 h 41, Cycles 2 à 4 en 36, 36 et 43 min, essaimages à 4 h et 6 h de jeu, comme après M31.
+- **Écarts avec la roadmap.** « Tout récolter » est un bouton des panneaux plutôt qu'un clic sur la fleur, qui garde son geste (la Lumière et le pollen). Les demandes de miel des voisins viennent avec M35. Les ruches rendaient déjà les variétés plus probables (§9.8) : rien de plus pour la ruche pleine.
+- **Sauvegarde.** Version 33 : la dernière culture et la rotation de chaque carré, le nombre de récoltes en rotation et les cueillettes de chaque arbre ; rien pour une sauvegarde plus ancienne.
 
 ## 10. Écrans et interface
 

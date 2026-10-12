@@ -123,7 +123,7 @@ describe('the orchard (§9.8)', () => {
     };
     const loaded = deserialize(serialize(odd), 0)!;
     expect(loaded.orchard.trees.apple.age).toBe(0);
-    expect(loaded.orchard.trees.pear).toEqual({ age: TREE_SECONDS, fruit: FRUIT_SECONDS });
+    expect(loaded.orchard.trees.pear).toMatchObject({ age: TREE_SECONDS, fruit: FRUIT_SECONDS });
     expect(loaded.orchard.trees.cherry.age).toBeNull();
     expect(loaded.orchard.hives).toBe(1);
     expect(loaded.orchard.honey).toBe(3);
