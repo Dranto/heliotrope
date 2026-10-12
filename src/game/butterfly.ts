@@ -1,6 +1,7 @@
 // The Golden Butterfly (docs/game-design.md §9.2): a random visitor that grants a temporary
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
-import { FLIGHT_BUTTERFLY_FACTOR } from './pollen';
+import { addPollen, FLIGHT_BUTTERFLY_FACTOR, POLLEN_PER_MOMENT } from './pollen';
+import { isWeatherOpen, type WeatherId } from './weather';
 import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
 import { effectDurationFactor, factorOf } from './bonuses';
 import {
@@ -25,10 +26,38 @@ export const HARVEST_PRODUCTION_SECONDS = 15 * 60;
 
 export type ButterflyOutcome = 'bloom' | 'pollination' | 'harvest';
 
+/** Odds of the Floraison and the Récolte; the Pollinisation takes the rest. */
+export interface ButterflyOdds {
+  bloom: number;
+  harvest: number;
+}
+
 /** §9.2 odds: Floraison 50%, Récolte 40%, Pollinisation 10%. */
-export function butterflyOutcome(random: number): ButterflyOutcome {
-  if (random < 0.5) return 'bloom';
-  if (random < 0.9) return 'harvest';
+export const BUTTERFLY_ODDS: ButterflyOdds = { bloom: 0.5, harvest: 0.4 };
+
+/**
+ * §5.7 (M31): the butterfly takes the colour of the weather. Its three effects stay, but more
+ * Floraisons come under grand soleil, more Récoltes in the wind and more Pollinisations in the
+ * mist. The other weathers keep the §9.2 odds.
+ */
+export const WEATHER_BUTTERFLY_ODDS: Partial<Record<WeatherId, ButterflyOdds>> = {
+  sun: { bloom: 0.6, harvest: 0.3 },
+  wind: { bloom: 0.4, harvest: 0.5 },
+  mist: { bloom: 0.45, harvest: 0.35 },
+};
+
+/** The odds in force: the weather's once the sky is open (§9.10), §9.2's otherwise. */
+export function butterflyOdds(state: GameState): ButterflyOdds {
+  if (!isWeatherOpen(state)) return BUTTERFLY_ODDS;
+  return WEATHER_BUTTERFLY_ODDS[state.weather.current] ?? BUTTERFLY_ODDS;
+}
+
+export function butterflyOutcome(
+  random: number,
+  odds: ButterflyOdds = BUTTERFLY_ODDS,
+): ButterflyOutcome {
+  if (random < odds.bloom) return 'bloom';
+  if (random < odds.bloom + odds.harvest) return 'harvest';
   return 'pollination';
 }
 
@@ -106,7 +135,7 @@ export interface CatchResult {
 export function catchButterfly(state: GameState): CatchResult | null {
   if (state.butterfly.visible <= 0) return null;
   const [random, rngSeed] = nextRandom(state.rngSeed);
-  const outcome = butterflyOutcome(random);
+  const outcome = butterflyOutcome(random, butterflyOdds(state));
   let next: GameState = { ...state, rngSeed, butterflies: state.butterflies + 1 };
   let light = 0;
   if (outcome === 'harvest') {
@@ -117,5 +146,6 @@ export function catchButterfly(state: GameState): CatchResult | null {
   }
   // Hidden Milestone "De justesse" (§9.3): caught in its last seconds on screen.
   if (state.butterfly.visible <= JUST_IN_TIME_SECONDS) next = unlockAchievement(next, 'justInTime');
-  return { state: scheduleNext(next), outcome, light };
+  // §5.7 (M31): the butterfly leaves pollen on the flower, after its own effect has started.
+  return { state: scheduleNext(addPollen(next, POLLEN_PER_MOMENT)), outcome, light };
 }

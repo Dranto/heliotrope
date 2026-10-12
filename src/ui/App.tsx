@@ -11,6 +11,7 @@ import {
 import type { CatchResult } from '../game/butterfly';
 import { VISIT_EFFECTS, type WelcomeResult } from '../game/visits';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
+import { bouquetBonus, bouquetSize } from '../game/effects';
 import { phaseOf } from '../game/phases';
 import { fleaMarketGenerator, lightPerSecond } from '../game/production';
 import { NextGoal } from './Goals';
@@ -607,6 +608,14 @@ export function App() {
                   {t.butterfly.effect[effect.kind](t.duration(Math.ceil(effect.remaining)))}
                 </span>
               ))}
+              {bouquetBonus(state.effects) > 0 && (
+                <span className="effect-chip" data-kind="bouquet">
+                  {t.butterfly.bouquet(
+                    bouquetSize(state.effects),
+                    formatPercent(bouquetBonus(state.effects)),
+                  )}
+                </span>
+              )}
             </span>
           )}
         </div>

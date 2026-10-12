@@ -494,7 +494,8 @@ describe('App', () => {
     expect(document.querySelector('.pollen-wave')).toBeNull();
     fireEvent.click(flower());
     fireEvent.click(flower());
-    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '0');
+    // The gauge starts again from almost nothing (faster at the start of a Season, §5.7).
+    expect(Number(screen.getByRole('meter').getAttribute('aria-valuenow'))).toBeLessThan(5);
     expect(flower().closest('section')).toHaveAttribute('data-flight', 'true');
     expect(document.querySelector('.pollen-wave')).not.toBeNull();
   });

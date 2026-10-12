@@ -62,3 +62,21 @@ export const BIRDS_SECONDS_PER_SPECIES = 10;
 export function effectFactor(effects: readonly ActiveEffect[], kind: EffectKind): number {
   return effects.some((effect) => effect.kind === kind) ? EFFECTS[kind].factor : 1;
 }
+
+/**
+ * The bouquet (§5.7, M31): each effect running beside the first adds BOUQUET_STEP to every
+ * building's production, up to BOUQUET_MAX, so the player who makes the butterfly, the flight,
+ * the visits and the helping hands meet is rewarded. It never takes anything away.
+ */
+export const BOUQUET_STEP = 0.1;
+export const BOUQUET_MAX = 0.5;
+
+/** Kinds of effect running at once. */
+export function bouquetSize(effects: readonly ActiveEffect[]): number {
+  return new Set(effects.map((effect) => effect.kind)).size;
+}
+
+/** Production bonus of the bouquet: 0 with fewer than two effects running. */
+export function bouquetBonus(effects: readonly ActiveEffect[]): number {
+  return Math.min(BOUQUET_MAX, BOUQUET_STEP * Math.max(0, bouquetSize(effects) - 1));
+}

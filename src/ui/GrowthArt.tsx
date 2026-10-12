@@ -65,11 +65,25 @@ function Crown({ marks }: { marks: string }) {
   );
 }
 
-export const GrowthLayer = memo(function GrowthLayer({ growth }: { growth: string }) {
+export const GrowthLayer = memo(function GrowthLayer({
+  growth,
+  flying = false,
+  reduced = false,
+}: {
+  growth: string;
+  /** A pollen flight crosses the city: the marks shine (§5.7). */
+  flying?: boolean;
+  reduced?: boolean;
+}) {
   const grown = parse(growth);
   if (grown.length === 0) return null;
   return (
-    <g className="growth-marks" aria-hidden="true">
+    <g
+      className="growth-marks"
+      data-flying={flying || undefined}
+      data-reduced={reduced || undefined}
+      aria-hidden="true"
+    >
       {grown.map(([id, marks]) =>
         GROWTH_ANCHORS[id].map(([x, y], i) => (
           <g key={`${id}-${i}`} data-growth={id} transform={`translate(${x} ${y})`}>

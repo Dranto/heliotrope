@@ -3,7 +3,7 @@
 import { achievementBonus } from './achievements';
 import { challengeProductionFactor, generatorLimit, upgradesAllowed } from './challenges';
 import { bonusesOf, costFactor, factorOf, globalBonus } from './bonuses';
-import { effectFactor } from './effects';
+import { bouquetBonus, effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import { siteFactor } from './bioregion';
 import { sourceBonus } from './cycles';
@@ -115,8 +115,8 @@ export function upgradeSynergyBonus(state: GameState): number {
 
 /**
  * §8: multiplier applied to every generator: Seeds × Sources × Milestones × biodiversity ×
- * upgrade synergies × parcels and projects × Floraison × the pollen's flight (§5.6), and the constraint of a challenge Season
- * (§7.3).
+ * upgrade synergies × parcels and projects × Floraison × the pollen's flight (§5.6) × the bouquet of
+ * the effects running together (§5.7), and the constraint of a challenge Season (§7.3).
  */
 export function globalMultiplier(state: GameState): number {
   return (
@@ -128,6 +128,7 @@ export function globalMultiplier(state: GameState): number {
     (1 + upgradeSynergyBonus(state)) *
     effectFactor(state.effects, 'bloom') *
     effectFactor(state.effects, 'flight') *
+    (1 + bouquetBonus(state.effects)) *
     challengeProductionFactor(state)
   );
 }

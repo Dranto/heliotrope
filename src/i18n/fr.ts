@@ -250,6 +250,7 @@ export const fr = {
       fleaMarket: (seconds: string) => `Brocante, moitié prix · ${seconds}`,
       flight: (seconds: string) => `Envolée de pollen ×1,5 · ${seconds}`,
     },
+    bouquet: (count: number, bonus: string) => `Bouquet de ${count}\u00a0effets +${bonus}\u00a0%`,
   },
   visits: {
     welcome: {
@@ -430,6 +431,8 @@ export const fr = {
       manyPaths: 'La ville aux mille formes',
       firstFlight: 'Première envolée',
       pollenStorm: 'Tempête de pollen',
+      bouquet: 'Bouquet',
+      grandBouquet: 'Grand bouquet',
       firstFavour: 'Coup de main',
       goodNeighbour: 'Bon voisin',
       'weather.sun': 'Plein soleil',
@@ -552,6 +555,7 @@ export const fr = {
       weather: (day: string) => `Vivre ${day}`,
       requests: (count: number) =>
         count === 1 ? 'Rendre service à un voisin' : `Rendre ${count} services aux voisins`,
+      bouquet: (count: number) => `Faire jouer ${count}\u00a0effets en même temps`,
       flights: (count: number) =>
         count === 1
           ? 'Remplir la jauge de pollen et lancer une envolée'

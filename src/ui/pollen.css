@@ -93,3 +93,43 @@
     display: none;
   }
 }
+
+/* The bouquet (§5.7, M31): golden petals around the gauge, one per effect beside the first. */
+.bouquet-petals ellipse {
+  fill: #f6c75a;
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 0.6;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bouquet-open 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes bouquet-open {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+
+/* A flight lights the marks of the buildings that grow as it passes (§5.7). */
+.growth-marks[data-flying] {
+  filter: drop-shadow(0 0 4px rgb(246 199 90 / 0.95));
+  animation: growth-shine 1.6s ease-in-out infinite;
+}
+
+.growth-marks[data-flying][data-reduced] {
+  animation: none;
+}
+
+@keyframes growth-shine {
+  50% {
+    filter: drop-shadow(0 0 9px rgb(255 226 140 / 1)) brightness(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bouquet-petals ellipse,
+  .growth-marks[data-flying] {
+    animation: none;
+  }
+}

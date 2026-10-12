@@ -204,6 +204,7 @@ export const en: Texts = {
       fleaMarket: (seconds: string) => `Flea market, half price · ${seconds}`,
       flight: (seconds: string) => `Pollen flight ×1.5 · ${seconds}`,
     },
+    bouquet: (count: number, bonus: string) => `Bouquet of ${count} effects +${bonus}%`,
   },
   visits: {
     welcome: {
@@ -383,6 +384,8 @@ export const en: Texts = {
       manyPaths: 'A city of a thousand shapes',
       firstFlight: 'First flight',
       pollenStorm: 'Pollen storm',
+      bouquet: 'Bouquet',
+      grandBouquet: 'Grand bouquet',
       firstFavour: 'A helping hand',
       goodNeighbour: 'Good neighbour',
       'weather.sun': 'Full sun',
@@ -497,6 +500,7 @@ export const en: Texts = {
       weather: (day: string) => `Live through ${day}`,
       requests: (count: number) =>
         count === 1 ? 'Help out a neighbour' : `Help out the neighbours ${count} times`,
+      bouquet: (count: number) => `Have ${count} effects running at the same time`,
       flights: (count: number) =>
         count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,

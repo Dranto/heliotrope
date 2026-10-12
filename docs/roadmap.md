@@ -1,8 +1,9 @@
 # Heliotrope — Feuille de route
 
-> Statut : v5.0 (2026-10-12), proposée à Antoine (« fais une roadmap pour améliorer les mécaniques existantes, en
-> étendre certaines, les rendre plus agréables, mieux les synergiser »), à valider. La v1 (M5 à M12), la v2 (M13 à
-> M18), la v3 (M19 à M24) et la v4 (M25 à M30) sont livrées ; cette version propose la suite, de M31 à M36.
+> Statut : v5.1 (2026-10-12), proposée à Antoine (« fais une roadmap pour améliorer les mécaniques existantes, en
+> étendre certaines, les rendre plus agréables, mieux les synergiser ») et validée le même jour (« implémente la
+> roadmap »), avec un ajout : des Jalons qui interagissent avec le jeu (P36, M37). La v1 (M5 à M12), la v2 (M13 à
+> M18), la v3 (M19 à M24) et la v4 (M25 à M30) sont livrées ; cette version construit la suite, de M31 à M37.
 > Ce document classe les mécaniques à ajouter. Il ne fixe aucun chiffre : `docs/game-design.md` reste la référence pour
 > les mécaniques et l'équilibrage, et chaque mécanique retenue y sera décrite dans la PR qui l'implémente. Les valeurs
 > données ici sont des ordres de grandeur à confirmer avec le simulateur (§8) et la partie complète (`wholeGame.ts`).
@@ -213,6 +214,26 @@ Comme M30 pour la v4, la v5 se clôt par l'automatisation gagnée de ce qui devi
 - **Satisfaction :** la fin de partie garde les gestes qui plaisent et perd ceux qui lassent.
 - **Effort :** moyen : deux Coopératives sur le modèle existant, surtout du simulateur.
 
+### P36 — Des Jalons qui comptent
+
+Ajout d'Antoine (2026-10-12 : « ajoute aussi des interactions avec les jalons et d'autres mécaniques du jeu pour
+rendre leur complétion satisfaisante »). Aujourd'hui, un Jalon éclot en médaillon et ajoute +1 % : rien d'autre ne le
+lit. P36 les fait entrer dans le jeu :
+
+- **Un cadeau à l'éclosion.** Chaque Jalon atteint laisse un petit geste lié à sa famille, visible sur la carte
+  (une bouffée de Lumière, un pas de jauge de pollen, une pousse du potager qui avance, une goutte d'Eau).
+- **Les familles complètes.** Finir une famille dore son titre dans l'écran des Jalons et donne un bonus gardé, relié
+  à son monde (la famille des clics à la jauge, celle du Papillon au bouquet, celle du quartier aux projets), et une
+  couleur de fleur ou une pièce de décor (§6.5).
+- **Voir le prochain.** L'écran des Jalons montre, pour chaque famille, le prochain Jalon et sa progression ; le
+  prochain objectif (M10) peut en désigner un quand il est proche.
+- **D'autres mécaniques les lisent.** Les voisins demandent parfois un Jalon proche (§9.11), des alliances et un
+  talent comptent les familles complètes.
+
+- **Thème :** chaque étape de la réparation de la ville se fête et sert.
+- **Satisfaction :** atteindre un Jalon se sent tout de suite, et compléter une famille devient un objectif.
+- **Effort :** moyen : une table de cadeaux par famille, l'écran des Jalons, quelques liens.
+
 ---
 
 ## 4. Jalons
@@ -223,12 +244,13 @@ rejoue le simulateur et la partie complète et, si l'état change, ajoute une mi
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
 | M5 à M30 | *Livrés* (voir §7) | — |
-| **M31 — Les moments qui s'enchaînent** | P30 : bouquet, envolée qui fait briller les voies, Papillon selon le temps, premier clic de Saison | Touche tous les joueurs dès la 1ʳᵉ Saison ; petit, et le bouquet sert de point d'accroche aux jalons suivants |
+| **M31 — Les moments qui s'enchaînent** *(livré)* | P30 : bouquet, envolée qui fait briller les voies, Papillon selon le temps, premier clic de Saison | Touche tous les joueurs dès la 1ʳᵉ Saison ; petit, et le bouquet sert de point d'accroche aux jalons suivants |
 | **M32 — Le potager et le verger** | P31 : tout récolter et ressemer, rotation, cultures et temps, fraises et 4 variétés, miel utile, arbres qui vieillissent | Retire la corvée la plus visible ; les fraises et le miel nourrissent la jauge de M31 |
 | **M33 — Les voies et le ciel** | P32 : voies sous leur ciel, temps échangé, quatre espèces du temps, ciel dans le retour en images | Les cultures de M32 suivent aussi le temps : la prévision devient une vraie décision |
 | **M34 — Les alliances du milieu** | P33 : six alliances de plus, places dès la 2ᵉ Saison, fils sur la carte | Relie ce que M31 à M33 ont étendu ; a besoin des espèces et des temps vécus |
 | **M35 — L'Herbier et les voisins** | P34 : saluer une espèce, familles et leurs bonus, demandes d'espèce, de miel et de forme, deux récompenses | Les familles comptent les espèces du temps de M33 ; les demandes s'appuient sur le miel de M32 |
 | **M36 — Les boucles confiées, la partie remesurée** | P35 : projets menés par le conseil, jardiniers, apiculteurs, simulateur de la v5 | Clôt la v5 : automatise ce qui lasse et mesure tout ce que M31 à M35 ont ajouté |
+| **M37 — Des Jalons qui comptent** | P36 : cadeaux à l'éclosion, familles complètes et leurs bonus, prochain Jalon visible, demandes et alliances qui les lisent | En dernier : compte aussi les Jalons ajoutés par M31 à M36 |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Chaque extension se lie à l'existant (les fraises à la jauge, le temps
 aux voies, les familles aux alliances, le miel aux envolées) plutôt que d'ajouter un multiplicateur isolé.
@@ -236,8 +258,8 @@ aux voies, les familles aux alliances, le miel aux envolées) plutôt que d'ajou
 **Récit par le jeu (décision d'Antoine, 2026-10-10).** Aucun jalon n'ajoute de journal ni de texte narratif : le
 bouquet se voit aux pétales, les familles aux planches dorées, le temps échangé sur la prévision.
 
-**Avec les fils en cours.** Le fil « Prise en main progressive » règle l'ordre d'apparition des mécaniques : les
-seuils d'ouverture proposés ici (fraises, alliances dès la 2ᵉ Saison) suivront ses choix. Le fil « Audit et
+**Avec les fils en cours.** Le fil « Prise en main progressive » règle l'ordre d'apparition des mécaniques (une
+nouveauté à la fois, §10.8) : ce que M31 à M37 ouvrent (fraises, alliances dès la 2ᵉ Saison) passe par sa file. Le fil « Audit et
 corrections graphiques » corrige les dessins existants ; les dessins neufs (fraises, quatre espèces, pétales du
 bouquet) partent de son état.
 

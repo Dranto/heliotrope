@@ -22,7 +22,8 @@ const CLICKS_PER_FLIGHT = Math.round(1 / POLLEN_PER_CLICK);
 
 function fresh(extra: Partial<GameState> = {}): GameState {
   const state = createInitialState(0);
-  return { ...state, generators: { ...state.generators, pot: 10 }, ...extra };
+  // Past the first seconds of the Season, when the gauge fills faster (§5.7).
+  return { ...state, generators: { ...state.generators, pot: 10 }, seasonSeconds: 60, ...extra };
 }
 
 function clicked(state: GameState, count: number): GameState {
