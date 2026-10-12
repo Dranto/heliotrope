@@ -59,7 +59,8 @@ export function pollinate(state: GameState, clicks = 1): GameState {
   return flights > 0 ? sendFlights(next, flights) : next;
 }
 
-function sendFlights(state: GameState, count: number): GameState {
+/** Send `count` flights at once: also the neighbours' help (§9.11). */
+export function sendFlights(state: GameState, count: number): GameState {
   const seconds = EFFECTS.flight.seconds * count;
   const current = state.effects.find((effect) => effect.kind === 'flight');
   const effects = current

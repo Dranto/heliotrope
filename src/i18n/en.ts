@@ -19,6 +19,36 @@ export const en: Texts = {
   perSecond: '/ s',
   clickFlower: 'Harvest the heliotrope’s light',
   pollen: (percent: string) => `Pollen gauge: ${percent}%`,
+  requests: {
+    title: 'Neighbours’ requests',
+    hint: 'Serving a request keeps a helping hand in reserve, three at most, to play when you like.',
+    needs: {
+      harvests: (count: number) => `${count} garden harvests`,
+      fruit: (count: number) => `${count} orchard pickings`,
+      flights: (count: number) => `${count} pollen flights`,
+      butterflies: (count: number) => `${count} Golden Butterflies caught`,
+      owned: (count: number, generator: string) => `${count} × ${generator}`,
+    },
+    hands: {
+      quarter: 'A quarter of an hour of production',
+      bloom: 'A Bloom',
+      ripen: 'A crop ripe at once',
+      flight: 'A pollen flight',
+    },
+    offers: (hand: string) => `Offers: ${hand}`,
+    from: (district: string) => `From ${district}`,
+    serve: 'Help out',
+    serveLabel: (need: string) => `Help out: ${need}`,
+    decline: 'Decline',
+    declineLabel: (need: string) => `Decline: ${need}`,
+    waiting: 'A request is on its way.',
+    reserve: 'Helping hands',
+    reserveEmpty: 'No helping hand in reserve.',
+    reserveFull: 'Reserve full',
+    play: 'Play',
+    playLabel: (hand: string) => `Play: ${hand}`,
+    bond: (district: string, percent: string) => `Bond with ${district}: +${percent}%`,
+  },
   weather: {
     names: {
       sun: 'Bright sun',
@@ -353,6 +383,8 @@ export const en: Texts = {
       manyPaths: 'A city of a thousand shapes',
       firstFlight: 'First flight',
       pollenStorm: 'Pollen storm',
+      firstFavour: 'A helping hand',
+      goodNeighbour: 'Good neighbour',
       'weather.sun': 'Full sun',
       'weather.shower': 'Singing in the rain',
       'weather.wind': 'The wind rises',
@@ -463,6 +495,8 @@ export const en: Texts = {
           ? 'Pick the path of a growing building'
           : `Have ${count} building paths at work`,
       weather: (day: string) => `Live through ${day}`,
+      requests: (count: number) =>
+        count === 1 ? 'Help out a neighbour' : `Help out the neighbours ${count} times`,
       flights: (count: number) =>
         count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,

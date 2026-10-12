@@ -2,6 +2,7 @@
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
+import { bondBonuses, type Bonds } from './bonds';
 import { weatherBonuses, type WeatherState } from './weather';
 import { allianceBonuses } from './alliances';
 import type { GameState } from './state';
@@ -116,6 +117,8 @@ export interface BonusSource {
   weather?: Pick<WeatherState, 'current'>;
   /** Cycles of water done: the weather opens with the second Season or the first Cycle. */
   cycles?: number;
+  /** The bonds with the neighbouring districts (§9.11, M29); absent where none can be. */
+  requests?: { bonds: Bonds };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -160,6 +163,7 @@ function collectBonuses(source: BonusSource): Bonus[] {
     city,
     growth,
     weather,
+    requests,
   } = source;
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
@@ -180,6 +184,7 @@ function collectBonuses(source: BonusSource): Bonus[] {
     ...(city ? cityBonuses(city) : []),
     ...(growth ? growthBonuses({ generators: source.generators, growth }) : []),
     ...(weather ? weatherBonuses({ weather, seasons: source.seasons, cycles: source.cycles }) : []),
+    ...(requests ? bondBonuses(requests.bonds) : []),
     ...(isGameState(source) ? allianceBonuses(source) : []),
   ];
 }

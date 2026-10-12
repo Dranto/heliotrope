@@ -499,6 +499,32 @@ describe('App', () => {
     expect(document.querySelector('.pollen-wave')).not.toBeNull();
   });
 
+  it('shows the neighbours’ requests, serves one and plays its hand (§9.11, M29)', () => {
+    const fresh = createInitialState(0);
+    saveGame({
+      ...fresh,
+      seasons: 1,
+      garden: { ...fresh.garden, harvests: 3 },
+      requests: {
+        ...fresh.requests,
+        open: [{ need: { kind: 'harvests', count: 3 }, base: 0, hand: 'bloom', from: 'tanneries' }],
+      },
+    });
+    const store = renderApp();
+    const panel = document.querySelector('.requests-panel') as HTMLElement;
+    expect(panel).toHaveTextContent('3 récoltes du potager');
+    expect(document.querySelector('.request-bubble[data-met]')).not.toBeNull();
+    fireEvent.click(
+      within(panel).getByRole('button', {
+        name: 'Rendre service\u00a0: 3\u00a0récoltes du potager',
+      }),
+    );
+    expect(store.getState().requests.hands).toEqual(['bloom']);
+    expect(panel).toHaveTextContent('+1 %');
+    fireEvent.click(within(panel).getByRole('button', { name: 'Lancer\u00a0: Une Floraison' }));
+    expect(store.getState().effects.some((e) => e.kind === 'bloom')).toBe(true);
+  });
+
   it('offers a tab bar for small screens (§10.3)', () => {
     renderApp();
     const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });

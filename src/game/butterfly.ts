@@ -85,7 +85,7 @@ export function advanceButterfly(state: GameState, dtSeconds: number): GameState
   return scheduleNext(state);
 }
 
-function startEffect(state: GameState, kind: EffectKind): ActiveEffect[] {
+export function startEffect(state: GameState, kind: EffectKind): ActiveEffect[] {
   // Catching the same effect again restarts it rather than stacking it. Caught during the
   // pollen's flight (§5.6), it lasts longer.
   const flying = state.effects.some((e) => e.kind === 'flight');

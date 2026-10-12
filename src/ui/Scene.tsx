@@ -58,6 +58,8 @@ import { GreatWorksLayer } from './GreatWorksArt';
 import { GrowthLayer } from './GrowthArt';
 import { PollenWave } from './PollenWave';
 import { WeatherForecast, WeatherLayer } from './WeatherArt';
+import { RequestBubbles } from './RequestArt';
+import { isRequestMet } from '../game/requests';
 import { isFlying } from '../game/pollen';
 import { isWeatherOpen, type WeatherId } from '../game/weather';
 import { encodeGrowth } from './growthMap';
@@ -256,6 +258,10 @@ export function Scene({
   const flights = state.pollen.flights;
   const weather = isWeatherOpen(state) ? state.weather.current : null;
   const forecast = state.weather.forecast.join(',');
+  // The neighbours' requests waiting (§9.11), encoded so the bubbles only redraw when one changes.
+  const requests = state.requests.open
+    .map((r) => `${r.need.kind}:${isRequestMet(state, r) ? 1 : 0}`)
+    .join(',');
   const flying = isFlying(state);
   const growth = encodeGrowth(
     Object.fromEntries(GENERATOR_IDS.map((id) => [id, reachedTiers(state, id)])) as Record<
@@ -316,6 +322,7 @@ export function Scene({
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <GrowthLayer growth={growth} />
         <PollenWave flights={flights} flying={flying} reduced={reduced} />
+        <RequestBubbles bubbles={requests} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
@@ -342,6 +349,7 @@ export function Scene({
       flights,
       flying,
       weather,
+      requests,
       corridors,
       working,
       bloomed,
