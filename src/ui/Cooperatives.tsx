@@ -1,5 +1,6 @@
 import { formatNumber } from '../game/format';
 import {
+  councilLeadsProjects,
   isCooperativeActive,
   setThrifty,
   toggleCooperative,
@@ -7,7 +8,7 @@ import {
   type CooperativeId,
 } from '../game/cooperatives';
 import { t } from '../i18n';
-import { cooperativeBuysText } from '../i18n/talents';
+import { cooperativeCountText, cooperativeDoesText } from '../i18n/talents';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
@@ -54,12 +55,12 @@ export function Cooperatives() {
               <span className="coop-text">
                 <span className="coop-name">{name}</span>
                 <span className="coop-buys">
-                  {t.cooperatives.buys(cooperativeBuysText(id).toLowerCase())}
+                  {cooperativeDoesText(id, councilLeadsProjects(state))}
                 </span>
                 <span className="coop-count" data-testid={`coop-${id}`}>
                   {/* Re-keyed so the count pops at each purchase. */}
                   <span key={state.cooperatives.purchases[id]}>
-                    {t.cooperatives.purchases(formatNumber(state.cooperatives.purchases[id]))}
+                    {cooperativeCountText(id, formatNumber(state.cooperatives.purchases[id]))}
                   </span>
                 </span>
               </span>

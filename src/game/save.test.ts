@@ -53,6 +53,8 @@ function playedState(): GameState {
         farmers: 0,
         foresters: 0,
         council: 0,
+        growers: 0,
+        beekeepers: 0,
         fountaineers: 0,
       },
     },
@@ -447,6 +449,8 @@ describe('export and import', () => {
       foresters: 0,
       council: 0,
       fountaineers: 0,
+      growers: 0,
+      beekeepers: 0,
     });
   });
 

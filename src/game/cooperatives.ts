@@ -1,7 +1,10 @@
 // The Cooperatives (docs/game-design.md §7.2): neighbours who buy for the player once a talent of
 // the Tree of Seasons brings them in. Each one looks after some buildings, the council after the
 // upgrades, the fountaineers (from the Canopy, §7.1) after the water collectors of the
-// Bioregion. Pure: `runCooperatives` returns new state, called by every tick.
+// Bioregion. M36 adds the small loops: the council carries out the projects once the assembly of
+// the Canopy asks it, the growers resow the courtyard garden (never harvesting, D27) and the
+// beekeepers carry the spare honey to the great works. Pure: `runCooperatives` returns new
+// state, called by every tick.
 import { isIntroduced } from './introductions';
 import {
   buyCollector,
@@ -22,6 +25,19 @@ import {
 import type { GameState } from './state';
 import { CANOPY_LIST, TALENT_LIST } from './talents';
 import { windBikesRiding } from './alliances';
+import {
+  canSow,
+  CROP_IDS,
+  isCropUnlocked,
+  openPlots,
+  sow,
+  weatherCrop,
+  type CropId,
+} from './garden';
+import { carryHoney } from './greatWorks';
+import { HIVE_COSTS } from './orchard';
+import { PROJECTS, type ProjectId } from './projects';
+import { carryOutProject, offeredProjects } from './restoration';
 
 export const COOPERATIVE_IDS = [
   'gardeners',
@@ -30,6 +46,8 @@ export const COOPERATIVE_IDS = [
   'foresters',
   'council',
   'fountaineers',
+  'growers',
+  'beekeepers',
 ] as const;
 export type CooperativeId = (typeof COOPERATIVE_IDS)[number];
 
@@ -41,6 +59,8 @@ export const COOPERATIVE_GENERATORS: Record<CooperativeId, readonly GeneratorId[
   foresters: ['urbanCanopy', 'arcology'],
   council: [],
   fountaineers: [],
+  growers: [],
+  beekeepers: [],
 };
 
 /** "Garder une réserve": a purchase may then cost at most this share of the Light in reserve. */
@@ -75,10 +95,11 @@ export function isCooperativeId(value: unknown): value is CooperativeId {
 
 /**
  * A cooperative joins once the talent that brings it in is learnt (from the 2nd Season, D3), or
- * its canopy talent sown.
+ * its canopy talent sown. The beekeepers come with the second hive of the orchard (M36).
  */
 export function isCooperativeUnlocked(state: GameState, id: CooperativeId): boolean {
   if (!isIntroduced(state, 'cooperatives')) return false;
+  if (id === 'beekeepers') return state.orchard.hives >= HIVE_COSTS.length;
   return (
     TALENT_LIST.some((t) => t.cooperative === id && state.talents.includes(t.id)) ||
     CANOPY_LIST.some((c) => c.cooperative === id && state.canopy.levels[c.id] > 0)
@@ -125,7 +146,24 @@ type Purchase = { cooperative: CooperativeId } & (
   | { kind: 'generator'; id: GeneratorId; cost: number }
   | { kind: 'upgrade'; id: GameState['upgrades'][number]; cost: number }
   | { kind: 'collector'; id: CollectorId; cost: number }
+  | { kind: 'project'; id: ProjectId; cost: number }
 );
+
+/** The council carries out the projects once the assembly of the Canopy is sown (M36). */
+export function councilLeadsProjects(state: GameState): boolean {
+  return isCooperativeActive(state, 'council') && state.canopy.levels.assembly > 0;
+}
+
+/** The cheapest project offered this Season, for the council. */
+function nextProject(state: GameState): { id: ProjectId; cost: number } | null {
+  if (!councilLeadsProjects(state)) return null;
+  let best: { id: ProjectId; cost: number } | null = null;
+  for (const { id } of offeredProjects(state)) {
+    const { cost } = PROJECTS[id];
+    if (!best || cost < best.cost) best = { id, cost };
+  }
+  return best;
+}
 
 /**
  * The fountaineers build the cheapest water collector shown, once it costs at most a tenth of the
@@ -189,6 +227,14 @@ function nextPurchase(state: GameState): Purchase | null {
     : riders
       ? availableUpgrades(state).find((u) => u.effect.kind === 'synergy')
       : undefined;
+  // The council's projects (M36) wait in line with its upgrades, the cheaper first.
+  const project = nextProject(state);
+  if (project && (!upgrade || project.cost < upgrade.cost)) {
+    if (!best || project.cost <= buildingCost * COUNCIL_PRIORITY) {
+      if (project.cost > money) return null;
+      return { cooperative: 'council', kind: 'project', ...project };
+    }
+  }
   if (upgrade && (!best || upgrade.cost <= buildingCost * COUNCIL_PRIORITY)) {
     if (upgrade.cost > money) return null;
     const buyer = council ? 'council' : best!.cooperative;
@@ -202,34 +248,81 @@ function nextPurchase(state: GameState): Purchase | null {
 }
 
 /**
+ * What the growers sow after `last` (M36): the crop of the weather when it differs, otherwise
+ * the next crop unlocked after it, so every bed rotates; the same crop when it is the only one.
+ */
+export function growersCrop(state: GameState, last: CropId): CropId {
+  const sky = weatherCrop(state);
+  if (sky !== null && sky !== last && isCropUnlocked(state, sky)) return sky;
+  const from = CROP_IDS.indexOf(last);
+  for (let step = 1; step < CROP_IDS.length; step++) {
+    const crop = CROP_IDS[(from + step) % CROP_IDS.length]!;
+    if (isCropUnlocked(state, crop)) return crop;
+  }
+  return last;
+}
+
+function counted(state: GameState, id: CooperativeId, count: number): GameState {
+  if (count === 0) return state;
+  const { purchases } = state.cooperatives;
+  return {
+    ...state,
+    cooperatives: {
+      ...state.cooperatives,
+      purchases: { ...purchases, [id]: purchases[id] + count },
+    },
+  };
+}
+
+/** The growers (M36) resow every harvested bed; they never harvest (D27). */
+function resowGarden(state: GameState): GameState {
+  if (!isCooperativeActive(state, 'growers')) return state;
+  let next = state;
+  let sown = 0;
+  for (let i = 0; i < openPlots(state); i++) {
+    const last = next.garden.plots[i]?.last;
+    if (!last) continue;
+    const crop = growersCrop(next, last);
+    if (!canSow(next, i, crop)) continue;
+    next = sow(next, i, crop);
+    sown += 1;
+  }
+  return counted(next, 'growers', sown);
+}
+
+/** The beekeepers (M36) carry the spare honey to the great work in progress. */
+function tendHives(state: GameState): GameState {
+  if (!isCooperativeActive(state, 'beekeepers')) return state;
+  const next = carryHoney(state);
+  return counted(next, 'beekeepers', state.orchard.honey - next.orchard.honey);
+}
+
+/**
  * Let the working cooperatives buy what they can afford now. Their purchases are not the
  * player's: they do not reset the time since the last purchase (hidden Milestone, §9.3).
  */
 export function runCooperatives(state: GameState): GameState {
-  if (state.talents.length === 0) return state;
-  let next = state;
+  // The beekeepers need no talent (M36): they keep working after a swarm empties the tree.
+  let next = tendHives(resowGarden(state));
+  if (next.talents.length === 0) return next;
   for (let i = 0; i < MAX_PURCHASES_PER_TICK; i++) {
     const purchase = nextPurchase(next);
     if (!purchase) break;
-    const { purchases } = next.cooperatives;
-    const counted = {
-      ...next.cooperatives,
-      purchases: { ...purchases, [purchase.cooperative]: purchases[purchase.cooperative] + 1 },
-    };
-    if (purchase.kind === 'collector') {
+    const { cooperatives } = counted(next, purchase.cooperative, 1);
+    if (purchase.kind === 'collector' || purchase.kind === 'project') {
       // Kept as the player's purchase would, except for the time since the last purchase.
-      next = {
-        ...buyCollector(next, purchase.id),
-        idleSeconds: next.idleSeconds,
-        cooperatives: counted,
-      };
+      const bought =
+        purchase.kind === 'collector'
+          ? buyCollector(next, purchase.id)
+          : carryOutProject(next, purchase.id);
+      next = { ...bought, idleSeconds: next.idleSeconds, cooperatives };
       continue;
     }
     const light = Math.max(0, next.resources.light - purchase.cost);
     next = {
       ...next,
       resources: { ...next.resources, light },
-      cooperatives: counted,
+      cooperatives,
       ...(purchase.kind === 'generator'
         ? { generators: { ...next.generators, [purchase.id]: next.generators[purchase.id] + 1 } }
         : { upgrades: [...next.upgrades, purchase.id] }),

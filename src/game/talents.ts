@@ -197,6 +197,8 @@ export const CANOPY_IDS = [
   'nursery',
   'sower',
   'fountaineers',
+  'assembly',
+  'growers',
 ] as const;
 export type CanopyId = (typeof CANOPY_IDS)[number];
 
@@ -250,6 +252,16 @@ export const CANOPY_LIST: readonly CanopyDef[] = [
     maxLevel: 1,
     bonuses: () => [],
     cooperative: 'fountaineers',
+  },
+  // M36: the council of the neighbourhood carries out the projects too (read in cooperatives.ts).
+  { id: 'assembly', baseCost: 15, growth: 1, maxLevel: 1, bonuses: () => [] },
+  {
+    id: 'growers',
+    baseCost: 15,
+    growth: 1,
+    maxLevel: 1,
+    bonuses: () => [],
+    cooperative: 'growers',
   },
 ];
 
