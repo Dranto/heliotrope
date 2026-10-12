@@ -21,6 +21,11 @@ export const FLIGHT_GARDEN_SECONDS = 60;
 export const FLIGHT_BUTTERFLY_FACTOR = 1.5;
 /** Flights in a row add their seconds up to this many seconds of flight. */
 export const FLIGHT_MAX_SECONDS = 60;
+/** §5.7 (M31): catching the butterfly or welcoming a visitor fills a tenth of the gauge. */
+export const POLLEN_PER_MOMENT = 0.1;
+/** §5.7 (M31): in the first seconds of each Season, the clicks fill the gauge this much faster. */
+export const SEASON_START_SECONDS = 30;
+export const SEASON_START_FILL = 3;
 
 export interface PollenState {
   /** The gauge around the flower, from 0 to 1. */
@@ -36,8 +41,15 @@ export function createPollenState(): PollenState {
 /** How fast the clicks fill the gauge: the click upgrades and the paths that feed it (§5.5). */
 export function pollenFill(state: GameState): number {
   return (
-    (1 + POLLEN_FILL_PER_CLICK_UPGRADE * clickUpgradeCount(state)) * factorOf(state, 'pollenFill')
+    (1 + POLLEN_FILL_PER_CLICK_UPGRADE * clickUpgradeCount(state)) *
+    factorOf(state, 'pollenFill') *
+    (isSeasonStart(state) ? SEASON_START_FILL : 1)
   );
+}
+
+/** The first seconds of a Season, when the flower's pollen comes quicker (§5.7). */
+export function isSeasonStart(state: Pick<GameState, 'seasonSeconds'>): boolean {
+  return state.seasonSeconds < SEASON_START_SECONDS;
 }
 
 /**
@@ -61,8 +73,18 @@ export function isFlying(state: GameState): boolean {
  * FLIGHT_MAX_SECONDS.
  */
 export function pollinate(state: GameState, clicks = 1): GameState {
-  if (clicks <= 0 || !isPollenOpen(state)) return state;
-  const filled = state.pollen.gauge + clicks * POLLEN_PER_CLICK * pollenFill(state);
+  if (clicks <= 0) return state;
+  return addPollen(state, clicks * POLLEN_PER_CLICK * pollenFill(state));
+}
+
+/**
+ * Fill the gauge by `share` (1 is a full gauge), sending a flight each time it is full: the
+ * clicks, and the butterfly caught or a visitor welcomed (§5.7). Nothing while the gauge is not
+ * on the flower yet (§10.8).
+ */
+export function addPollen(state: GameState, share: number): GameState {
+  if (share <= 0 || !isPollenOpen(state)) return state;
+  const filled = state.pollen.gauge + share;
   const flights = Math.floor(filled);
   const next: GameState = {
     ...state,

@@ -8,6 +8,7 @@ import { effectSeconds } from './butterfly';
 import { generatorLimit } from './challenges';
 import type { EffectKind } from './effects';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
+import { addPollen, POLLEN_PER_MOMENT } from './pollen';
 import { nextRandom } from './random';
 import type { GameState } from './state';
 
@@ -176,5 +177,10 @@ export function welcomeVisit(state: GameState): WelcomeResult | null {
       ],
     };
   }
-  return { state: unlockAchievements(scheduleNext(next)), kind, gift };
+  // §5.7 (M31): a welcomed visitor leaves pollen on the flower.
+  return {
+    state: unlockAchievements(scheduleNext(addPollen(next, POLLEN_PER_MOMENT))),
+    kind,
+    gift,
+  };
 }

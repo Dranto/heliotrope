@@ -240,6 +240,27 @@ Roadmap P26. Le clic redevient un geste tout au long de la partie. Code dans `sr
 - **Jalons (2).** « Première envolée » (une envolée), « Tempête de pollen » (100 envolées), famille Clics. 144 jalons en tout.
 - **Sauvegarde.** Version 28 : la jauge et le nombre d'envolées, vides pour une sauvegarde plus ancienne.
 
+### 5.7 Les moments qui s'enchaînent (M31)
+
+Roadmap P30, décision D23 : le bouquet est un bonus de production. Le clic, le Papillon doré, l'envolée et les visites deviennent une seule famille de moments qui se renforcent. Code dans `src/game/effects.ts` (bouquet), `src/game/butterfly.ts` (chances selon le temps) et `src/game/pollen.ts`, pétales dans `src/ui/Flower.tsx`, reflets des voies dans `src/ui/GrowthArt.tsx`.
+
+- **Le bouquet.** Chaque sorte d'effet en cours au-delà de la première (Floraison, Pollinisation, Averse d'été, Nuée, haricots, transhumance, fête des récoltes, lucioles, brocante, envolée) ajoute **+10 % à toute la production**, jusqu'à **+50 %** (six effets à la fois). Il ne retire jamais rien et s'arrête avec les effets. Autour de la jauge de pollen, la couronne de la fleur porte un **pétale doré** par effet au-delà du premier (sept au plus), et le compteur montre « Bouquet de 3 effets +20 % » parmi les effets en cours. Les coups de main gardés en réserve (§9.11) servent à le composer : une Floraison ou une envolée lancée quand le Papillon passe.
+- **Une envolée qui se sent.** Pendant une envolée, les marques des bâtiments qui grandissent (§5.5) brillent d'un reflet doré qui respire (un reflet fixe avec les animations réduites).
+- **Le pollen des moments.** Attraper le Papillon doré ou accueillir un visiteur (§9.6) remplit **un dixième** de la jauge de pollen ; s'il la remplit, l'envolée part aussitôt.
+- **Le Papillon prend la couleur du temps.** Une fois le ciel ouvert (§9.10), les chances de ses trois effets suivent le temps, sans jamais en retirer un ; ni sa fréquence ni ses effets ne changent :
+
+| Temps | Floraison | Récolte | Pollinisation |
+|---|---|---|---|
+| Grand soleil | 60 % | 30 % | 10 % |
+| Vent | 40 % | 50 % | 10 % |
+| Brume | 45 % | 35 % | 20 % |
+| Averse, chaleur (et la 1ʳᵉ Saison) | 50 % | 40 % | 10 % |
+
+- **Le premier clic de chaque Saison.** Pendant les **30 premières secondes** d'une Saison, chaque clic remplit la jauge **trois fois** plus vite : à 2,5 clics par seconde, une relance commence par une envolée.
+- **Jalons (2).** « Bouquet » (3 effets en même temps) et « Grand bouquet » (5), famille Papillon doré. 153 jalons en tout.
+- **Équilibrage.** Le joueur de référence vit le bouquet quand ses Floraisons croisent ses envolées, et le Papillon suit le temps. La 1ʳᵉ Saison conseillée ne bouge pas (66 min, cible 80 min). Le 1ᵉʳ Cycle conseillé passe de 2 h 29 à 2 h 41 (cible 2 h 45) : le Papillon donne d'autres effets selon le ciel, pas davantage. Les Cycles 2 à 4 durent 36, 36 et 43 min (cibles 35, 35 et 45). La 1ʳᵉ ville sœur reste à 4 h de jeu ; la 2ᵉ passe de 5 h à 6 h (cible 5 h, dans la marge de ±30 %) parce que le premier Cycle de la ville sœur du simulateur tient en une Saison au lieu de deux, ce qui décale d'une heure de jeu le second essaimage. Le Papillon et les visites ne viennent pas plus souvent : leurs Averses doublent l'Eau, et le 2ᵉ Cycle y est très sensible (§9.10).
+- **Sauvegarde.** Rien de neuf à garder : le bouquet se lit dans les effets en cours, déjà sauvegardés.
+
 ## 6. Phases de progression
 
 Chaque phase change la scène centrale (le décor reverdit) et débloque des éléments d'interface. Les durées sont des cibles pour un joueur qui joue activement la première fois *(à valider)*.
@@ -857,6 +878,8 @@ Un papillon traverse l'écran à intervalle aléatoire (**toutes les 3 à 8 min*
 
 C'est la principale raison de garder l'onglet ouvert et de jouer activement, sans être obligatoire.
 
+Depuis M31 (§5.7), ces chances suivent le temps qu'il fait une fois le ciel ouvert, et chaque Papillon attrapé remplit un dixième de la jauge de pollen.
+
 > Jalon 4 : la Floraison passe de ×7 à ×3. À ×7, le simulateur arrivait à la Centrale à miroirs en 27 min au lieu d'une heure, même avec des générateurs plus chers (voir §4 et §8).
 
 **Implémentation (jalon 4).** `src/game/butterfly.ts`. Précisions retenues :
@@ -880,13 +903,13 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
 - **Améliorations** (dans une même Saison) : 10, 25, 50, 75 améliorations ; « Fil doré » (une première synergie entre bâtiments), « Toile dorée » (les 18 synergies entre bâtiments), « Mains d'or » (les 10 améliorations du clic).
 - **La fleur** : 10, 100, 1 000, 10 000, 100 000 clics ; un clic qui vaut 1 000 puis 1 M Lumière ; caché : « Graine qui dort » (récolter 1 000 Lumière dans une Saison sans aucun bâtiment).
-- **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
+- **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; « Bouquet » et « Grand bouquet » (3 puis 5 effets en même temps, §5.7, M31) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
 - **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 1, 25, 250 récoltes du potager, « Croisement » et « Grainothèque » (§9.7, M14) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
 - **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
 

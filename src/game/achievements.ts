@@ -9,6 +9,7 @@ import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
 import { workingAlliances } from './alliances';
+import { bouquetSize } from './effects';
 import { FRUIT_IDS } from './fruits';
 import { worksBuilt } from './greatWorks';
 import { VARIETY_IDS } from './seedBank';
@@ -22,6 +23,9 @@ export const SOWER_MILESTONE_SEASONS = 10;
 
 /** Visits of one kind welcomed for their Milestone (§9.6). */
 export const VISIT_MILESTONE_COUNT = 10;
+
+/** Effects running at once for the Milestones of the bouquet (§5.7). */
+export const BOUQUET_MILESTONES = [3, 5] as const;
 
 /** §9.3: each Milestone unlocked adds +1% to global production (additive). */
 export const ACHIEVEMENT_BONUS = 0.01;
@@ -105,6 +109,8 @@ export type AchievementCondition =
   | { kind: 'paths'; count: number }
   /** Pollen flights sent over all Seasons (§5.6). */
   | { kind: 'flights'; count: number }
+  /** Kinds of effect running at once, the bouquet (§5.7). */
+  | { kind: 'bouquet'; count: number }
   /** A weather lived at least once (§9.10). */
   | { kind: 'weather'; weather: WeatherId }
   /** Neighbours' requests served over the whole game (§9.11). */
@@ -207,6 +213,8 @@ export type AchievementId =
   | 'manyPaths'
   | 'firstFlight'
   | 'pollenStorm'
+  | 'bouquet'
+  | 'grandBouquet'
   | 'weather.sun'
   | 'weather.shower'
   | 'weather.wind'
@@ -377,6 +385,17 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   // The pollen (§5.6).
   { id: 'firstFlight', family: 'clicks', condition: { kind: 'flights', count: 1 } },
   { id: 'pollenStorm', family: 'clicks', condition: { kind: 'flights', count: 100 } },
+  // The bouquet of effects running together (§5.7, M31).
+  {
+    id: 'bouquet',
+    family: 'butterflies',
+    condition: { kind: 'bouquet', count: BOUQUET_MILESTONES[0] },
+  },
+  {
+    id: 'grandBouquet',
+    family: 'butterflies',
+    condition: { kind: 'bouquet', count: BOUQUET_MILESTONES[1] },
+  },
   // The neighbours' requests (§9.11).
   { id: 'firstFavour', family: 'neighbourhood', condition: { kind: 'requests', count: 1 } },
   { id: 'goodNeighbour', family: 'neighbourhood', condition: { kind: 'requests', count: 25 } },
@@ -637,6 +656,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return pathsWorking(state) >= condition.count;
     case 'flights':
       return state.pollen.flights >= condition.count;
+    case 'bouquet':
+      return bouquetSize(state.effects) >= condition.count;
     case 'weather':
       return state.weather.seen.includes(condition.weather);
     case 'requests':

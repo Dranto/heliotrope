@@ -320,7 +320,7 @@ export function Scene({
         <AllianceThreads working={working} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
-        <GrowthLayer growth={growth} />
+        <GrowthLayer growth={growth} flying={flying} reduced={reduced} />
         <PollenWave flights={flights} flying={flying} reduced={reduced} />
         <RequestBubbles bubbles={requests} />
         <ProjectMarks projects={projects} />
