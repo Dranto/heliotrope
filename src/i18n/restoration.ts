@@ -69,6 +69,12 @@ export function bonusText(bonus: Bonus): string {
       return b.perSpecies(t.generators[bonus.generator].name, formatPercent(bonus.bonus));
     case 'generatorPerParcel':
       return b.generatorPerParcel(t.generators[bonus.generator].name, formatPercent(bonus.bonus));
+    case 'harvestBaskets':
+      return b.harvestBaskets(bonus.units);
+    case 'perPath':
+      return b.perPath(formatPercent(bonus.bonus));
+    case 'handSlots':
+      return b.handSlots(bonus.units);
   }
 }
 

@@ -23,11 +23,13 @@ import { withAllIntroduced } from './introductions';
 
 /** A new game whose mechanics are all introduced (§10.8), to test them directly. */
 const openGame = (now: number) => withAllIntroduced(createInitialState(now));
-/** A player whose orchard bees and deep roots are awake. */
+/** A player after a first Cycle, whose orchard bees and deep roots are awake. */
 function grown(extra: Partial<GameState> = {}): GameState {
   const fresh = openGame(0);
   return {
     ...fresh,
+    seasons: 3,
+    cycles: 1,
     orchard: { ...fresh.orchard, hives: 1 },
     species: ['bee', 'bumblebee', 'ladybird'],
     canopy: { ...fresh.canopy, levels: { ...fresh.canopy.levels, sower: 10 } },
@@ -140,6 +142,6 @@ describe('saving the alliances', () => {
     expect(globalBonus(loaded)).toBeCloseTo(globalBonus(state));
     expect(
       validAlliances({ chosen: ['deepRoots', 'nope', 'deepRoots'], changedCycle: 1.5, bloomed: 1 }),
-    ).toEqual({ chosen: ['deepRoots'], changedCycle: -1, bloomed: false });
+    ).toEqual({ chosen: ['deepRoots'], changedCycle: -1, changedSeason: -1, bloomed: false });
   });
 });

@@ -8,6 +8,7 @@ import {
   chooseAlliance,
   isAwake,
   takeOutAlliance,
+  type AllianceId,
 } from '../game/alliances';
 import { formatNumber } from '../game/format';
 import { t } from '../i18n';
@@ -29,6 +30,9 @@ export function Alliances() {
   if (!areAlliancesOpen(state)) return null;
   const { chosen } = state.alliances;
   const slots = allianceSlots(state);
+  // Twelve alliances (M34): the chosen ones first, then those awake, then those still asleep.
+  const rank = (id: AllianceId) => (chosen.includes(id) ? 0 : isAwake(state, id) ? 1 : 2);
+  const order = [...ALLIANCE_IDS].sort((a, b) => rank(a) - rank(b));
 
   return (
     <section className="panel alliances-panel" aria-labelledby="alliances-title" data-open={open}>
@@ -42,7 +46,7 @@ export function Alliances() {
       </header>
       <p className="hint">{t.alliances.hint}</p>
       <ul className="alliances-list">
-        {ALLIANCE_IDS.map((id) => {
+        {order.map((id) => {
           const def = ALLIANCES[id];
           const name = t.alliances.names[id];
           const awake = isAwake(state, id);
@@ -65,7 +69,9 @@ export function Alliances() {
                 </span>
               </strong>
               <p className="alliance-sides">{sides}</p>
-              <p className="alliance-effect">{bonusesText(def.bonuses)}</p>
+              <p className="alliance-effect">
+                {def.bonuses.length > 0 ? bonusesText(def.bonuses) : t.alliances.effects[id]}
+              </p>
               {isChosen ? (
                 <button
                   type="button"

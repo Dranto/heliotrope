@@ -1,7 +1,8 @@
 // The alliances and the grand bloom (docs/game-design.md §9.9, M24). An alliance is a synergy
 // between two systems the player has grown, often of two layers: it wakes once both reach a
 // threshold, and works only while chosen, in a few slots. The composition changes freely while
-// slots are free; taking one out is allowed once per Cycle of water. The grand bloom comes when
+// slots are free; taking one out is allowed once per Cycle of water (once per Season before the
+// first Cycle, M34). The grand bloom comes when
 // the whole region is restored: it opens the last slot and is celebrated on the map, without
 // text, and nothing starts again.
 import { isIntroduced } from './introductions';
@@ -11,6 +12,10 @@ import { worksBuilt } from './greatWorks';
 import { isHerbierComplete, type SpeciesId } from './species';
 import type { GameState } from './state';
 import { cityVisits } from './visits';
+import { pathsWorking } from './growth';
+import { unlockedCooperatives } from './cooperatives';
+import { isWeatherOpen } from './weather';
+import { isBioregionOpen } from './bioregion';
 
 export const ALLIANCE_IDS = [
   'orchardBees',
@@ -19,6 +24,13 @@ export const ALLIANCE_IDS = [
   'travellingSeeds',
   'villageFeast',
   'deepRoots',
+  // M33-M34: the alliances of the middle of the game, between the systems of v4.
+  'hivePollen',
+  'showerGardens',
+  'neighbourhoodForms',
+  'mutualAid',
+  'windBikes',
+  'canopyFlocks',
 ] as const;
 export type AllianceId = (typeof ALLIANCE_IDS)[number];
 
@@ -100,10 +112,85 @@ export const ALLIANCES: Record<AllianceId, AllianceDef> = {
     ],
     bonuses: [{ kind: 'discount', fraction: 0.1 }],
   },
+  // The orchard's hives (§9.8) and the pollen flights (§5.6): the bees carry the pollen.
+  hivePollen: {
+    id: 'hivePollen',
+    sides: [
+      { key: 'hives', need: 1, have: (s) => s.orchard.hives },
+      { key: 'flights', need: 50, have: (s) => s.pollen.flights },
+    ],
+    bonuses: [{ kind: 'pollenFill', factor: 1.25 }],
+  },
+  // The neighbours' showers (§9.6) and the seed bank (§9.7): the watered beds give more.
+  showerGardens: {
+    id: 'showerGardens',
+    sides: [
+      { key: 'showers', need: 10, have: (s) => s.visits.shower },
+      { key: 'varieties', need: 3, have: (s) => s.garden.varieties.length },
+    ],
+    bonuses: [{ kind: 'harvestBaskets', units: 1 }],
+  },
+  // The buildings' paths (§5.5) and the restored parcels (§6.1): every form shapes the district.
+  neighbourhoodForms: {
+    id: 'neighbourhoodForms',
+    sides: [
+      { key: 'paths', need: 6, have: (s) => pathsWorking(s) },
+      { key: 'parcels', need: 4, have: (s) => s.parcels.length },
+    ],
+    bonuses: [{ kind: 'perPath', bonus: 0.01 }],
+  },
+  // The neighbours' requests (§9.11) and a district bound to ours: help comes back.
+  mutualAid: {
+    id: 'mutualAid',
+    sides: [
+      { key: 'requests', need: 10, have: (s) => s.requests.served },
+      {
+        key: 'bonds',
+        need: 1,
+        have: (s) => Object.values(s.requests.bonds).filter((n) => (n ?? 0) > 0).length,
+      },
+    ],
+    bonuses: [{ kind: 'handSlots', units: 1 }],
+  },
+  // The Cooperatives (§7.2) and the weathers lived (§9.10): the cargo bikes ride the wind.
+  windBikes: {
+    id: 'windBikes',
+    sides: [
+      { key: 'cooperatives', need: 3, have: (s) => unlockedCooperatives(s).length },
+      { key: 'weathers', need: 5, have: (s) => s.weather.seen.length },
+    ],
+    bonuses: [],
+  },
+  // The flocks of migrating birds (§9.6) and the urban canopy: the flocks rest in the trees.
+  canopyFlocks: {
+    id: 'canopyFlocks',
+    sides: [
+      { key: 'flocks', need: 10, have: (s) => s.visits.birds },
+      { key: 'urbanCanopy', need: 10, have: (s) => s.generators.urbanCanopy },
+    ],
+    bonuses: [{ kind: 'effectDuration', effect: 'birds', factor: 1.5 }],
+  },
 };
 
-/** Slots at first; one more with two great works complete, each sister city, the bloom. */
+/**
+ * "Les vélos dans le vent" (M34): under the wind, the Cooperatives also buy the synergies, as the
+ * council would.
+ */
+export function windBikesRiding(state: GameState): boolean {
+  return (
+    workingAlliances(state).includes('windBikes') &&
+    isWeatherOpen(state) &&
+    state.weather.current === 'wind'
+  );
+}
+
+/**
+ * Slots once the Bioregion is open; two from the 2nd Season before it (M34). One more with two
+ * great works complete, each sister city and the bloom, up to MAX_SLOTS.
+ */
 export const BASE_SLOTS = 3;
+export const EARLY_SLOTS = 2;
+export const MAX_SLOTS = 8;
 
 /** Sites of the Bioregion each need this level for the grand bloom. */
 export const BLOOM_SITE_LEVEL = 5;
@@ -113,12 +200,14 @@ export interface AlliancesState {
   chosen: AllianceId[];
   /** The Cycle in which one was last taken out; -1 never. */
   changedCycle: number;
+  /** The Season in which one was last taken out (M34); -1 never. */
+  changedSeason: number;
   /** The grand bloom came: kept forever. */
   bloomed: boolean;
 }
 
 export function createAlliancesState(): AlliancesState {
-  return { chosen: [], changedCycle: -1, bloomed: false };
+  return { chosen: [], changedCycle: -1, changedSeason: -1, bloomed: false };
 }
 
 export function isAllianceId(value: unknown): value is AllianceId {
@@ -139,9 +228,10 @@ export function areAlliancesOpen(state: GameState): boolean {
 }
 
 export function allianceSlots(state: GameState): number {
+  const base = isBioregionOpen(state) ? BASE_SLOTS : state.seasons > 0 ? EARLY_SLOTS : 0;
   return Math.min(
-    ALLIANCE_IDS.length,
-    BASE_SLOTS +
+    MAX_SLOTS,
+    base +
       Number(worksBuilt(state) >= 2) +
       state.city.founded.length +
       Number(state.alliances.bloomed),
@@ -153,9 +243,14 @@ export function canChoose(state: GameState, id: AllianceId): boolean {
   return !chosen.includes(id) && chosen.length < allianceSlots(state);
 }
 
-/** Taking an alliance out is allowed once per Cycle of water. */
+/**
+ * Taking an alliance out is allowed once per Cycle of water; before the first Cycle, once per
+ * Season (M34).
+ */
 export function canTakeOut(state: GameState, id: AllianceId): boolean {
-  return state.alliances.chosen.includes(id) && state.alliances.changedCycle !== state.cycles;
+  if (!state.alliances.chosen.includes(id)) return false;
+  if (state.cycles === 0) return state.alliances.changedSeason !== state.seasons;
+  return state.alliances.changedCycle !== state.cycles;
 }
 
 /** Player action: choose an alliance for a free slot. */
@@ -176,6 +271,7 @@ export function takeOutAlliance(state: GameState, id: AllianceId): GameState {
       ...state.alliances,
       chosen: state.alliances.chosen.filter((c) => c !== id),
       changedCycle: state.cycles,
+      changedSeason: state.seasons,
     },
   };
 }
@@ -215,6 +311,9 @@ export function validAlliances(raw: unknown): AlliancesState {
   }
   if (typeof data.changedCycle === 'number' && Number.isInteger(data.changedCycle)) {
     alliances.changedCycle = data.changedCycle;
+  }
+  if (typeof data.changedSeason === 'number' && Number.isInteger(data.changedSeason)) {
+    alliances.changedSeason = data.changedSeason;
   }
   alliances.bloomed = data.bloomed === true;
   return alliances;

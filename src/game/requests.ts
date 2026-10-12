@@ -7,6 +7,7 @@
 import { isIntroduced } from './introductions';
 import { isButterflyUnlocked, startEffect } from './butterfly';
 import type { Bonds } from './bonds';
+import { extraHandSlots } from './bonuses';
 import { DISTRICT_IDS, type DistrictId } from './districts';
 import { CROPS, isRipe } from './garden';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
@@ -55,6 +56,11 @@ export interface RequestsState {
 
 export const MAX_REQUESTS = 3;
 export const MAX_HANDS = 3;
+
+/** Helping hands the reserve holds: one more with "L'entraide" (§9.9, M34). */
+export function handLimit(state: GameState): number {
+  return MAX_HANDS + extraHandSlots(state);
+}
 /** Seconds of play between two requests. */
 export const REQUEST_INTERVAL = 4 * 60;
 /** The quarter-of-an-hour hand: this many seconds of production at once. */
@@ -156,7 +162,9 @@ export function advanceRequests(state: GameState, dtSeconds: number): GameState 
 export function canServe(state: GameState, index: number): boolean {
   const request = state.requests.open[index];
   return (
-    request !== undefined && isRequestMet(state, request) && state.requests.hands.length < MAX_HANDS
+    request !== undefined &&
+    isRequestMet(state, request) &&
+    state.requests.hands.length < handLimit(state)
   );
 }
 
@@ -281,7 +289,8 @@ export function validRequests(raw: unknown, fallback: RequestsState): RequestsSt
         .slice(0, MAX_REQUESTS)
         .map(({ need, base, hand, from }) => ({ need, base, hand, from }))
     : [];
-  const hands = Array.isArray(data.hands) ? data.hands.filter(isHand).slice(0, MAX_HANDS) : [];
+  // One more place with "L'entraide" (M34): the save keeps it.
+  const hands = Array.isArray(data.hands) ? data.hands.filter(isHand).slice(0, MAX_HANDS + 1) : [];
   const bonds: Bonds = {};
   if (typeof data.bonds === 'object' && data.bonds !== null) {
     for (const [id, served] of Object.entries(data.bonds)) {

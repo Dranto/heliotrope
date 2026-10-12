@@ -195,7 +195,10 @@ export function choosePath(state: GameState, id: GeneratorId, tier: number, path
 }
 
 /** Paths picked at any tier reached, over every building (Milestones). */
-export function pathsWorking(state: GameState): number {
+export function pathsWorking(state: {
+  generators: Readonly<Record<string, number>>;
+  growth: GrowthState;
+}): number {
   return GENERATOR_IDS.reduce((sum, id) => {
     const reached = reachedTiers(state, id);
     return sum + state.growth.paths[id].slice(0, reached).filter((p) => p !== null).length;

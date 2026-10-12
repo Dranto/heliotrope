@@ -17,7 +17,7 @@ import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
 import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
 import { greatWorksBonuses, type WorkId } from './greatWorks';
-import { growthBonuses, type GrowthState } from './growth';
+import { growthBonuses, pathsWorking, type GrowthState } from './growth';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
@@ -79,7 +79,13 @@ export type Bonus =
   /** `generator` gains `bonus` (additive) per species back in the Herbier (§5.5). */
   | { kind: 'perSpecies'; generator: GeneratorId; bonus: number }
   /** `generator` gains `bonus` (additive) per parcel restored (§5.5). */
-  | { kind: 'generatorPerParcel'; generator: GeneratorId; bonus: number };
+  | { kind: 'generatorPerParcel'; generator: GeneratorId; bonus: number }
+  /** Each harvest of the courtyard garden gives `units` more baskets (§9.9, M34). */
+  | { kind: 'harvestBaskets'; units: number }
+  /** Adds `bonus` to global production per path working on the buildings (§9.9, M34). */
+  | { kind: 'perPath'; bonus: number }
+  /** The reserve of helping hands holds `units` more (§9.11, M34). */
+  | { kind: 'handSlots'; units: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -252,6 +258,11 @@ export function globalBonus(source: BonusSource): number {
   for (const b of bonusesOf(source, 'perSeason')) bonus += b.bonus * source.seasons;
   const types = Object.values(source.generators).filter((owned) => owned > 0).length;
   for (const b of bonusesOf(source, 'globalPerType')) bonus += b.bonus * types;
+  const perPath = bonusesOf(source, 'perPath');
+  if (perPath.length > 0 && source.growth) {
+    const paths = pathsWorking({ generators: source.generators, growth: source.growth });
+    for (const b of perPath) bonus += b.bonus * paths;
+  }
   return bonus;
 }
 
@@ -270,4 +281,14 @@ export function effectDurationFactor(source: BonusSource, effect: EffectKind): n
 /** Extra seconds of offline progress. */
 export function offlineCapBonus(source: BonusSource): number {
   return bonusesOf(source, 'offlineCap').reduce((sum, b) => sum + b.seconds, 0);
+}
+
+/** Baskets added to each harvest of the courtyard garden. */
+export function extraHarvestBaskets(source: BonusSource): number {
+  return bonusesOf(source, 'harvestBaskets').reduce((sum, b) => sum + b.units, 0);
+}
+
+/** Places added to the reserve of helping hands. */
+export function extraHandSlots(source: BonusSource): number {
+  return bonusesOf(source, 'handSlots').reduce((sum, b) => sum + b.units, 0);
 }

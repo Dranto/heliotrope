@@ -130,6 +130,8 @@ const migrations: Record<number, Migration> = {
   32: (raw) => ({ ...raw, version: 33 }),
   // v34 lets the forecast be swapped once per Season (M33): never swapped for an older save.
   33: (raw) => ({ ...raw, version: 34 }),
+  // v35 lets an alliance be taken out once per Season before the first Cycle (M34): none yet.
+  34: (raw) => ({ ...raw, version: 35 }),
 };
 
 function isLanguage(value: string): value is Language {

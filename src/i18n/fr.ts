@@ -436,6 +436,7 @@ export const fr = {
       'cities.1': 'Essaimage',
       'cities.3': 'Les villes sœurs',
       firstAlliance: 'Main dans la main',
+      livingWeb: 'La toile du vivant',
       grandBloom: 'La grande floraison',
       firstPath: 'Première voie',
       manyPaths: 'La ville aux mille formes',
@@ -553,7 +554,10 @@ export const fr = {
         count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Cueillir un premier fruit au verger' : `Cueillir ${count} fois au verger`,
-      alliances: 'Faire jouer une alliance',
+      alliances: (count: number) =>
+        count === 1
+          ? 'Faire jouer une alliance'
+          : `Faire jouer ${count}\u00a0alliances en même temps`,
       grandBloom:
         'Restaurer toute la région\u00a0: les quatre chantiers, l’Herbier, chaque site au niveau 5',
       sisterCities: (count: number) =>
@@ -683,6 +687,15 @@ export const fr = {
         `${generator}\u00a0: +${percent}\u00a0% par espèce de l’Herbier`,
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}\u00a0: +${percent}\u00a0% par parcelle restaurée`,
+      harvestBaskets: (units: number) =>
+        units === 1
+          ? 'Chaque récolte du potager donne un panier de plus'
+          : `Chaque récolte du potager donne ${units} paniers de plus`,
+      perPath: (percent: string) => `+${percent}\u00a0% de production par voie qui joue`,
+      handSlots: (units: number) =>
+        units === 1
+          ? 'Une place de plus pour les coups de main'
+          : `${units} places de plus pour les coups de main`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
       orchardGrowth: (factor: string) => `Le verger pousse ×${factor} plus vite`,
       pollenFill: (factor: string) => `La jauge de pollen se remplit ×${factor} plus vite`,
@@ -790,10 +803,10 @@ export const fr = {
   },
   alliances: {
     title: 'Les alliances',
-    hint: 'Une alliance relie deux choses que vous avez fait grandir. Elle s’éveille quand les deux atteignent leur seuil, et ne joue que si elle occupe une place. On peut en retirer une par Cycle de l’eau.',
+    hint: 'Une alliance relie deux choses que vous avez fait grandir. Elle s’éveille quand les deux atteignent leur seuil, et ne joue que si elle occupe une place. On peut en retirer une par Saison avant le premier Cycle de l’eau, puis une par Cycle.',
     slots: (used: string, total: string) => `Places\u00a0: ${used} sur ${total}`,
     slotsHint:
-      'Trois places au début, une de plus avec deux grands chantiers achevés, avec chaque ville sœur et avec la grande floraison.',
+      'Deux places dès la 2ᵉ Saison, trois avec la Biorégion, une de plus avec deux grands chantiers achevés, avec chaque ville sœur et avec la grande floraison (huit au plus).',
     names: {
       orchardBees: 'Les abeilles du verger',
       tramMarket: 'Le marché du tram',
@@ -801,6 +814,12 @@ export const fr = {
       travellingSeeds: 'Les graines voyageuses',
       villageFeast: 'La fête au village',
       deepRoots: 'Les racines profondes',
+      hivePollen: 'Le pollen des ruches',
+      showerGardens: 'Les jardins sous la pluie',
+      neighbourhoodForms: 'Les formes du quartier',
+      mutualAid: 'L’entraide',
+      windBikes: 'Les vélos dans le vent',
+      canopyFlocks: 'Les nuées de la canopée',
     } satisfies Record<AllianceId, string>,
     sides: {
       hives: 'Ruches',
@@ -815,7 +834,20 @@ export const fr = {
       hall: 'Étapes des halles',
       canopy: 'Niveaux de la Canopée',
       widths: 'Élargissements du delta',
+      flights: 'Envolées de pollen',
+      showers: 'Averses des voisins',
+      paths: 'Voies qui jouent',
+      parcels: 'Parcelles restaurées',
+      requests: 'Demandes servies',
+      bonds: 'Quartiers voisins liés',
+      cooperatives: 'Coopératives',
+      weathers: 'Temps vécus',
+      flocks: 'Nuées accueillies',
+      urbanCanopy: 'Canopées urbaines',
     } as Record<string, string>,
+    effects: {
+      windBikes: 'Par vent, les Coopératives achètent aussi les synergies',
+    } as Partial<Record<AllianceId, string>>,
     side: (name: string, have: string, need: string) => `${name}\u00a0: ${have} sur ${need}`,
     awake: 'Éveillée',
     asleep: 'Endormie',
@@ -823,7 +855,8 @@ export const fr = {
     chooseLabel: (name: string) => `Choisir l’alliance\u00a0: ${name}`,
     takeOut: 'Retirer',
     takeOutLabel: (name: string) => `Retirer l’alliance\u00a0: ${name}`,
-    takenOut: 'Déjà une alliance retirée ce Cycle',
+    takenOut:
+      'Déjà une alliance retirée (une par Saison avant le premier Cycle, puis une par Cycle)',
     full: 'Toutes les places sont prises',
   },
   cities: {
