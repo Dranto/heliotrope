@@ -352,11 +352,12 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   rooftopGarden: 1.5 * 60,
   greenhouse: 5.5 * 60,
   verticalFarm: 12 * 60,
-  mirrorPlant: 26 * 60,
-  // Brought closer in M19 to what the synergies and the Herbier made of the end of the Season.
-  urbanCanopy: 45 * 60,
-  arcology: 70 * 60,
-  advisedSeason: 80 * 60,
+  // Brought closer in M19, then again after the growing buildings, the pollen and the chained
+  // moments (M26, M27, M31) quickened the second half of the Season.
+  mirrorPlant: 21 * 60,
+  urbanCanopy: 37 * 60,
+  arcology: 57 * 60,
+  advisedSeason: 67 * 60,
 };
 
 /** §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. */
