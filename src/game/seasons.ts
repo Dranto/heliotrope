@@ -1,4 +1,5 @@
 // Prestige: the Seasons (docs/game-design.md §7). Pure formulas and the new Season transition.
+import { isIntroduced } from './introductions';
 import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './achievements';
 import { keptGeneratorShare } from './bonuses';
 import { generatorLimit, offeredChallenges, type ChallengeId } from './challenges';
@@ -107,7 +108,10 @@ export function isSeasonPremature(state: GameState): boolean {
 
 /** The Seasons screen appears once prestige is available, and stays once a Season is done. */
 export function isSeasonsScreenUnlocked(state: GameState): boolean {
-  return state.seasons > 0 || state.seeds > 0 || seedsGrowing(state) >= 1;
+  return (
+    isIntroduced(state, 'seasons') &&
+    (state.seasons > 0 || state.seeds > 0 || seedsGrowing(state) >= 1)
+  );
 }
 
 /**

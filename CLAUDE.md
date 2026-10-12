@@ -53,6 +53,8 @@ a design decision changes, update that document in the same PR.
   - `garden.ts`, `seedBank.ts`: the courtyard garden (§9.7), crops in real time and the seed
     bank's varieties
   - `phases.ts`: progression phases and visual seasons of the scene (§6)
+  - `introductions.ts`, `onboarding.ts`: the mechanics introduced one at a time (§10.8); gate a new
+    mechanic's open check with `isIntroduced` and add it to `FEATURE_IDS` and `isOpen`
   - `random.ts`: seeded random numbers; the seed lives in `GameState` so random events stay pure
   - `state.ts`: `GameState` shape, `STATE_VERSION`, initial state
   - `tick.ts`: `tick(state, dtSeconds)` and player actions; pure functions returning new state

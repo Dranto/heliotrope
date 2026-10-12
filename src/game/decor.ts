@@ -2,6 +2,7 @@
 // with the Milestones and the Herbier, set by the player on a few spots of the map, and the colour
 // of the heliotrope's flowers. Nothing here changes production. Names live in src/i18n, the
 // drawings and the spots in src/ui.
+import { isIntroduced } from './introductions';
 import type { GameState } from './state';
 
 export const DECOR_IDS = [
@@ -87,8 +88,8 @@ export function unlockedDecor(state: Pick<GameState, 'achievements' | 'species'>
 }
 
 /** Decorating opens with the first piece won. */
-export function isDecorOpen(state: Pick<GameState, 'achievements' | 'species'>): boolean {
-  return unlockedDecor(state).length > 0;
+export function isDecorOpen(state: Pick<GameState, 'achievements' | 'species' | 'intro'>): boolean {
+  return isIntroduced(state, 'decor') && unlockedDecor(state).length > 0;
 }
 
 /** Player action: set a piece of decor won on a spot, or clear the spot with null. */

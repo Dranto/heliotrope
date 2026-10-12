@@ -1,3 +1,4 @@
+import { createIntroState, type IntroState } from './introductions';
 import type { AchievementId } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
 import type { ChallengeId } from './challenges';
@@ -31,7 +32,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 31;
+export const STATE_VERSION = 32;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -154,6 +155,8 @@ export interface GameState {
   requests: RequestsState;
   /** Side menu panels the player has touched (§10.1, M25); the others glow until then. */
   seenPanels: PanelId[];
+  /** The mechanics introduced so far, one at a time (§10.8). Kept across Seasons and Cycles. */
+  intro: IntroState;
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -240,6 +243,7 @@ export function createInitialState(now: number): GameState {
     weather: createWeatherState((rngSeed ^ 0x5bd1e995) >>> 0),
     requests: createRequestsState((rngSeed ^ 0x27d4eb2f) >>> 0),
     seenPanels: ['generators'],
+    intro: createIntroState(),
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     // Drawn from the same number as the butterfly, so a quick one comes with a slow visit.

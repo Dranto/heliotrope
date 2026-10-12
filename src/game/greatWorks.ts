@@ -3,6 +3,7 @@
 // the courtyard garden, honey from the hives) and asking for species back in the Herbier. What is paid stays paid, so a
 // stage can be filled over several Seasons and Cycles. Each stage adds a synergy between two
 // systems. Names live in src/i18n, the drawings in src/ui.
+import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { isBioregionOpen } from './bioregion';
 import type { Bonus } from './bonuses';
@@ -124,7 +125,7 @@ export function isWorkId(value: unknown): value is WorkId {
 
 /** The great works open with the Bioregion, whose Water they need, and stay open. */
 export function areGreatWorksOpen(state: GameState): boolean {
-  return isBioregionOpen(state) || worksBuilt(state) > 0;
+  return isIntroduced(state, 'greatWorks') && (isBioregionOpen(state) || worksBuilt(state) > 0);
 }
 
 export function stageCount(id: WorkId): number {

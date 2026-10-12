@@ -1,3 +1,5 @@
+import { INTRO_GAP_SECONDS, validIntro } from './introductions';
+import { introduceAllDue } from './onboarding';
 import { isAchievementId, type AchievementId } from './achievements';
 import { EFFECT_KINDS, type ActiveEffect, type EffectKind } from './effects';
 import { LANGUAGES, type Language } from './format';
@@ -121,6 +123,8 @@ const migrations: Record<number, Migration> = {
   // v31 learns the workshop's rules level by level (§7.6, M30): validCity turns the old list into
   // first levels.
   30: (raw) => ({ ...raw, version: 31 }),
+  // v32 introduces the mechanics one at a time (§10.8): an older save has all those it shows.
+  31: (raw) => ({ ...raw, version: 32 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -415,7 +419,13 @@ export function deserialize(json: string, now: number): GameState | null {
     state.settings = { ...state.settings, language: settings.language };
   }
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
-  // An older save has seen every panel it shows (v26).
+  // An older save has every mechanic it already shows (v32), then sees every panel it shows (v26).
+  const intro = validIntro(data.intro);
+  if (intro) state.intro = intro;
+  else {
+    state.intro = { ...state.intro, sinceLast: INTRO_GAP_SECONDS };
+    state.intro = introduceAllDue(state).intro;
+  }
   if (!Array.isArray(data.seenPanels)) state.seenPanels = shownPanels(state);
   return state;
 }

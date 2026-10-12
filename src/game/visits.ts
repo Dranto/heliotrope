@@ -1,6 +1,7 @@
 // Visits to the neighbourhood (docs/game-design.md §9.6): now and then something crosses the
 // map at a place tied to what the player built, and a click welcomes it. Like the Golden
 // Butterfly (§9.2), the randomness comes from the seed in GameState, so every transition is pure.
+import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { bonusesOf, factorOf } from './bonuses';
 import { effectSeconds } from './butterfly';
@@ -71,6 +72,7 @@ export function createVisitState(random: number): VisitState {
  * workshops.
  */
 export function isVisitUnlocked(state: GameState, kind: VisitKind): boolean {
+  if (!isIntroduced(state, 'visits')) return false;
   switch (kind) {
     case 'cuttings':
       return state.generators.pot >= 10;

@@ -1,5 +1,6 @@
 // Restoring the neighbourhood (docs/game-design.md §6.1, §6.2): when parcels and projects are
 // offered, and the player actions that carry them out. Pure functions returning new state.
+import { isIntroduced } from './introductions';
 import {
   PARCEL_LIST,
   PARCEL_REVEAL_SHARE,
@@ -17,6 +18,7 @@ import type { GeneratorId } from './generators';
 export function isParcelOffered(state: GameState, id: ParcelId): boolean {
   const parcel = PARCELS[id];
   return (
+    isIntroduced(state, 'restoration') &&
     !state.parcels.includes(id) &&
     phaseOf(state) >= parcel.phase &&
     state.totalLight >= parcel.cost * PARCEL_REVEAL_SHARE
@@ -101,6 +103,7 @@ export function isProjectUnlocked(state: GameState, id: ProjectId): boolean {
 
 /** Projects offered and not carried out yet this Season, cheapest first. */
 export function offeredProjects(state: GameState): ProjectDef[] {
+  if (!isIntroduced(state, 'restoration')) return [];
   return PROJECT_LIST.filter(
     (p) => !state.projects.includes(p.id) && isProjectUnlocked(state, p.id),
   );

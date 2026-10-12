@@ -77,6 +77,26 @@
   transition: stroke-dashoffset 0.25s ease-out;
 }
 
+/* The gauge joins the flower (§10.8): its track draws itself around the crown. */
+.pollen-arriving .pollen-track {
+  stroke-dasharray: 1 1;
+  animation: pollen-draw 3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pollen-draw {
+  0% {
+    stroke-dashoffset: 1;
+    stroke: #e9a93b;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    stroke: #e9a93b;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
 .flower-panel[data-flight] .pollen-fill {
   stroke: #ffd36b;
   filter: drop-shadow(0 0 4px rgb(255 211 107 / 0.9));

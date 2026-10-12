@@ -2,6 +2,7 @@
 // the Tree of Seasons brings them in. Each one looks after some buildings, the council after the
 // upgrades, the fountaineers (from the Canopy, §7.1) after the water collectors of the
 // Bioregion. Pure: `runCooperatives` returns new state, called by every tick.
+import { isIntroduced } from './introductions';
 import {
   buyCollector,
   canBuyCollector,
@@ -76,6 +77,7 @@ export function isCooperativeId(value: unknown): value is CooperativeId {
  * its canopy talent sown.
  */
 export function isCooperativeUnlocked(state: GameState, id: CooperativeId): boolean {
+  if (!isIntroduced(state, 'cooperatives')) return false;
   return (
     TALENT_LIST.some((t) => t.cooperative === id && state.talents.includes(t.id)) ||
     CANOPY_LIST.some((c) => c.cooperative === id && state.canopy.levels[c.id] > 0)

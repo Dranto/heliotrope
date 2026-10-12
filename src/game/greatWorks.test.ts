@@ -21,10 +21,13 @@ import { deserialize, serialize } from './save';
 import { SPECIES_IDS } from './species';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A player with the Bioregion open and plenty to give. */
 function rich(extra: Partial<GameState> = {}): GameState {
-  const fresh = createInitialState(0);
+  const fresh = openGame(0);
   return {
     ...fresh,
     seasons: 3,
@@ -107,7 +110,7 @@ describe('The great works (§6.6, M20)', () => {
   });
 
   it('fills baskets at each harvest, more for longer crops', () => {
-    const fresh = createInitialState(0);
+    const fresh = openGame(0);
     const plots = fresh.garden.plots.map((p, i) =>
       i === 0 ? { crop: 'beans' as const, grown: 3600 } : p,
     );

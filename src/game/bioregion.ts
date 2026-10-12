@@ -2,6 +2,7 @@
 // collectors bought with Light, then spent on regional sites whose levels raise the
 // neighbourhood's buildings. Collectors, sites and Water are kept from one Season to the next;
 // only a new Cycle of water (cycles.ts) resets them. Names live in src/i18n, the art in src/ui.
+import { isIntroduced } from './introductions';
 import { bonusesOf } from './bonuses';
 import {
   challengeCollectorCostFactor,
@@ -84,8 +85,10 @@ export function isSiteId(value: unknown): value is SiteId {
 }
 
 /** The Bioregion opens from the third Season and, once opened, stays open. */
-export function isBioregionOpen(state: Pick<GameState, 'seasons' | 'cycles'>): boolean {
-  return state.seasons >= BIOREGION_FROM_SEASON || state.cycles > 0;
+export function isBioregionOpen(state: Pick<GameState, 'seasons' | 'cycles' | 'intro'>): boolean {
+  return (
+    isIntroduced(state, 'bioregion') && (state.seasons >= BIOREGION_FROM_SEASON || state.cycles > 0)
+  );
 }
 
 /** Multiplier on every collector: Sources, then the Water bonuses of parcels and projects. */

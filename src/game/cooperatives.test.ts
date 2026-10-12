@@ -9,9 +9,12 @@ import { generatorCost } from './production';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
 import type { TalentId } from './talents';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function withTalents(talents: TalentId[], extra: Partial<GameState> = {}): GameState {
-  return { ...createInitialState(0), seeds: 20, seasons: 1, talents, ...extra };
+  return { ...openGame(0), seeds: 20, seasons: 1, talents, ...extra };
 }
 
 /** `light` in reserve; only the pots and panels shown, unless `earned` says otherwise. */
@@ -21,7 +24,7 @@ function rich(state: GameState, light: number, earned = 150): GameState {
 
 describe('Cooperatives (§7.2)', () => {
   it('do nothing until their talent is learnt', () => {
-    const state = rich(createInitialState(0), 1000);
+    const state = rich(openGame(0), 1000);
     expect(runCooperatives(state)).toBe(state);
     expect(isCooperativeActive(state, 'gardeners')).toBe(false);
   });

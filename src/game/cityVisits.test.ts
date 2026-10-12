@@ -12,12 +12,15 @@ import {
   welcomeVisit,
   type VisitKind,
 } from './visits';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function withState(patch: Partial<GameState>): GameState {
-  return { ...createInitialState(0), ...patch };
+  return { ...openGame(0), ...patch };
 }
 
-const owned = { ...createInitialState(0).generators, pot: 10, balconyPanel: 5, greenhouse: 3 };
+const owned = { ...openGame(0).generators, pot: 10, balconyPanel: 5, greenhouse: 3 };
 
 /** A state with `kind` on the map. */
 function visiting(kind: VisitKind, patch: Partial<GameState> = {}): GameState {
@@ -76,7 +79,7 @@ describe('The visits of the city (§9.6, M18)', () => {
 
   it('bring their species after five welcomes, beyond the Herbier of the neighbourhood', () => {
     const visits = {
-      ...createInitialState(0).visits,
+      ...openGame(0).visits,
       sheep: 5,
       festival: 4,
       fireflies: 5,
@@ -95,7 +98,7 @@ describe('The visits of the city (§9.6, M18)', () => {
 
   it('unlock their Milestones, count in the save, and migrate from v19', () => {
     const visits = {
-      ...createInitialState(0).visits,
+      ...openGame(0).visits,
       sheep: 9,
       festival: 6,
       fireflies: 5,

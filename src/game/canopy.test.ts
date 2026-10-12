@@ -20,14 +20,17 @@ import {
   type CanopyId,
 } from './talents';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 const ALL_TALENTS = TALENT_LIST.map((t) => t.id);
 
 /** A player who learnt the whole tree and has `spare` Seeds left to sow. */
 function fullTree(spare: number, extra: Partial<GameState> = {}): GameState {
   const seeds = seedsSpent(ALL_TALENTS) + spare;
   return {
-    ...createInitialState(0),
+    ...openGame(0),
     seeds,
     seasons: 10,
     talents: ALL_TALENTS,
@@ -178,7 +181,7 @@ describe('The fountaineers (§7.2, Canopy)', () => {
     const state = fullTree(20, {
       resources: { light, water: 0 },
       totalLight: 1e7,
-      cooperatives: { ...createInitialState(0).cooperatives, paused: ['gardeners'] },
+      cooperatives: { ...openGame(0).cooperatives, paused: ['gardeners'] },
     });
     return sown ? withLevel(state, 'fountaineers', 1) : state;
   }

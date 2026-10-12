@@ -17,10 +17,13 @@ import { deserialize, serialize } from './save';
 import { startNewSeason } from './seasons';
 import { SPECIES_IDS } from './species';
 import { createInitialState, type GameState } from './state';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function rich(patch: Partial<GameState> = {}): GameState {
   return {
-    ...createInitialState(0),
+    ...openGame(0),
     resources: { water: 0, light: 1e12 },
     totalLight: 1e12,
     allTimeLight: 1e12,

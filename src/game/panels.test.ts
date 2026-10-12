@@ -9,14 +9,17 @@ import {
 } from './panels';
 import { deserialize, serialize } from './save';
 import { createInitialState, type GameState } from './state';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function at(extra: Partial<GameState>): GameState {
-  return { ...createInitialState(0), ...extra };
+  return { ...openGame(0), ...extra };
 }
 
 describe('side menu panels (§10.1, M25)', () => {
   it('opens with the city layer only, the generators already seen', () => {
-    const fresh = createInitialState(0);
+    const fresh = openGame(0);
     expect(shownPanels(fresh)).toEqual(['generators']);
     expect(shownLayers(fresh)).toEqual(['city']);
     expect(unseenPanels(fresh)).toEqual([]);
@@ -38,7 +41,7 @@ describe('side menu panels (§10.1, M25)', () => {
   });
 
   it('marks a folded panel with something to buy', () => {
-    const poor = createInitialState(0);
+    const poor = openGame(0);
     expect(panelHasAction(poor, 'generators')).toBe(false);
     const rich = { ...poor, totalLight: 1e6, resources: { ...poor.resources, light: 1e6 } };
     expect(panelHasAction(rich, 'generators')).toBe(true);

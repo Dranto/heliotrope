@@ -13,7 +13,8 @@ import { formatNumber, formatPercent } from '../game/format';
 import { visualSeason } from '../game/phases';
 import { clickValue } from '../game/production';
 import { clickHeliotrope } from '../game/tick';
-import { isFlying } from '../game/pollen';
+import { isFlying, isPollenOpen } from '../game/pollen';
+import { arrivedFeature } from '../game/introductions';
 import './pollen.css';
 import { t } from '../i18n';
 import {
@@ -291,6 +292,8 @@ export function Flower() {
   const stage = flowerStage(state.totalLight);
   const season = visualSeason(state);
   const reduced = state.settings.reducedMotion;
+  const arrived = arrivedFeature(state);
+  const pollenOpen = isPollenOpen(state);
   const flying = isFlying(state);
 
   // The plant stretches and glows once when it reaches a new stage during play.
@@ -355,14 +358,16 @@ export function Flower() {
       data-stage={stage}
       data-flight={flying || undefined}
     >
-      <div
-        className="visually-hidden"
-        role="meter"
-        aria-label={t.pollen(formatPercent(state.pollen.gauge))}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(state.pollen.gauge * 100)}
-      />
+      {pollenOpen && (
+        <div
+          className="visually-hidden"
+          role="meter"
+          aria-label={t.pollen(formatPercent(state.pollen.gauge))}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(state.pollen.gauge * 100)}
+        />
+      )}
       <button
         type="button"
         className="flower-button"
@@ -406,19 +411,41 @@ export function Flower() {
             className="halo"
             style={{ opacity: 0.4 + stage * 0.08 }}
           />
-          {/* The pollen gauge (§5.6): a golden arc around the crown, filling with the clicks. */}
-          <g transform={`rotate(-90 100 ${headY})`}>
-            <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="pollen-track" />
-            <circle
-              cx="100"
-              cy={headY}
-              r={POLLEN_RADIUS}
-              className="pollen-fill"
-              pathLength={1}
-              strokeDasharray="1 1"
-              strokeDashoffset={flying ? 0 : 1 - state.pollen.gauge}
-            />
-          </g>
+          {/* A mechanic has just joined the game (§10.8): three golden rings spread from the
+              crown, once, over a brief glow. */}
+          {arrived && (
+            <g key={arrived} className="arrival" aria-hidden="true">
+              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-glow" />
+              <circle cx="100" cy={headY} r={POLLEN_RADIUS} />
+              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-late" />
+              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-late arrival-last" />
+            </g>
+          )}
+          {/* The pollen gauge (§5.6): a golden arc around the crown, filling with the clicks. It
+              joins the flower with the first click upgrade (§10.8) and draws itself in. */}
+          {pollenOpen && (
+            <g
+              transform={`rotate(-90 100 ${headY})`}
+              className={arrived === 'pollen' ? 'pollen-gauge pollen-arriving' : 'pollen-gauge'}
+            >
+              <circle
+                cx="100"
+                cy={headY}
+                r={POLLEN_RADIUS}
+                className="pollen-track"
+                pathLength={1}
+              />
+              <circle
+                cx="100"
+                cy={headY}
+                r={POLLEN_RADIUS}
+                className="pollen-fill"
+                pathLength={1}
+                strokeDasharray="1 1"
+                strokeDashoffset={flying ? 0 : 1 - state.pollen.gauge}
+              />
+            </g>
+          )}
           {/* A garden arbour over the courtyard bed: a climbing vine on a fine gilded hoop, where
               the click upgrades hang their sprigs. */}
           <g className="arbour">

@@ -16,13 +16,16 @@ import {
   type VisitKind,
 } from './visits';
 import { waterMultiplier } from './bioregion';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function withState(patch: Partial<GameState>): GameState {
-  return { ...createInitialState(0), ...patch };
+  return { ...openGame(0), ...patch };
 }
 
 function generators(patch: Partial<GameState['generators']>): GameState['generators'] {
-  return { ...createInitialState(0).generators, ...patch };
+  return { ...openGame(0).generators, ...patch };
 }
 
 /** A state with `kind` on the map. */
@@ -32,7 +35,7 @@ function visiting(kind: VisitKind, patch: Partial<GameState> = {}): GameState {
 
 describe('visits to the neighbourhood (§9.6)', () => {
   it('starts within the interval and waits until a visitor is drawn', () => {
-    const state = createInitialState(0);
+    const state = openGame(0);
     expect(state.visit.kind).toBeNull();
     expect(state.visit.nextIn).toBeGreaterThanOrEqual(VISIT_MIN_INTERVAL);
     expect(state.visit.nextIn).toBeLessThanOrEqual(VISIT_MAX_INTERVAL);
@@ -126,7 +129,7 @@ describe('visits to the neighbourhood (§9.6)', () => {
   });
 
   it('does nothing without a visitor', () => {
-    expect(welcomeVisit(createInitialState(0))).toBeNull();
+    expect(welcomeVisit(openGame(0))).toBeNull();
   });
 
   it('unlocks the visit Milestones', () => {
