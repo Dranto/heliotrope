@@ -411,12 +411,14 @@ export function Flower() {
             className="halo"
             style={{ opacity: 0.4 + stage * 0.08 }}
           />
-          {/* A mechanic has just joined the game (§10.8): two soft golden rings spread from the
-              crown, once. */}
+          {/* A mechanic has just joined the game (§10.8): three golden rings spread from the
+              crown, once, over a brief glow. */}
           {arrived && (
             <g key={arrived} className="arrival" aria-hidden="true">
+              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-glow" />
               <circle cx="100" cy={headY} r={POLLEN_RADIUS} />
               <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-late" />
+              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-late arrival-last" />
             </g>
           )}
           {/* The pollen gauge (§5.6): a golden arc around the crown, filling with the clicks. It

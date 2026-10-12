@@ -80,14 +80,19 @@
 /* The gauge joins the flower (§10.8): its track draws itself around the crown. */
 .pollen-arriving .pollen-track {
   stroke-dasharray: 1 1;
-  animation: pollen-draw 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: pollen-draw 3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes pollen-draw {
-  from {
+  0% {
     stroke-dashoffset: 1;
+    stroke: #e9a93b;
   }
-  to {
+  60% {
+    stroke-dashoffset: 0;
+    stroke: #e9a93b;
+  }
+  100% {
     stroke-dashoffset: 0;
   }
 }
@@ -100,8 +105,7 @@
 @media (prefers-reduced-motion: reduce) {
   .pollen-ring,
   .pollen-grain,
-  .pollen-glow,
-  .pollen-arriving .pollen-track {
+  .pollen-glow {
     animation: none;
   }
   .pollen-ring,

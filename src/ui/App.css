@@ -445,46 +445,57 @@ button {
   }
 }
 
-/* ...and two golden rings spread once from the flower's crown. */
+/* ...and three golden rings spread once from the flower's crown, over a brief glow. */
 .arrival circle {
   fill: none;
-  stroke: rgb(233 169 59 / 0.8);
-  stroke-width: 2.5;
+  stroke: rgb(233 169 59 / 0.9);
+  stroke-width: 3.5;
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
-  animation: arrival-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: arrival-ring 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.arrival .arrival-glow {
+  fill: rgb(246 213 143 / 0.55);
+  stroke: none;
+  animation: arrival-glow-fade 3.2s ease-out forwards;
 }
 
 .arrival .arrival-late {
-  stroke: rgb(255 236 179 / 0.9);
-  stroke-width: 1.5;
-  animation-delay: 0.45s;
+  stroke: rgb(255 236 179 / 0.95);
+  stroke-width: 2.5;
+  animation-delay: 0.5s;
+}
+
+.arrival .arrival-last {
+  stroke-width: 2;
+  animation-delay: 1s;
+}
+
+@keyframes arrival-glow-fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
 }
 
 @keyframes arrival-ring {
   0% {
     transform: scale(0.6);
-    opacity: 0.95;
+    opacity: 1;
   }
   100% {
-    transform: scale(3.2);
+    transform: scale(3.6);
     opacity: 0;
-  }
-}
-
-.app[data-motion='reduced'] .arrival {
-  display: none;
-}
-
-.app[data-motion='reduced']
-  :is(.achievements-button, .herbier-button, .menu-button, .decor-tool, .scene-weather) {
-  animation-iteration-count: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .arrival {
-    display: none;
   }
 }
 

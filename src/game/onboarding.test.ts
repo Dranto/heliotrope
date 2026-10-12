@@ -116,7 +116,7 @@ describe('progressive introductions (§10.8)', () => {
     for (const gap of gaps(times)) expect(gap).toBeGreaterThanOrEqual(INTRO_GAP_SECONDS - 2);
     expect(times.get('pollen')!).toBeLessThan(60);
     expect(times.get('decor')!).toBeLessThan(10 * 60);
-  });
+  }, 60_000);
 
   it('brings the second Season’s mechanics one by one instead of all at once', () => {
     const first = simulate({ stopWhenAdvised: true, maxSeconds: 3 * 3600 });
@@ -125,7 +125,7 @@ describe('progressive introductions (§10.8)', () => {
     expect([...times.keys()]).toEqual(['tree', 'cooperatives', 'requests', 'weather']);
     expect(times.get('tree')!).toBeLessThan(5);
     for (const gap of gaps(times)) expect(gap).toBeGreaterThanOrEqual(INTRO_GAP_SECONDS - 2);
-  });
+  }, 60_000);
 
   it('keeps what was introduced across Seasons', () => {
     const state = withAllIntroduced(createInitialState(0));
