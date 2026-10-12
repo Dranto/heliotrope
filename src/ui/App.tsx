@@ -52,6 +52,7 @@ import { Restoration } from './Restoration';
 import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
 import { Orchard } from './Orchard';
+import { Requests } from './Requests';
 import { Alliances } from './Alliances';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest } from '../game/garden';
@@ -85,7 +86,7 @@ const TABS: Tab[] = ['build', 'improve', 'living', 'region', 'more'];
 const TAB_PANELS: Record<Tab, PanelId[]> = {
   build: ['generators', 'cooperatives'],
   improve: ['upgrades', 'restoration'],
-  living: ['garden', 'orchard', 'alliances'],
+  living: ['garden', 'orchard', 'requests', 'alliances'],
   region: ['bioregion', 'greatWorks'],
   more: [],
 };
@@ -106,6 +107,7 @@ const PANEL_CLASS: Record<PanelId, string> = {
   garden: 'garden-panel',
   orchard: 'orchard-panel',
   alliances: 'alliances-panel',
+  requests: 'requests-panel',
   bioregion: 'bioregion',
   greatWorks: 'works-panel',
 };
@@ -677,6 +679,7 @@ export function App() {
               <Restoration onHighlight={setHighlight} />
               <Garden onHarvest={onHarvest} />
               <Orchard />
+              <Requests />
               <GreatWorks />
               <Alliances />
             </div>

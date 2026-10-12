@@ -105,6 +105,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.flights(condition.count);
     case 'weather':
       return describe.weather(t.weather.day[condition.weather]);
+    case 'requests':
+      return describe.requests(condition.count);
     case 'fruitHarvests':
       return describe.fruitHarvests(condition.count);
     case 'fruitVarieties':

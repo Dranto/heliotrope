@@ -18,6 +18,7 @@ import { validAlliances } from './alliances';
 import { validGrowth } from './growth';
 import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './pollen';
 import { validWeather } from './weather';
+import { validRequests } from './requests';
 import { isPanelId, shownPanels, type PanelId } from './panels';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
@@ -115,6 +116,8 @@ const migrations: Record<number, Migration> = {
   27: (raw) => ({ ...raw, version: 28 }),
   // v29 adds the weather (§9.10, M28): a new sky, drawn from the state's seed.
   28: (raw) => ({ ...raw, version: 29 }),
+  // v30 adds the neighbours' requests (§9.11, M29): none yet, no hand in reserve.
+  29: (raw) => ({ ...raw, version: 30 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -340,6 +343,7 @@ export function deserialize(json: string, now: number): GameState | null {
   state.growth = validGrowth(data.growth);
   state.pollen = validPollen(data.pollen);
   state.weather = validWeather(data.weather, state.weather);
+  state.requests = validRequests(data.requests, state.requests);
   if (Array.isArray(data.seenPanels)) {
     state.seenPanels = [...new Set<PanelId>(data.seenPanels.filter(isPanelId))];
   }

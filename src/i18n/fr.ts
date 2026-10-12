@@ -55,6 +55,36 @@ export const fr = {
   perSecond: '/ s',
   clickFlower: 'Récolter la lumière de l’héliotrope',
   pollen: (percent: string) => `Jauge de pollen\u00a0: ${percent}\u00a0%`,
+  requests: {
+    title: 'Les demandes des voisins',
+    hint: 'Rendre service garde un coup de main en réserve, trois au plus, à lancer quand vous voulez.',
+    needs: {
+      harvests: (count: number) => `${count}\u00a0récoltes du potager`,
+      fruit: (count: number) => `${count}\u00a0cueillettes du verger`,
+      flights: (count: number) => `${count}\u00a0envolées de pollen`,
+      butterflies: (count: number) => `${count}\u00a0Papillons dorés attrapés`,
+      owned: (count: number, generator: string) => `${count}\u00a0× ${generator}`,
+    },
+    hands: {
+      quarter: 'Un quart d’heure de production',
+      bloom: 'Une Floraison',
+      ripen: 'Une culture mûre d’un coup',
+      flight: 'Une envolée de pollen',
+    },
+    offers: (hand: string) => `Offre\u00a0: ${hand}`,
+    from: (district: string) => `De ${district}`,
+    serve: 'Rendre service',
+    serveLabel: (need: string) => `Rendre service\u00a0: ${need}`,
+    decline: 'Refuser',
+    declineLabel: (need: string) => `Refuser\u00a0: ${need}`,
+    waiting: 'Une demande arrive bientôt.',
+    reserve: 'Coups de main',
+    reserveEmpty: 'Aucun coup de main en réserve.',
+    reserveFull: 'Réserve pleine',
+    play: 'Lancer',
+    playLabel: (hand: string) => `Lancer\u00a0: ${hand}`,
+    bond: (district: string, percent: string) => `Lien avec ${district}\u00a0: +${percent}\u00a0%`,
+  },
   weather: {
     names: {
       sun: 'Grand soleil',
@@ -400,6 +430,8 @@ export const fr = {
       manyPaths: 'La ville aux mille formes',
       firstFlight: 'Première envolée',
       pollenStorm: 'Tempête de pollen',
+      firstFavour: 'Coup de main',
+      goodNeighbour: 'Bon voisin',
       'weather.sun': 'Plein soleil',
       'weather.shower': 'Chanter sous la pluie',
       'weather.wind': 'Le vent se lève',
@@ -518,6 +550,8 @@ export const fr = {
           ? 'Choisir la voie d’un bâtiment qui grandit'
           : `Faire jouer ${count} voies de bâtiments`,
       weather: (day: string) => `Vivre ${day}`,
+      requests: (count: number) =>
+        count === 1 ? 'Rendre service à un voisin' : `Rendre ${count} services aux voisins`,
       flights: (count: number) =>
         count === 1
           ? 'Remplir la jauge de pollen et lancer une envolée'
