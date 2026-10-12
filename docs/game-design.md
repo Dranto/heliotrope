@@ -1147,7 +1147,7 @@ Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'impl�
 
 ## 13. Au-delà du MVP
 
-Idées à reprendre quand le MVP est stable, par ordre de priorité proposé  (la suite, de M13 à M24, est planifiée dans `docs/roadmap.md`) :
+Idées à reprendre quand le MVP est stable, par ordre de priorité proposé  (la suite, de M13 à M30, est planifiée dans `docs/roadmap.md`) :
 
 1. ~~**Carte du quartier.**~~ *Livré en M6 (§6.1).* Une grille de parcelles grises (friches, parkings, toits nus) à restaurer contre de la Lumière. Chaque parcelle restaurée apporte un bonus ciblé (un parc : +clic ; une rivière dépolluée : +1 h de plafond hors ligne ; un verger : +% à un générateur). Rend la restauration du monde concrète et visuelle.
 2. ~~**Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.~~ *Livré en M7 (§7.1), avec les Coopératives (§7.2).*

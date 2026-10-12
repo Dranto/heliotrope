@@ -22,7 +22,7 @@ a design decision changes, update that document in the same PR.
 
 ## Reading efficiently
 
-- The design doc is ~690 lines and the roadmap ~220: read the section you need with
+- The design doc is ~690 lines and the roadmap ~300: read the section you need with
   `npm run -s doc`, not the whole file. The `§` numbers in this file are design doc sections.
 - Large files (`src/ui/App.css`, `Neighbourhood.tsx`, `RestorationArt.tsx`, `Flower.tsx`): grep
   for the selector or symbol, then read that range.
