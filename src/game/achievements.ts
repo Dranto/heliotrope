@@ -221,6 +221,7 @@ export type AchievementId =
   | 'oldTree'
   | `cities.${(typeof CITY_STEPS)[number]}`
   | 'firstAlliance'
+  | 'livingWeb'
   | 'grandBloom'
   | 'firstPath'
   | 'manyPaths'
@@ -392,6 +393,7 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   })),
   // The alliances and the grand bloom (§9.9).
   { id: 'firstAlliance', family: 'neighbourhood', condition: { kind: 'alliances', count: 1 } },
+  { id: 'livingWeb', family: 'neighbourhood', condition: { kind: 'alliances', count: 5 } },
   { id: 'grandBloom', family: 'neighbourhood', condition: { kind: 'grandBloom' } },
   // The buildings that grow (§5.5).
   { id: 'firstPath', family: 'buildings', condition: { kind: 'paths', count: 1 } },

@@ -386,6 +386,7 @@ export const en: Texts = {
       'cities.1': 'Swarming',
       'cities.3': 'Sister cities',
       firstAlliance: 'Hand in hand',
+      livingWeb: 'The web of life',
       grandBloom: 'The grand bloom',
       firstPath: 'First path',
       manyPaths: 'A city of a thousand shapes',
@@ -495,7 +496,8 @@ export const en: Texts = {
         count === 1 ? 'Complete a great work' : `Complete all ${count} great works`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Pick a first fruit in the orchard' : `Pick fruit ${count} times`,
-      alliances: 'Make an alliance work',
+      alliances: (count: number) =>
+        count === 1 ? 'Make an alliance work' : `Make ${count} alliances work at the same time`,
       grandBloom:
         'Restore the whole region: the four great works, the Herbier, every site at level 5',
       sisterCities: (count: number) =>
@@ -618,6 +620,13 @@ export const en: Texts = {
         `${generator}: +${percent}% per species in the Herbarium`,
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}: +${percent}% per restored parcel`,
+      harvestBaskets: (units: number) =>
+        units === 1
+          ? 'Each garden harvest gives one more basket'
+          : `Each garden harvest gives ${units} more baskets`,
+      perPath: (percent: string) => `+${percent}% production per working path`,
+      handSlots: (units: number) =>
+        units === 1 ? 'One more place for helping hands' : `${units} more places for helping hands`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
       orchardGrowth: (factor: string) => `The orchard grows ×${factor} faster`,
       pollenFill: (factor: string) => `The pollen gauge fills ×${factor} faster`,
@@ -725,10 +734,10 @@ export const en: Texts = {
   },
   alliances: {
     title: 'The alliances',
-    hint: 'An alliance links two things you have grown. It wakes once both reach their threshold, and works only while it holds a slot. One can be taken out per Cycle of water.',
+    hint: 'An alliance links two things you have grown. It wakes once both reach their threshold, and works only while it holds a slot. One can be taken out per Season before the first Cycle of water, then one per Cycle.',
     slots: (used: string, total: string) => `Slots: ${used} of ${total}`,
     slotsHint:
-      'Three slots at first, one more with two great works complete, with each sister city and with the grand bloom.',
+      'Two slots from the 2nd Season, three with the Bioregion, one more with two great works complete, with each sister city and with the grand bloom (eight at most).',
     names: {
       orchardBees: 'The orchard’s bees',
       tramMarket: 'The tram market',
@@ -736,6 +745,12 @@ export const en: Texts = {
       travellingSeeds: 'Travelling seeds',
       villageFeast: 'The village feast',
       deepRoots: 'Deep roots',
+      hivePollen: 'Pollen of the hives',
+      showerGardens: 'Gardens in the rain',
+      neighbourhoodForms: 'Forms of the neighbourhood',
+      mutualAid: 'Mutual aid',
+      windBikes: 'Bikes in the wind',
+      canopyFlocks: 'Flocks of the canopy',
     } satisfies Record<AllianceId, string>,
     sides: {
       hives: 'Hives',
@@ -750,7 +765,20 @@ export const en: Texts = {
       hall: 'Food hall stages',
       canopy: 'Canopy levels',
       widths: 'Delta widenings',
+      flights: 'Pollen flights',
+      showers: 'Neighbours’ showers',
+      paths: 'Working paths',
+      parcels: 'Restored parcels',
+      requests: 'Requests served',
+      bonds: 'Bound districts',
+      cooperatives: 'Cooperatives',
+      weathers: 'Weathers lived',
+      flocks: 'Flocks welcomed',
+      urbanCanopy: 'Urban canopies',
     } as Record<string, string>,
+    effects: {
+      windBikes: 'In the wind, the Cooperatives also buy the synergies',
+    } as Partial<Record<AllianceId, string>>,
     side: (name: string, have: string, need: string) => `${name}: ${have} of ${need}`,
     awake: 'Awake',
     asleep: 'Asleep',
@@ -758,7 +786,8 @@ export const en: Texts = {
     chooseLabel: (name: string) => `Choose the alliance: ${name}`,
     takeOut: 'Take out',
     takeOutLabel: (name: string) => `Take out the alliance: ${name}`,
-    takenOut: 'An alliance was already taken out this Cycle',
+    takenOut:
+      'An alliance was already taken out (one per Season before the first Cycle, then one per Cycle)',
     full: 'Every slot is taken',
   },
   cities: {

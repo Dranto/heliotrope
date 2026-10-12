@@ -7,7 +7,7 @@ import {
   canServe,
   declineRequest,
   isRequestMet,
-  MAX_HANDS,
+  handLimit,
   playHand,
   requestProgress,
   serveRequest,
@@ -35,7 +35,7 @@ export function Requests() {
   const [open, toggle] = usePanelOpen('requests');
   if (!areRequestsOpen(state)) return null;
   const { requests } = state;
-  const full = requests.hands.length >= MAX_HANDS;
+  const full = requests.hands.length >= handLimit(state);
   const bonds = DISTRICT_IDS.filter((id) => (requests.bonds[id] ?? 0) > 0);
 
   return (
@@ -90,7 +90,7 @@ export function Requests() {
         </ul>
       )}
       <h3 className="requests-sub">
-        {t.requests.reserve} · {requests.hands.length}/{MAX_HANDS}
+        {t.requests.reserve} · {requests.hands.length}/{handLimit(state)}
       </h3>
       {requests.hands.length === 0 ? (
         <p className="hint">{t.requests.reserveEmpty}</p>

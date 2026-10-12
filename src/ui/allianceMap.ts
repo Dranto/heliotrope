@@ -3,8 +3,8 @@
 // coordinates.
 import type { AllianceId } from '../game/alliances';
 import { DISTRICT_PLACES } from './districtMap';
-import { centre, type Box } from './neighbourhood';
-import { ORCHARD_PLACE } from './orchardMap';
+import { ARCOLOGY_SITE, centre, TREES, type Box } from './neighbourhood';
+import { HIVE_SPOTS, ORCHARD_PLACE } from './orchardMap';
 import { WORK_PLACES } from './greatWorksMap';
 
 type Point = [number, number];
@@ -22,6 +22,17 @@ export const THREADS: Record<AllianceId, [Point, Point]> = {
   travellingSeeds: [COURTYARD, [-620, 225]],
   villageFeast: [at(WORK_PLACES.hall), COURTYARD],
   deepRoots: [COURTYARD, [415, 720]],
+  // M34: from the courtyard to the hives, the river's rain gardens, the buildings' forms, a
+  // neighbouring district, the cargo bikes' street, and from a street tree to the sky.
+  hivePollen: [HIVE_SPOTS[0]!, COURTYARD],
+  showerGardens: [COURTYARD, [415, 300]],
+  neighbourhoodForms: [COURTYARD, at(ARCOLOGY_SITE)],
+  mutualAid: [COURTYARD, at(DISTRICT_PLACES.tanneries)],
+  windBikes: [COURTYARD, [560, 236]],
+  canopyFlocks: [
+    [TREES[6]!.x, TREES[6]!.y],
+    [300, -80],
+  ],
 };
 
 /** A gentle curve between the two ends, bowed to one side. */

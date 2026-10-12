@@ -6,7 +6,7 @@
 import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
-import { factorOf } from './bonuses';
+import { extraHarvestBaskets, factorOf } from './bonuses';
 import { effectSeconds } from './butterfly';
 import { effectFactor } from './effects';
 import { earnLight } from './light';
@@ -362,7 +362,7 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
     garden: {
       ...next.garden,
       harvests: next.garden.harvests + 1,
-      baskets: next.garden.baskets + BASKETS[crop],
+      baskets: next.garden.baskets + BASKETS[crop] + extraHarvestBaskets(state),
       rotations: next.garden.rotations + Number(plot.rotated === true),
       varieties: variety ? [...next.garden.varieties, variety] : next.garden.varieties,
     },

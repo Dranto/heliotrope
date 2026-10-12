@@ -903,7 +903,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12, 156 avec celui de M33, §9.13), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12, 156 avec celui de M33, §9.13, 157 avec celui de M34, §9.14), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -1032,7 +1032,7 @@ Des **synergies entre systèmes** à composer (roadmap P23, décision D16), à l
 | La fête au village | 10 visites de la ville (§9.6) · 1 étape des halles (§6.6) | Les haricots durent ×1,5 |
 | Les racines profondes | 10 niveaux de Canopée (§7.1) · 1 élargissement du delta (M19) | Bâtiments 10 % moins chers |
 
-- **Les places.** **Trois** au début, une de plus avec **deux grands chantiers achevés**, avec **chaque ville sœur** et avec la **grande floraison**, six au plus (autant que d'alliances). Le panneau s'ouvre dès qu'une alliance est éveillée. On choisit librement tant qu'une place est libre ; **retirer** une alliance n'est permis **qu'une fois par Cycle de l'eau**, pour que la composition soit un choix. Une alliance choisie dont un côté retombe sous son seuil (la Canopée qui recommence avec une ville sœur fondée sans l'atelier des semis, par exemple) garde sa place mais s'endort.
+- **Les places** (revues par M34, §9.14). **Trois** au début, une de plus avec **deux grands chantiers achevés**, avec **chaque ville sœur** et avec la **grande floraison**, six au plus (autant que d'alliances). Le panneau s'ouvre dès qu'une alliance est éveillée. On choisit librement tant qu'une place est libre ; **retirer** une alliance n'est permis **qu'une fois par Cycle de l'eau**, pour que la composition soit un choix. Une alliance choisie dont un côté retombe sous son seuil (la Canopée qui recommence avec une ville sœur fondée sans l'atelier des semis, par exemple) garde sa place mais s'endort.
 - **Sur la carte.** Chaque alliance qui joue tend un **fil doré** entre ses deux lieux (du verger à la cour, du tram aux quartiers voisins, de la rivière aux coteaux, de la cour vers les villes sœurs…), une courbe lumineuse qui pulse doucement ; immobile avec les animations réduites.
 - **La grande floraison.** Quand toute la région est restaurée (les **quatre grands chantiers achevés**, l'**Herbier complet** et **chaque site de la Biorégion au niveau 5**), la carte entière fleurit : quelque 220 fleurs s'ouvrent l'une après l'autre sur les rues et les sites, puis restent. Aucun texte, **rien ne recommence** (décision D13) ; elle ouvre la dernière place. Elle n'arrive qu'une fois.
 - **Équilibrage.** Les effets sont des bonus modestes de fin de partie, du même ordre que les variétés et les trames. Le simulateur ne joue pas les alliances : elles s'éveillent après les mesures du §8.
@@ -1125,6 +1125,28 @@ Roadmap P32, décision D25 : échanger le prochain temps une fois par Saison. La
 - **Équilibrage.** Le joueur de référence (§8) ne change pas ses choix de voies ni la prévision. 1ʳᵉ Saison 66 min (cible 80) ; 1ᵉʳ Cycle 2 h 38 au lieu de 2 h 41 (cible 2 h 45) ; Cycles 2 à 4 en 36, 42 et 56 min au lieu de 36, 36 et 43 (cibles 35, 35 et 45) : les voies renforcées donnent un peu plus de Sources par Cycle, et le simulateur, qui garde ses seuils, joue alors une Saison de plus pour les Cycles 3 et 4. Les essaimages reviennent à 4 h et 5 h de jeu (cibles 4 h et 5 h). Tout reste dans les ±30 %.
 - **Écart avec la roadmap.** La règle de l'atelier qui ajouterait un échange par Saison n'est pas faite : une seule règle de plus aurait demandé un niveau d'atelier en plus, et l'échange unique garde la surprise.
 - **Sauvegarde.** Version 34 : la Saison du dernier échange ; jamais d'échange pour une sauvegarde plus ancienne.
+
+### 9.14 Les alliances du milieu (M34)
+
+Roadmap P33, décision D26 : des places plus tôt plutôt que plus de places. Six alliances relient enfin les systèmes de la v4, et la composition devient une décision dès la 2ᵉ Saison. Code dans `src/game/alliances.ts` ; les effets nouveaux passent par `src/game/bonuses.ts` (`harvestBaskets`, `perPath`, `handSlots`) et `src/game/cooperatives.ts` (les vélos).
+
+| Alliance | Ce qu'elle relie (seuils) | Effet |
+|---|---|---|
+| Le pollen des ruches | 1 ruche (§9.8) · 50 envolées de pollen (§5.6) | La jauge de pollen se remplit ×1,25 plus vite |
+| Les jardins sous la pluie | 10 averses des voisins (§9.6) · 3 variétés du potager (§9.7) | Chaque récolte du potager donne un panier de plus |
+| Les formes du quartier | 6 voies qui jouent (§5.5) · 4 parcelles restaurées (§6.1) | +1 % de production par voie qui joue |
+| L'entraide | 10 demandes servies · 1 quartier voisin lié (§9.11) | Une place de plus dans la réserve des coups de main (4 au lieu de 3) |
+| Les vélos dans le vent | 3 Coopératives (§7.2) · 5 temps vécus (§9.10) | Par vent, les Coopératives des bâtiments achètent aussi les synergies (sans le Conseil) |
+| Les nuées de la canopée | 10 Nuées de migrateurs accueillies (§9.6) · 10 Canopées urbaines | La Nuée dure ×1,5 |
+
+- **Les places.** **Deux** dès la 2ᵉ Saison, **trois** avec la Biorégion, puis une de plus avec deux grands chantiers achevés, chaque ville sœur et la grande floraison ; **huit au plus** pour douze alliances. Le panneau s'ouvre toujours dès qu'une alliance est éveillée ; il range les alliances choisies d'abord, puis les éveillées, puis les endormies.
+- **Retirer.** Avant le premier Cycle de l'eau, une alliance se retire **une fois par Saison** ; ensuite une fois par Cycle, comme avant.
+- **Les vélos dans le vent.** Ils achètent comme le Conseil, mais seulement les synergies (§5.3), et seulement par vent : la synergie la moins chère, si elle ne coûte pas plus de trente fois le prochain bâtiment. Avec le Conseil au travail, rien ne change.
+- **Sur la carte.** Six nouveaux fils dorés : des ruches à la cour, de la cour aux jardins de pluie de la rivière, de la cour à l'arcologie, de la cour aux Tanneries, de la cour vers la rue des vélos, d'un arbre de la rue vers le ciel.
+- **Jalon (1).** « La toile du vivant » : cinq alliances qui jouent en même temps. 157 jalons en tout.
+- **Équilibrage.** Les effets restent modestes, du même ordre que les alliances de M24. Le joueur de référence (§8) ne compose pas d'alliances avant la fin de partie : les mesures ne bougent pas (1ʳᵉ Saison 66 min, 1ᵉʳ Cycle 2 h 38, Cycles 2 à 4 en 36, 42 et 56 min).
+- **Écart avec la roadmap.** « 10 averses vécues » compte les averses des voisins (§9.6), déjà comptées, plutôt que le temps « Averse ».
+- **Sauvegarde.** Version 35 : la Saison du dernier retrait ; aucun retrait pour une sauvegarde plus ancienne.
 
 ## 10. Écrans et interface
 

@@ -96,7 +96,7 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
     case 'sisterCities':
       return describe.sisterCities(condition.count);
     case 'alliances':
-      return describe.alliances;
+      return describe.alliances(condition.count);
     case 'grandBloom':
       return describe.grandBloom;
     case 'paths':
