@@ -1,5 +1,6 @@
 import {
   memo,
+  type CSSProperties,
   useEffect,
   useMemo,
   useRef,
@@ -36,6 +37,8 @@ interface Floater {
   id: number;
   x: number;
   y: number;
+  /** Sideways drift, from -1 to 1, so quick clicks on one spot fan out instead of piling up. */
+  drift: number;
   text: string;
 }
 
@@ -325,7 +328,8 @@ export function Flower() {
     const fromPointer = event.detail > 0;
     const x = fromPointer ? event.clientX - rect.left : rect.width / 2;
     const y = fromPointer ? event.clientY - rect.top : rect.height / 3;
-    const floater = { id: nextFloaterId++, x, y, text: `+${formatNumber(value)}` };
+    const drift = Math.random() * 2 - 1;
+    const floater = { id: nextFloaterId++, x, y, drift, text: `+${formatNumber(value)}` };
     setFloaters((list) => [...list.slice(-12), floater]);
   }
 
@@ -422,7 +426,7 @@ export function Flower() {
           <span
             key={f.id}
             className="floater"
-            style={{ left: f.x, top: f.y }}
+            style={{ left: f.x, top: f.y, '--drift': f.drift } as CSSProperties}
             onAnimationEnd={() => setFloaters((list) => list.filter((x) => x.id !== f.id))}
           >
             {f.text}
