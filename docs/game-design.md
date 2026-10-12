@@ -775,12 +775,12 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 | 1ᵉʳ Potager sur le toit | ~1 min 30 |
 | 1ʳᵉ Serre communautaire | ~5 min 30 |
 | 1ʳᵉ Ferme verticale | ~12 min |
-| 1ʳᵉ Centrale à miroirs | ~26 min |
-| 1ʳᵉ Canopée urbaine | ~45 min |
-| 1ʳᵉ Arcologie vivante | ~1 h 10 |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~1 h 20 |
+| 1ʳᵉ Centrale à miroirs | ~21 min |
+| 1ʳᵉ Canopée urbaine | ~37 min |
+| 1ʳᵉ Arcologie vivante | ~57 min |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~1 h 07 |
 
-Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie. Les améliorations de clic précoces (§5.2) accélèrent ensuite surtout le début : le Potager arrive vers 1 min 30 au lieu de 2 min 40. Avec les parcelles et les projets du jalon 6 (§6.1, §6.2), qui accélèrent la seconde moitié, la Saison conseillée arrive vers 1 h 30 – 1 h 40. Les synergies, les Jalons et l'Herbier l'ont ensuite avancée vers 1 h 12 – 1 h 15, à −28 % de l'ancienne cible de 1 h 40, au bord de la marge : M19 rapproche les trois dernières cibles de ce rythme voulu (Canopée 50 → 45 min, Arcologie 1 h 20 → 1 h 10, Saison conseillée 1 h 40 → 1 h 20), sans changer le jeu.
+Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie. Les améliorations de clic précoces (§5.2) accélèrent ensuite surtout le début : le Potager arrive vers 1 min 30 au lieu de 2 min 40. Avec les parcelles et les projets du jalon 6 (§6.1, §6.2), qui accélèrent la seconde moitié, la Saison conseillée arrive vers 1 h 30 – 1 h 40. Les synergies, les Jalons et l'Herbier l'ont ensuite avancée vers 1 h 12 – 1 h 15, à −28 % de l'ancienne cible de 1 h 40, au bord de la marge : M19 rapproche les trois dernières cibles de ce rythme voulu (Canopée 50 → 45 min, Arcologie 1 h 20 → 1 h 10, Saison conseillée 1 h 40 → 1 h 20), sans changer le jeu. Les bâtiments qui grandissent (M26), le pollen (M27) et les moments qui s'enchaînent (M31) ont ensuite avancé toute la seconde moitié de la Saison : sur six graines de hasard, la Centrale arrivait entre −34 % et −12 % de sa cible, hors de la marge pour une graine. Les quatre dernières cibles suivent donc à nouveau ce rythme (Centrale 26 → 21 min, Canopée 45 → 37 min, Arcologie 1 h 10 → 57 min, Saison conseillée 1 h 20 → 1 h 07), toujours sans changer le jeu.
 
 ### Outil de simulation
 
@@ -788,21 +788,21 @@ L'équilibrage doit être vérifié par un **simulateur sans interface** qui rej
 
 **Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat dépend un peu de la graine, surtout en milieu de partie où un Papillon tombe plus ou moins tôt (chiffres sous le tableau ci-dessous).
 
-Sortie actuelle (améliorations de clic, parcelles et projets, Arbre et Coopératives en 2ᵉ Saison, Herbier) :
+Sortie actuelle (mesurée après M37, graine 0) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
 | 1ᵉʳ Héliotrope en pot | < 15 s | 10 s | ok | 1 s |
 | 1ᵉʳ Panneau de balcon | ~35 s | 31,5 s | −10 % | 6 s |
 | 1ᵉʳ Potager sur le toit | ~1 min 30 | 1,5 min | 0 % | 36 s |
-| 1ʳᵉ Serre communautaire | ~5 min 30 | 5,6 min | +2 % | 1,6 min |
-| 1ʳᵉ Ferme verticale | ~12 min | 11,1 min | −8 % | 4,8 min |
-| 1ʳᵉ Centrale à miroirs | ~26 min | 22 min | −16 % | 10,4 min |
-| 1ʳᵉ Canopée urbaine | ~45 min | 39 min | −12 % | 17 min |
-| 1ʳᵉ Arcologie vivante | ~1 h 10 | 1 h 01 | −12 % | 26,5 min |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 20 | 1 h 12 | −10 % | 31 min |
+| 1ʳᵉ Serre communautaire | ~5 min 30 | 5,3 min | −3 % | 1,6 min |
+| 1ʳᵉ Ferme verticale | ~12 min | 10,2 min | −15 % | 4,5 min |
+| 1ʳᵉ Centrale à miroirs | ~21 min | 18,9 min | −10 % | 7 min |
+| 1ʳᵉ Canopée urbaine | ~37 min | 35 min | −5 % | 13,6 min |
+| 1ʳᵉ Arcologie vivante | ~57 min | 53,8 min | −6 % | 21,9 min |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 07 | 1 h 06 | −2 % | 25 min |
 
-Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, la 1ʳᵉ Saison suit ses cibles jusqu'à la Ferme verticale (entre −8 % et +5 %), puis prend de l'avance : Centrale entre −14 % et −2 %, Canopée entre −20 % et −7 %, Arcologie entre −24 % et −13 %, Saison conseillée entre −26 % et −21 %, toujours dans les ±30 %. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, la 1ʳᵉ Saison suit ses cibles : Ferme verticale entre −15 % et 0 %, Centrale entre −18 % et +9 %, Canopée entre −10 % et +3 %, Arcologie entre −12 % et +4 %, Saison conseillée entre −9 % et +1 %, toutes dans les ±30 %. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 > Restaurer le quartier (M6) : le joueur de référence considère aussi les parcelles et les projets, avec la même règle (attente + coût / gain de revenu). Ceux dont l'effet ne touche pas le revenu (Papillon, plafond hors ligne, remises) ne lui rapportent rien de mesurable et ne sont achetés que lorsqu'un autre effet les rend rentables (les Pistes cyclables, par exemple, donnent du prix à chaque parcelle). Dans sa 1ʳᵉ Saison, il restaure cinq parcelles et mène cinq projets, et le rythme s'accélère encore : Ferme verticale à 15,0 min (0 %), Centrale à 31,6 min (−10 %), Canopée à 55,2 min (−15 %), Arcologie à 1 h 28 (−16 %), Saison conseillée à 1 h 46 (−21 %, la marge la plus faible). Les effets ont été réduits pour rester dans les ±30 % (Batteries partagées +5 % par type au lieu de +25 %, Verger ×1,5 au lieu de ×2, Eau de pluie ×1,25, Pistes cyclables +2 % par parcelle). Comme les parcelles restent acquises, la 2ᵉ Saison est bien plus rapide : Saison conseillée en 1 h au lieu de 1 h 22.
 
