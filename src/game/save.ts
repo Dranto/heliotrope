@@ -17,6 +17,7 @@ import { validGreatWorks } from './greatWorks';
 import { validOrchard } from './orchard';
 import { validCity } from './cities';
 import { validAlliances } from './alliances';
+import { validGreetings } from './greetings';
 import { validGrowth } from './growth';
 import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './pollen';
 import { validWeather } from './weather';
@@ -132,6 +133,8 @@ const migrations: Record<number, Migration> = {
   33: (raw) => ({ ...raw, version: 34 }),
   // v35 lets an alliance be taken out once per Season before the first Cycle (M34): none yet.
   34: (raw) => ({ ...raw, version: 35 }),
+  // v36 adds the species greeted on the map (M35): none yet.
+  35: (raw) => ({ ...raw, version: 36 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -355,6 +358,7 @@ export function deserialize(json: string, now: number): GameState | null {
   state.orchard = validOrchard(data.orchard);
   state.city = validCity(data.city);
   state.alliances = validAlliances(data.alliances);
+  state.greetings = validGreetings(data.greetings);
   state.growth = validGrowth(data.growth);
   state.pollen = validPollen(data.pollen);
   state.weather = validWeather(data.weather, state.weather);

@@ -17,18 +17,31 @@ import { isGeneratorRevealed, lightPerSecond } from './production';
 import { earnLight } from './light';
 import { nextRandom } from './random';
 import type { GameState } from './state';
+import { BOND_MAX } from './bonds';
+import { handWork, lightenStage } from './greatWorks';
+import { GROWTH_TIERS, pathsWorking } from './growth';
+import { isSpeciesId, type SpeciesId } from './species';
+import { isWeatherOpen } from './weather';
 
-export const COUNTED_NEEDS = ['harvests', 'fruit', 'flights', 'butterflies'] as const;
+export const COUNTED_NEEDS = ['harvests', 'fruit', 'flights', 'butterflies', 'paths'] as const;
 export type CountedNeed = (typeof COUNTED_NEEDS)[number];
 
-/** What a neighbour asks for: things done from now on, or units of a building owned. */
+/**
+ * What a neighbour asks for: things done from now on (one more path working is a new form of a
+ * building, M35), units of a building owned, a species greeted on the map, or jars of honey
+ * given when the request is served (M35).
+ */
 export type Need =
-  { kind: CountedNeed; count: number } | { kind: 'owned'; generator: GeneratorId; count: number };
+  | { kind: CountedNeed; count: number }
+  | { kind: 'owned'; generator: GeneratorId; count: number }
+  | { kind: 'greet'; species: SpeciesId; count: number }
+  | { kind: 'honey'; count: number };
 
-export const HAND_IDS = ['quarter', 'bloom', 'ripen', 'flight'] as const;
+export const HAND_IDS = ['quarter', 'bloom', 'ripen', 'flight', 'works', 'sky'] as const;
 /**
  * The helping hands: a quarter of an hour of production at once, a Floraison (§9.2), the crop of
- * the courtyard garden closest to ripe ripens (§9.7), a pollen flight (§5.6).
+ * the courtyard garden closest to ripe ripens (§9.7), a pollen flight (§5.6); with M35, a quarter
+ * of a great work's next stage paid (§6.6), and one more swap of the forecast (§9.13).
  */
 export type HandId = (typeof HAND_IDS)[number];
 
@@ -87,17 +100,27 @@ function counter(state: GameState, need: Need): number {
       return state.pollen.flights;
     case 'butterflies':
       return state.butterflies;
+    case 'paths':
+      return pathsWorking(state);
     case 'owned':
       return state.generators[need.generator];
+    case 'greet':
+      return state.greetings.counts[need.species] ?? 0;
+    case 'honey':
+      return state.orchard.honey;
   }
+}
+
+/** Needs counted from the request on; the others read what is owned now. */
+function isRelative(need: Need): boolean {
+  return need.kind !== 'owned' && need.kind !== 'honey';
 }
 
 /** How much of a request is done, from 0 to its count. */
 export function requestProgress(state: GameState, request: Request): number {
-  const done =
-    request.need.kind === 'owned'
-      ? counter(state, request.need)
-      : counter(state, request.need) - request.base;
+  const done = isRelative(request.need)
+    ? counter(state, request.need) - request.base
+    : counter(state, request.need);
   return Math.max(0, Math.min(request.need.count, done));
 }
 
@@ -113,6 +136,15 @@ function possibleNeeds(state: GameState): Need[] {
   ];
   if (isOrchardOpen(state)) needs.push({ kind: 'fruit', count: 2 });
   if (isButterflyUnlocked(state)) needs.push({ kind: 'butterflies', count: 2 });
+  // M35: a species to greet (the least greeted one back), honey, a new form of a building.
+  const toGreet = [...state.species].sort(
+    (a, b) => (state.greetings.counts[a] ?? 0) - (state.greetings.counts[b] ?? 0),
+  )[0];
+  if (toGreet) needs.push({ kind: 'greet', species: toGreet, count: 1 });
+  if (state.orchard.hives > 0) needs.push({ kind: 'honey', count: 1 });
+  if (GENERATOR_IDS.some((id) => state.generators[id] >= GROWTH_TIERS[0] * 0.8)) {
+    needs.push({ kind: 'paths', count: 1 });
+  }
   const revealed = GENERATOR_IDS.filter((id) => isGeneratorRevealed(state, id));
   const generator = revealed[revealed.length - 1];
   if (generator) {
@@ -127,9 +159,17 @@ function pick<T>(list: readonly T[], seed: number): [T, number] {
   return [list[Math.floor(value * list.length)]!, next];
 }
 
+/** The hands that can help now: no great work or forecast hand before they open. */
+function possibleHands(state: GameState): HandId[] {
+  return HAND_IDS.filter(
+    (hand) =>
+      (hand !== 'works' || handWork(state) !== null) && (hand !== 'sky' || isWeatherOpen(state)),
+  );
+}
+
 function drawRequest(state: GameState, seed: number): [Request, number] {
   const [need, afterNeed] = pick(possibleNeeds(state), seed);
-  const [hand, afterHand] = pick(HAND_IDS, afterNeed);
+  const [hand, afterHand] = pick(possibleHands(state), afterNeed);
   const [share, afterShare] = nextRandom(afterHand);
   let from: DistrictId | null = null;
   let next = afterShare;
@@ -176,13 +216,20 @@ export function serveRequest(state: GameState, index: number): GameState {
   const bonds = request.from
     ? { ...requests.bonds, [request.from]: (requests.bonds[request.from] ?? 0) + 1 }
     : requests.bonds;
+  // A district whose bond is full sends one more hand (M35), room allowing.
+  const full = request.from !== null && (requests.bonds[request.from] ?? 0) >= BOND_MAX;
+  const given = full ? [request.hand, request.hand] : [request.hand];
+  const hands = [...requests.hands, ...given].slice(0, handLimit(state));
+  // Honey asked for is given (M35).
+  const honey = request.need.kind === 'honey' ? request.need.count : 0;
   return {
     ...state,
+    orchard: honey > 0 ? { ...state.orchard, honey: state.orchard.honey - honey } : state.orchard,
     requests: {
       ...requests,
       open: requests.open.filter((_, i) => i !== index),
       nextIn: requests.open.length >= MAX_REQUESTS ? REQUEST_INTERVAL : requests.nextIn,
-      hands: [...requests.hands, request.hand],
+      hands,
       served: requests.served + 1,
       bonds,
     },
@@ -222,6 +269,8 @@ function closestToRipe(state: GameState): number | null {
 export function canPlayHand(state: GameState, index: number): boolean {
   const hand = state.requests.hands[index];
   if (hand === undefined) return false;
+  if (hand === 'works') return handWork(state) !== null;
+  if (hand === 'sky') return isWeatherOpen(state) && state.weather.swapped === state.seasons;
   return hand !== 'ripen' || closestToRipe(state) !== null;
 }
 
@@ -240,6 +289,11 @@ export function playHand(state: GameState, index: number): GameState {
       return { ...next, effects: startEffect(next, 'bloom') };
     case 'flight':
       return sendFlights(next, 1);
+    case 'works':
+      return lightenStage(next);
+    case 'sky':
+      // The forecast can be swapped once more this Season (§9.13).
+      return { ...next, weather: { ...next.weather, swapped: -1 } };
     case 'ripen': {
       const plot = closestToRipe(state)!;
       const plots = next.garden.plots.map((p, i) =>
@@ -252,13 +306,15 @@ export function playHand(state: GameState, index: number): GameState {
 
 function isNeed(value: unknown): value is Need {
   if (typeof value !== 'object' || value === null) return false;
-  const { kind, count, generator } = value as Record<string, unknown>;
+  const { kind, count, generator, species } = value as Record<string, unknown>;
   if (typeof count !== 'number' || !Number.isInteger(count) || count <= 0) return false;
   if (kind === 'owned') {
     return (
       typeof generator === 'string' && (GENERATOR_IDS as readonly string[]).includes(generator)
     );
   }
+  if (kind === 'greet') return isSpeciesId(species);
+  if (kind === 'honey') return true;
   return typeof kind === 'string' && (COUNTED_NEEDS as readonly string[]).includes(kind);
 }
 

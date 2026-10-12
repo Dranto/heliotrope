@@ -4,7 +4,12 @@
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import type { IntroState } from './introductions';
 import { bondBonuses, type Bonds } from './bonds';
-import { favouredBuildings, weatherBonuses, type WeatherState } from './weather';
+import {
+  favouredBuildings,
+  WEATHER_PATH_FACTOR,
+  weatherBonuses,
+  type WeatherState,
+} from './weather';
 import { allianceBonuses } from './alliances';
 import type { GameState } from './state';
 import { cityBonuses, type CitySource } from './cityData';
@@ -18,6 +23,7 @@ import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './del
 import { DISTRICTS, type DistrictId } from './districts';
 import { greatWorksBonuses, type WorkId } from './greatWorks';
 import { growthBonuses, pathsWorking, type GrowthState } from './growth';
+import { familyBonuses, isFamilyComplete, WEATHER_FAMILY_PATH_FACTOR } from './families';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
@@ -204,6 +210,9 @@ function collectBonuses(source: BonusSource): Bonus[] {
                 intro: source.intro,
               })
             : [],
+          isGameState(source) && isFamilyComplete(source.species, 'weather')
+            ? WEATHER_FAMILY_PATH_FACTOR
+            : WEATHER_PATH_FACTOR,
         )
       : []),
     ...(weather && source.intro
@@ -216,6 +225,7 @@ function collectBonuses(source: BonusSource): Bonus[] {
       : []),
     ...(requests ? bondBonuses(requests.bonds) : []),
     ...(isGameState(source) ? allianceBonuses(source) : []),
+    ...(isGameState(source) ? familyBonuses(source.species) : []),
   ];
 }
 

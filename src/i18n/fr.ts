@@ -20,6 +20,7 @@ import type { WorkId } from '../game/greatWorks';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
+import type { FamilyId } from '../game/families';
 import type { CanopyId, TalentBranch, TalentId } from '../game/talents';
 import type { CropId, VarietyId } from '../game/seedBank';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
@@ -64,12 +65,18 @@ export const fr = {
       flights: (count: number) => `${count}\u00a0envolées de pollen`,
       butterflies: (count: number) => `${count}\u00a0Papillons dorés attrapés`,
       owned: (count: number, generator: string) => `${count}\u00a0× ${generator}`,
+      greet: (species: string) => `Saluer sur la carte\u00a0: ${species}`,
+      honey: (count: number) => (count > 1 ? `${count}\u00a0pots de miel` : 'Un pot de miel'),
+      paths: (count: number) =>
+        count > 1 ? `${count}\u00a0nouvelles formes de bâtiment` : 'Une nouvelle forme de bâtiment',
     },
     hands: {
       quarter: 'Un quart d’heure de production',
       bloom: 'Une Floraison',
       ripen: 'Une culture mûre d’un coup',
       flight: 'Une envolée de pollen',
+      works: 'Un quart d’étape de grand chantier',
+      sky: 'Un échange de prévision de plus',
     },
     offers: (hand: string) => `Offre\u00a0: ${hand}`,
     from: (district: string) => `De ${district}`,
@@ -432,6 +439,8 @@ export const fr = {
       oldOrchard: 'Vieux vergers',
       rotation: 'La terre se repose',
       oldTree: 'Vieil arbre',
+      hello: 'Bonjour voisin',
+      wholeFamily: 'Toute la famille',
       skyCreatures: 'Les bêtes du ciel',
       'cities.1': 'Essaimage',
       'cities.3': 'Les villes sœurs',
@@ -578,6 +587,8 @@ export const fr = {
       rotations: (count: number) =>
         `Récolter ${count}\u00a0cultures semées après une culture différente`,
       oldTree: 'Cueillir un fruitier jusqu’à ce qu’il devienne un vieil arbre',
+      greetings: 'Saluer une espèce sur la carte',
+      families: (count: number) => `Réunir ${count}\u00a0familles entières de l’Herbier`,
       weatherSpecies: 'Voir revenir les cinq espèces du temps',
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
@@ -976,6 +987,16 @@ export const fr = {
     returnedMany: (count: string) => `${count} espèces reviennent dans le quartier\u00a0!`,
     unknown: 'Espèce à retrouver',
     found: 'Revenue',
+    greet: (name: string) => `Saluer\u00a0: ${name}`,
+    families: 'Familles de l’Herbier',
+    familyNames: {
+      pollinators: 'Pollinisateurs',
+      birds: 'Oiseaux',
+      river: 'Gens de la rivière',
+      night: 'Habitants de la nuit',
+      weather: 'Espèces du temps',
+    } satisfies Record<FamilyId, string>,
+    weatherFamily: 'Sous leur ciel, les voies jouent ×1,75 au lieu de ×1,5',
     names: {
       poppy: 'Coquelicot',
       bee: 'Abeille',

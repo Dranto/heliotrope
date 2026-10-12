@@ -74,6 +74,38 @@ export function RequestIcon({ kind }: { kind: NeedKind | HandId }) {
           <circle cx="10" cy="10" r="1.8" className="ri-pollen" />
         </>
       )}
+      {kind === 'greet' && (
+        <>
+          {/* An eye: a species to see and greet on the map (M35). */}
+          <path d="M2.6 10c2-3.4 4.6-5 7.4-5s5.4 1.6 7.4 5c-2 3.4-4.6 5-7.4 5s-5.4-1.6-7.4-5Z" />
+          <circle cx="10" cy="10" r="2.4" className="ri-leaf" />
+        </>
+      )}
+      {kind === 'honey' && (
+        <>
+          <path d="M5.4 8h9.2v7.4a2 2 0 0 1-2 2H7.4a2 2 0 0 1-2-2Z" className="ri-honey" />
+          <path d="M5 6h10v2H5Z" />
+        </>
+      )}
+      {kind === 'paths' && (
+        <>
+          {/* A building growing into a new form (§5.5). */}
+          <path d="M4 17V9l4-3 4 3v8M12 17V6l4-2v13" className="ri-house" />
+          <path d="M14 2.6v3M12.6 4h3" />
+        </>
+      )}
+      {kind === 'works' && (
+        <>
+          <path d="M3 17h14M5 17V9h10v8M8 9V5h4v4" />
+          <path d="M10 5V2.6" className="ri-pollen" />
+        </>
+      )}
+      {kind === 'sky' && (
+        <>
+          <circle cx="7" cy="8" r="3" className="ri-pollen" />
+          <path d="M8.6 15.6h6a2.6 2.6 0 0 0 0-5.2 3.6 3.6 0 0 0-6.8 1 2.2 2.2 0 0 0 .8 4.2Z" />
+        </>
+      )}
       {kind === 'ripen' && (
         <>
           <path

@@ -903,7 +903,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12, 156 avec celui de M33, §9.13, 157 avec celui de M34, §9.14), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12, 156 avec celui de M33, §9.13, 157 avec celui de M34, §9.14, 159 avec ceux de M35, §9.15), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -1147,6 +1147,29 @@ Roadmap P33, décision D26 : des places plus tôt plutôt que plus de places. Si
 - **Équilibrage.** Les effets restent modestes, du même ordre que les alliances de M24. Le joueur de référence (§8) ne compose pas d'alliances avant la fin de partie : les mesures ne bougent pas (1ʳᵉ Saison 66 min, 1ᵉʳ Cycle 2 h 38, Cycles 2 à 4 en 36, 42 et 56 min).
 - **Écart avec la roadmap.** « 10 averses vécues » compte les averses des voisins (§9.6), déjà comptées, plutôt que le temps « Averse ».
 - **Sauvegarde.** Version 35 : la Saison du dernier retrait ; aucun retrait pour une sauvegarde plus ancienne.
+
+### 9.15 L'Herbier et les voisins (M35)
+
+Roadmap P34. Le vivant revenu devient un acteur de la carte, et les demandes des voisins s'élargissent. Code dans `src/game/greetings.ts` (saluer), `src/game/families.ts` (familles), `src/game/requests.ts` et `src/game/greatWorks.ts` (`lightenStage`).
+
+- **Saluer une espèce.** Une espèce revenue se clique sur la carte (ou Entrée) : un **pas de 4 % de la jauge de pollen** (§5.6) et deux notes légères, puis plus rien pour elle pendant **10 min de jeu** (« une fois par passage »). Le halo d'une espèce qu'on peut saluer se dore et respire ; il redevient simple une fois saluée. Les saluts sont comptés par espèce.
+- **Les familles de l'Herbier.** L'écran de l'Herbier montre cinq familles avec leur progression ; une famille complète dore ses planches et donne un bonus lié à son monde :
+
+| Famille | Espèces | Bonus une fois complète |
+|---|---|---|
+| Pollinisateurs | abeille, bourdon, citron, coccinelle | La jauge de pollen se remplit ×1,15 plus vite |
+| Oiseaux | moineau, mésange bleue, rouge-gorge, martinet, alouette, hirondelle, rougequeue | La Nuée de migrateurs dure ×1,25 |
+| Gens de la rivière | grenouille, martin-pêcheur, triton, libellule, loutre, saumon, cigogne noire | Eau ×1,1 |
+| Habitants de la nuit | hérisson, ver luisant, pipistrelle, chouette | Les lucioles durent ×1,25 |
+| Espèces du temps | escargot, lézard, faucon, salamandre, cigale | Sous leur ciel, les voies jouent ×1,75 au lieu de ×1,5 (§9.13) |
+
+  Le coquelicot, la fougère, l'orchis, le lucane et le pic vert n'appartiennent à aucune famille.
+- **Les demandes oubliées.** Trois besoins de plus : **saluer une espèce** sur la carte (celle qui a été le moins saluée), **un pot de miel** (avec une ruche ; il est donné en rendant service) et **une nouvelle forme de bâtiment** (une voie de plus qui joue, §5.5, dès qu'un bâtiment approche de son premier palier). Deux coups de main de plus : **un quart d'étape de grand chantier** (le quart de la Lumière, de l'Eau, des paniers et du miel de la prochaine étape du chantier le plus avancé, §6.6) et **un échange de prévision de plus** cette Saison (§9.13, seulement une fois l'échange de la Saison fait). Ils ne sont offerts qu'une fois les grands chantiers ou le temps ouverts.
+- **Les liens pleins.** Un quartier voisin dont le lien est plein (10 demandes servies, §9.11) offre **deux** coups de main au lieu d'un, dans la limite de la réserve.
+- **Jalons (2).** « Bonjour voisin » (saluer une espèce) et « Toute la famille » (deux familles complètes ; une seule, celle des pollinisateurs souvent complète dès la 1ʳᵉ Saison, rendait les Saisons à défi trop courtes), famille du quartier. 159 jalons en tout.
+- **Équilibrage.** Saluer reste un petit geste : au plus quelques envolées de plus par heure pour un joueur qui cherche chaque espèce. Le joueur de référence (§8) ne salue pas ; sa famille des pollinisateurs est complète dès la 1ʳᵉ Saison, les autres après les mesures. 1ʳᵉ Saison 66 min ; 2ᵉ Saison 25 min ; 1ᵉʳ Cycle 2 h 39 (cible 2 h 45) ; Cycles 2 à 4 en 36, 36 et 45 min (cibles 35, 35 et 45), plus près des cibles qu'après M33 ; Saisons à défi gagnées en 23 à 26 min ; essaimages à 4 h et 6 h de jeu (cibles 4 h et 5 h, dans les ±30 %).
+- **Écarts avec la roadmap.** Le vélo-cargo des quartiers au lien plein n'est pas dessiné : leur second coup de main suffit pour ce jalon. « Un temps choisi » devient un échange de prévision de plus, pour garder la règle de D25.
+- **Sauvegarde.** Version 36 : les saluts de chaque espèce et l'heure de jeu du dernier ; aucun pour une sauvegarde plus ancienne.
 
 ## 10. Écrans et interface
 

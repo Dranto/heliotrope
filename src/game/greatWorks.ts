@@ -245,6 +245,39 @@ export function contribute(state: GameState, id: WorkId): GameState {
   return unlockAchievements(build(next, id));
 }
 
+/** Share of a stage's cost the neighbours' helping hand pays (§9.15, M35). */
+export const HAND_STAGE_SHARE = 0.25;
+
+/** The work a helping hand lightens: the unfinished one closest to its next stage. */
+export function handWork(state: GameState): WorkId | null {
+  if (!areGreatWorksOpen(state)) return null;
+  let best: WorkId | null = null;
+  let bestShare = -1;
+  for (const id of WORK_IDS) {
+    const cost = nextStageCost(state, id);
+    if (!cost) continue;
+    const { paid } = state.greatWorks.works[id];
+    const share = paid.light / cost.light;
+    if (share > bestShare) [best, bestShare] = [id, share];
+  }
+  return best;
+}
+
+/**
+ * A helping hand of the neighbours (M35): a quarter of the next stage's Light, Water, baskets
+ * and honey paid for the work closest to it, no further than the stage asks.
+ */
+export function lightenStage(state: GameState): GameState {
+  const id = handWork(state);
+  if (!id) return state;
+  const cost = nextStageCost(state, id)!;
+  const work = state.greatWorks.works[id];
+  const paid = Object.fromEntries(
+    PAYMENTS.map((p) => [p, Math.min(cost[p], work.paid[p] + cost[p] * HAND_STAGE_SHARE)]),
+  ) as Record<Payment, number>;
+  return unlockAchievements(build(withWork(state, id, { stage: work.stage, paid }), id));
+}
+
 /**
  * Build every stage that became ready on its own: its species came back after it was paid.
  * Called by every tick; returns the same state when nothing changes.

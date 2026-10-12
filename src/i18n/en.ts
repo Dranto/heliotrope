@@ -2,6 +2,7 @@
 import type { AllianceId } from '../game/alliances';
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
+import type { FamilyId } from '../game/families';
 import type { FruitId } from '../game/fruits';
 import type { TreeStage } from '../game/orchard';
 import type { CropId, VarietyId } from '../game/seedBank';
@@ -28,12 +29,17 @@ export const en: Texts = {
       flights: (count: number) => `${count} pollen flights`,
       butterflies: (count: number) => `${count} Golden Butterflies caught`,
       owned: (count: number, generator: string) => `${count} × ${generator}`,
+      greet: (species: string) => `Greet on the map: ${species}`,
+      honey: (count: number) => (count > 1 ? `${count} jars of honey` : 'A jar of honey'),
+      paths: (count: number) => (count > 1 ? `${count} new building forms` : 'A new building form'),
     },
     hands: {
       quarter: 'A quarter of an hour of production',
       bloom: 'A Bloom',
       ripen: 'A crop ripe at once',
       flight: 'A pollen flight',
+      works: 'A quarter of a great work stage',
+      sky: 'One more forecast swap',
     },
     offers: (hand: string) => `Offers: ${hand}`,
     from: (district: string) => `From ${district}`,
@@ -382,6 +388,8 @@ export const en: Texts = {
       oldOrchard: 'Old orchards',
       rotation: 'The soil rests',
       oldTree: 'Old tree',
+      hello: 'Hello, neighbour',
+      wholeFamily: 'The whole family',
       skyCreatures: 'Creatures of the sky',
       'cities.1': 'Swarming',
       'cities.3': 'Sister cities',
@@ -515,6 +523,8 @@ export const en: Texts = {
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       rotations: (count: number) => `Harvest ${count} crops sown after a different one`,
       oldTree: 'Pick a fruit tree until it becomes an old tree',
+      greetings: 'Greet a species on the map',
+      families: (count: number) => `Bring ${count} whole families of the Herbier back`,
       weatherSpecies: 'See the five species of the weather come back',
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
@@ -904,6 +914,16 @@ export const en: Texts = {
     returnedMany: (count: string) => `${count} species come back to the neighbourhood!`,
     unknown: 'Species to find',
     found: 'Back',
+    greet: (name: string) => `Greet: ${name}`,
+    families: 'Families of the Herbier',
+    familyNames: {
+      pollinators: 'Pollinators',
+      birds: 'Birds',
+      river: 'River folk',
+      night: 'Night dwellers',
+      weather: 'Species of the weather',
+    } satisfies Record<FamilyId, string>,
+    weatherFamily: 'Under their sky, paths play ×1.75 instead of ×1.5',
     names: {
       poppy: 'Poppy',
       bee: 'Honeybee',

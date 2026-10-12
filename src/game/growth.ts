@@ -129,7 +129,7 @@ export function strengthen(bonus: Bonus, scale: number): Bonus {
 
 /**
  * Bonuses of every path picked at a tier reached; those of the `favoured` buildings, under their
- * weather (M33), play WEATHER_PATH_FACTOR stronger.
+ * weather (M33), play `skyScale` stronger (more with the weather's family complete, M35).
  */
 export function growthBonuses(
   state: {
@@ -137,12 +137,13 @@ export function growthBonuses(
     growth: GrowthState;
   },
   favoured: readonly GeneratorId[] = [],
+  skyScale = WEATHER_PATH_FACTOR,
 ): Bonus[] {
   const bonuses: Bonus[] = [];
   for (const id of GENERATOR_IDS) {
     const reached = reachedTiers(state, id);
     const paths = state.growth.paths[id];
-    const scale = favoured.includes(id) ? WEATHER_PATH_FACTOR : 1;
+    const scale = favoured.includes(id) ? skyScale : 1;
     for (let tier = 0; tier < reached; tier++) {
       const path = paths[tier];
       if (path !== null && path !== undefined) {

@@ -2,6 +2,8 @@
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
 import { WEATHER_IDS, type WeatherId } from './weather';
 import { WEATHER_SPECIES } from './species';
+import { totalGreetings } from './greetings';
+import { completeFamilies } from './families';
 import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
@@ -124,6 +126,10 @@ export type AchievementCondition =
   | { kind: 'weather'; weather: WeatherId }
   /** Every species of the weather back (M33). */
   | { kind: 'weatherSpecies' }
+  /** Species greeted on the map, over the whole game (M35). */
+  | { kind: 'greetings'; count: number }
+  /** Families of the Herbier complete (M35). */
+  | { kind: 'families'; count: number }
   /** Neighbours' requests served over the whole game (§9.11). */
   | { kind: 'requests'; count: number }
   /** Challenge Cycles won (§7.5). */
@@ -235,6 +241,8 @@ export type AchievementId =
   | 'weather.mist'
   | 'weather.heat'
   | 'skyCreatures'
+  | 'hello'
+  | 'wholeFamily'
   | 'firstFavour'
   | 'goodNeighbour'
   | 'lockKeeper'
@@ -425,6 +433,9 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
       }) as const,
   ),
   { id: 'skyCreatures', family: 'neighbourhood', condition: { kind: 'weatherSpecies' } },
+  // The species greeted and the families of the Herbier (M35).
+  { id: 'hello', family: 'neighbourhood', condition: { kind: 'greetings', count: 1 } },
+  { id: 'wholeFamily', family: 'neighbourhood', condition: { kind: 'families', count: 2 } },
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
   {
@@ -690,6 +701,10 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.weather.seen.includes(condition.weather);
     case 'weatherSpecies':
       return WEATHER_SPECIES.every((id) => state.species.includes(id));
+    case 'greetings':
+      return totalGreetings(state) >= condition.count;
+    case 'families':
+      return completeFamilies(state.species).length >= condition.count;
     case 'requests':
       return state.requests.served >= condition.count;
     case 'fruitHarvests':
