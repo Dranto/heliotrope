@@ -109,6 +109,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.rotations(condition.count);
     case 'oldTree':
       return describe.oldTree;
+    case 'weatherSpecies':
+      return describe.weatherSpecies;
     case 'weather':
       return describe.weather(t.weather.day[condition.weather]);
     case 'requests':

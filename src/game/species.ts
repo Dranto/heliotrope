@@ -42,6 +42,10 @@ export const SPECIES_IDS = [
   'greenWoodpecker',
   'newt',
   'snail',
+  'wallLizard',
+  'kestrel',
+  'salamander',
+  'cicada',
 ] as const;
 export type SpeciesId = (typeof SPECIES_IDS)[number];
 
@@ -119,6 +123,11 @@ export const SPECIES_LIST: readonly SpeciesDef[] = [
   { id: 'newt', condition: { kind: 'corridor', family: 'blue', length: SPECIES_LENGTH } },
   // The weather's species (§9.10, M28): the snail comes out under the shower.
   { id: 'snail', condition: { kind: 'weather', weather: 'shower' } },
+  // M33: one species for each other weather.
+  { id: 'wallLizard', condition: { kind: 'weather', weather: 'sun' } },
+  { id: 'kestrel', condition: { kind: 'weather', weather: 'wind' } },
+  { id: 'salamander', condition: { kind: 'weather', weather: 'mist' } },
+  { id: 'cicada', condition: { kind: 'weather', weather: 'heat' } },
 ];
 
 /** The river species (§7.5), beyond the neighbourhood's Herbier. */
@@ -131,7 +140,13 @@ export const CITY_SPECIES: readonly SpeciesId[] = ['skylark', 'swallow', 'dragon
 export const CORRIDOR_SPECIES: readonly SpeciesId[] = ['greenWoodpecker', 'newt'];
 
 /** The species that come out under one weather (§9.10, M28): not needed for the complete Herbier. */
-export const WEATHER_SPECIES: readonly SpeciesId[] = ['snail'];
+export const WEATHER_SPECIES: readonly SpeciesId[] = [
+  'snail',
+  'wallLizard',
+  'kestrel',
+  'salamander',
+  'cicada',
+];
 
 export const SPECIES: Record<SpeciesId, SpeciesDef> = Object.fromEntries(
   SPECIES_LIST.map((s) => [s.id, s]),

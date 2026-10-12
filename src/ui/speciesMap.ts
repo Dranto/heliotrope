@@ -1,7 +1,7 @@
 // Where the species of the Herbier live on the top-down map (docs/game-design.md §9.5): near the
 // parcel, building or project that brought them back. Pure data in world coordinates.
 import type { SpeciesId } from '../game/species';
-import { STREETS } from './neighbourhood';
+import { STREETS, TREES } from './neighbourhood';
 
 const [NORTH, SOUTH] = STREETS.horizontal;
 const [WEST, EAST] = STREETS.vertical;
@@ -128,4 +128,10 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   newt: { spots: [[EAST + MID, 330]], motion: 'hop', size: 13 },
   // The weather's species (§9.10, M28): the snail on the courtyard's paving after the shower.
   snail: { spots: [[352, 262]], motion: 'still', size: 12 },
+  // M33: the lizard on the courtyard's sunny wall, the kestrel hovering over the roofs, the
+  // salamander in the courtyard's damp corner, the cicada in a street tree.
+  wallLizard: { spots: [[276, 212]], motion: 'still', size: 12 },
+  kestrel: { spots: [[420, 64]], motion: 'fly', size: 18 },
+  salamander: { spots: [[268, 260]], motion: 'still', size: 12 },
+  cicada: { spots: [[TREES[2]!.x, TREES[2]!.y]], motion: 'buzz', size: 11 },
 };

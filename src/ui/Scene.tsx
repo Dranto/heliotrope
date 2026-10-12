@@ -61,7 +61,7 @@ import { WeatherForecast, WeatherLayer } from './WeatherArt';
 import { RequestBubbles } from './RequestArt';
 import { isRequestMet } from '../game/requests';
 import { isFlying } from '../game/pollen';
-import { isWeatherOpen, type WeatherId } from '../game/weather';
+import { canSwapForecast, isWeatherOpen, swapForecast, type WeatherId } from '../game/weather';
 import { encodeGrowth } from './growthMap';
 import { reachedTiers } from '../game/growth';
 import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
@@ -76,7 +76,7 @@ import { corridors as corridorsOf } from '../game/corridors';
 import { encodeStages } from './greatWorksMap';
 import { areGreatWorksOpen } from '../game/greatWorks';
 import { ReturnReplay } from './ReturnReplay';
-import { replaySeconds, returnMarks, returnSweeps } from './returnMap';
+import { replaySeconds, returnMarks, returnSkies, returnSweeps } from './returnMap';
 import { encodeDecor } from './decorMap';
 import { DecorToolbar, PhotoToolbar, type PhotoLook } from './MapTools';
 import { useGameState, useGameStore } from './useGame';
@@ -214,15 +214,20 @@ export function Scene({
   // The return in images (§9.1): what grew while away, replayed once after loading.
   const [replay] = useState(() =>
     store.offlineSeconds >= 60
-      ? { marks: returnMarks(store.offlineReport), sweeps: returnSweeps(store.offlineSeconds) }
+      ? {
+          marks: returnMarks(store.offlineReport),
+          skies: returnSkies(store.offlineReport.weathers, returnSweeps(store.offlineSeconds)),
+        }
       : null,
   );
-  const [replaying, setReplaying] = useState(replay !== null && replay.marks.length > 0);
+  const [replaying, setReplaying] = useState(
+    replay !== null && (replay.marks.length > 0 || store.offlineReport.weathers.length > 0),
+  );
   useEffect(() => {
     if (!replaying || !replay) return;
     const timer = setTimeout(
       () => setReplaying(false),
-      replaySeconds(replay.marks.length, replay.sweeps) * 1000,
+      replaySeconds(replay.marks.length, replay.skies.length) * 1000,
     );
     return () => clearTimeout(timer);
   }, [replaying, replay]);
@@ -329,7 +334,7 @@ export function Scene({
         <GardenBeds beds={beds} onHarvest={onHarvest} />
         <DecorLayer slots={decor} editing={editing} onSlot={setDecor} />
         {replaying && replay && !reduced && (
-          <ReturnReplay marks={replay.marks} sweeps={replay.sweeps} />
+          <ReturnReplay marks={replay.marks} skies={replay.skies} />
         )}
         <VisitLayer kind={visitor} onWelcome={welcome} />
         <ParcelOffers
@@ -499,7 +504,14 @@ export function Scene({
         )}
         {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
         {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
-        {weather && <WeatherForecast now={weather} next={forecast.split(',') as WeatherId[]} />}
+        {weather && (
+          <WeatherForecast
+            now={weather}
+            next={forecast.split(',') as WeatherId[]}
+            canSwap={(i) => canSwapForecast(state, i)}
+            onSwap={(i) => store.dispatch((s) => swapForecast(s, i))}
+          />
+        )}
         {mode === 'play' && isDecorOpen(state) && (
           <button type="button" className="scene-tool decor-tool" onClick={() => setMode('decor')}>
             {t.decor.open}

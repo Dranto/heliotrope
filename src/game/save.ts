@@ -128,6 +128,8 @@ const migrations: Record<number, Migration> = {
   // v33 lightens the garden and the orchard (M32): each bed remembers its last crop and its
   // rotation, the garden its rotated harvests and each tree its picks; none for an older save.
   32: (raw) => ({ ...raw, version: 33 }),
+  // v34 lets the forecast be swapped once per Season (M33): never swapped for an older save.
+  33: (raw) => ({ ...raw, version: 34 }),
 };
 
 function isLanguage(value: string): value is Language {

@@ -129,6 +129,27 @@
   height: 0.95rem;
 }
 
+/* Once per Season, the two later forecast weathers can be brought next (M33). */
+.weather-next[data-swappable] {
+  opacity: 0.85;
+}
+
+.weather-swap {
+  display: inline-flex;
+  padding: 0.05rem;
+  border: 1px dashed rgb(217 154 43 / 0.7);
+  border-radius: 999px;
+  background: rgb(255 244 214 / 0.7);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.weather-swap:hover,
+.weather-swap:focus-visible {
+  border-style: solid;
+  background: rgb(255 236 180 / 0.95);
+}
+
 .weather-icon {
   width: 1.3rem;
   height: 1.3rem;

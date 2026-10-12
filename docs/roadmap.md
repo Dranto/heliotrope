@@ -246,7 +246,7 @@ rejoue le simulateur et la partie complète et, si l'état change, ajoute une mi
 | M5 à M30 | *Livrés* (voir §7) | — |
 | **M31 — Les moments qui s'enchaînent** *(livré)* | P30 : bouquet, envolée qui fait briller les voies, Papillon selon le temps, premier clic de Saison | Touche tous les joueurs dès la 1ʳᵉ Saison ; petit, et le bouquet sert de point d'accroche aux jalons suivants |
 | **M32 — Le potager et le verger** *(livré)* | P31 : tout récolter et ressemer, rotation, cultures et temps, fraises et 4 variétés, miel utile, arbres qui vieillissent | Retire la corvée la plus visible ; les fraises et le miel nourrissent la jauge de M31 |
-| **M33 — Les voies et le ciel** | P32 : voies sous leur ciel, temps échangé, quatre espèces du temps, ciel dans le retour en images | Les cultures de M32 suivent aussi le temps : la prévision devient une vraie décision |
+| **M33 — Les voies et le ciel** *(livré)* | P32 : voies sous leur ciel, temps échangé, quatre espèces du temps, ciel dans le retour en images | Les cultures de M32 suivent aussi le temps : la prévision devient une vraie décision |
 | **M34 — Les alliances du milieu** | P33 : six alliances de plus, places dès la 2ᵉ Saison, fils sur la carte | Relie ce que M31 à M33 ont étendu ; a besoin des espèces et des temps vécus |
 | **M35 — L'Herbier et les voisins** | P34 : saluer une espèce, familles et leurs bonus, demandes d'espèce, de miel et de forme, deux récompenses | Les familles comptent les espèces du temps de M33 ; les demandes s'appuient sur le miel de M32 |
 | **M36 — Les boucles confiées, la partie remesurée** | P35 : projets menés par le conseil, jardiniers, apiculteurs, simulateur de la v5 | Clôt la v5 : automatise ce qui lasse et mesure tout ce que M31 à M35 ont ajouté |

@@ -124,21 +124,49 @@ export function WeatherIcon({ id }: { id: WeatherId }) {
   );
 }
 
-/** The weather of the moment and the three forecast ones, in the map's caption. */
-export function WeatherForecast({ now, next }: { now: WeatherId; next: readonly WeatherId[] }) {
+/**
+ * The weather of the moment and the three forecast ones, in the map's caption. Once per Season the
+ * second or third forecast weather can be brought next (M33): those two are then buttons.
+ */
+export function WeatherForecast({
+  now,
+  next,
+  canSwap,
+  onSwap,
+}: {
+  now: WeatherId;
+  next: readonly WeatherId[];
+  canSwap?: (index: number) => boolean;
+  onSwap?: (index: number) => void;
+}) {
   const names = t.weather.names;
+  const label = t.weather.forecast(names[now], next.map((id) => names[id]).join(', '));
+  const swappable = onSwap !== undefined && next.some((_, i) => canSwap?.(i));
   return (
     <span
       className="scene-weather"
-      role="img"
-      aria-label={t.weather.forecast(names[now], next.map((id) => names[id]).join(', '))}
-      title={t.weather.forecast(names[now], next.map((id) => names[id]).join(', '))}
+      role={swappable ? 'group' : 'img'}
+      aria-label={label}
+      title={label}
     >
       <WeatherIcon id={now} />
-      <span className="weather-next">
-        {next.map((id, i) => (
-          <WeatherIcon key={i} id={id} />
-        ))}
+      <span className="weather-next" data-swappable={swappable || undefined}>
+        {next.map((id, i) =>
+          swappable && canSwap?.(i) ? (
+            <button
+              key={i}
+              type="button"
+              className="weather-swap"
+              aria-label={t.weather.swap(names[id])}
+              title={t.weather.swap(names[id])}
+              onClick={() => onSwap(i)}
+            >
+              <WeatherIcon id={id} />
+            </button>
+          ) : (
+            <WeatherIcon key={i} id={id} />
+          ),
+        )}
       </span>
     </span>
   );

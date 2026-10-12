@@ -3,6 +3,7 @@
 // for the Seeds. World units of neighbourhood.ts.
 import type { GeneratorId } from '../game/generators';
 import type { OfflineReport } from '../game/offline';
+import type { WeatherId } from '../game/weather';
 import { BED_PLACES } from './gardenMap';
 import {
   ARCOLOGY_SITE,
@@ -55,6 +56,19 @@ export const MARK_STEP_SECONDS = 0.45;
 /** Sweeps of the sun: one per hour away, at least one, at most four. */
 export function returnSweeps(offlineSeconds: number): number {
   return Math.max(1, Math.min(4, Math.ceil(offlineSeconds / 3600)));
+}
+
+/**
+ * The sky of each sweep (M33): the weathers lived while away, spread over the sweeps, one sweep
+ * per weather when more changed than hours went by (at most four); null where the sky held.
+ */
+export function returnSkies(weathers: readonly WeatherId[], sweeps: number): (WeatherId | null)[] {
+  if (weathers.length === 0) return Array.from({ length: sweeps }, () => null);
+  const count = Math.max(sweeps, Math.min(4, weathers.length));
+  return Array.from(
+    { length: count },
+    (_, i) => weathers[Math.floor((i * weathers.length) / count)]!,
+  );
 }
 
 /** Seconds the whole replay lasts, to take it off the map afterwards. */

@@ -298,7 +298,7 @@ describe('App', () => {
     expect(document.querySelector('.species [data-species="frog"]')).not.toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /Herbier/ }));
     const dialog = await screen.findByRole('dialog', { name: 'L’Herbier' });
-    expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 28');
+    expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 32');
     expect(dialog.querySelector('[data-species="frog"]')).toHaveAttribute('data-found', 'true');
     expect(dialog.querySelector('[data-species="hedgehog"]')).toHaveTextContent(
       'Restaurer Parc du parking',
