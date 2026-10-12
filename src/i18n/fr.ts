@@ -154,10 +154,18 @@ export const fr = {
   },
   tabs: {
     label: 'Sections du jeu',
-    harvest: 'Récolte',
     build: 'Bâtir',
     improve: 'Améliorer',
+    living: 'Le vivant',
+    region: 'La région',
     more: 'Plus',
+    fresh: 'nouveau',
+  },
+  layers: {
+    label: 'Couches du menu',
+    city: 'La ville',
+    living: 'Le vivant',
+    region: 'La région',
   },
   butterfly: {
     catch: 'Attraper le Papillon doré',

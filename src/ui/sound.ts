@@ -14,6 +14,9 @@ export type SoundName =
   | 'butterfly'
   | 'milestone'
   | 'season'
+  | 'harvest'
+  | 'work'
+  | 'alliance'
   | 'bird';
 
 interface Note {
@@ -60,6 +63,13 @@ export function notesFor(name: SoundName, variant = 0): Note[] {
       return [note(4, 0, 0.8, 0.05), note(7, 0.14, 1, 0.05)];
     case 'season':
       return [0, 2, 4, 7].map((degree, i) => note(degree, i * 0.25, 2.4, 0.05, 'triangle'));
+    // M25: a crop or a fruit picked, a stage of a great work or a hive, an alliance woken.
+    case 'harvest':
+      return [note(4, 0, 0.3, 0.06, 'triangle'), note(6, 0.09, 0.5, 0.05, 'triangle')];
+    case 'work':
+      return [note(0, 0, 1.4, 0.06, 'triangle'), note(4, 0.1, 1.4, 0.05), note(7, 0.2, 1.6, 0.04)];
+    case 'alliance':
+      return [note(5, 0, 1, 0.045), note(7, 0.12, 1, 0.04), note(9, 0.24, 1.4, 0.035)];
     case 'bird': {
       const base = 2600 + variant * 900;
       return [0, 0.16, 0.3].map((at, i) => ({

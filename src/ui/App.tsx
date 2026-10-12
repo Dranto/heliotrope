@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { cycleWater, isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { activeChallenge } from '../game/challenges';
 import { activeCycleChallenge } from '../game/cycleChallenges';
@@ -20,6 +20,17 @@ import {
   seedBonus,
   seedsToGain,
 } from '../game/seasons';
+import {
+  markPanelSeen,
+  PANEL_IDS,
+  PANEL_LAYER,
+  panelHasAction,
+  shownLayers,
+  shownPanels,
+  unseenPanels,
+  type LayerId,
+  type PanelId,
+} from '../game/panels';
 import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
 import { availableSeeds, canSowInTree } from '../game/talents';
@@ -31,12 +42,9 @@ import {
   speciesName,
 } from '../i18n/herbier';
 import { setLanguage, t } from '../i18n';
-import { Achievements } from './Achievements';
 import { Bioregion, WaterIcon } from './Bioregion';
 import { Cooperatives } from './Cooperatives';
-import { Cycles } from './Cycles';
 import { Generators } from './Generators';
-import { Herbier } from './Herbier';
 import { useLayoutPref } from './layoutPrefs';
 import { MilestoneBloom } from './MilestoneBloom';
 import { Options } from './Options';
@@ -45,14 +53,10 @@ import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
 import { Orchard } from './Orchard';
 import { Alliances } from './Alliances';
-import { Cities } from './Cities';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest } from '../game/garden';
 import { Scene } from './Scene';
-import { Seasons } from './Seasons';
-import { SeasonTree } from './SeasonTree';
 import { SpeciesArt } from './SpeciesArt';
-import { Stats } from './Stats';
 import { Upgrades } from './Upgrades';
 import { useGameState, useGameStore } from './useGame';
 import { useSounds } from './useSounds';
@@ -61,11 +65,50 @@ import { useReminders } from './useReminders';
 import type { OfflineReport } from '../game/offline';
 import { isRipe } from '../game/garden';
 
+// The screens load on first opening (M25), so the map shows sooner on a phone.
+const Achievements = lazy(() =>
+  import('./Achievements').then((m) => ({ default: m.Achievements })),
+);
+const Herbier = lazy(() => import('./Herbier').then((m) => ({ default: m.Herbier })));
+const Seasons = lazy(() => import('./Seasons').then((m) => ({ default: m.Seasons })));
+const SeasonTree = lazy(() => import('./SeasonTree').then((m) => ({ default: m.SeasonTree })));
+const Cycles = lazy(() => import('./Cycles').then((m) => ({ default: m.Cycles })));
+const Cities = lazy(() => import('./Cities').then((m) => ({ default: m.Cities })));
+const Stats = lazy(() => import('./Stats').then((m) => ({ default: m.Stats })));
+
 type Screen =
   'achievements' | 'herbier' | 'seasons' | 'tree' | 'cycles' | 'cities' | 'stats' | 'options';
-/** §10.3: mobile tab bar sections. */
-type Tab = 'harvest' | 'build' | 'improve' | 'more';
-const TABS: Tab[] = ['harvest', 'build', 'improve', 'more'];
+/** §10.1, §10.3: the sections of the side menu; the phone's tab bar shows each one. */
+type Tab = 'build' | 'improve' | 'living' | 'region' | 'more';
+const TABS: Tab[] = ['build', 'improve', 'living', 'region', 'more'];
+/** The panels each section shows; on a wider screen, build and improve form the city. */
+const TAB_PANELS: Record<Tab, PanelId[]> = {
+  build: ['generators', 'cooperatives'],
+  improve: ['upgrades', 'restoration'],
+  living: ['garden', 'orchard', 'alliances'],
+  region: ['bioregion', 'greatWorks'],
+  more: [],
+};
+const TAB_LAYER: Record<Tab, LayerId> = {
+  build: 'city',
+  improve: 'city',
+  living: 'living',
+  region: 'region',
+  more: 'city',
+};
+const LAYER_TAB: Record<LayerId, Tab> = { city: 'build', living: 'living', region: 'region' };
+/** The class of each panel's section, to know which one the player touched. */
+const PANEL_CLASS: Record<PanelId, string> = {
+  upgrades: 'upgrades',
+  generators: 'generators',
+  restoration: 'restoration',
+  cooperatives: 'cooperatives',
+  garden: 'garden-panel',
+  orchard: 'orchard-panel',
+  alliances: 'alliances-panel',
+  bioregion: 'bioregion',
+  greatWorks: 'works-panel',
+};
 
 interface Toast {
   id: number;
@@ -102,17 +145,20 @@ function SeedIcon() {
   );
 }
 
-function TabIcon({ tab }: { tab: Tab }) {
-  const paths: Record<Tab, string> = {
-    harvest:
-      'M12 21v-7M12 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM12 3v2M5 11H3M21 11h-2M6.5 5.5 8 7M17.5 5.5 16 7',
-    build: 'M4 20V10l5-4 5 4v10M14 20V6l6-2v16M3 20h18',
-    improve: 'M12 20V8M7 13l5-5 5 5M6 4h12',
-    more: 'M5 11.2v1.6M12 11.2v1.6M19 11.2v1.6',
-  };
+const TAB_PATHS: Record<Tab | LayerId, string> = {
+  build: 'M4 20V10l5-4 5 4v10M14 20V6l6-2v16M3 20h18',
+  improve: 'M12 20V8M7 13l5-5 5 5M6 4h12',
+  city: 'M4 20V10l5-4 5 4v10M14 20V6l6-2v16M3 20h18',
+  living:
+    'M12 21v-7M12 14c-4 0-6-2.5-6.5-6 4 0 6 2.5 6.5 6ZM12 12c3.5 0 5.5-2.2 6-5.5-3.5 0-5.5 2.2-6 5.5Z',
+  region: 'M3 18c3-4 5-6 8-6s4 3 6 3 3-1 4-2M3 12l5-6 4 4 3-3 6 6M3 21h18',
+  more: 'M5 11.2v1.6M12 11.2v1.6M19 11.2v1.6',
+};
+
+function TabIcon({ tab }: { tab: Tab | LayerId }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d={paths[tab]} />
+      <path d={TAB_PATHS[tab]} />
     </svg>
   );
 }
@@ -177,7 +223,7 @@ export function App() {
   const store = useGameStore();
   const state = useGameState();
   const [screen, setScreen] = useState<Screen | null>(null);
-  const [tab, setTab] = useState<Tab>('harvest');
+  const [savedTab, setTab] = useLayoutPref<Tab>('tab', 'build');
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [highlight, setHighlight] = useState<ParcelId | null>(null);
   const [sideOpen, setSideOpen] = useLayoutPref('side', true);
@@ -286,6 +332,22 @@ export function App() {
   const seedsToSow = availableSeeds(state);
   const canSow = canSowInTree(state);
   const sourceGain = sourcesToGain(state);
+
+  // §10.1 (M25): the side menu by layers, opened as the player reaches them. A panel the player
+  // has not touched yet glows, and its section's tab carries a gold dot until it is opened.
+  const layers = shownLayers(state);
+  const isTabShown = (id: Tab) => TAB_LAYER[id] === 'city' || layers.includes(TAB_LAYER[id]);
+  const tab: Tab = isTabShown(savedTab) ? savedTab : 'build';
+  const layer = TAB_LAYER[tab];
+  const unseen = unseenPanels(state);
+  const withAction = shownPanels(state).filter((id) => panelHasAction(state, id));
+  const isFresh = (panels: readonly PanelId[]) => panels.some((id) => unseen.includes(id));
+  const layerPanels = (id: LayerId) => PANEL_IDS.filter((panel) => PANEL_LAYER[panel] === id);
+  const touchPanel = (target: EventTarget) => {
+    const section = target instanceof Element ? target.closest('section.panel') : null;
+    const id = unseen.find((panel) => section?.classList.contains(PANEL_CLASS[panel]));
+    if (id) store.dispatch((s) => markPanelSeen(s, id));
+  };
 
   const menu = (
     <nav className="menu" aria-label={t.menu}>
@@ -416,6 +478,7 @@ export function App() {
     <div
       className="app"
       data-tab={tab}
+      data-layer={layer}
       data-side={sideOpen ? 'open' : 'closed'}
       data-motion={state.settings.reducedMotion ? 'reduced' : undefined}
     >
@@ -582,7 +645,33 @@ export function App() {
               <path d={sideOpen ? 'M10 7l5 5-5 5' : 'M14 7l-5 5 5 5'} />
             </svg>
           </button>
-          <div className="side-panels" id="side-panels">
+          <div
+            className="side-panels"
+            id="side-panels"
+            data-new={unseen.join(' ')}
+            data-action={withAction.join(' ')}
+            onPointerDown={(event) => touchPanel(event.target)}
+            onFocus={(event) => touchPanel(event.target)}
+          >
+            {layers.length > 1 && (
+              <nav className="layerbar" aria-label={t.layers.label}>
+                {layers.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-current={layer === id ? 'page' : undefined}
+                    data-new={layer !== id && isFresh(layerPanels(id))}
+                    onClick={() => layer !== id && setTab(LAYER_TAB[id])}
+                  >
+                    <TabIcon tab={id} />
+                    {t.layers[id]}
+                    {layer !== id && isFresh(layerPanels(id)) && (
+                      <span className="visually-hidden"> ({t.tabs.fresh})</span>
+                    )}
+                  </button>
+                ))}
+              </nav>
+            )}
             <div className="side-column">
               <Upgrades />
               <Restoration onHighlight={setHighlight} />
@@ -601,15 +690,19 @@ export function App() {
       </main>
 
       <nav className="tabbar" aria-label={t.tabs.label}>
-        {TABS.map((id) => (
+        {TABS.filter(isTabShown).map((id) => (
           <button
             key={id}
             type="button"
             aria-current={tab === id ? 'page' : undefined}
+            data-new={tab !== id && isFresh(TAB_PANELS[id])}
             onClick={() => setTab(id)}
           >
             <TabIcon tab={id} />
             {t.tabs[id]}
+            {tab !== id && isFresh(TAB_PANELS[id]) && (
+              <span className="visually-hidden"> ({t.tabs.fresh})</span>
+            )}
           </button>
         ))}
       </nav>
@@ -627,15 +720,17 @@ export function App() {
 
       <MilestoneBloom />
 
-      {screen === 'achievements' && <Achievements onClose={closeScreen} />}
-      {screen === 'herbier' && <Herbier onClose={closeScreen} />}
-      {screen === 'seasons' && (
-        <Seasons onClose={closeScreen} onOpenTree={() => setScreen('tree')} />
-      )}
-      {screen === 'tree' && <SeasonTree onClose={closeScreen} />}
-      {screen === 'cycles' && <Cycles onClose={closeScreen} />}
-      {screen === 'cities' && <Cities onClose={closeScreen} />}
-      {screen === 'stats' && <Stats onClose={closeScreen} />}
+      <Suspense fallback={null}>
+        {screen === 'achievements' && <Achievements onClose={closeScreen} />}
+        {screen === 'herbier' && <Herbier onClose={closeScreen} />}
+        {screen === 'seasons' && (
+          <Seasons onClose={closeScreen} onOpenTree={() => setScreen('tree')} />
+        )}
+        {screen === 'tree' && <SeasonTree onClose={closeScreen} />}
+        {screen === 'cycles' && <Cycles onClose={closeScreen} />}
+        {screen === 'cities' && <Cities onClose={closeScreen} />}
+        {screen === 'stats' && <Stats onClose={closeScreen} />}
+      </Suspense>
       {screen === 'options' && <Options onClose={closeScreen} />}
     </div>
   );

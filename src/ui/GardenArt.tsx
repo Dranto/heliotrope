@@ -175,6 +175,7 @@ export const GardenBeds = memo(function GardenBeds({
           >
             <title>{label}</title>
             <rect className="bed-ring" x="-6" y="-10" width="12" height="20" rx="3" />
+            <circle className="tap-hit" r="16" />
             <Bed crop={crop} stage={stage} />
           </g>
         );

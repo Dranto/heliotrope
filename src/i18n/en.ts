@@ -108,10 +108,18 @@ export const en: Texts = {
   },
   tabs: {
     label: 'Game sections',
-    harvest: 'Harvest',
     build: 'Build',
     improve: 'Improve',
+    living: 'Living',
+    region: 'Region',
     more: 'More',
+    fresh: 'new',
+  },
+  layers: {
+    label: 'Menu layers',
+    city: 'The city',
+    living: 'The living',
+    region: 'The region',
   },
   butterfly: {
     catch: 'Catch the Golden Butterfly',

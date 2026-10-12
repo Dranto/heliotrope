@@ -10,6 +10,24 @@
   fill: transparent;
 }
 
+/* M25: fingers get a wider ring than the mouse around what can be tapped on the map. */
+.tap-hit {
+  display: none;
+  fill: transparent;
+}
+
+@media (pointer: coarse) {
+  .tap-hit {
+    display: inline;
+  }
+
+  .visit-hit {
+    transform: scale(1.6);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+}
+
 .visit-ring {
   fill: rgb(244 192 99 / 0.18);
   stroke: var(--gold);
