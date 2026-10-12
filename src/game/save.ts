@@ -15,6 +15,7 @@ import { validGreatWorks } from './greatWorks';
 import { validOrchard } from './orchard';
 import { validCity } from './cities';
 import { validAlliances } from './alliances';
+import { validGrowth } from './growth';
 import { isPanelId, shownPanels, type PanelId } from './panels';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
@@ -106,6 +107,8 @@ const migrations: Record<number, Migration> = {
   // v26 remembers the side menu panels touched (§10.1, M25): an older save has seen every panel
   // it shows, filled in below once the state is read.
   25: (raw) => ({ ...raw, version: 26 }),
+  // v27 adds the paths of the buildings that grow (§5.5, M26): none picked yet.
+  26: (raw) => ({ ...raw, version: 27 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -321,6 +324,7 @@ export function deserialize(json: string, now: number): GameState | null {
   state.orchard = validOrchard(data.orchard);
   state.city = validCity(data.city);
   state.alliances = validAlliances(data.alliances);
+  state.growth = validGrowth(data.growth);
   if (Array.isArray(data.seenPanels)) {
     state.seenPanels = [...new Set<PanelId>(data.seenPanels.filter(isPanelId))];
   }

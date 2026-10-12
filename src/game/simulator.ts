@@ -145,6 +145,22 @@ function bestOption(state: GameState, clicksPerSecond: number): Option {
   return best;
 }
 
+/**
+ * M26 (§5.5): the reference player picks the first path of every tier of the buildings that grow,
+ * ahead of reaching it, and keeps it.
+ */
+export function withReferencePaths(state: GameState): GameState {
+  const unset = GENERATOR_IDS.some((id) => state.growth.paths[id].includes(null));
+  if (!unset) return state;
+  const paths = Object.fromEntries(
+    GENERATOR_IDS.map((id) => [id, state.growth.paths[id].map((p) => p ?? REFERENCE_PATH)]),
+  ) as GameState['growth']['paths'];
+  return { ...state, growth: { ...state.growth, paths } };
+}
+
+/** The path the reference player picks at every tier. */
+export const REFERENCE_PATH = 0;
+
 export function simulate({
   state: start = createInitialState(0),
   stopWhenAdvised = false,
@@ -155,7 +171,7 @@ export function simulate({
   butterflyCatchRate = REFERENCE_BUTTERFLY_CATCH_RATE,
   stopAtSeeds = Infinity,
 }: SimulationOptions = {}): SimulationResult {
-  let state = start;
+  let state = withReferencePaths(start);
   let butterfliesSeen = 0;
   let watching = false;
   /** Catch the butterfly on screen, or let it fly away, to match the catch rate. */
@@ -175,6 +191,13 @@ export function simulate({
   };
   let seconds = 0;
   const firstGenerator: SimulationResult['firstGenerator'] = {};
+  /** The first unit of each generator, bought by the player or by a Cooperative (§7.2). */
+  const noteFirstGenerators = () => {
+    for (const id of GENERATOR_IDS) {
+      if (firstGenerator[id] === undefined && state.generators[id] > 0)
+        firstGenerator[id] = seconds;
+    }
+  };
   let advisedSeason: number | undefined;
 
   let challengeWon: number | undefined;
@@ -200,6 +223,7 @@ export function simulate({
       state = { ...state, clicks: state.clicks + clicks };
       seconds += dt;
       watchButterfly();
+      noteFirstGenerators();
       // Tiny floating-point leftovers: top up rather than looping on sub-microsecond waits.
       if (price - state.resources.light > 1e-9 * price) {
         if (advisedSeason === undefined && state.totalLight >= ADVISED_SEASON_LIGHT) {
@@ -223,9 +247,7 @@ export function simulate({
       continue;
     }
     state = bought;
-    if (option.kind === 'generator' && firstGenerator[option.id] === undefined) {
-      firstGenerator[option.id] = seconds;
-    }
+    noteFirstGenerators();
     if (advisedSeason === undefined && state.totalLight >= ADVISED_SEASON_LIGHT) {
       advisedSeason = seconds;
     }

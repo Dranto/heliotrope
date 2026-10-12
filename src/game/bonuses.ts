@@ -14,6 +14,7 @@ import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
 import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
 import { greatWorksBonuses, type WorkId } from './greatWorks';
+import { growthBonuses, type GrowthState } from './growth';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
@@ -65,7 +66,13 @@ export type Bonus =
   /** Multiplies how fast the courtyard garden's crops grow (§9.7, §6.6). */
   | { kind: 'gardenGrowth'; factor: number }
   /** The neighbours bring `units` more of their building (§9.6). */
-  | { kind: 'cuttingsGift'; units: number };
+  | { kind: 'cuttingsGift'; units: number }
+  /** `generator` gains `bonusPerUnit` (additive, like a synergy) per unit of `source` (§5.5). */
+  | { kind: 'feeds'; generator: GeneratorId; source: GeneratorId; bonusPerUnit: number }
+  /** `generator` gains `bonus` (additive) per species back in the Herbier (§5.5). */
+  | { kind: 'perSpecies'; generator: GeneratorId; bonus: number }
+  /** `generator` gains `bonus` (additive) per parcel restored (§5.5). */
+  | { kind: 'generatorPerParcel'; generator: GeneratorId; bonus: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -100,6 +107,8 @@ export interface BonusSource {
   orchard?: { varieties: readonly FruitId[] };
   /** The sister cities (§7.6, M23); absent where none can be. */
   city?: CitySource;
+  /** The paths picked as the buildings grow (§5.5, M26); absent where none can be. */
+  growth?: GrowthState;
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -115,6 +124,18 @@ function isGameState(source: BonusSource): source is GameState {
  * Cycles won and the hillsides site (§7.5).
  */
 export function activeBonuses(source: BonusSource): Bonus[] {
+  // States are never mutated, so the list is computed once per state: the formulas ask for it
+  // dozens of times per tick and per render.
+  const cached = bonusCache.get(source);
+  if (cached) return cached;
+  const bonuses = collectBonuses(source);
+  bonusCache.set(source, bonuses);
+  return bonuses;
+}
+
+const bonusCache = new WeakMap<BonusSource, Bonus[]>();
+
+function collectBonuses(source: BonusSource): Bonus[] {
   const {
     parcels,
     futures,
@@ -130,6 +151,7 @@ export function activeBonuses(source: BonusSource): Bonus[] {
     greatWorks,
     orchard,
     city,
+    growth,
   } = source;
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
@@ -148,6 +170,7 @@ export function activeBonuses(source: BonusSource): Bonus[] {
     ...corridorBonuses({ parcels, futures }),
     ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
     ...(city ? cityBonuses(city) : []),
+    ...(growth ? growthBonuses({ generators: source.generators, growth }) : []),
     ...(isGameState(source) ? allianceBonuses(source) : []),
   ];
 }

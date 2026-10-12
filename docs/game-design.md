@@ -202,6 +202,30 @@ Mécanique passive propre au thème : **chaque type de générateur possédé à
 
 ---
 
+### 5.5 Les bâtiments qui grandissent (M26)
+
+Roadmap P25. Chaque bâtiment prend **trois formes** à **50, 100 et 200 exemplaires** possédés dans la Saison, et à chacune le joueur **choisit une voie** parmi deux. Les deux voies se valent : l'une renforce souvent le bâtiment lui-même, l'autre le relie à un autre système. Code dans `src/game/growth.ts`, choix dans le panneau Bâtir (`src/ui/Generators.tsx`), marques sur la carte dans `src/ui/GrowthArt.tsx`.
+
+| Bâtiment | 50 exemplaires | 100 exemplaires | 200 exemplaires |
+|---|---|---|---|
+| Héliotrope en pot | Jardinière fleurie : clic +0,25 par pot · ou le Potager sur le toit +0,25 % par pot | Mur de pots : pots ×1,5 · ou le potager de la cour pousse ×1,15 plus vite | Cascade de pots : pots +5 % par espèce de l'Herbier · ou toute la production +2 % |
+| Panneau de balcon | Pergola solaire : clic +1 par panneau · ou la Serre +0,25 % par panneau | Treille photovoltaïque : panneaux ×1,5 · ou la Floraison dure ×1,25 | Façade solaire : panneaux ×1,5 · ou panneaux +5 % par parcelle restaurée |
+| Potager sur le toit | Potager en terrasses : le potager de la cour pousse ×1,15 plus vite · ou potagers +4 % par parcelle | Toit nourricier : potagers ×1,5 · ou la Ferme verticale +0,2 % par potager | Jardin suspendu : Récolte du Papillon ×1,5 · ou potagers +2,5 % par espèce |
+| Serre communautaire | Serre à étages : serres ×1,25 · ou le Potager sur le toit +0,5 % par serre | Jardin d'hiver : le potager pousse ×1,2 plus vite · ou serres +2,5 % par espèce | Palais de verre : serres ×1,5 · ou toute la production +2 % |
+| Ferme verticale | Tour maraîchère : fermes ×1,25 · ou clic +25 par ferme | Ferme-cathédrale : la Centrale +0,25 % par ferme · ou fermes ×1,4 | Ferme-forêt : fermes ×1,5 · ou biodiversité ×1,05 |
+| Centrale à miroirs | Miroirs-tournesols : la Floraison dure ×1,25 · ou l'Eau ×1,15 | Couronne de miroirs : centrales ×1,5 · ou le Papillon revient 10 % plus vite | Soleil captif : centrales ×1,5 · ou la Canopée urbaine +0,5 % par centrale |
+| Canopée urbaine | Allée ombragée : canopées ×1,25 · ou les visites reviennent 10 % plus vite | Forêt urbaine : canopées +1 % par espèce · ou biodiversité ×1,05 | Canopée continue : canopées ×1,5 · ou +1 h de plafond hors ligne |
+| Arcologie vivante | Arcologie fleurie : arcologies ×1,25 · ou bâtiments 5 % moins chers | Arcologie-jardin : arcologies +1 % par espèce · ou toute la production +3 % | Arcologie-monde : arcologies ×1,5 · ou +1 % de production par type de bâtiment |
+
+Les liens entre bâtiments (« +0,25 % par pot ») s'ajoutent aux synergies du §5.3 et suivent leurs multiplicateurs.
+
+- **Choisir.** Sous chaque bâtiment, trois pastilles montrent ses formes : vide avant le seuil, pleine une fois atteint, dorée pour la première voie, lilas pour la seconde. Un seuil atteint sans voie fait respirer sa pastille et ouvre seul le choix : deux boutons, chacun avec son effet. Le panneau replié porte alors son point doré (§10.7). Une voie se choisit aussi **à l'avance**, avant son seuil : elle jouera dès qu'il sera atteint.
+- **Changer (décision D18).** Une voie pas encore atteinte se change librement. Une voie qui joue se change **une fois par bâtiment et par Saison**. Les voies restent d'une Saison, d'un Cycle et d'une ville à l'autre ; comme les bâtiments recommencent à chaque Saison, chaque forme se regagne.
+- **Sur la carte.** Chaque forme atteinte avec sa voie couronne les premières places du bâtiment (les pots du coin de la cour, les panneaux des toits, les premières serres et fermes, la tour des miroirs, les premiers arbres, l'arcologie) : une couronne de feuilles aux baies de la couleur de la voie, puis une fleur, puis un halo qui respire (immobile avec les animations réduites). Dessinées en SVG par-dessus les deux rendus.
+- **Simulateur.** Le joueur de référence prend la première voie partout, choisie à l'avance (`withReferencePaths`). La 1ʳᵉ Saison conseillée passe de 74 à 72 min (cible 80 min), la Centrale à miroirs de 23 à 22 min : un adoucissement par synergies, comme voulu (§5.3). Les voies restent modestes (×1,25 à ×1,5) parce qu'elles jouent dans toutes les Saisons suivantes : deux fois plus fortes, elles faisaient tenir le 2ᵉ Cycle en 2 Saisons au lieu de 3 (24 min pour une cible de 35). Avec ces valeurs, ses Sources atteignent 7,4 sur 8 au bout de 2 Saisons avec la première voie partout, 7,9 avec la seconde. Le simulateur compte aussi le premier exemplaire acheté par une Coopérative (§7.2).
+- **Jalons (2).** « Première voie » (une voie qui joue), « La ville aux mille formes » (12 voies qui jouent). 142 jalons en tout.
+- **Sauvegarde.** Version 27 : les voies et la Saison du dernier changement de chaque bâtiment, vides pour une sauvegarde plus ancienne.
+
 ## 6. Phases de progression
 
 Chaque phase change la scène centrale (le décor reverdit) et débloque des éléments d'interface. Les durées sont des cibles pour un joueur qui joue activement la première fois *(à valider)*.
@@ -823,7 +847,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).

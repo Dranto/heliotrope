@@ -55,6 +55,16 @@ export function bonusText(bonus: Bonus): string {
       return b.perDistrict(formatPercent(bonus.bonus));
     case 'gardenGrowth':
       return b.gardenGrowth(factor(bonus.factor));
+    case 'feeds':
+      return b.feeds(
+        t.generators[bonus.generator].name,
+        t.generators[bonus.source].name,
+        formatPercent(bonus.bonusPerUnit),
+      );
+    case 'perSpecies':
+      return b.perSpecies(t.generators[bonus.generator].name, formatPercent(bonus.bonus));
+    case 'generatorPerParcel':
+      return b.generatorPerParcel(t.generators[bonus.generator].name, formatPercent(bonus.bonus));
   }
 }
 

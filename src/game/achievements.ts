@@ -1,5 +1,6 @@
 // Milestones ("Jalons", docs/game-design.md §9.3). Data table plus pure unlock checks; names
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
+import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
@@ -99,6 +100,8 @@ export type AchievementCondition =
   /** Alliances chosen and awake (§9.9), and the grand bloom. */
   | { kind: 'alliances'; count: number }
   | { kind: 'grandBloom' }
+  /** Paths working on the buildings that grow (§5.5). */
+  | { kind: 'paths'; count: number }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -193,6 +196,8 @@ export type AchievementId =
   | `cities.${(typeof CITY_STEPS)[number]}`
   | 'firstAlliance'
   | 'grandBloom'
+  | 'firstPath'
+  | 'manyPaths'
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -350,6 +355,9 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   // The alliances and the grand bloom (§9.9).
   { id: 'firstAlliance', family: 'neighbourhood', condition: { kind: 'alliances', count: 1 } },
   { id: 'grandBloom', family: 'neighbourhood', condition: { kind: 'grandBloom' } },
+  // The buildings that grow (§5.5).
+  { id: 'firstPath', family: 'buildings', condition: { kind: 'paths', count: 1 } },
+  { id: 'manyPaths', family: 'buildings', condition: { kind: 'paths', count: 12 } },
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
   {
@@ -594,6 +602,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return workingAlliances(state).length >= condition.count;
     case 'grandBloom':
       return state.alliances.bloomed;
+    case 'paths':
+      return pathsWorking(state) >= condition.count;
     case 'fruitHarvests':
       return state.orchard.harvests >= condition.count;
     case 'fruitVarieties':

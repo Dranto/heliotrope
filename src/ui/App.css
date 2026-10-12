@@ -1529,6 +1529,104 @@ button {
   color: var(--leaf);
 }
 
+/* §5.5 (M26): the three forms of a building, and the fork of two paths. Gold for the first path,
+   lilac for the second; a reached tier without a path breathes until one is picked. */
+.growth {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.growth-pips {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.growth-pip {
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  border: 1.5px solid var(--sage);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.growth-pip[data-reached='true'] {
+  background: rgb(143 174 139 / 0.4);
+}
+
+.growth-pip[data-path='0'] {
+  border-color: var(--gold);
+}
+
+.growth-pip[data-path='1'] {
+  border-color: var(--lilac);
+}
+
+.growth-pip[data-reached='true'][data-path='0'] {
+  background: var(--gold);
+}
+
+.growth-pip[data-reached='true'][data-path='1'] {
+  background: var(--lilac);
+}
+
+.growth-pip[data-pending='true'] {
+  border-color: var(--gold);
+  animation: fresh-dot 1.8s ease-in-out infinite;
+}
+
+.growth-pip[aria-expanded='true'] {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
+}
+
+.growth-pip:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
+}
+
+.growth-fork {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+
+.growth-path {
+  padding: 0.45rem 0.6rem;
+  border: 1.5px solid rgb(233 169 59 / 0.55);
+  border-radius: 0.8rem;
+  background: rgb(255 255 255 / 0.7);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.growth-path[data-path='1'] {
+  border-color: rgb(183 154 214 / 0.7);
+}
+
+.growth-path[aria-pressed='true'][data-path='0'] {
+  background: rgb(246 213 143 / 0.6);
+}
+
+.growth-path[aria-pressed='true'][data-path='1'] {
+  background: rgb(183 154 214 / 0.35);
+}
+
+.growth-path:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.app[data-motion='reduced'] .growth-pip {
+  animation: none;
+}
+
 .owned {
   min-width: 2ch;
   font-family: var(--serif);
