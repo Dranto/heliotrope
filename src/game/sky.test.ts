@@ -86,6 +86,14 @@ describe('the forecast swapped once per Season (M33, D25)', () => {
     expect(canSwapForecast({ ...swapped, seasons: 2 }, 1)).toBe(true);
   });
 
+  it('stays used for the Season after the weather changes', () => {
+    const swapped = swapForecast(state, 1);
+    const later = advanceWeather(swapped, swapped.weather.remaining + 1);
+    expect(later.weather.current).not.toBe(swapped.weather.current);
+    expect(later.weather.swapped).toBe(1);
+    expect(canSwapForecast(later, 1)).toBe(false);
+  });
+
   it('stays closed with the sky, and for a weather equal to the next one', () => {
     const first = { ...state, seasons: 0 };
     expect(swapForecast(first, 1)).toBe(first);

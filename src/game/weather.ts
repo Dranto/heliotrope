@@ -126,7 +126,7 @@ export function advanceWeather<
     remaining += length;
     if (!seen.includes(current)) seen = [...seen, current];
   }
-  return { ...state, weather: { current, remaining, forecast, seed, seen } };
+  return { ...state, weather: { ...weather, current, remaining, forecast, seed, seen } };
 }
 
 /** The weather a building's paths play stronger under. */
