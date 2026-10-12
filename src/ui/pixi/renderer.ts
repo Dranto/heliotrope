@@ -11,6 +11,7 @@ import {
   Container,
   DisplacementFilter,
   Graphics,
+  RenderTexture,
   Sprite,
   Texture,
   TilingSprite,
@@ -401,8 +402,13 @@ export class MapRenderer {
   private shadowLayer = new Container();
   private treeShadows = new Graphics();
   private treeShadowLayer = new Container();
-  /** The blurred shadows are kept as textures, redrawn only when the sun has moved. */
-  private shadowCaches = [new Container(), new Container()];
+  /**
+   * The blurred shadows are kept as textures, redrawn only when the sun has moved. They are drawn
+   * into textures of their own size: cached with `cacheAsTexture`, the blur was cut at the size of
+   * the canvas, leaving straight edges across the map on small or low-density screens.
+   */
+  private shadowSprites = [new Sprite(), new Sprite()];
+  private shadowTextures: (RenderTexture | null)[] = [null, null];
   private shadowRes = 0;
   private items = new Container();
   private groups = new Map<Group, Container>();
@@ -509,8 +515,6 @@ export class MapRenderer {
     this.outskirts = new TilingSprite({ texture: Texture.WHITE, width: 10, height: 10 });
     this.outskirts.alpha = 0.75;
     this.shadowLayer.addChild(this.shadows);
-    this.shadowCaches[0]!.addChild(this.shadowLayer);
-    this.shadowCaches[1]!.addChild(this.treeShadowLayer);
     this.shadowLayer.filters = [new BlurFilter({ strength: 3, quality: 3 })];
     this.treeShadowLayer.addChild(this.treeShadows);
     this.treeShadowLayer.filters = [new BlurFilter({ strength: 2, quality: 2 })];
@@ -533,8 +537,8 @@ export class MapRenderer {
       const container = new Container();
       this.groups.set(group, container);
       // Buildings cast on the ground, under every roof; trees on roofs and gardens too.
-      if (group === 'buildings') this.items.addChild(this.shadowCaches[0]!);
-      if (group === 'urbanCanopy') this.items.addChild(this.shadowCaches[1]!);
+      if (group === 'buildings') this.items.addChild(this.shadowSprites[0]!);
+      if (group === 'urbanCanopy') this.items.addChild(this.shadowSprites[1]!);
       // Water lies over the river's banks and in the arcology's heart, under its footbridges.
       if (group === 'bridges') this.items.addChild(this.water);
       this.items.addChild(container);
@@ -1438,8 +1442,8 @@ export class MapRenderer {
         ).fill(0x46372a);
       }
     }
-    this.shadowLayer.alpha = this.palette.shadowAlpha;
-    this.treeShadowLayer.alpha = this.palette.shadowAlpha * 1.1;
+    this.shadowSprites[0]!.alpha = this.palette.shadowAlpha;
+    this.shadowSprites[1]!.alpha = this.palette.shadowAlpha * 1.1;
     // Blurred once into a texture of a few pixels per world unit: soft edges of about two
     // world units, and no blur to redo at every frame.
     const res = Math.min(this.res, 3);
@@ -1447,13 +1451,40 @@ export class MapRenderer {
       this.shadowRes = res;
       (this.shadowLayer.filters?.[0] as BlurFilter).strength = res * 2;
       (this.treeShadowLayer.filters?.[0] as BlurFilter).strength = res * 1.2;
-      for (const cache of this.shadowCaches) {
-        cache.cacheAsTexture(false);
-        cache.cacheAsTexture({ resolution: res, antialias: false });
-      }
-    } else {
-      for (const cache of this.shadowCaches) cache.updateCacheTexture();
     }
+    [this.shadowLayer, this.treeShadowLayer].forEach((layer, i) => this.bakeShadows(layer, i, res));
+  }
+
+  /** Draws one blurred shadow layer into its texture, with room around it for the blur. */
+  private bakeShadows(layer: Container, i: number, res: number): void {
+    const sprite = this.shadowSprites[i]!;
+    const graphics = layer.children[0]!;
+    const bounds = graphics.getLocalBounds();
+    if (bounds.width <= 0 || bounds.height <= 0) {
+      sprite.visible = false;
+      return;
+    }
+    const margin = 8;
+    const x = Math.floor(bounds.x - margin);
+    const y = Math.floor(bounds.y - margin);
+    const width = Math.ceil(bounds.x + bounds.width + margin) - x;
+    const height = Math.ceil(bounds.y + bounds.height + margin) - y;
+    let texture = this.shadowTextures[i];
+    if (
+      !texture ||
+      texture.width !== width ||
+      texture.height !== height ||
+      texture.source.resolution !== res
+    ) {
+      texture?.destroy(true);
+      texture = RenderTexture.create({ width, height, resolution: res, antialias: false });
+      this.shadowTextures[i] = texture;
+      sprite.texture = texture;
+    }
+    layer.position.set(-x, -y);
+    this.app.renderer.render({ container: layer, target: texture, clear: true });
+    sprite.position.set(x, y);
+    sprite.visible = true;
   }
 
   private drawBeams(t: number): void {
