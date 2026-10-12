@@ -50,6 +50,16 @@ export function generatorMultiplier(state: GameState, id: GeneratorId): number {
   for (const bonus of bonusesOf(state, 'perType')) {
     if (bonus.generator === id) typeBonus += bonus.bonus * typesOwned(state);
   }
+  // §5.5 (M26): the paths of the buildings that grow.
+  for (const bonus of bonusesOf(state, 'feeds')) {
+    if (bonus.generator === id) synergyBonus += bonus.bonusPerUnit * state.generators[bonus.source];
+  }
+  for (const bonus of bonusesOf(state, 'perSpecies')) {
+    if (bonus.generator === id) typeBonus += bonus.bonus * state.species.length;
+  }
+  for (const bonus of bonusesOf(state, 'generatorPerParcel')) {
+    if (bonus.generator === id) typeBonus += bonus.bonus * state.parcels.length;
+  }
   // §9.6: the summer shower waters the rooftop gardens and the greenhouses.
   // §9.7: so do the climbing beans of the courtyard garden.
   if (id === 'rooftopGarden' || id === 'greenhouse') {

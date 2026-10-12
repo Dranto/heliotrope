@@ -1,0 +1,66 @@
+/* The buildings that grow (§5.5, M26) on the map: gold for the first path, lilac for the second. */
+.growth-marks [data-path='a'] {
+  --growth: #e9a93b;
+  --growth-soft: rgb(246 213 143 / 0.35);
+}
+
+.growth-marks [data-path='b'] {
+  --growth: #b79ad6;
+  --growth-soft: rgb(183 154 214 / 0.3);
+}
+
+.growth-wreath ellipse {
+  fill: #5e9a6a;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.4;
+}
+
+.growth-berry {
+  fill: var(--growth);
+}
+
+.growth-flower ellipse {
+  fill: var(--growth);
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 0.4;
+}
+
+.growth-heart {
+  fill: #fff7e0;
+}
+
+.growth-halo circle {
+  fill: var(--growth-soft);
+  stroke: var(--growth);
+  stroke-width: 0.6;
+  stroke-dasharray: 2 2;
+}
+
+.growth-halo path {
+  stroke: var(--growth);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.growth-halo {
+  animation: growth-breathe 4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes growth-breathe {
+  50% {
+    opacity: 0.6;
+    transform: scale(1.08);
+  }
+}
+
+.app[data-motion='reduced'] .growth-halo {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .growth-halo {
+    animation: none;
+  }
+}

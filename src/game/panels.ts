@@ -13,6 +13,7 @@ import { canRestoreDistrict, offeredDistrict } from './districts';
 import { FRUIT_IDS } from './fruits';
 import { isGardenOpen, isRipe } from './garden';
 import { GENERATOR_IDS } from './generators';
+import { pendingTier } from './growth';
 import { areGreatWorksOpen, isStageReady, WORK_IDS } from './greatWorks';
 import { canPlant, isOrchardOpen, treeStage } from './orchard';
 import { availableUpgrades, isGeneratorRevealed } from './production';
@@ -118,7 +119,9 @@ export function panelHasAction(state: GameState, id: PanelId): boolean {
       return availableUpgrades(state).some((upgrade) => canBuyUpgrade(state, upgrade.id));
     case 'generators':
       return GENERATOR_IDS.some(
-        (generator) => isGeneratorRevealed(state, generator) && canBuyGenerator(state, generator),
+        (generator) =>
+          (isGeneratorRevealed(state, generator) && canBuyGenerator(state, generator)) ||
+          pendingTier(state, generator) !== null,
       );
     case 'restoration': {
       const district = offeredDistrict(state);

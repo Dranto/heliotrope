@@ -67,7 +67,8 @@ describe('App', () => {
     expect(panel()).toHaveAttribute('data-stage', '0');
     for (let i = 0; i < 100; i++) fireEvent.click(flower());
     expect(panel()).toHaveAttribute('data-stage', '1');
-  });
+    // A hundred renders of the whole app: slow on a busy machine.
+  }, 15_000);
 
   it('buys a generator once affordable and starts producing', () => {
     const store = renderApp();
@@ -467,6 +468,20 @@ describe('App', () => {
     fireEvent.pointerDown(document.querySelector('.garden-panel h2')!);
     expect(store.getState().seenPanels).toContain('garden');
     expect(panels.getAttribute('data-new')).not.toContain('garden');
+  });
+
+  it('asks for a path when a building grows, and crowns it on the map (§5.5, M26)', () => {
+    const fresh = createInitialState(0);
+    saveGame({ ...fresh, generators: { ...fresh.generators, pot: 50 } });
+    const store = renderApp();
+    const forms = screen.getByRole('group', { name: 'Formes\u00a0: Héliotrope en pot' });
+    const fork = within(forms).getByRole('group', { name: /Jardinière fleurie/ });
+    fireEvent.click(within(fork).getByRole('button', { name: /Le clic rapporte \+0,25/ }));
+    expect(store.getState().growth.paths.pot[0]).toBe(0);
+    expect(document.querySelector('[data-growth="pot"] .growth-wreath')).toHaveAttribute(
+      'data-path',
+      'a',
+    );
   });
 
   it('offers a tab bar for small screens (§10.3)', () => {

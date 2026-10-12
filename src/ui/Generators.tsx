@@ -1,4 +1,13 @@
 import { useEffect, useState } from 'react';
+import {
+  canChoosePath,
+  choosePath,
+  GROWTH,
+  GROWTH_TIERS,
+  pendingTier,
+  reachedTiers,
+} from '../game/growth';
+import { bonusText } from '../i18n/restoration';
 import { guideStep } from '../game/guide';
 import { generatorLimit } from '../game/challenges';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
@@ -163,6 +172,7 @@ export function Generators() {
                 <span className="buy-cost">☀ {cost}</span>
                 {owned < limit && <Eta cost={generatorCost(state, id, units)} />}
               </button>
+              <GrowthPaths id={id} state={state} />
             </li>
           );
         })}
@@ -177,5 +187,67 @@ export function Generators() {
         )}
       </ul>
     </section>
+  );
+}
+
+/**
+ * §5.5 (M26): the three forms of a building, as pips, and the fork of two paths at a tier: shown
+ * on its own when a tier is reached without a path, or when the player picks a pip.
+ */
+function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
+  const store = useGameStore();
+  const [picked, setPicked] = useState<number | null>(null);
+  const reached = reachedTiers(state, id);
+  const pending = pendingTier(state, id);
+  const shown = picked ?? pending;
+  const forms = t.growth.forms[id];
+  if (reached === 0 && picked === null && state.generators[id] < GROWTH_TIERS[0] / 2) return null;
+  return (
+    <div className="growth" role="group" aria-label={t.growth.label(t.generators[id].name)}>
+      <span className="growth-pips">
+        {GROWTH_TIERS.map((count, tier) => {
+          const path = state.growth.paths[id][tier];
+          return (
+            <button
+              key={count}
+              type="button"
+              className="growth-pip"
+              data-reached={tier < reached}
+              data-path={path ?? undefined}
+              data-pending={pending === tier || undefined}
+              aria-expanded={shown === tier}
+              title={t.growth.tier(forms[tier]!, formatNumber(count))}
+              aria-label={t.growth.tier(forms[tier]!, formatNumber(count))}
+              onClick={() => setPicked(shown === tier ? null : tier)}
+            />
+          );
+        })}
+      </span>
+      {shown !== null && (
+        <div className="growth-fork" role="group" aria-label={t.growth.choose(forms[shown]!)}>
+          {([0, 1] as const).map((path) => {
+            const current = state.growth.paths[id][shown] === path;
+            const allowed = current || canChoosePath(state, id, shown, path);
+            return (
+              <button
+                key={path}
+                type="button"
+                className="growth-path"
+                data-path={path}
+                aria-pressed={current}
+                disabled={!allowed}
+                title={allowed ? undefined : t.growth.locked}
+                onClick={() => {
+                  store.dispatch((s) => choosePath(s, id, shown, path));
+                  setPicked(null);
+                }}
+              >
+                {bonusText(GROWTH[id][shown]![path])}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

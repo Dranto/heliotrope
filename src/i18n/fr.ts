@@ -161,6 +161,22 @@ export const fr = {
     more: 'Plus',
     fresh: 'nouveau',
   },
+  growth: {
+    label: (name: string) => `Formes\u00a0: ${name}`,
+    tier: (form: string, count: string) => `${form}, dès ${count}`,
+    choose: (form: string) => `${form}\u00a0: choisir une voie`,
+    locked: 'Une voie déjà changée cette Saison',
+    forms: {
+      pot: ['Jardinière fleurie', 'Mur de pots', 'Cascade de pots'],
+      balconyPanel: ['Pergola solaire', 'Treille photovoltaïque', 'Façade solaire'],
+      rooftopGarden: ['Potager en terrasses', 'Toit nourricier', 'Jardin suspendu'],
+      greenhouse: ['Serre à étages', 'Jardin d’hiver', 'Palais de verre'],
+      verticalFarm: ['Tour maraîchère', 'Ferme-cathédrale', 'Ferme-forêt'],
+      mirrorPlant: ['Miroirs-tournesols', 'Couronne de miroirs', 'Soleil captif'],
+      urbanCanopy: ['Allée ombragée', 'Forêt urbaine', 'Canopée continue'],
+      arcology: ['Arcologie fleurie', 'Arcologie-jardin', 'Arcologie-monde'],
+    },
+  },
   layers: {
     label: 'Couches du menu',
     city: 'La ville',
@@ -361,6 +377,8 @@ export const fr = {
       'cities.3': 'Les villes sœurs',
       firstAlliance: 'Main dans la main',
       grandBloom: 'La grande floraison',
+      firstPath: 'Première voie',
+      manyPaths: 'La ville aux mille formes',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -469,6 +487,10 @@ export const fr = {
         'Restaurer toute la région\u00a0: les quatre chantiers, l’Herbier, chaque site au niveau 5',
       sisterCities: (count: number) =>
         count === 1 ? 'Fonder une ville sœur' : `Fonder ${count} villes sœurs`,
+      paths: (count: number) =>
+        count === 1
+          ? 'Choisir la voie d’un bâtiment qui grandit'
+          : `Faire jouer ${count} voies de bâtiments`,
       fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
@@ -572,6 +594,12 @@ export const fr = {
       visitInterval: (percent: string) => `Les visites reviennent ${percent}\u00a0% plus vite`,
       perDistrict: (percent: string) =>
         `Production +${percent}\u00a0% par quartier voisin restauré`,
+      feeds: (generator: string, source: string, percent: string) =>
+        `${generator}\u00a0: +${percent}\u00a0% par ${source}`,
+      perSpecies: (generator: string, percent: string) =>
+        `${generator}\u00a0: +${percent}\u00a0% par espèce de l’Herbier`,
+      generatorPerParcel: (generator: string, percent: string) =>
+        `${generator}\u00a0: +${percent}\u00a0% par parcelle restaurée`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
       cuttingsGift: (units: number) =>
         units === 1

@@ -115,6 +115,22 @@ export const en: Texts = {
     more: 'More',
     fresh: 'new',
   },
+  growth: {
+    label: (name: string) => `Forms of the ${name}`,
+    tier: (form: string, count: string) => `${form}, from ${count}`,
+    choose: (form: string) => `${form}: pick a path`,
+    locked: 'A path already changed this Season',
+    forms: {
+      pot: ['Flowering planter', 'Wall of pots', 'Cascade of pots'],
+      balconyPanel: ['Solar pergola', 'Photovoltaic trellis', 'Solar facade'],
+      rooftopGarden: ['Terraced garden', 'Feeding roof', 'Hanging garden'],
+      greenhouse: ['Tiered greenhouse', 'Winter garden', 'Glass palace'],
+      verticalFarm: ['Market tower', 'Cathedral farm', 'Forest farm'],
+      mirrorPlant: ['Sunflower mirrors', 'Crown of mirrors', 'Captive sun'],
+      urbanCanopy: ['Shaded avenue', 'Urban forest', 'Unbroken canopy'],
+      arcology: ['Flowering arcology', 'Garden arcology', 'World arcology'],
+    },
+  },
   layers: {
     label: 'Menu layers',
     city: 'The city',
@@ -314,6 +330,8 @@ export const en: Texts = {
       'cities.3': 'Sister cities',
       firstAlliance: 'Hand in hand',
       grandBloom: 'The grand bloom',
+      firstPath: 'First path',
+      manyPaths: 'A city of a thousand shapes',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -414,6 +432,10 @@ export const en: Texts = {
         'Restore the whole region: the four great works, the Herbier, every site at level 5',
       sisterCities: (count: number) =>
         count === 1 ? 'Found a sister city' : `Found ${count} sister cities`,
+      paths: (count: number) =>
+        count === 1
+          ? 'Pick the path of a growing building'
+          : `Have ${count} building paths at work`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
@@ -513,6 +535,12 @@ export const en: Texts = {
       visitInterval: (percent: string) => `Visits come back ${percent}% sooner`,
       perDistrict: (percent: string) =>
         `Production +${percent}% per neighbouring district restored`,
+      feeds: (generator: string, source: string, percent: string) =>
+        `${generator}: +${percent}% per ${source}`,
+      perSpecies: (generator: string, percent: string) =>
+        `${generator}: +${percent}% per species in the Herbarium`,
+      generatorPerParcel: (generator: string, percent: string) =>
+        `${generator}: +${percent}% per restored parcel`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
       cuttingsGift: (units: number) =>
         units === 1

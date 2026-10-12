@@ -55,6 +55,10 @@ import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
 import { GreatWorksLayer } from './GreatWorksArt';
+import { GrowthLayer } from './GrowthArt';
+import { encodeGrowth } from './growthMap';
+import { reachedTiers } from '../game/growth';
+import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
 import { CorridorLayer } from './CorridorArt';
 import { AllianceThreads, BloomLayer } from './AllianceArt';
 import { workingAlliances } from '../game/alliances';
@@ -244,6 +248,14 @@ export function Scene({
       Object.entries(state.greatWorks.works).map(([id, w]) => [id, w.stage]),
     ) as Parameters<typeof encodeStages>[0],
   );
+  // The buildings that grow (§5.5), encoded so the layer only redraws when a form or path changes.
+  const growth = encodeGrowth(
+    Object.fromEntries(GENERATOR_IDS.map((id) => [id, reachedTiers(state, id)])) as Record<
+      GeneratorId,
+      number
+    >,
+    state.growth.paths,
+  );
   // The alliances at work and the grand bloom (§9.9), joined so the map redraws only on a change.
   const working = workingAlliances(state).join();
   const bloomed = state.alliances.bloomed;
@@ -293,6 +305,7 @@ export function Scene({
         <AllianceThreads working={working} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
+        <GrowthLayer growth={growth} />
         <ProjectMarks projects={projects} />
         <SpeciesLife species={species} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
@@ -315,6 +328,7 @@ export function Scene({
       districtOffer,
       works,
       worksOpen,
+      growth,
       corridors,
       working,
       bloomed,
