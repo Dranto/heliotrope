@@ -487,9 +487,12 @@ export function Scene({
                 type="button"
                 role="radio"
                 aria-checked={view === v}
+                aria-label={t.phases[v]}
                 onClick={() => choose(v)}
               >
-                {t.phases[v]}
+                {/* Narrow screens drop the article so the four views fit on one line. */}
+                <span className="view-long">{t.phases[v]}</span>
+                <span className="view-short">{t.layout.viewNames[v]}</span>
               </button>
             ))}
           </div>

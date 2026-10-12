@@ -11,6 +11,7 @@ import { cooperativeBuysText } from '../i18n/talents';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
+import './cooperatives.css';
 
 /** A cargo bike, the mark of the cooperatives in the panel and on the map. */
 export function CooperativeIcon() {
