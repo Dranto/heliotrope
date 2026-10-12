@@ -258,7 +258,7 @@ Roadmap P30, décision D23 : le bouquet est un bonus de production. Le clic, le 
 
 - **Le premier clic de chaque Saison.** Pendant les **30 premières secondes** d'une Saison, chaque clic remplit la jauge **trois fois** plus vite : à 2,5 clics par seconde, une relance commence par une envolée.
 - **Jalons (2).** « Bouquet » (3 effets en même temps) et « Grand bouquet » (5), famille Papillon doré. 153 jalons en tout.
-- **Équilibrage.** Le joueur de référence vit le bouquet quand ses Floraisons croisent ses envolées. La 1ʳᵉ Saison conseillée passe de 66 à 65 min (cible 80 min) ; le 1ᵉʳ Cycle reste à 2 h 26 (cible 2 h 45), les Cycles 2 à 4 durent 36, 36 et 45 min (cibles 35, 35 et 45) ; les deux essaimages restent à 4 h et 5 h de jeu. Le Papillon et les visites ne viennent pas plus souvent : leurs Averses doublent l'Eau, et le 2ᵉ Cycle y est très sensible (§9.10).
+- **Équilibrage.** Le joueur de référence vit le bouquet quand ses Floraisons croisent ses envolées, et le Papillon suit le temps. La 1ʳᵉ Saison conseillée ne bouge pas (66 min, cible 80 min). Le 1ᵉʳ Cycle conseillé passe de 2 h 29 à 2 h 41 (cible 2 h 45) : le Papillon donne d'autres effets selon le ciel, pas davantage. Les Cycles 2 à 4 durent 36, 36 et 43 min (cibles 35, 35 et 45). La 1ʳᵉ ville sœur reste à 4 h de jeu ; la 2ᵉ passe de 5 h à 6 h (cible 5 h, dans la marge de ±30 %) parce que le premier Cycle de la ville sœur du simulateur tient en une Saison au lieu de deux, ce qui décale d'une heure de jeu le second essaimage. Le Papillon et les visites ne viennent pas plus souvent : leurs Averses doublent l'Eau, et le 2ᵉ Cycle y est très sensible (§9.10).
 - **Sauvegarde.** Rien de neuf à garder : le bouquet se lit dans les effets en cours, déjà sauvegardés.
 
 ## 6. Phases de progression
