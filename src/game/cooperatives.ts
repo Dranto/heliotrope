@@ -302,8 +302,9 @@ function tendHives(state: GameState): GameState {
  * player's: they do not reset the time since the last purchase (hidden Milestone, §9.3).
  */
 export function runCooperatives(state: GameState): GameState {
-  if (state.talents.length === 0) return state;
+  // The beekeepers need no talent (M36): they keep working after a swarm empties the tree.
   let next = tendHives(resowGarden(state));
+  if (next.talents.length === 0) return next;
   for (let i = 0; i < MAX_PURCHASES_PER_TICK; i++) {
     const purchase = nextPurchase(next);
     if (!purchase) break;

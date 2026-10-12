@@ -105,6 +105,17 @@ describe('the beekeepers (M36)', () => {
     expect(run.cooperatives.purchases.beekeepers).toBe(3);
   });
 
+  it('keep carrying honey with no talent learnt, as after a swarm', () => {
+    const state = late({
+      talents: [],
+      orchard: { ...late().orchard, hives: 2, honey: HONEY_RESERVE + 5 },
+      greatWorks: { works: { ...works.works, tram: stage } },
+    });
+    const run = runCooperatives(state);
+    expect(run.greatWorks.works.tram.paid.honey).toBe(3);
+    expect(run.orchard.honey).toBe(HONEY_RESERVE + 2);
+  });
+
   it('keep the reserve, and wait for the second hive', () => {
     const one = late({
       orchard: { ...late().orchard, hives: 1, honey: 9 },
