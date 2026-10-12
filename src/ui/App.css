@@ -1643,9 +1643,10 @@ button {
 }
 
 .growth-pips {
+  --pip-gap: 0.6rem;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: var(--pip-gap);
 }
 
 /* The weather the building's paths play stronger under (M33), lit while it reigns. */
@@ -1667,6 +1668,7 @@ button {
 }
 
 .growth-pip {
+  position: relative;
   width: 1.1rem;
   height: 1.1rem;
   padding: 0;
@@ -1696,13 +1698,43 @@ button {
   background: var(--lilac);
 }
 
+/* The three forms read as one stem growing: a fine line joins each dot to the one before, and
+   turns to the colour of the path once the form is reached. */
+.growth-pip + .growth-pip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 1.5px);
+  width: var(--pip-gap);
+  height: 1.5px;
+  translate: 0 -50%;
+  background: rgb(143 174 139 / 0.55);
+  pointer-events: none;
+}
+
+.growth-pip[data-reached='true'][data-path='0'] + .growth-pip::before {
+  background: var(--gold);
+}
+
+.growth-pip[data-reached='true'][data-path='1'] + .growth-pip::before {
+  background: var(--lilac);
+}
+
+/* A form waiting for its path calls softly with a golden halo, without growing over its
+   neighbours. */
 .growth-pip[data-pending='true'] {
   border-color: var(--gold);
-  animation: fresh-dot 1.8s ease-in-out infinite;
+  animation: pip-call 1.8s ease-in-out infinite;
+}
+
+@keyframes pip-call {
+  50% {
+    box-shadow: 0 0 0 4px rgb(244 192 99 / 0.35);
+  }
 }
 
 .growth-pip[aria-expanded='true'] {
-  outline: 2px solid var(--leaf);
+  outline: 1.5px solid var(--leaf);
   outline-offset: 2px;
 }
 
@@ -1719,12 +1751,8 @@ button {
   }
 
   .growth-pips {
-    gap: 1.1rem;
+    --pip-gap: 1.1rem;
     padding-inline-start: 0.3rem;
-  }
-
-  .growth-pip {
-    position: relative;
   }
 
   .growth-pip::after {
