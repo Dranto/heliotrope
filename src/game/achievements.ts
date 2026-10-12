@@ -1,6 +1,7 @@
 // Milestones ("Jalons", docs/game-design.md §9.3). Data table plus pure unlock checks; names
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
 import { WEATHER_IDS, type WeatherId } from './weather';
+import { WEATHER_SPECIES } from './species';
 import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
@@ -121,6 +122,8 @@ export type AchievementCondition =
   | { kind: 'bouquet'; count: number }
   /** A weather lived at least once (§9.10). */
   | { kind: 'weather'; weather: WeatherId }
+  /** Every species of the weather back (M33). */
+  | { kind: 'weatherSpecies' }
   /** Neighbours' requests served over the whole game (§9.11). */
   | { kind: 'requests'; count: number }
   /** Challenge Cycles won (§7.5). */
@@ -230,6 +233,7 @@ export type AchievementId =
   | 'weather.wind'
   | 'weather.mist'
   | 'weather.heat'
+  | 'skyCreatures'
   | 'firstFavour'
   | 'goodNeighbour'
   | 'lockKeeper'
@@ -418,6 +422,7 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
         condition: { kind: 'weather', weather },
       }) as const,
   ),
+  { id: 'skyCreatures', family: 'neighbourhood', condition: { kind: 'weatherSpecies' } },
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
   {
@@ -681,6 +686,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return bouquetSize(state.effects) >= condition.count;
     case 'weather':
       return state.weather.seen.includes(condition.weather);
+    case 'weatherSpecies':
+      return WEATHER_SPECIES.every((id) => state.species.includes(id));
     case 'requests':
       return state.requests.served >= condition.count;
     case 'fruitHarvests':

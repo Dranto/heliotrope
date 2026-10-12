@@ -56,7 +56,13 @@ describe('The return in images (§9.1, M17)', () => {
       seasonSeconds: 3600,
     };
     const report = offlineReport(before, after);
-    expect(report).toEqual({ built: ['pot'], ripened: [0], seedsRipened: true, seasons: 0 });
+    expect(report).toEqual({
+      built: ['pot'],
+      ripened: [0],
+      seedsRipened: true,
+      seasons: 0,
+      weathers: [],
+    });
     expect(isReportEmpty(report)).toBe(false);
     expect(isReportEmpty(offlineReport(before, before))).toBe(true);
   });

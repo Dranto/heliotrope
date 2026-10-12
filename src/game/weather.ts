@@ -4,6 +4,7 @@
 // Golden Butterfly would have given.
 import { isIntroduced, type IntroState } from './introductions';
 import type { Bonus } from './bonuses';
+import type { GeneratorId } from './generators';
 import { nextRandom } from './random';
 
 export const WEATHER_IDS = ['sun', 'shower', 'wind', 'mist', 'heat'] as const;
@@ -23,6 +24,8 @@ export interface WeatherState {
   seed: number;
   /** Weathers lived since the sky opened, over all Seasons: the Milestones read them. */
   seen: WeatherId[];
+  /** The Season (count of Seasons done) in which the forecast was last swapped (M33). */
+  swapped?: number;
 }
 
 /**
@@ -46,6 +49,19 @@ export const WEATHER_BONUSES: Record<WeatherId, readonly Bonus[]> = {
     { kind: 'perParcel', bonus: 0.01 },
   ],
 };
+
+/**
+ * The buildings each weather favours (M33): under it, the paths they grew into (§5.5) play
+ * WEATHER_PATH_FACTOR stronger. Each building has one weather.
+ */
+export const WEATHER_BUILDINGS: Record<WeatherId, readonly GeneratorId[]> = {
+  sun: ['balconyPanel', 'mirrorPlant'],
+  shower: ['rooftopGarden', 'pot'],
+  wind: ['verticalFarm', 'arcology'],
+  mist: ['greenhouse'],
+  heat: ['urbanCanopy'],
+};
+export const WEATHER_PATH_FACTOR = 1.5;
 
 export function isWeatherId(value: unknown): value is WeatherId {
   return typeof value === 'string' && (WEATHER_IDS as readonly string[]).includes(value);
@@ -113,6 +129,71 @@ export function advanceWeather<
   return { ...state, weather: { current, remaining, forecast, seed, seen } };
 }
 
+/** The weather a building's paths play stronger under. */
+export function buildingWeather(id: GeneratorId): WeatherId {
+  return WEATHER_IDS.find((w) => WEATHER_BUILDINGS[w].includes(id))!;
+}
+
+/** The buildings whose paths play stronger now: none while the sky is closed. */
+export function favouredBuildings(source: {
+  weather: Pick<WeatherState, 'current'>;
+  seasons: number;
+  cycles?: number;
+  intro: IntroState;
+}): readonly GeneratorId[] {
+  return isWeatherOpen(source) ? WEATHER_BUILDINGS[source.weather.current] : [];
+}
+
+/**
+ * Once per Season (decision D25), the next weather can be swapped with one of the two after it
+ * (index 1 or 2 of the forecast).
+ */
+export function canSwapForecast(
+  state: { weather: WeatherState; seasons: number; cycles: number; intro: IntroState },
+  index: number,
+): boolean {
+  return (
+    isWeatherOpen(state) &&
+    (index === 1 || index === 2) &&
+    state.weather.swapped !== state.seasons &&
+    state.weather.forecast[index] !== state.weather.forecast[0]
+  );
+}
+
+/** Player action: bring the forecast weather at `index` forward to come next. */
+export function swapForecast<
+  S extends { weather: WeatherState; seasons: number; cycles: number; intro: IntroState },
+>(state: S, index: number): S {
+  if (!canSwapForecast(state, index)) return state;
+  const forecast = [...state.weather.forecast];
+  [forecast[0], forecast[index]] = [forecast[index]!, forecast[0]!];
+  return { ...state, weather: { ...state.weather, forecast, swapped: state.seasons } };
+}
+
+/**
+ * The weathers lived from `before` to `after` (§9.1, M33), the first one included, for the return
+ * in images: the sky's draws are replayed until they reach `after`'s seed. Empty when the sky did
+ * not change, or past `limit` changes.
+ */
+export function weathersBetween(
+  before: WeatherState,
+  after: WeatherState,
+  limit = 64,
+): WeatherId[] {
+  if (before.seed === after.seed) return [];
+  let { forecast, seed } = before;
+  const lived: WeatherId[] = [before.current];
+  for (let i = 0; i < limit; i++) {
+    const current = forecast[0]!;
+    const [drawn, afterDraw] = draw(seed);
+    seed = duration(afterDraw)[1];
+    forecast = [...forecast.slice(1), drawn];
+    lived.push(current);
+    if (seed === after.seed) return lived;
+  }
+  return [];
+}
+
 export function weatherBonuses(source: {
   weather: Pick<WeatherState, 'current'>;
   seasons: number;
@@ -124,7 +205,7 @@ export function weatherBonuses(source: {
 
 export function validWeather(raw: unknown, fallback: WeatherState): WeatherState {
   const data = (raw ?? {}) as Partial<Record<keyof WeatherState, unknown>>;
-  const { current, remaining, forecast, seed, seen } = data;
+  const { current, remaining, forecast, seed, seen, swapped } = data;
   if (
     !isWeatherId(current) ||
     typeof remaining !== 'number' ||
@@ -146,5 +227,8 @@ export function validWeather(raw: unknown, fallback: WeatherState): WeatherState
     forecast: [...forecast],
     seed,
     seen: [...new Set<WeatherId>(lived)],
+    ...(typeof swapped === 'number' && Number.isInteger(swapped) && swapped >= 0
+      ? { swapped }
+      : {}),
   };
 }

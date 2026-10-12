@@ -1644,7 +1644,26 @@ button {
 
 .growth-pips {
   display: flex;
+  align-items: center;
   gap: 0.3rem;
+}
+
+/* The weather the building's paths play stronger under (M33), lit while it reigns. */
+.growth-sky {
+  display: inline-flex;
+  margin-left: auto;
+  opacity: 0.45;
+}
+
+.growth-sky .weather-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.growth-sky[data-active='true'] {
+  opacity: 1;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgb(244 192 99 / 0.6);
 }
 
 .growth-pip {

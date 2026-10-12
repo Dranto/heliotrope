@@ -564,4 +564,97 @@ export const SPECIES_ART: Record<SpeciesId, () => ReactNode> = {
       ))}
     </>
   ),
+  wallLizard: () => (
+    <>
+      {/* The wall lizard of the grand soleil (M33): a slim brown body with a long curled tail. */}
+      <path
+        d="M16 3c1.6 0 2.4 1.4 2.2 3-.2 1.2-.8 2-1 3 .6 2.4.8 5 .4 7.4-.4 2.6-1.4 4.6-1.2 6.6.2 2.4 2.4 4 5 4.4-3.6.8-6.4-.6-7.2-3.2-.8-2.4 0-5-.2-7.6-.2-2.6-1-5-.4-7.2-.4-1-1-1.8-1-3 0-1.8 1.2-3.4 3.4-3.4Z"
+        fill="#8a7458"
+        {...line}
+      />
+      <path
+        d="M14.4 10.4 10 8.6l-1.4 1.2M17.6 10.4l4.4-1.8 1.4 1.2M14.6 17.6l-4.4 2.6-.8 1.6M17.4 17.6l4.2 2.8.6 1.6"
+        fill="none"
+        {...line}
+        stroke="#6e5a42"
+        strokeWidth={1.1}
+      />
+      <path d="M16 8.6v12" stroke="#5a4632" strokeWidth={0.7} strokeDasharray="1 1" />
+      <path d="M14.6 11.6h2.8M14.4 14h3.2M14.6 16.4h2.8" stroke="#b8d08a" strokeWidth={0.5} />
+      <circle cx="14.8" cy="4.6" r="0.5" fill="#2b2622" />
+      <circle cx="17.2" cy="4.6" r="0.5" fill="#2b2622" />
+    </>
+  ),
+  kestrel: () => (
+    <>
+      {/* The kestrel hovering in the wind (M33): rufous back, grey head, dark wing tips. */}
+      <path
+        d="M16 12c-4-2-8-2.6-13-1.2 3 .6 5 1.8 6.6 3.4 2 .4 4.4.2 6.4-.2 2 .4 4.4.6 6.4.2 1.6-1.6 3.6-2.8 6.6-3.4-5-1.4-9-.8-13 1.2Z"
+        fill="#b8693a"
+        {...line}
+      />
+      <path
+        d="M3 10.8c1.6.2 2.8.8 3.8 1.6M29 10.8c-1.6.2-2.8.8-3.8 1.6"
+        stroke="#3d3128"
+        strokeWidth={1.4}
+      />
+      <path
+        d="M8 12.6l1.4.6M11 12.4l1.2.8M24 12.6l-1.4.6M21 12.4l-1.2.8"
+        stroke="#4a3a2c"
+        strokeWidth={0.7}
+      />
+      <path d="M14.4 14c-.4 4 .2 8 1.6 12 1.4-4 2-8 1.6-12Z" fill="#a85c30" {...line} />
+      <path d="M14.8 25.6h2.4" stroke="#2c2f33" strokeWidth={1} />
+      <ellipse cx="16" cy="10.6" rx="2" ry="2.2" fill="#8d97a0" {...line} />
+      <path d="M16 12.6v.8" stroke="#e7b84a" strokeWidth={0.9} />
+      <circle cx="15.2" cy="10.2" r="0.4" fill="#2b2622" />
+      <circle cx="16.8" cy="10.2" r="0.4" fill="#2b2622" />
+    </>
+  ),
+  salamander: () => (
+    <>
+      {/* The fire salamander of the mist (M33): glossy black with bright yellow blotches. */}
+      <path
+        d="M16 3.4c2 0 3 1.6 2.8 3.4 0 1-.6 1.8-.8 2.6.8 2.6 1 5.4.6 8-.4 2.6-1.4 4.6-.6 6.6.8 1.8 2.6 3 4.4 3.4-3 .6-5.6-.6-6.6-3-1-2.2-.4-4.8-.6-7.4-.2-2.6-1-5.2-.2-7.6-.4-.8-1-1.6-1-2.6 0-1.8 1-3.4 2-3.4Z"
+        fill="#2a2a2c"
+        {...line}
+      />
+      <path
+        d="M14.2 11 9.4 9.4M17.8 11l4.8-1.6M14.6 19l-4.6 2.8M17.6 19l4.4 3"
+        fill="none"
+        {...line}
+        stroke="#2a2a2c"
+        strokeWidth={1.6}
+      />
+      {[
+        [15, 5.6, 1],
+        [17.4, 9, 0.9],
+        [14.8, 12.4, 1.1],
+        [17.2, 15.6, 1],
+        [15.4, 19, 0.9],
+        [17.6, 23.4, 0.8],
+        [10.4, 9.8, 0.6],
+        [21.6, 9.8, 0.6],
+      ].map(([x, y, r]) => (
+        <ellipse key={`${x}-${y}`} cx={x} cy={y} rx={r} ry={r! * 0.8} fill="#f2c230" />
+      ))}
+    </>
+  ),
+  cicada: () => (
+    <>
+      {/* The grey cicada of the heat (M33): a stout body under clear veined wings. */}
+      {wing('M14.4 10C9 12 6 18 7 26c3-2 6-7 8-14Z', 'rgb(235 245 240 / 0.75)')}
+      {wing('M17.6 10c5.4 2 8.4 8 7.4 16-3-2-6-7-8-14Z', 'rgb(235 245 240 / 0.75)')}
+      <path
+        d="M13 14c-2 3-3.4 6.4-4 10M19 14c2 3 3.4 6.4 4 10"
+        stroke="#9aa69c"
+        strokeWidth={0.4}
+      />
+      <ellipse cx="16" cy="16" rx="2.8" ry="7.4" fill="#7c7466" {...line} />
+      <path d="M13.6 16h4.8M13.8 18.6h4.4M14.2 21h3.6" stroke="#5c564c" strokeWidth={0.5} />
+      <ellipse cx="16" cy="8" rx="3.6" ry="2.4" fill="#8a8274" {...line} />
+      <circle cx="12.8" cy="7.6" r="1" fill="#4a4a3e" />
+      <circle cx="19.2" cy="7.6" r="1" fill="#4a4a3e" />
+    </>
+  ),
 };

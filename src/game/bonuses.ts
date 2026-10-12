@@ -4,7 +4,7 @@
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import type { IntroState } from './introductions';
 import { bondBonuses, type Bonds } from './bonds';
-import { weatherBonuses, type WeatherState } from './weather';
+import { favouredBuildings, weatherBonuses, type WeatherState } from './weather';
 import { allianceBonuses } from './alliances';
 import type { GameState } from './state';
 import { cityBonuses, type CitySource } from './cityData';
@@ -187,7 +187,19 @@ function collectBonuses(source: BonusSource): Bonus[] {
     ...corridorBonuses({ parcels, futures }),
     ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
     ...(city ? cityBonuses(city) : []),
-    ...(growth ? growthBonuses({ generators: source.generators, growth }) : []),
+    ...(growth
+      ? growthBonuses(
+          { generators: source.generators, growth },
+          weather && source.intro
+            ? favouredBuildings({
+                weather,
+                seasons: source.seasons,
+                cycles: source.cycles,
+                intro: source.intro,
+              })
+            : [],
+        )
+      : []),
     ...(weather && source.intro
       ? weatherBonuses({
           weather,

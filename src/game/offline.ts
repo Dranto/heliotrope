@@ -4,6 +4,7 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { areSeedsRipe } from './seasons';
 import type { GameState } from './state';
 import { tick } from './tick';
+import { weathersBetween, type WeatherId } from './weather';
 
 /** Offline progress is capped so a long absence stays rewarding but bounded. */
 export const MAX_OFFLINE_SECONDS = 8 * 60 * 60;
@@ -67,6 +68,8 @@ export interface OfflineReport {
   seedsRipened: boolean;
   /** Seasons started by the sower (§7.1) while away. */
   seasons: number;
+  /** The weathers lived while away, the one left behind first (M33); empty if the sky held. */
+  weathers: WeatherId[];
 }
 
 export function offlineReport(before: GameState, after: GameState): OfflineReport {
@@ -83,6 +86,7 @@ export function offlineReport(before: GameState, after: GameState): OfflineRepor
     }),
     seedsRipened: areSeedsRipe(after) && (seasons > 0 || !areSeedsRipe(before)),
     seasons,
+    weathers: weathersBetween(before.weather, after.weather),
   };
 }
 

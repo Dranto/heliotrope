@@ -6,7 +6,15 @@ import {
   GROWTH_TIERS,
   pendingTier,
   reachedTiers,
+  strengthen,
 } from '../game/growth';
+import {
+  buildingWeather,
+  favouredBuildings,
+  isWeatherOpen,
+  WEATHER_PATH_FACTOR,
+} from '../game/weather';
+import { WeatherIcon } from './WeatherArt';
 import { bonusText } from '../i18n/restoration';
 import { guideStep } from '../game/guide';
 import { generatorLimit } from '../game/challenges';
@@ -202,6 +210,9 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
   const shown = picked ?? pending;
   const forms = t.growth.forms[id];
   if (reached === 0 && picked === null && state.generators[id] < GROWTH_TIERS[0] / 2) return null;
+  // Under its weather, a building's paths play stronger (M33).
+  const sky = isWeatherOpen(state) ? buildingWeather(id) : null;
+  const favoured = favouredBuildings(state).includes(id);
   return (
     <div className="growth" role="group" aria-label={t.growth.label(t.generators[id].name)}>
       <span className="growth-pips">
@@ -222,6 +233,17 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
             />
           );
         })}
+        {sky && (
+          <span
+            className="growth-sky"
+            data-active={favoured}
+            role="img"
+            aria-label={t.weather.paths(t.weather.day[sky])}
+            title={t.weather.paths(t.weather.day[sky])}
+          >
+            <WeatherIcon id={sky} />
+          </span>
+        )}
       </span>
       {shown !== null && (
         <div className="growth-fork" role="group" aria-label={t.growth.choose(forms[shown]!)}>
@@ -242,7 +264,9 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
                   setPicked(null);
                 }}
               >
-                {bonusText(GROWTH[id][shown]![path])}
+                {bonusText(
+                  strengthen(GROWTH[id][shown]![path], favoured ? WEATHER_PATH_FACTOR : 1),
+                )}
               </button>
             );
           })}

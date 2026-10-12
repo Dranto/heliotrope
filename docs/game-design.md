@@ -903,7 +903,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10, 151 avec ceux de M29, §9.11, 153 avec ceux de M31, §5.7, 155 avec ceux de M32, §9.12, 156 avec celui de M33, §9.13), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -1061,7 +1061,7 @@ Roadmap P27, décision D19 : au hasard, avec trois temps de prévision. Code dan
 - **Jalons (5).** Un par temps vécu (« Plein soleil », « Chanter sous la pluie », « Le vent se lève », « Ville de brume », « Été indien »). 149 jalons en tout.
 - **Animations réduites.** Ni pluie ni feuilles : seuls restent le voile de couleur, des reflets fixes et la brume immobile.
 - **Équilibrage.** Le joueur de référence vit le temps comme les autres ; la 1ʳᵉ Saison conseillée ne change pas (66 min, cible 80 min). La roadmap faisait aussi revenir plus tôt le Papillon (vent) et les visites (brume) : comme leurs Averses doublent l'Eau, le 2ᵉ Cycle passait de 3 Saisons à 2. Ces deux temps favorisent donc la Récolte du Papillon et la biodiversité. Pour la même raison, l'averse favorise les potagers plutôt que l'Eau. Le pollen (§5.6) avait déjà réduit la marge du 2ᵉ Cycle à presque rien (7,9 Sources sur les 8 visées au bout de 2 Saisons). Pour la retrouver, le diviseur des Sources passe de 4e5 à 5e5 (§7.4) : le 1ᵉʳ Cycle conseillé ne bouge pas (2 h 27, cible 2 h 45), les Cycles 2 à 4 durent 36, 36 et 51 min (cibles 35, 35 et 45). Un joueur en cours garde ses Sources ; la suivante lui demande un peu plus d'Eau.
-- **Pas encore fait.** La roadmap liait aussi certaines voies (§5.5) et alliances à un temps, et le retour en images (M17) au temps passé hors ligne : laissés pour plus tard, pour garder ce jalon petit.
+- **Pas encore fait.** La roadmap liait aussi certaines voies (§5.5) et alliances à un temps, et le retour en images (M17) au temps passé hors ligne : laissés pour plus tard, pour garder ce jalon petit. Les voies et le retour en images suivent le temps depuis M33 (§9.13).
 - **Sauvegarde.** Version 29 : le temps présent, le temps restant, la prévision, la graine et les temps vécus ; une sauvegarde plus ancienne reçoit un ciel neuf.
 
 ### 9.11 Les demandes des voisins (M29)
@@ -1102,6 +1102,29 @@ Roadmap P31, décision D24 : « Tout récolter » ressème la même culture. Les
 - **Équilibrage.** Le potager et le verger restent des bonus pour le joueur qui revient. Le joueur de référence de la partie complète (§8), qui alterne déjà ses cultures, profite de la rotation et du temps, mais aucune cible ne bouge : 1ʳᵉ Saison 66 min, 1ᵉʳ Cycle 2 h 41, Cycles 2 à 4 en 36, 36 et 43 min, essaimages à 4 h et 6 h de jeu, comme après M31.
 - **Écarts avec la roadmap.** « Tout récolter » est un bouton des panneaux plutôt qu'un clic sur la fleur, qui garde son geste (la Lumière et le pollen). Les demandes de miel des voisins viennent avec M35. Les ruches rendaient déjà les variétés plus probables (§9.8) : rien de plus pour la ruche pleine.
 - **Sauvegarde.** Version 33 : la dernière culture et la rotation de chaque carré, le nombre de récoltes en rotation et les cueillettes de chaque arbre ; rien pour une sauvegarde plus ancienne.
+
+### 9.13 Les voies et le ciel (M33)
+
+Roadmap P32, décision D25 : échanger le prochain temps une fois par Saison. La prévision devient une décision, et chaque temps a plusieurs gagnants. Code dans `src/game/weather.ts` (bâtiments de chaque temps, échange, temps vécus hors ligne) et `src/game/growth.ts` (`strengthen`).
+
+- **Les voies sous leur ciel.** Chaque bâtiment a un temps. Sous ce temps, les voies qu'il a prises (§5.5) jouent **×1,5** : la part de leur effet au-delà de rien grandit de moitié (×1,5 devient ×1,75, +1 % devient +1,5 %, un intervalle ×0,9 devient ×0,85). Seules les heures hors ligne gardées par une voie ne changent pas.
+
+| Temps | Bâtiments dont les voies jouent ×1,5 |
+|---|---|
+| Grand soleil | Panneaux de balcon, Centrale à miroirs |
+| Averse | Potagers sur le toit, Héliotropes en pot |
+| Vent | Fermes verticales, Arcologies |
+| Brume | Serres communautaires |
+| Chaleur | Canopée urbaine |
+
+  Sous les pastilles des formes de chaque bâtiment, l'icône de son temps s'allume quand il règne ; les deux voies affichent alors leur effet renforcé.
+- **Échanger le prochain temps.** Une fois par Saison, le 2ᵉ ou le 3ᵉ temps de la prévision peut passer en tête, d'un clic sur son icône dans la légende de la carte (les deux icônes cliquables sont cerclées d'or tant que l'échange reste à faire). Le temps présent ne change pas, ni la durée tirée.
+- **Quatre espèces du temps.** Après l'escargot sous l'averse : le **lézard des murailles** au grand soleil (sur le mur de la cour), le **faucon crécerelle** par vent (au-dessus des toits), la **salamandre tachetée** dans la brume (dans le coin humide de la cour), la **cigale grise** par la chaleur (dans un arbre de la rue). Comme l'escargot, elles comptent dans la biodiversité mais ne sont pas exigées pour l'Herbier complet, qui compte désormais 32 espèces.
+- **Le ciel dans le retour en images** (§9.1). Chaque passage du soleil prend la couleur d'un temps vécu hors ligne (doré, bleu de pluie, vert pâle du vent, gris de brume, orangé de chaleur), avec un passage par temps quand le ciel a changé plus souvent que d'heures passées (quatre au plus). Le retour joue même quand rien d'autre n'a poussé. L'avis de retour dit le temps présent et les trois qui viennent.
+- **Jalon (1).** « Les bêtes du ciel » : les cinq espèces du temps revenues, famille du quartier. 156 jalons en tout.
+- **Équilibrage.** Le joueur de référence (§8) ne change pas ses choix de voies ni la prévision. 1ʳᵉ Saison 66 min (cible 80) ; 1ᵉʳ Cycle 2 h 38 au lieu de 2 h 41 (cible 2 h 45) ; Cycles 2 à 4 en 36, 42 et 56 min au lieu de 36, 36 et 43 (cibles 35, 35 et 45) : les voies renforcées donnent un peu plus de Sources par Cycle, et le simulateur, qui garde ses seuils, joue alors une Saison de plus pour les Cycles 3 et 4. Les essaimages reviennent à 4 h et 5 h de jeu (cibles 4 h et 5 h). Tout reste dans les ±30 %.
+- **Écart avec la roadmap.** La règle de l'atelier qui ajouterait un échange par Saison n'est pas faite : une seule règle de plus aurait demandé un niveau d'atelier en plus, et l'échange unique garde la surprise.
+- **Sauvegarde.** Version 34 : la Saison du dernier échange ; jamais d'échange pour une sauvegarde plus ancienne.
 
 ## 10. Écrans et interface
 

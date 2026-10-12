@@ -64,6 +64,7 @@ describe('the return in images on the map (§9.1, M17)', () => {
       ripened: [2],
       seedsRipened: true,
       seasons: 0,
+      weathers: [],
     });
     expect(marks.map((m) => m.kind)).toEqual(['built', 'built', 'ripe', 'seeds']);
     expect(returnSweeps(60)).toBe(1);

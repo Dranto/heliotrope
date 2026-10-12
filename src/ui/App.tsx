@@ -130,6 +130,15 @@ function WelcomeReport({ report, state }: { report: OfflineReport; state: GameSt
     ...(report.ripened.length > 0 && ripe > 0 ? [t.welcomeReport.crops(ripe)] : []),
     ...(report.seedsRipened ? [t.welcomeReport.seeds(formatNumber(seedsToGain(state)))] : []),
     ...(report.seasons > 0 ? [t.welcomeReport.seasons(report.seasons)] : []),
+    // The sky changed while away (M33): what reigns now, and what comes.
+    ...(report.weathers.length > 0
+      ? [
+          t.weather.forecast(
+            t.weather.names[state.weather.current],
+            state.weather.forecast.map((id) => t.weather.names[id]).join(', '),
+          ),
+        ]
+      : []),
   ];
   if (chips.length === 0) return null;
   return (

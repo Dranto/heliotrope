@@ -101,6 +101,9 @@ export const fr = {
       heat: 'un jour de chaleur',
     },
     forecast: (now: string, next: string) => `Le temps\u00a0: ${now}, puis ${next}`,
+    swap: (name: string) => `Faire venir ${name} juste après (une fois par Saison)`,
+    swapUsed: 'Prévision déjà échangée cette Saison',
+    paths: (day: string) => `Par ${day}, les voies de ce bâtiment jouent ×1,5`,
   },
   generatorsTitle: 'Bâtir',
   owned: 'possédés',
@@ -429,6 +432,7 @@ export const fr = {
       oldOrchard: 'Vieux vergers',
       rotation: 'La terre se repose',
       oldTree: 'Vieil arbre',
+      skyCreatures: 'Les bêtes du ciel',
       'cities.1': 'Essaimage',
       'cities.3': 'Les villes sœurs',
       firstAlliance: 'Main dans la main',
@@ -570,6 +574,7 @@ export const fr = {
       rotations: (count: number) =>
         `Récolter ${count}\u00a0cultures semées après une culture différente`,
       oldTree: 'Cueillir un fruitier jusqu’à ce qu’il devienne un vieil arbre',
+      weatherSpecies: 'Voir revenir les cinq espèces du temps',
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
     },
@@ -967,6 +972,10 @@ export const fr = {
       greenWoodpecker: 'Pic vert',
       newt: 'Triton crêté',
       snail: 'Escargot de Bourgogne',
+      wallLizard: 'Lézard des murailles',
+      kestrel: 'Faucon crécerelle',
+      salamander: 'Salamandre tachetée',
+      cicada: 'Cigale grise',
     } satisfies Record<SpeciesId, string>,
     describe: {
       parcel: (parcel: string) => `Restaurer ${parcel}`,

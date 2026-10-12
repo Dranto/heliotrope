@@ -40,7 +40,13 @@ export class GameStore {
       this.state = createInitialState(this.now());
       this.offlineSeconds = 0;
       this.offlineLight = 0;
-      this.offlineReport = { built: [], ripened: [], seedsRipened: false, seasons: 0 };
+      this.offlineReport = {
+        built: [],
+        ripened: [],
+        seedsRipened: false,
+        seasons: 0,
+        weathers: [],
+      };
     }
   }
 
