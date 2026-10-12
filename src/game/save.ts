@@ -1,3 +1,4 @@
+import { isMilestoneGift, MAX_WAITING_GIFTS } from './milestoneFamilies';
 import { INTRO_GAP_SECONDS, validIntro } from './introductions';
 import { introduceAllDue } from './onboarding';
 import { isAchievementId, type AchievementId } from './achievements';
@@ -138,6 +139,8 @@ const migrations: Record<number, Migration> = {
   // v37 adds the assembly and the growers to the Canopy, the growers and the beekeepers to the
   // Cooperatives (M36): none yet.
   36: (raw) => ({ ...raw, version: 37 }),
+  // v38 adds the laurels to the Canopy and the gifts of the Milestones (M37): none yet.
+  37: (raw) => ({ ...raw, version: 38 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -362,6 +365,9 @@ export function deserialize(json: string, now: number): GameState | null {
   state.city = validCity(data.city);
   state.alliances = validAlliances(data.alliances);
   state.greetings = validGreetings(data.greetings);
+  state.milestoneGifts = Array.isArray(data.milestoneGifts)
+    ? data.milestoneGifts.filter(isMilestoneGift).slice(0, MAX_WAITING_GIFTS)
+    : [];
   state.growth = validGrowth(data.growth);
   state.pollen = validPollen(data.pollen);
   state.weather = validWeather(data.weather, state.weather);

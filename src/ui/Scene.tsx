@@ -1,3 +1,4 @@
+import { MilestoneGifts } from './MilestoneGifts';
 import {
   lazy,
   Suspense,
@@ -488,6 +489,10 @@ export function Scene({
         <div className="map-flower" style={{ left: flower.x, top: flower.y, width: flower.width }}>
           <Flower />
         </div>
+        <MilestoneGifts
+          left={flower.x + flower.width * 0.78}
+          top={flower.y + flower.width * 1.02}
+        />
         <Butterfly onCatch={onCatch} />
       </div>
       <figcaption className="scene-caption">

@@ -126,6 +126,8 @@ describe('new Season', () => {
         'seasons.1',
         'playHours.1',
       ],
+      // Each Milestone left its gift on the map (M37).
+      milestoneGifts: ['light', 'light', 'light', 'pollen', 'pollen', 'garden', 'garden'],
       butterfly: { nextIn: state.butterfly.nextIn, visible: 0 },
       // The first Season's curve is kept for the Statistics; the second one starts (§10.5).
       history: [state.history[0], { season: 2, step: 30, points: [] }],

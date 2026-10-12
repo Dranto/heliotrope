@@ -553,11 +553,12 @@ Une fois les 17 talents appris, l'Arbre a encore une place pour les Graines des 
 | Les fontainiers | 15 | — | 1 | Une coopérative qui bâtit les collecteurs d'eau (§7.2) |
 | L'assemblée de quartier | 15 | — | 1 | Le conseil de quartier mène aussi les projets (§7.2, M36) |
 | Les amis du potager | 15 | — | 1 | Une coopérative qui ressème le potager (§7.2, M36) |
+| Les lauriers | 10 | ×2 | 3 | +3 *n* % de production par famille de Jalons complète (§9.16, M37) |
 
-La Canopée complète coûte environ 1 900 Graines : un puits de long terme, qui se remplit Cycle après Cycle. Ses effets restent liés à l'existant (synergies, Papillon, visites, Boutures) et modestes, pour allonger et alléger les Saisons tardives sans relancer leur emballement (§7, §8) ; le simulateur ne la joue pas, et les cibles du §8 ne bougent pas.
+La Canopée complète coûte environ 2 000 Graines : un puits de long terme, qui se remplit Cycle après Cycle. Ses effets restent liés à l'existant (synergies, Papillon, visites, Boutures) et modestes, pour allonger et alléger les Saisons tardives sans relancer leur emballement (§7, §8) ; le simulateur ne la joue pas, et les cibles du §8 ne bougent pas.
 
 - **Le semoir.** Une fois semé, un réglage de l'écran des Saisons choisit quand il relance : **éteint** (par défaut, décision D6 de la feuille de route), ou dès que les Graines mûres de la Saison multiplient celles déjà obtenues par **×1,5, ×2, ×3 ou ×5**. Il lance toujours une Saison libre et attend la fin d'une Saison à défi ; il travaille à chaque pas de simulation, donc hors ligne aussi. C'est l'automatisation de la couche du dessous, comme les Coopératives pour les bâtiments.
-- **Écran.** Sous l'arbre, la section « La Canopée » liste ses huit talents, leur niveau (des pastilles dorées), l'effet d'aujourd'hui et celui du niveau suivant, et le bouton Semer avec son prix. Avant les 17 talents, une ligne dit quand elle s'ouvre. Sur le dessin, une feuille dorée s'ajoute au-dessus du feuillage à chaque niveau semé et se balance doucement.
+- **Écran.** Sous l'arbre, la section « La Canopée » liste ses neuf talents, leur niveau (des pastilles dorées), l'effet d'aujourd'hui et celui du niveau suivant, et le bouton Semer avec son prix. Avant les 17 talents, une ligne dit quand elle s'ouvre. Sur le dessin, une feuille dorée s'ajoute au-dessus du feuillage à chaque niveau semé et se balance doucement.
 - **Jalons (4).** Jeune canopée (1 niveau), Canopée touffue (18 niveaux), Cime (la Canopée complète), Semis spontané (le semoir lance 10 Saisons). 120 jalons en tout.
 - **Sauvegarde.** Version 15 : les niveaux de la Canopée et les réglages du semoir, rien de semé et le semoir éteint pour une sauvegarde plus ancienne.
 
@@ -1179,6 +1180,41 @@ Roadmap P34. Le vivant revenu devient un acteur de la carte, et les demandes des
 - **Équilibrage.** Saluer reste un petit geste : au plus quelques envolées de plus par heure pour un joueur qui cherche chaque espèce. Le joueur de référence (§8) ne salue pas ; sa famille des pollinisateurs est complète dès la 1ʳᵉ Saison, les autres après les mesures. 1ʳᵉ Saison 66 min ; 2ᵉ Saison 25 min ; 1ᵉʳ Cycle 2 h 39 (cible 2 h 45) ; Cycles 2 à 4 en 36, 36 et 45 min (cibles 35, 35 et 45), plus près des cibles qu'après M33 ; Saisons à défi gagnées en 23 à 26 min ; essaimages à 4 h et 6 h de jeu (cibles 4 h et 5 h, dans les ±30 %).
 - **Écarts avec la roadmap.** Le vélo-cargo des quartiers au lien plein n'est pas dessiné : leur second coup de main suffit pour ce jalon. « Un temps choisi » devient un échange de prévision de plus, pour garder la règle de D25.
 - **Sauvegarde.** Version 36 : les saluts de chaque espèce et l'heure de jeu du dernier ; aucun pour une sauvegarde plus ancienne.
+
+### 9.16 Des Jalons qui comptent (M37)
+
+Roadmap P36, ajout d'Antoine (« ajoute aussi des interactions avec les jalons et d'autres mécaniques du jeu pour rendre leur complétion satisfaisante »). Un Jalon ne faisait qu'ajouter +1 % ; désormais il laisse un cadeau, les familles complètes comptent, et d'autres mécaniques les lisent. Code dans `src/game/milestoneFamilies.ts`, la progression dans `src/game/achievements.ts` (`achievementProgress`).
+
+- **Un cadeau sur la carte.** Chaque Jalon atteint pose un petit médaillon de laurier au pied de l'héliotrope (son compte s'affiche quand il y en a plusieurs, huit au plus). Un clic les ramasse tous ; chacun donne le geste de sa famille, et le médaillon d'éclosion (§9.3) l'annonce sous « Production +1 % » :
+
+| Famille | Cadeau |
+|---|---|
+| Lumière, Bâtiments, Améliorations | Une bouffée de Lumière : la valeur de 10 clics |
+| La fleur, Papillon doré | Un pas de 5 % de la jauge de pollen (§5.6) |
+| Le quartier, Saisons | Le potager pousse de 10 min (§9.7) |
+| La Biorégion | Une goutte d'Eau : 30 s d'Eau (§7.4) |
+
+- **Les familles complètes.** Une famille dont tous les Jalons sont atteints (les cachés sont un bonus et ne comptent pas) dore son titre dans l'écran des Jalons (« Famille complète ») et donne, pour toujours, un bonus relié à son monde et une **couleur de l'héliotrope** (§6.5). Avant, l'écran dit ce qu'elle donnera.
+
+| Famille | Bonus | Couleur |
+|---|---|---|
+| Lumière | Toute la production +10 % | Soleil |
+| Bâtiments | Les bâtiments coûtent 5 % de moins | Mousse |
+| Améliorations | Synergies ×1,1 | Safran |
+| La fleur | La jauge de pollen se remplit ×1,15 plus vite | Corail |
+| Papillon doré | Le Papillon revient 10 % plus vite | Indigo |
+| Le quartier | Chaque Jalon donne 0,2 % de plus | Prairie (les têtes lilas, or et rose mêlées) |
+| Saisons | 2 h de plus hors ligne | Automne |
+| La Biorégion | Eau ×1,1 | Eau vive |
+
+- **Voir le prochain.** Sous le titre de chaque famille, le prochain Jalon : celui qui est le plus près de son but, avec une barre et un pourcentage. Les quantités qui s'étendent sur des puissances de dix (Lumière, Lumière par seconde, valeur du clic, Eau) se comptent en ordres de grandeur ; les Jalons qui ne se mesurent pas (une action, une Saison éclair) s'affichent sans barre.
+- **D'autres mécaniques les lisent.**
+  - **Les voisins** (§9.11) demandent parfois d'atteindre un Jalon déjà aux trois quarts de son but (hors ceux comptés en ordres de grandeur, qui peuvent encore être loin).
+  - **Deux alliances** (§9.9) : « Les guirlandes » (1 famille de Jalons complète et 2 familles de l'Herbier, §9.15 : chaque Jalon donne 0,2 % de plus) et « L'almanach des voisins » (3 familles de Jalons complètes et 20 demandes servies : un panier de plus par récolte).
+  - **Les lauriers**, un talent de la Canopée (§7.1) à 3 niveaux (10, 20 puis 40 Graines) : +3 % de production par niveau et par famille de Jalons complète.
+- **Écarts avec la roadmap.** Le cadeau attend un clic au lieu d'être donné d'un coup : donné seul, il raccourcissait la 1ʳᵉ Saison de plus de 30 % (le joueur de référence ne le ramasse que dans la partie complète, §8), et le ramasser est un geste de plus sur la carte. Le prochain objectif (M10) ne désigne pas de Jalon : il compare des prix, qu'un Jalon n'a pas. Pas de nouveau Jalon : 159 en tout.
+- **Équilibrage.** Les familles se complètent tard (la Lumière demande 1 Qn au total, le quartier la grande floraison) : leurs bonus et les lauriers servent la fin de partie. Le joueur de référence ramasse les cadeaux à chaque visite des petites boucles. 1ʳᵉ Saison 66 min (inchangée) ; 1ᵉʳ Cycle 2 h 39 ; Cycles 2 à 4 en 36, 36 et 44 min ; essaimages à 4 h et 5 h, sur leurs cibles.
+- **Sauvegarde.** Version 38 : les cadeaux en attente et le niveau des lauriers ; aucun pour une sauvegarde plus ancienne.
 
 ## 10. Écrans et interface
 

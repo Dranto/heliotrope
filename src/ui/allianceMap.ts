@@ -33,6 +33,9 @@ export const THREADS: Record<AllianceId, [Point, Point]> = {
     [TREES[6]!.x, TREES[6]!.y],
     [300, -80],
   ],
+  // M37: from the courtyard to the river's meadow, and to the neighbours' market.
+  garlands: [COURTYARD, [470, 420]],
+  almanac: [COURTYARD, at(DISTRICT_PLACES.railyard)],
 };
 
 /** A gentle curve between the two ends, bowed to one side. */

@@ -4,9 +4,18 @@ import {
   achievementBonus,
   type AchievementDef,
 } from '../game/achievements';
+import { familyColour } from '../game/decor';
 import { formatNumber, formatPercent } from '../game/format';
+import {
+  familyMilestones,
+  isMilestoneFamilyComplete,
+  MILESTONE_FAMILY_BONUSES,
+  nextMilestone,
+} from '../game/milestoneFamilies';
 import { t } from '../i18n';
 import { achievementDescription, achievementName } from '../i18n/achievements';
+import { bonusesText } from '../i18n/restoration';
+import { COROLLAS } from './decorMap';
 import { Dialog } from './Dialog';
 import { useGameState } from './useGame';
 
@@ -59,19 +68,54 @@ export function Achievements({ onClose }: { onClose: () => void }) {
       <p className="hint">{t.achievements.hint}</p>
       {ACHIEVEMENT_FAMILIES.map((family) => {
         const members = ACHIEVEMENT_LIST.filter((a) => a.family === family);
-        const reached = members.filter((a) => unlocked.has(a.id)).length;
+        // Hidden Milestones are a bonus: the family is complete without them (M37).
+        const counted = familyMilestones(family);
+        const reached = counted.filter((a) => unlocked.has(a.id)).length;
+        const complete = isMilestoneFamilyComplete(state.achievements, family);
+        const colour = familyColour(family);
+        const reward = bonusesText(MILESTONE_FAMILY_BONUSES[family]);
+        const colourName = t.decor.colours[colour].toLowerCase();
+        const next = complete ? null : nextMilestone(state, family);
         return (
           <section
             key={family}
             className="achievement-family"
             aria-label={t.achievements.families[family]}
+            data-complete={complete}
           >
             <h3 className="achievement-family-title">
               {t.achievements.families[family]}
               <span className="achievement-family-count">
-                {t.achievements.familyCount(formatNumber(reached), formatNumber(members.length))}
+                {complete
+                  ? t.achievements.complete
+                  : t.achievements.familyCount(formatNumber(reached), formatNumber(counted.length))}
               </span>
             </h3>
+            <p className="achievement-family-reward">
+              <span
+                className="colour-dot"
+                style={{ background: COROLLAS[colour][0]![1] }}
+                aria-hidden="true"
+              />
+              {complete
+                ? t.achievements.reward(reward, colourName)
+                : t.achievements.toComplete(reward, colourName)}
+            </p>
+            {next && (
+              <div className="achievement-next" data-testid={`next-${family}`}>
+                <span>{t.achievements.next(achievementName(next.achievement))}</span>
+                {next.progress !== null && (
+                  <>
+                    <span className="achievement-next-bar" aria-hidden="true">
+                      <span style={{ width: `${Math.round(next.progress * 100)}%` }} />
+                    </span>
+                    <span className="achievement-next-percent">
+                      {t.achievements.progress(formatNumber(Math.floor(next.progress * 100)))}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
             <ul className="achievement-grid">
               {members.map((achievement) => (
                 <Milestone

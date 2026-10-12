@@ -2,6 +2,7 @@
 // challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
+import { completeMilestoneFamilies, milestoneFamilyBonuses } from './milestoneFamilies';
 import type { IntroState } from './introductions';
 import { bondBonuses, type Bonds } from './bonds';
 import {
@@ -91,7 +92,9 @@ export type Bonus =
   /** Adds `bonus` to global production per path working on the buildings (§9.9, M34). */
   | { kind: 'perPath'; bonus: number }
   /** The reserve of helping hands holds `units` more (§9.11, M34). */
-  | { kind: 'handSlots'; units: number };
+  | { kind: 'handSlots'; units: number }
+  /** Adds `bonus` to global production per family of Milestones complete (§9.16, M37). */
+  | { kind: 'perMilestoneFamily'; bonus: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -226,6 +229,7 @@ function collectBonuses(source: BonusSource): Bonus[] {
     ...(requests ? bondBonuses(requests.bonds) : []),
     ...(isGameState(source) ? allianceBonuses(source) : []),
     ...(isGameState(source) ? familyBonuses(source.species) : []),
+    ...(isGameState(source) ? milestoneFamilyBonuses(source.achievements) : []),
   ];
 }
 
@@ -272,6 +276,11 @@ export function globalBonus(source: BonusSource): number {
   if (perPath.length > 0 && source.growth) {
     const paths = pathsWorking({ generators: source.generators, growth: source.growth });
     for (const b of perPath) bonus += b.bonus * paths;
+  }
+  const perFamily = bonusesOf(source, 'perMilestoneFamily');
+  if (perFamily.length > 0 && isGameState(source)) {
+    const families = completeMilestoneFamilies(source.achievements).length;
+    for (const b of perFamily) bonus += b.bonus * families;
   }
   return bonus;
 }

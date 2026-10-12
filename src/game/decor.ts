@@ -3,6 +3,8 @@
 // of the heliotrope's flowers. Nothing here changes production. Names live in src/i18n, the
 // drawings and the spots in src/ui.
 import { isIntroduced } from './introductions';
+import type { AchievementFamily } from './achievements';
+import { isMilestoneFamilyComplete } from './milestoneFamilies';
 import type { GameState } from './state';
 
 export const DECOR_IDS = [
@@ -16,12 +18,32 @@ export const DECOR_IDS = [
 ] as const;
 export type DecorId = (typeof DECOR_IDS)[number];
 
-export const FLOWER_COLOURS = ['lilac', 'gold', 'rose', 'blue', 'white'] as const;
+export const FLOWER_COLOURS = [
+  'lilac',
+  'gold',
+  'rose',
+  'blue',
+  'white',
+  // M37: one colour for each family of Milestones complete (§9.16).
+  'sunny',
+  'moss',
+  'saffron',
+  'coral',
+  'indigo',
+  'meadow',
+  'autumn',
+  'stream',
+] as const;
 export type FlowerColour = (typeof FLOWER_COLOURS)[number];
 
-/** What wins a piece of decor or a colour: Milestones reached, or species back in the Herbier. */
+/**
+ * What wins a piece of decor or a colour: Milestones reached, species back in the Herbier, or a
+ * family of Milestones complete (M37).
+ */
 export type DecorCondition =
-  { kind: 'achievements'; count: number } | { kind: 'species'; count: number };
+  | { kind: 'achievements'; count: number }
+  | { kind: 'species'; count: number }
+  | { kind: 'milestoneFamily'; family: AchievementFamily };
 
 export const DECOR_CONDITIONS: Record<DecorId, DecorCondition> = {
   bench: { kind: 'achievements', count: 10 },
@@ -39,7 +61,23 @@ export const FLOWER_CONDITIONS: Record<FlowerColour, DecorCondition | null> = {
   rose: { kind: 'species', count: 6 },
   blue: { kind: 'species', count: 12 },
   white: { kind: 'achievements', count: 60 },
+  sunny: { kind: 'milestoneFamily', family: 'light' },
+  moss: { kind: 'milestoneFamily', family: 'buildings' },
+  saffron: { kind: 'milestoneFamily', family: 'upgrades' },
+  coral: { kind: 'milestoneFamily', family: 'clicks' },
+  indigo: { kind: 'milestoneFamily', family: 'butterflies' },
+  meadow: { kind: 'milestoneFamily', family: 'neighbourhood' },
+  autumn: { kind: 'milestoneFamily', family: 'seasons' },
+  stream: { kind: 'milestoneFamily', family: 'bioregion' },
 };
+
+/** The colour a complete family of Milestones gives. */
+export function familyColour(family: AchievementFamily): FlowerColour {
+  return FLOWER_COLOURS.find((colour) => {
+    const condition = FLOWER_CONDITIONS[colour];
+    return condition?.kind === 'milestoneFamily' && condition.family === family;
+  })!;
+}
 
 /** Spots of the map where a piece of decor can stand. */
 export const DECOR_SLOTS = 8;
@@ -63,9 +101,14 @@ export function isFlowerColour(value: unknown): value is FlowerColour {
 }
 
 function isMet(state: Pick<GameState, 'achievements' | 'species'>, condition: DecorCondition) {
-  return condition.kind === 'achievements'
-    ? state.achievements.length >= condition.count
-    : state.species.length >= condition.count;
+  switch (condition.kind) {
+    case 'achievements':
+      return state.achievements.length >= condition.count;
+    case 'species':
+      return state.species.length >= condition.count;
+    case 'milestoneFamily':
+      return isMilestoneFamilyComplete(state.achievements, condition.family);
+  }
 }
 
 export function isDecorUnlocked(

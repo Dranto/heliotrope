@@ -18,6 +18,8 @@ import { earnLight } from './light';
 import { nextRandom } from './random';
 import type { GameState } from './state';
 import { BOND_MAX } from './bonds';
+import { isAchievementId, type AchievementId } from './achievements';
+import { closeMilestone } from './milestoneFamilies';
 import { handWork, lightenStage } from './greatWorks';
 import { GROWTH_TIERS, pathsWorking } from './growth';
 import { isSpeciesId, type SpeciesId } from './species';
@@ -35,7 +37,9 @@ export type Need =
   | { kind: CountedNeed; count: number }
   | { kind: 'owned'; generator: GeneratorId; count: number }
   | { kind: 'greet'; species: SpeciesId; count: number }
-  | { kind: 'honey'; count: number };
+  | { kind: 'honey'; count: number }
+  /** M37: a Milestone close to its goal, reached (§9.16). */
+  | { kind: 'milestone'; id: AchievementId; count: number };
 
 export const HAND_IDS = ['quarter', 'bloom', 'ripen', 'flight', 'works', 'sky'] as const;
 /**
@@ -108,12 +112,14 @@ function counter(state: GameState, need: Need): number {
       return state.greetings.counts[need.species] ?? 0;
     case 'honey':
       return state.orchard.honey;
+    case 'milestone':
+      return Number(state.achievements.includes(need.id));
   }
 }
 
 /** Needs counted from the request on; the others read what is owned now. */
 function isRelative(need: Need): boolean {
-  return need.kind !== 'owned' && need.kind !== 'honey';
+  return need.kind !== 'owned' && need.kind !== 'honey' && need.kind !== 'milestone';
 }
 
 /** How much of a request is done, from 0 to its count. */
@@ -145,6 +151,9 @@ function possibleNeeds(state: GameState): Need[] {
   if (GENERATOR_IDS.some((id) => state.generators[id] >= GROWTH_TIERS[0] * 0.8)) {
     needs.push({ kind: 'paths', count: 1 });
   }
+  // M37: a Milestone close to its goal.
+  const milestone = closeMilestone(state);
+  if (milestone) needs.push({ kind: 'milestone', id: milestone, count: 1 });
   const revealed = GENERATOR_IDS.filter((id) => isGeneratorRevealed(state, id));
   const generator = revealed[revealed.length - 1];
   if (generator) {
@@ -315,6 +324,7 @@ function isNeed(value: unknown): value is Need {
   }
   if (kind === 'greet') return isSpeciesId(species);
   if (kind === 'honey') return true;
+  if (kind === 'milestone') return isAchievementId((value as Record<string, unknown>).id);
   return typeof kind === 'string' && (COUNTED_NEEDS as readonly string[]).includes(kind);
 }
 
