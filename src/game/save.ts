@@ -16,6 +16,7 @@ import { validOrchard } from './orchard';
 import { validCity } from './cities';
 import { validAlliances } from './alliances';
 import { validGrowth } from './growth';
+import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './pollen';
 import { isPanelId, shownPanels, type PanelId } from './panels';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
@@ -109,6 +110,8 @@ const migrations: Record<number, Migration> = {
   25: (raw) => ({ ...raw, version: 26 }),
   // v27 adds the paths of the buildings that grow (§5.5, M26): none picked yet.
   26: (raw) => ({ ...raw, version: 27 }),
+  // v28 adds the pollen gauge and the flights sent (§5.6, M27): empty.
+  27: (raw) => ({ ...raw, version: 28 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -124,6 +127,13 @@ function isCount(value: unknown): value is number {
 }
 
 /** A running effect, no longer than the parcels and projects of `state` allow. */
+/** The longest an effect can run: a butterfly's lasts longer when caught during a flight (§5.6). */
+function maxEffectSeconds(state: GameState, kind: EffectKind): number {
+  return kind === 'flight'
+    ? FLIGHT_MAX_SECONDS
+    : effectSeconds(state, kind) * FLIGHT_BUTTERFLY_FACTOR;
+}
+
 function isEffect(value: unknown, state: GameState): value is ActiveEffect {
   if (typeof value !== 'object' || value === null) return false;
   const { kind, remaining } = value as Record<string, unknown>;
@@ -132,7 +142,7 @@ function isEffect(value: unknown, state: GameState): value is ActiveEffect {
     (EFFECT_KINDS as readonly string[]).includes(kind) &&
     isFiniteNumber(remaining) &&
     remaining > 0 &&
-    remaining <= effectSeconds(state, kind as EffectKind)
+    remaining <= maxEffectSeconds(state, kind as EffectKind)
   );
 }
 
@@ -325,6 +335,7 @@ export function deserialize(json: string, now: number): GameState | null {
   state.city = validCity(data.city);
   state.alliances = validAlliances(data.alliances);
   state.growth = validGrowth(data.growth);
+  state.pollen = validPollen(data.pollen);
   if (Array.isArray(data.seenPanels)) {
     state.seenPanels = [...new Set<PanelId>(data.seenPanels.filter(isPanelId))];
   }

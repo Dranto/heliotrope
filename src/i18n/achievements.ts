@@ -101,6 +101,8 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.grandBloom;
     case 'paths':
       return describe.paths(condition.count);
+    case 'flights':
+      return describe.flights(condition.count);
     case 'fruitHarvests':
       return describe.fruitHarvests(condition.count);
     case 'fruitVarieties':

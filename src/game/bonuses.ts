@@ -65,6 +65,8 @@ export type Bonus =
   | { kind: 'perDistrict'; bonus: number }
   /** Multiplies how fast the courtyard garden's crops grow (§9.7, §6.6). */
   | { kind: 'gardenGrowth'; factor: number }
+  /** The pollen gauge fills faster (§5.6). */
+  | { kind: 'pollenFill'; factor: number }
   /** The neighbours bring `units` more of their building (§9.6). */
   | { kind: 'cuttingsGift'; units: number }
   /** `generator` gains `bonusPerUnit` (additive, like a synergy) per unit of `source` (§5.5). */
@@ -189,7 +191,8 @@ export function factorOf(
     | 'butterflyInterval'
     | 'visitInterval'
     | 'harvestFactor'
-    | 'gardenGrowth',
+    | 'gardenGrowth'
+    | 'pollenFill',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);
 }

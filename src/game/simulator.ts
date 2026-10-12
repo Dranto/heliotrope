@@ -1,5 +1,6 @@
 // Headless balancing simulator (docs/game-design.md §8). Replays a simple active strategy with
 // the game's own formulas and data, and reports when each pacing event of §8 happens.
+import { pollinate } from './pollen';
 import {
   buyCollector,
   canBuyCollector,
@@ -220,7 +221,7 @@ export function simulate({
       const dt = Math.min(missing / rate, maxStepSeconds, maxSeconds - seconds);
       const clicks = clicksPerSecond * dt;
       state = earnLight(tick(state, dt), clicks * clickValue(state));
-      state = { ...state, clicks: state.clicks + clicks };
+      state = pollinate({ ...state, clicks: state.clicks + clicks }, clicks);
       seconds += dt;
       watchButterfly();
       noteFirstGenerators();
@@ -238,7 +239,10 @@ export function simulate({
       // Nothing left worth buying (a challenge Season's limits, §7.3): keep playing.
       const dt = Math.min(maxStepSeconds, maxSeconds - seconds);
       state = earnLight(tick(state, dt), clicksPerSecond * dt * clickValue(state));
-      state = { ...state, clicks: state.clicks + clicksPerSecond * dt };
+      state = pollinate(
+        { ...state, clicks: state.clicks + clicksPerSecond * dt },
+        clicksPerSecond * dt,
+      );
       seconds += dt;
       watchButterfly();
       if (advisedSeason === undefined && state.totalLight >= ADVISED_SEASON_LIGHT) {

@@ -115,7 +115,7 @@ export function upgradeSynergyBonus(state: GameState): number {
 
 /**
  * §8: multiplier applied to every generator: Seeds × Sources × Milestones × biodiversity ×
- * upgrade synergies × parcels and projects × Floraison, and the constraint of a challenge Season
+ * upgrade synergies × parcels and projects × Floraison × the pollen's flight (§5.6), and the constraint of a challenge Season
  * (§7.3).
  */
 export function globalMultiplier(state: GameState): number {
@@ -127,6 +127,7 @@ export function globalMultiplier(state: GameState): number {
     (1 + biodiversityBonus(state)) *
     (1 + upgradeSynergyBonus(state)) *
     effectFactor(state.effects, 'bloom') *
+    effectFactor(state.effects, 'flight') *
     challengeProductionFactor(state)
   );
 }

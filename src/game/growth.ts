@@ -49,7 +49,7 @@ export const GROWTH: Record<GeneratorId, readonly (readonly [Bonus, Bonus])[]> =
       feeds('rooftopGarden', 'pot', 0.0025),
     ],
     [times('pot', 1.5), { kind: 'gardenGrowth', factor: 1.15 }],
-    [perSpecies('pot', 0.05), { kind: 'global', bonus: 0.02 }],
+    [perSpecies('pot', 0.05), { kind: 'pollenFill', factor: 1.25 }],
   ],
   balconyPanel: [
     [

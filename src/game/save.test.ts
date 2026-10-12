@@ -380,7 +380,7 @@ describe('export and import', () => {
     expect(state.projects).toEqual(['tram']);
   });
 
-  it('accepts an effect lengthened by a project, but no longer', () => {
+  it('accepts an effect lengthened by a project and a flight (§5.6), but no longer', () => {
     const json = (remaining: number) =>
       JSON.stringify({
         version: STATE_VERSION,
@@ -388,7 +388,9 @@ describe('export and import', () => {
         effects: [{ kind: 'bloom', remaining }],
       });
     expect(deserialize(json(85), 0)!.effects).toEqual([{ kind: 'bloom', remaining: 85 }]);
-    expect(deserialize(json(95), 0)!.effects).toEqual([]);
+    // 90 s with the project, ×1.5 when the butterfly is caught during a pollen flight.
+    expect(deserialize(json(135), 0)!.effects).toEqual([{ kind: 'bloom', remaining: 135 }]);
+    expect(deserialize(json(140), 0)!.effects).toEqual([]);
   });
 
   it('migrates a v7 save with no talent learnt and every Seed to spend', () => {

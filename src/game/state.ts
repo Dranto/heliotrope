@@ -23,12 +23,13 @@ import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { SpeciesId } from './species';
 import { createCanopyState, type CanopyState, type TalentId } from './talents';
 import { createGrowthState, type GrowthState } from './growth';
+import { createPollenState, type PollenState } from './pollen';
 import type { PanelId } from './panels';
 import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 27;
+export const STATE_VERSION = 28;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -143,6 +144,8 @@ export interface GameState {
   alliances: AlliancesState;
   /** The paths picked as the buildings grow (§5.5, M26). Kept across Seasons and Cycles. */
   growth: GrowthState;
+  /** The pollen gauge around the flower and the flights sent (§5.6, M27). */
+  pollen: PollenState;
   /** Side menu panels the player has touched (§10.1, M25); the others glow until then. */
   seenPanels: PanelId[];
   /** Golden Butterflies caught over all Seasons (§9.2). */
@@ -226,6 +229,7 @@ export function createInitialState(now: number): GameState {
     city: createCityState(),
     alliances: createAlliancesState(),
     growth: createGrowthState(),
+    pollen: createPollenState(),
     seenPanels: ['generators'],
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },

@@ -102,6 +102,8 @@ export type AchievementCondition =
   | { kind: 'grandBloom' }
   /** Paths working on the buildings that grow (§5.5). */
   | { kind: 'paths'; count: number }
+  /** Pollen flights sent over all Seasons (§5.6). */
+  | { kind: 'flights'; count: number }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -198,6 +200,8 @@ export type AchievementId =
   | 'grandBloom'
   | 'firstPath'
   | 'manyPaths'
+  | 'firstFlight'
+  | 'pollenStorm'
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -358,6 +362,9 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   // The buildings that grow (§5.5).
   { id: 'firstPath', family: 'buildings', condition: { kind: 'paths', count: 1 } },
   { id: 'manyPaths', family: 'buildings', condition: { kind: 'paths', count: 12 } },
+  // The pollen (§5.6).
+  { id: 'firstFlight', family: 'clicks', condition: { kind: 'flights', count: 1 } },
+  { id: 'pollenStorm', family: 'clicks', condition: { kind: 'flights', count: 100 } },
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
   {
@@ -604,6 +611,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.alliances.bloomed;
     case 'paths':
       return pathsWorking(state) >= condition.count;
+    case 'flights':
+      return state.pollen.flights >= condition.count;
     case 'fruitHarvests':
       return state.orchard.harvests >= condition.count;
     case 'fruitVarieties':

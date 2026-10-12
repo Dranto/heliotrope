@@ -10,7 +10,8 @@ export type EffectKind =
   | 'grazing'
   | 'festival'
   | 'fireflies'
-  | 'fleaMarket';
+  | 'fleaMarket'
+  | 'flight';
 
 export const EFFECT_KINDS: readonly EffectKind[] = [
   'bloom',
@@ -22,6 +23,7 @@ export const EFFECT_KINDS: readonly EffectKind[] = [
   'festival',
   'fireflies',
   'fleaMarket',
+  'flight',
 ];
 
 export interface ActiveEffect {
@@ -37,7 +39,8 @@ export interface ActiveEffect {
  * rooftop gardens and greenhouses ×2 for 20 min. The visits of the city (§9.6, M18): the
  * transhumance makes the balcony panels ×3 for 60 s, the harvest festival the Golden Butterfly's
  * harvest ×2 for 120 s, the fireflies the click ×3 for 60 s, the solar flea market halves the
- * price of the most expensive building owned for 60 s.
+ * price of the most expensive building owned for 60 s. The pollen's flight (§5.6, M27): every
+ * building ×1.5 for 10 s.
  */
 export const EFFECTS: Record<EffectKind, { factor: number; seconds: number }> = {
   bloom: { factor: 3, seconds: 60 },
@@ -49,6 +52,7 @@ export const EFFECTS: Record<EffectKind, { factor: number; seconds: number }> = 
   festival: { factor: 2, seconds: 120 },
   fireflies: { factor: 3, seconds: 60 },
   fleaMarket: { factor: 0.5, seconds: 60 },
+  flight: { factor: 1.5, seconds: 10 },
 };
 
 /** Extra seconds of the Nuée de migrateurs per species of the Herbier (§9.6). */

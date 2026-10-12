@@ -484,6 +484,21 @@ describe('App', () => {
     );
   });
 
+  it('fills the pollen gauge with the clicks and sends a flight across the map (§5.6, M27)', () => {
+    const fresh = createInitialState(0);
+    saveGame({ ...fresh, pollen: { gauge: 0.99, flights: 0 } });
+    renderApp();
+    expect(
+      screen.getByRole('meter', { name: 'Jauge de pollen\u00a0: 99\u00a0%' }),
+    ).toBeInTheDocument();
+    expect(document.querySelector('.pollen-wave')).toBeNull();
+    fireEvent.click(flower());
+    fireEvent.click(flower());
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '0');
+    expect(flower().closest('section')).toHaveAttribute('data-flight', 'true');
+    expect(document.querySelector('.pollen-wave')).not.toBeNull();
+  });
+
   it('offers a tab bar for small screens (§10.3)', () => {
     renderApp();
     const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });

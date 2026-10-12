@@ -54,6 +54,7 @@ export const fr = {
   light: 'Lumière',
   perSecond: '/ s',
   clickFlower: 'Récolter la lumière de l’héliotrope',
+  pollen: (percent: string) => `Jauge de pollen\u00a0: ${percent}\u00a0%`,
   generatorsTitle: 'Bâtir',
   owned: 'possédés',
   produces: 'produit',
@@ -200,6 +201,7 @@ export const fr = {
       festival: (seconds: string) => `Fête des récoltes ×2 · ${seconds}`,
       fireflies: (seconds: string) => `Lucioles, clic ×3 · ${seconds}`,
       fleaMarket: (seconds: string) => `Brocante, moitié prix · ${seconds}`,
+      flight: (seconds: string) => `Envolée de pollen ×1,5 · ${seconds}`,
     },
   },
   visits: {
@@ -379,6 +381,8 @@ export const fr = {
       grandBloom: 'La grande floraison',
       firstPath: 'Première voie',
       manyPaths: 'La ville aux mille formes',
+      firstFlight: 'Première envolée',
+      pollenStorm: 'Tempête de pollen',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -491,6 +495,10 @@ export const fr = {
         count === 1
           ? 'Choisir la voie d’un bâtiment qui grandit'
           : `Faire jouer ${count} voies de bâtiments`,
+      flights: (count: number) =>
+        count === 1
+          ? 'Remplir la jauge de pollen et lancer une envolée'
+          : `Lancer ${count} envolées de pollen`,
       fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
       cycleChallenges: (count: number) =>
         count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
@@ -601,6 +609,7 @@ export const fr = {
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}\u00a0: +${percent}\u00a0% par parcelle restaurée`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
+      pollenFill: (factor: string) => `La jauge de pollen se remplit ×${factor} plus vite`,
       cuttingsGift: (units: number) =>
         units === 1
           ? 'Les voisins apportent une bouture de plus'
@@ -616,6 +625,7 @@ export const fr = {
       festival: 'La Fête des récoltes',
       fireflies: 'Les Lucioles',
       fleaMarket: 'La Brocante solaire',
+      flight: 'L’Envolée de pollen',
     },
   },
   greatWorks: {
