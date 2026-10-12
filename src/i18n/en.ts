@@ -19,6 +19,23 @@ export const en: Texts = {
   perSecond: '/ s',
   clickFlower: 'Harvest the heliotrope’s light',
   pollen: (percent: string) => `Pollen gauge: ${percent}%`,
+  weather: {
+    names: {
+      sun: 'Bright sun',
+      shower: 'Shower',
+      wind: 'Wind',
+      mist: 'Mist',
+      heat: 'Heat',
+    },
+    day: {
+      sun: 'a day of bright sun',
+      shower: 'a showery day',
+      wind: 'a windy day',
+      mist: 'a misty day',
+      heat: 'a hot day',
+    },
+    forecast: (now: string, next: string) => `Weather: ${now}, then ${next}`,
+  },
   generatorsTitle: 'Build',
   owned: 'owned',
   produces: 'produces',
@@ -336,6 +353,11 @@ export const en: Texts = {
       manyPaths: 'A city of a thousand shapes',
       firstFlight: 'First flight',
       pollenStorm: 'Pollen storm',
+      'weather.sun': 'Full sun',
+      'weather.shower': 'Singing in the rain',
+      'weather.wind': 'The wind rises',
+      'weather.mist': 'City of mist',
+      'weather.heat': 'Indian summer',
       lockKeeper: 'The lock keeper watches',
       'cycleChallenges.1': 'Come hell or high water',
       'cycleChallenges.3': 'Keeper of the river',
@@ -440,6 +462,7 @@ export const en: Texts = {
         count === 1
           ? 'Pick the path of a growing building'
           : `Have ${count} building paths at work`,
+      weather: (day: string) => `Live through ${day}`,
       flights: (count: number) =>
         count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
@@ -805,6 +828,7 @@ export const en: Texts = {
       redstart: 'Black redstart',
       greenWoodpecker: 'Green woodpecker',
       newt: 'Great crested newt',
+      snail: 'Burgundy snail',
     },
     describe: {
       parcel: (parcel: string) => `Restore ${parcel}`,
@@ -815,6 +839,7 @@ export const en: Texts = {
       challenge: (challenge: string) => `Win ${challenge}`,
       visit: (visit: string, count: number) => `${visit}, ${count} times`,
       corridor: (family: string, length: number) => `A ${family} corridor of ${length} parcels`,
+      weather: (day: string) => `Comes out on ${day}`,
     },
   },
   challenges: {

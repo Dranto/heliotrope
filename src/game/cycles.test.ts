@@ -20,7 +20,7 @@ function ready(overrides: Partial<GameState> = {}): GameState {
     totalLight: 1e10,
     talents: ['gardenersCoop', 'mycorrhiza', 'nectarFlowers'],
     resources: { light: 1e9, water: 3e5 },
-    allTimeWater: 1e7,
+    allTimeWater: 1.25e7,
     collectors: { roofTanks: 5, swales: 3, ponds: 2, streams: 1 },
     sites: { wetlands: 4, meadows: 2, foodForests: 1, oldForest: 0, hillsides: 0 },
     parcels: ['river'],
@@ -33,10 +33,10 @@ function ready(overrides: Partial<GameState> = {}): GameState {
 describe('Sources formula (§7.4)', () => {
   it('turns the Water of every Cycle into Sources, square-root style', () => {
     expect(sourcesForWater(0)).toBe(0);
-    expect(sourcesForWater(4e5)).toBe(1);
-    expect(sourcesForWater(1e7)).toBe(5);
+    expect(sourcesForWater(5e5)).toBe(1);
+    expect(sourcesForWater(1.25e7)).toBe(5);
     expect(sourcesToGain(ready({ sources: 2 }))).toBe(3);
-    expect(waterToNextSource(ready())).toBeCloseTo(36 * 4e5 - 1e7);
+    expect(waterToNextSource(ready())).toBeCloseTo(36 * 5e5 - 1.25e7);
   });
 
   it('is available from one Source, advised from five for the first Cycle', () => {
@@ -97,6 +97,6 @@ describe('new Cycle', () => {
 
   it('unlocks the hidden "Grandes eaux" when 25 Sources spring at once', () => {
     expect(startNewCycle(ready()).achievements).not.toContain('floodTide');
-    expect(startNewCycle(ready({ allTimeWater: 2.5e8 })).achievements).toContain('floodTide');
+    expect(startNewCycle(ready({ allTimeWater: 3.2e8 })).achievements).toContain('floodTide');
   });
 });

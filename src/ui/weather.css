@@ -1,0 +1,162 @@
+/* The weather (§9.10, M28): a veil over the city, its moving details, and the forecast icons. */
+.weather-veil {
+  pointer-events: none;
+  fill: transparent;
+  transition: fill 4s ease;
+}
+
+.weather-veil[data-weather='sun'] {
+  fill: rgb(255 236 170 / 0.08);
+}
+
+.weather-veil[data-weather='shower'] {
+  fill: rgb(110 140 170 / 0.22);
+}
+
+.weather-veil[data-weather='wind'] {
+  fill: rgb(220 235 225 / 0.06);
+}
+
+.weather-veil[data-weather='mist'] {
+  fill: rgb(240 242 245 / 0.32);
+}
+
+.weather-veil[data-weather='heat'] {
+  fill: rgb(255 170 90 / 0.1);
+}
+
+.weather {
+  pointer-events: none;
+}
+
+.weather-rain path {
+  stroke: rgb(225 238 248 / 0.9);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  animation: weather-rain 0.9s linear infinite;
+}
+
+.weather-wind ellipse {
+  fill: #7ea866;
+  opacity: 0;
+  animation: weather-leaf 7s linear infinite;
+}
+
+.weather-glints path {
+  stroke: rgb(255 248 220 / 0.95);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  animation: weather-glint 2.8s ease-in-out infinite;
+  opacity: 0;
+}
+
+.weather-mist ellipse {
+  fill: rgb(250 250 252 / 0.45);
+  filter: blur(14px);
+  animation: weather-mist 18s ease-in-out infinite alternate;
+}
+
+@keyframes weather-rain {
+  from {
+    transform: translate(0, -40px);
+  }
+  to {
+    transform: translate(-10px, 40px);
+  }
+}
+
+@keyframes weather-leaf {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(720px, 60px);
+    opacity: 0;
+  }
+}
+
+@keyframes weather-glint {
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes weather-mist {
+  to {
+    transform: translateX(40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-rain,
+  .weather-wind {
+    display: none;
+  }
+  .weather-glints path,
+  .weather-mist ellipse {
+    animation: none;
+  }
+  .weather-glints path {
+    opacity: 0.6;
+  }
+}
+
+.scene-weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(251 246 236 / 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.weather-next {
+  display: inline-flex;
+  gap: 0.15rem;
+  opacity: 0.6;
+}
+
+.weather-next .weather-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.weather-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.weather-icon .weather-sun {
+  fill: #f2c14e;
+  stroke: #d99a2b;
+}
+
+.weather-icon[data-weather='heat'] .weather-sun {
+  fill: #f29a4e;
+  stroke: #d9702b;
+}
+
+.weather-icon .weather-wave {
+  stroke: #d9702b;
+}
+
+.weather-icon .weather-cloud {
+  fill: #eef2f5;
+}
+
+.weather-icon .weather-drop {
+  stroke: #5f8fb3;
+}

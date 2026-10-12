@@ -55,6 +55,23 @@ export const fr = {
   perSecond: '/ s',
   clickFlower: 'Récolter la lumière de l’héliotrope',
   pollen: (percent: string) => `Jauge de pollen\u00a0: ${percent}\u00a0%`,
+  weather: {
+    names: {
+      sun: 'Grand soleil',
+      shower: 'Averse',
+      wind: 'Vent',
+      mist: 'Brume',
+      heat: 'Chaleur',
+    },
+    day: {
+      sun: 'un jour de grand soleil',
+      shower: 'un jour d’averse',
+      wind: 'un jour de vent',
+      mist: 'un jour de brume',
+      heat: 'un jour de chaleur',
+    },
+    forecast: (now: string, next: string) => `Le temps\u00a0: ${now}, puis ${next}`,
+  },
   generatorsTitle: 'Bâtir',
   owned: 'possédés',
   produces: 'produit',
@@ -383,6 +400,11 @@ export const fr = {
       manyPaths: 'La ville aux mille formes',
       firstFlight: 'Première envolée',
       pollenStorm: 'Tempête de pollen',
+      'weather.sun': 'Plein soleil',
+      'weather.shower': 'Chanter sous la pluie',
+      'weather.wind': 'Le vent se lève',
+      'weather.mist': 'Ville de brume',
+      'weather.heat': 'Été indien',
       lockKeeper: 'L’éclusier veille',
       'cycleChallenges.1': 'Contre vents et marées',
       'cycleChallenges.3': 'Gardien de la rivière',
@@ -495,6 +517,7 @@ export const fr = {
         count === 1
           ? 'Choisir la voie d’un bâtiment qui grandit'
           : `Faire jouer ${count} voies de bâtiments`,
+      weather: (day: string) => `Vivre ${day}`,
       flights: (count: number) =>
         count === 1
           ? 'Remplir la jauge de pollen et lancer une envolée'
@@ -869,6 +892,7 @@ export const fr = {
       redstart: 'Rougequeue noir',
       greenWoodpecker: 'Pic vert',
       newt: 'Triton crêté',
+      snail: 'Escargot de Bourgogne',
     } satisfies Record<SpeciesId, string>,
     describe: {
       parcel: (parcel: string) => `Restaurer ${parcel}`,
@@ -879,6 +903,7 @@ export const fr = {
       challenge: (challenge: string) => `Réussir ${challenge}`,
       visit: (visit: string, count: number) => `${visit}, ${count} fois`,
       corridor: (family: string, length: number) => `Une trame ${family} de ${length} parcelles`,
+      weather: (day: string) => `Sort pendant ${day}`,
     },
   },
   challenges: {

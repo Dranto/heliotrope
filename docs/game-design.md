@@ -596,7 +596,7 @@ Un collecteur apparaît quand la Saison a gagné la moitié de son premier prix,
 **Le Cycle de l'eau (deuxième prestige).**
 
 ```
-sourcesTotalesMéritées = floor( sqrt( eauTotaleTousCycles / 4e5 ) )
+sourcesTotalesMéritées = floor( sqrt( eauTotaleTousCycles / 5e5 ) )
 sourcesGagnées         = sourcesTotalesMéritées − sourcesDéjàObtenues
 bonusSources           = +10 % de production par Source (multiplicateur à part)
                          +10 % d'Eau par Source
@@ -861,7 +861,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 
 **Implémentation (jalon 4).** `src/game/achievements.ts`, 43 jalons au départ.
 
-**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
+**Plus de jalons (post-M7, 2026-10-10).** Demande d'Antoine : renforcer le sentiment de progression avec des jalons créatifs ou liés à des actions et des événements du jeu. On passe à **92 jalons** (97 avec ceux de M8, ci-dessous, 109 avec ceux de M9, §7.4, 113 avec ceux de M11, §9.6, 116 avec ceux de M12, §6.4, 120 avec ceux de M13, §7.1, 125 avec ceux de M14, §9.7, 130 avec ceux de M15, §7.5, 134 avec ceux de M20, §6.6, 136 avec ceux de M22, §9.8, 138 avec ceux de M23, §7.6, 140 avec ceux de M24, §9.9, 142 avec ceux de M26, §5.5, 144 avec ceux de M27, §5.6, 149 avec ceux de M28, §9.10), toujours **+1 % chacun** (le simulateur reste dans les cibles du §8 : 1ʳᵉ Saison conseillée à 83 min au lieu de 88, ratio 0,83 ; 2ᵉ Saison 39 min au lieu de 43). L'écran les range par famille, avec le compte de chacune :
 
 - **Lumière** : récolter 1 000, 1 M, 1 Md, 1 Bn, 1 Bd, 1 Tn, 1 Td, 1 Qn Lumière au total (8) ; produire 1 000, 1 M, 1 Md Lumière par seconde (3).
 - **Bâtiments** : 1, 50, 100 et 200 exemplaires de chacun des 8 générateurs, dans la Saison en cours (32) ; « Mosaïque » (10 de chaque), « Courtepointe » (50 de chaque) ; cachés : « Jardin sauvage » (100 de chaque), « Tout dans le même pot » (50 Héliotropes en pot et aucun autre bâtiment).
@@ -998,6 +998,29 @@ Des **synergies entre systèmes** à composer (roadmap P23, décision D16), à l
 - **Sauvegarde.** Version 25 : les alliances choisies, le Cycle du dernier retrait et la floraison, vides pour une sauvegarde plus ancienne.
 
 ---
+
+### 9.10 Le temps qu'il fait (M28)
+
+Roadmap P27, décision D19 : au hasard, avec trois temps de prévision. Code dans `src/game/weather.ts`, carte et prévision dans `src/ui/WeatherArt.tsx`.
+
+- **Le ciel.** Le temps s'ouvre avec la 2ᵉ Saison (ou le premier Cycle) : la première Saison reste sous un grand soleil immobile, sans effet ni prévision. Ensuite, il change toutes les 15 à 30 min de jeu (tirées au hasard), en ligne comme hors ligne. Le hasard vient d'une graine propre au temps, tirée de celle de la sauvegarde, pour que le temps ne change jamais ce que donne le Papillon doré. Il reste d'une Saison et d'un Cycle à l'autre.
+- **Ce que chaque temps favorise** (jamais de pénalité) :
+
+| Temps | Sur la carte | Favorise |
+|---|---|---|
+| Grand soleil | Reflets qui scintillent | Panneaux de balcon et Centrale à miroirs ×1,25 |
+| Averse | Pluie qui tombe, ciel bleuté | Potagers sur le toit ×1,25, le potager de la cour pousse ×1,25 plus vite |
+| Vent | Feuilles qui traversent la ville | La Récolte du Papillon doré ×1,5 |
+| Brume | Voile blanc qui dérive | Biodiversité ×1,15 |
+| Chaleur | Lumière orangée | Canopée urbaine ×1,25, +1 % de production par parcelle restaurée |
+
+- **Prévision sans texte.** Dans la légende de la carte, à côté du sélecteur de vue : l'icône du temps présent, puis les trois suivants plus petits. Leurs noms sont lus par les lecteurs d'écran et en info-bulle.
+- **Espèce.** L'escargot de Bourgogne sort la première fois qu'il pleut (§9.5), dans la cour. Il n'est pas exigé pour l'Herbier complet. L'Herbier compte désormais 28 espèces.
+- **Jalons (5).** Un par temps vécu (« Plein soleil », « Chanter sous la pluie », « Le vent se lève », « Ville de brume », « Été indien »). 149 jalons en tout.
+- **Animations réduites.** Ni pluie ni feuilles : seuls restent le voile de couleur, des reflets fixes et la brume immobile.
+- **Équilibrage.** Le joueur de référence vit le temps comme les autres ; la 1ʳᵉ Saison conseillée ne change pas (66 min, cible 80 min). La roadmap faisait aussi revenir plus tôt le Papillon (vent) et les visites (brume) : comme leurs Averses doublent l'Eau, le 2ᵉ Cycle passait de 3 Saisons à 2. Ces deux temps favorisent donc la Récolte du Papillon et la biodiversité. Pour la même raison, l'averse favorise les potagers plutôt que l'Eau. Le pollen (§5.6) avait déjà réduit la marge du 2ᵉ Cycle à presque rien (7,9 Sources sur les 8 visées au bout de 2 Saisons). Pour la retrouver, le diviseur des Sources passe de 4e5 à 5e5 (§7.4) : le 1ᵉʳ Cycle conseillé ne bouge pas (2 h 27, cible 2 h 45), les Cycles 2 à 4 durent 36, 36 et 51 min (cibles 35, 35 et 45). Un joueur en cours garde ses Sources ; la suivante lui demande un peu plus d'Eau.
+- **Pas encore fait.** La roadmap liait aussi certaines voies (§5.5) et alliances à un temps, et le retour en images (M17) au temps passé hors ligne : laissés pour plus tard, pour garder ce jalon petit.
+- **Sauvegarde.** Version 29 : le temps présent, le temps restant, la prévision, la graine et les temps vécus ; une sauvegarde plus ancienne reçoit un ciel neuf.
 
 ## 10. Écrans et interface
 
