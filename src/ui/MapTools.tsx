@@ -20,9 +20,14 @@ import { downloadPhoto, takePhoto } from './photo';
 import { useGameState, useGameStore } from './useGame';
 
 function conditionText(condition: DecorCondition): string {
-  return condition.kind === 'achievements'
-    ? t.decor.achievements(condition.count)
-    : t.decor.species(condition.count);
+  switch (condition.kind) {
+    case 'achievements':
+      return t.decor.achievements(condition.count);
+    case 'species':
+      return t.decor.species(condition.count);
+    case 'milestoneFamily':
+      return t.decor.milestoneFamily(t.achievements.families[condition.family]);
+  }
 }
 
 /** While decorating: the pieces won and to win, and the colour of the heliotrope. */

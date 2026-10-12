@@ -4,6 +4,7 @@ import { WEATHER_IDS, type WeatherId } from './weather';
 import { WEATHER_SPECIES } from './species';
 import { totalGreetings } from './greetings';
 import { completeFamilies } from './families';
+import { MAX_WAITING_GIFTS, milestoneGift } from './milestoneFamilies';
 import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
@@ -731,17 +732,150 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
   }
 }
 
+/** Conditions on amounts spanning many powers of ten: their progress reads in orders of magnitude. */
+const LOG_KINDS: readonly AchievementCondition['kind'][] = [
+  'allTimeLight',
+  'lightPerSecond',
+  'clickValue',
+  'allTimeWater',
+];
+
+export function isMeasuredInPowers(condition: AchievementCondition): boolean {
+  return LOG_KINDS.includes(condition.kind);
+}
+
+/** How far a condition is, as [have, need]; null for the ones that cannot be measured. */
+function measure(state: GameState, condition: AchievementCondition): [number, number] | null {
+  switch (condition.kind) {
+    case 'allTimeLight':
+      return [state.allTimeLight, condition.amount];
+    case 'lightPerSecond':
+      return [lightPerSecond(state), condition.amount];
+    case 'clickValue':
+      return [clickValue(state), condition.amount];
+    case 'allTimeWater':
+      return [state.allTimeWater, condition.amount];
+    case 'owned':
+      return [state.generators[condition.generator], condition.count];
+    case 'clicks':
+      return [state.clicks, condition.count];
+    case 'butterflies':
+      return [state.butterflies, condition.count];
+    case 'visits':
+      return [state.visits[condition.visit], condition.count];
+    case 'cityVisits':
+      return [cityVisits(state), condition.count];
+    case 'seasons':
+      return [state.seasons, condition.count];
+    case 'everyGenerator':
+      return [Math.min(...GENERATOR_IDS.map((id) => state.generators[id])), condition.count];
+    case 'upgrades':
+      return [state.upgrades.length, condition.count];
+    case 'upgradeSet': {
+      const set: readonly UpgradeId[] = UPGRADE_SETS[condition.set];
+      return [state.upgrades.filter((id) => set.includes(id)).length, condition.count];
+    }
+    case 'parcels':
+      return [state.parcels.length, condition.count];
+    case 'districts':
+      return [state.districts.length, condition.count];
+    case 'projects':
+      return [state.projects.length, condition.count];
+    case 'talents':
+      return [state.talents.length, condition.count];
+    case 'canopyLevels':
+      return [canopyLevels(state), condition.count];
+    case 'sowerSeasons':
+      return [state.canopy.sowerSeasons, condition.count];
+    case 'harvests':
+      return [state.garden.harvests, condition.count];
+    case 'varieties':
+      return [state.garden.varieties.length, condition.count];
+    case 'species':
+      return [state.species.length, condition.count];
+    case 'challenges':
+      return [state.challenges.length, condition.count];
+    case 'cooperativePurchases':
+      return [
+        Object.values(state.cooperatives.purchases).reduce((a, b) => a + b, 0),
+        condition.count,
+      ];
+    case 'collectors':
+      return [collectorsOwned(state), condition.count];
+    case 'siteLevels':
+      return [siteLevels(state), condition.count];
+    case 'cycles':
+      return [state.cycles, condition.count];
+    case 'deltaLevels':
+      return [deltaLevels(state), condition.count];
+    case 'lockCycles':
+      return [state.delta.lockCycles, condition.count];
+    case 'worksBuilt':
+      return [worksBuilt(state), condition.count];
+    case 'sisterCities':
+      return [state.city.founded.length, condition.count];
+    case 'alliances':
+      return [workingAlliances(state).length, condition.count];
+    case 'paths':
+      return [pathsWorking(state), condition.count];
+    case 'rotations':
+      return [state.garden.rotations, condition.count];
+    case 'flights':
+      return [state.pollen.flights, condition.count];
+    case 'greetings':
+      return [totalGreetings(state), condition.count];
+    case 'families':
+      return [completeFamilies(state.species).length, condition.count];
+    case 'requests':
+      return [state.requests.served, condition.count];
+    case 'fruitHarvests':
+      return [state.orchard.harvests, condition.count];
+    case 'fruitVarieties':
+      return [state.orchard.varieties.length, condition.count];
+    case 'cycleChallenges':
+      return [state.cycleChallenges.length, condition.count];
+    case 'playSeconds':
+      return [state.playSeconds, condition.seconds];
+    default:
+      return null;
+  }
+}
+
+/**
+ * Share of a Milestone's goal reached, from 0 to 1 (M37); null when it cannot be measured. The
+ * amounts spanning powers of ten count in orders of magnitude.
+ */
+export function achievementProgress(
+  state: GameState,
+  condition: AchievementCondition,
+): number | null {
+  const measured = measure(state, condition);
+  if (!measured) return null;
+  const [have, need] = measured;
+  if (need <= 0) return 1;
+  const share = isMeasuredInPowers(condition)
+    ? Math.log10(Math.max(1, have)) / Math.log10(need)
+    : have / need;
+  return Math.max(0, Math.min(1, share));
+}
+
 /** Unlock every Milestone whose condition is met. Returns the same state when none is new. */
 export function unlockAchievements(state: GameState): GameState {
   const fresh = ACHIEVEMENT_LIST.filter(
     (a) => !state.achievements.includes(a.id) && isMet(state, a.condition),
   ).map((a) => a.id);
   if (fresh.length === 0) return state;
-  return { ...state, achievements: [...state.achievements, ...fresh] };
+  return leaveGifts({ ...state, achievements: [...state.achievements, ...fresh] }, fresh);
 }
 
 /** Unlock one Milestone directly, e.g. one earned by an action. */
 export function unlockAchievement(state: GameState, id: AchievementId): GameState {
   if (state.achievements.includes(id)) return state;
-  return { ...state, achievements: [...state.achievements, id] };
+  return leaveGifts({ ...state, achievements: [...state.achievements, id] }, [id]);
+}
+
+/** Each Milestone reached leaves its gift on the map (M37), to be gathered by the player. */
+function leaveGifts(state: GameState, fresh: readonly AchievementId[]): GameState {
+  const gifts = [...state.milestoneGifts, ...fresh.map(milestoneGift)];
+  return { ...state, milestoneGifts: gifts.slice(0, MAX_WAITING_GIFTS) };
 }

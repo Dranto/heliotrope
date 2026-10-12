@@ -1,3 +1,5 @@
+import { ACHIEVEMENTS } from '../game/achievements';
+import { achievementName } from '../i18n/achievements';
 import { BOND_BONUS, BOND_MAX } from '../game/bonds';
 import { DISTRICT_IDS } from '../game/districts';
 import { formatPercent } from '../game/format';
@@ -25,6 +27,8 @@ function needText(need: Need): string {
       return t.requests.needs.owned(need.count, t.generators[need.generator].name);
     case 'greet':
       return t.requests.needs.greet(t.herbier.names[need.species]);
+    case 'milestone':
+      return t.requests.needs.milestone(achievementName(ACHIEVEMENTS[need.id]));
     default:
       return t.requests.needs[need.kind](need.count);
   }

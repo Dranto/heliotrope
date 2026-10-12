@@ -55,4 +55,45 @@ export const COROLLAS: Record<FlowerColour, readonly (readonly [string, string, 
     ['#FDFCFB', '#EAE4EE', '#C8BED4'],
     ['#FFFFFF', '#F6F2F8', '#DCD3E4'],
   ],
+  // M37: the colours of the families of Milestones complete.
+  sunny: [
+    ['#FFF3C4', '#FFD24D', '#F0A818'],
+    ['#FFEDB0', '#FBC93A', '#E59A10'],
+    ['#FFF7D6', '#FFDB70', '#F3B32E'],
+  ],
+  moss: [
+    ['#E4F0D4', '#A9CB86', '#6F9A4E'],
+    ['#DAEBC6', '#9BC176', '#628D43'],
+    ['#EDF5E2', '#BBD69C', '#80A85D'],
+  ],
+  saffron: [
+    ['#FCE3C8', '#F3A65C', '#D9762A'],
+    ['#FAD9B6', '#EE9848', '#CC6A20'],
+    ['#FDEBD8', '#F6B676', '#E08638'],
+  ],
+  coral: [
+    ['#FDDCD4', '#F49A86', '#DC6650'],
+    ['#FBD0C5', '#EF8A74', '#D05944'],
+    ['#FEE6E0', '#F7AE9D', '#E2775F'],
+  ],
+  indigo: [
+    ['#DCDCF5', '#8F8FD6', '#5A58B0'],
+    ['#D0D0F0', '#7F7ECB', '#4C4AA2'],
+    ['#E6E6F8', '#A3A2DF', '#6866BC'],
+  ],
+  meadow: [
+    ['#E6DAF5', '#B79AD6', '#8E6CBB'],
+    ['#FBEBC0', '#F2C25E', '#D99A2B'],
+    ['#FADDE6', '#E89AB5', '#C76A8E'],
+  ],
+  autumn: [
+    ['#F6DCC6', '#D98A55', '#A9552C'],
+    ['#F2D0B4', '#CF7C46', '#9C4A24'],
+    ['#F9E4D2', '#E09C6A', '#B66336'],
+  ],
+  stream: [
+    ['#D6F0EE', '#7CC6C0', '#3E918C'],
+    ['#C8EAE7', '#6CBAB4', '#35837E'],
+    ['#E2F5F3', '#93D2CC', '#4E9F99'],
+  ],
 };

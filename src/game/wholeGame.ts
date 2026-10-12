@@ -15,6 +15,7 @@ import { applyOfflineProgress } from './offline';
 import { lightPerSecond } from './production';
 import { canPlayHand, canServe, playHand, serveRequest } from './requests';
 import { canGreet, greetSpecies } from './greetings';
+import { gatherMilestoneGifts } from './milestoneFamilies';
 import { canSwapForecast, swapForecast } from './weather';
 import {
   learnReferenceTalents,
@@ -129,7 +130,8 @@ function tendRequests(state: GameState): GameState {
 
 /** Everything the reference player does on a visit to the small loops. */
 export function tendLoops(state: GameState): GameState {
-  return tendRequests(tendAlliances(tendWorks(tendOrchard(tendSky(tendGarden(state))))));
+  const gathered = gatherMilestoneGifts(state);
+  return tendRequests(tendAlliances(tendWorks(tendOrchard(tendSky(tendGarden(gathered))))));
 }
 
 /** Learn the reference rules of the workshop as far as the Savoirs go, cheapest level first. */

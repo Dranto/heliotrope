@@ -66,6 +66,7 @@ export const fr = {
       butterflies: (count: number) => `${count}\u00a0Papillons dorés attrapés`,
       owned: (count: number, generator: string) => `${count}\u00a0× ${generator}`,
       greet: (species: string) => `Saluer sur la carte\u00a0: ${species}`,
+      milestone: (name: string) => `Atteindre le jalon\u00a0: ${name}`,
       honey: (count: number) => (count > 1 ? `${count}\u00a0pots de miel` : 'Un pot de miel'),
       paths: (count: number) =>
         count > 1 ? `${count}\u00a0nouvelles formes de bâtiment` : 'Une nouvelle forme de bâtiment',
@@ -186,11 +187,20 @@ export const fr = {
       rose: 'Rose',
       blue: 'Bleu',
       white: 'Blanc',
+      sunny: 'Soleil',
+      moss: 'Mousse',
+      saffron: 'Safran',
+      coral: 'Corail',
+      indigo: 'Indigo',
+      meadow: 'Prairie',
+      autumn: 'Automne',
+      stream: 'Eau vive',
     } satisfies Record<FlowerColour, string>,
     won: 'Gagnés',
     toWin: 'À gagner',
     achievements: (count: number) => `${count} jalons`,
     species: (count: number) => `${count} espèces de l’Herbier`,
+    milestoneFamily: (family: string) => `Tous les jalons de la famille ${family}`,
   },
   photo: {
     open: 'Photo',
@@ -294,13 +304,26 @@ export const fr = {
     close: 'Fermer les jalons',
     summary: (count: string, total: string, percent: string) =>
       `${count} sur ${total} jalons, production +${percent}\u00a0%`,
-    hint: 'Chaque jalon atteint ajoute 1\u00a0% à toute la production, pour toujours.',
+    hint: 'Chaque jalon atteint ajoute 1\u00a0% à toute la production, pour toujours, et laisse un petit cadeau. Une famille complète donne un bonus et une couleur de fleur.',
     unlocked: (name: string) => `Jalon atteint\u00a0: ${name}`,
     unlockedMany: (count: string) => `${count} jalons atteints\u00a0!`,
     bloomKicker: 'Jalon atteint',
     bloomKickerMany: 'Jalons atteints',
     bloomBonus: (percent: string) => `Production +${percent}\u00a0%`,
     familyCount: (count: string, total: string) => `${count} sur ${total}`,
+    next: (name: string) => `Prochain\u00a0: ${name}`,
+    gather: (count: string) => `Ramasser les cadeaux des jalons (${count})`,
+    progress: (percent: string) => `${percent}\u00a0%`,
+    complete: 'Famille complète',
+    reward: (bonus: string, colour: string) => `${bonus} · fleur ${colour}`,
+    toComplete: (bonus: string, colour: string) =>
+      `Complète, elle donnera\u00a0: ${bonus} · fleur ${colour}`,
+    gifts: {
+      light: 'Une bouffée de Lumière',
+      pollen: 'Un pas de la jauge de pollen',
+      garden: 'Le potager pousse de 10\u00a0min',
+      water: 'Une goutte d’Eau',
+    },
     locked: 'À atteindre',
     hiddenName: 'Jalon caché',
     names: {
@@ -703,6 +726,8 @@ export const fr = {
           ? 'Chaque récolte du potager donne un panier de plus'
           : `Chaque récolte du potager donne ${units} paniers de plus`,
       perPath: (percent: string) => `+${percent}\u00a0% de production par voie qui joue`,
+      perMilestoneFamily: (percent: string) =>
+        `+${percent}\u00a0% de production par famille de Jalons complète`,
       handSlots: (units: number) =>
         units === 1
           ? 'Une place de plus pour les coups de main'
@@ -831,6 +856,8 @@ export const fr = {
       mutualAid: 'L’entraide',
       windBikes: 'Les vélos dans le vent',
       canopyFlocks: 'Les nuées de la canopée',
+      garlands: 'Les guirlandes',
+      almanac: 'L’almanach des voisins',
     } satisfies Record<AllianceId, string>,
     sides: {
       hives: 'Ruches',
@@ -855,6 +882,8 @@ export const fr = {
       weathers: 'Temps vécus',
       flocks: 'Nuées accueillies',
       urbanCanopy: 'Canopées urbaines',
+      milestoneFamilies: 'Familles de Jalons complètes',
+      herbierFamilies: 'Familles de l’Herbier complètes',
     } as Record<string, string>,
     effects: {
       windBikes: 'Par vent, les Coopératives achètent aussi les synergies',
@@ -1219,6 +1248,7 @@ export const fr = {
         fountaineers: 'Les fontainiers',
         assembly: 'L’assemblée de quartier',
         growers: 'Les amis du potager',
+        laurels: 'Les lauriers',
       } satisfies Record<CanopyId, string>,
       assemblyEffect: 'Le conseil de quartier mène aussi les projets, à chaque Saison',
       sowerEffect:

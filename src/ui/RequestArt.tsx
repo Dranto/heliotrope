@@ -94,6 +94,16 @@ export function RequestIcon({ kind }: { kind: NeedKind | HandId }) {
           <path d="M14 2.6v3M12.6 4h3" />
         </>
       )}
+      {kind === 'milestone' && (
+        <>
+          {/* A laurel badge: a Milestone close to its goal (M37). */}
+          <circle cx="10" cy="9" r="5" />
+          <path
+            d="M10 16V9M10 12c-2 0-3.4-1.2-3.6-3 2 0 3.4 1.2 3.6 3ZM10 10.6c1.6 0 2.8-1 3-2.6-1.6 0-2.8 1-3 2.6Z"
+            className="ri-leaf"
+          />
+        </>
+      )}
       {kind === 'works' && (
         <>
           <path d="M3 17h14M5 17V9h10v8M8 9V5h4v4" />

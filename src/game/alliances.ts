@@ -16,6 +16,8 @@ import { pathsWorking } from './growth';
 import { unlockedCooperatives } from './cooperatives';
 import { isWeatherOpen } from './weather';
 import { isBioregionOpen } from './bioregion';
+import { completeFamilies } from './families';
+import { completeMilestoneFamilies } from './milestoneFamilies';
 
 export const ALLIANCE_IDS = [
   'orchardBees',
@@ -31,6 +33,9 @@ export const ALLIANCE_IDS = [
   'mutualAid',
   'windBikes',
   'canopyFlocks',
+  // M37: the alliances that count the families of Milestones complete.
+  'garlands',
+  'almanac',
 ] as const;
 export type AllianceId = (typeof ALLIANCE_IDS)[number];
 
@@ -169,6 +174,32 @@ export const ALLIANCES: Record<AllianceId, AllianceDef> = {
       { key: 'urbanCanopy', need: 10, have: (s) => s.generators.urbanCanopy },
     ],
     bonuses: [{ kind: 'effectDuration', effect: 'birds', factor: 1.5 }],
+  },
+  // The families of Milestones (§9.16) and those of the Herbier (§9.15): garlands for each.
+  garlands: {
+    id: 'garlands',
+    sides: [
+      {
+        key: 'milestoneFamilies',
+        need: 1,
+        have: (s) => completeMilestoneFamilies(s.achievements).length,
+      },
+      { key: 'herbierFamilies', need: 2, have: (s) => completeFamilies(s.species).length },
+    ],
+    bonuses: [{ kind: 'perAchievement', bonus: 0.002 }],
+  },
+  // The families of Milestones and the requests served (§9.11): the neighbours' almanac.
+  almanac: {
+    id: 'almanac',
+    sides: [
+      {
+        key: 'milestoneFamilies',
+        need: 3,
+        have: (s) => completeMilestoneFamilies(s.achievements).length,
+      },
+      { key: 'requests', need: 20, have: (s) => s.requests.served },
+    ],
+    bonuses: [{ kind: 'harvestBaskets', units: 1 }],
   },
 };
 

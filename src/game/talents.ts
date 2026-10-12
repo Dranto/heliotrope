@@ -199,6 +199,7 @@ export const CANOPY_IDS = [
   'fountaineers',
   'assembly',
   'growers',
+  'laurels',
 ] as const;
 export type CanopyId = (typeof CANOPY_IDS)[number];
 
@@ -262,6 +263,14 @@ export const CANOPY_LIST: readonly CanopyDef[] = [
     maxLevel: 1,
     bonuses: () => [],
     cooperative: 'growers',
+  },
+  // M37: the laurels count the families of Milestones complete (§9.16).
+  {
+    id: 'laurels',
+    baseCost: 10,
+    growth: 2,
+    maxLevel: 3,
+    bonuses: (level) => [{ kind: 'perMilestoneFamily', bonus: 0.03 * level }],
   },
 ];
 

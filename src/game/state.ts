@@ -10,6 +10,7 @@ import { createOrchardState, type OrchardState } from './orchard';
 import { createCityState, type CityState } from './cities';
 import { createAlliancesState, type AlliancesState } from './alliances';
 import { createGreetingsState, type GreetingsState } from './greetings';
+import type { MilestoneGift } from './milestoneFamilies';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -33,7 +34,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 37;
+export const STATE_VERSION = 38;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -146,6 +147,8 @@ export interface GameState {
   city: CityState;
   /** The alliances chosen and the grand bloom (§9.9, M24). */
   alliances: AlliancesState;
+  /** Gifts the Milestones reached left on the map, not gathered yet (§9.16, M37). */
+  milestoneGifts: MilestoneGift[];
   /** The species greeted on the map (§9.15, M35). Kept forever. */
   greetings: GreetingsState;
   /** The paths picked as the buildings grow (§5.5, M26). Kept across Seasons and Cycles. */
@@ -240,6 +243,7 @@ export function createInitialState(now: number): GameState {
     orchard: createOrchardState(),
     city: createCityState(),
     alliances: createAlliancesState(),
+    milestoneGifts: [],
     greetings: createGreetingsState(),
     growth: createGrowthState(),
     pollen: createPollenState(),

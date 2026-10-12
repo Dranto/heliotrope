@@ -250,7 +250,7 @@ rejoue le simulateur et la partie complète et, si l'état change, ajoute une mi
 | **M34 — Les alliances du milieu** *(livré)* | P33 : six alliances de plus, places dès la 2ᵉ Saison, fils sur la carte | Relie ce que M31 à M33 ont étendu ; a besoin des espèces et des temps vécus |
 | **M35 — L'Herbier et les voisins** *(livré)* | P34 : saluer une espèce, familles et leurs bonus, demandes d'espèce, de miel et de forme, deux récompenses | Les familles comptent les espèces du temps de M33 ; les demandes s'appuient sur le miel de M32 |
 | **M36 — Les boucles confiées, la partie remesurée** *(livré)* | P35 : projets menés par le conseil, jardiniers, apiculteurs, simulateur de la v5 | Clôt la v5 : automatise ce qui lasse et mesure tout ce que M31 à M35 ont ajouté |
-| **M37 — Des Jalons qui comptent** | P36 : cadeaux à l'éclosion, familles complètes et leurs bonus, prochain Jalon visible, demandes et alliances qui les lisent | En dernier : compte aussi les Jalons ajoutés par M31 à M36 |
+| **M37 — Des Jalons qui comptent** *(livré)* | P36 : cadeaux à l'éclosion, familles complètes et leurs bonus, prochain Jalon visible, demandes et alliances qui les lisent | En dernier : compte aussi les Jalons ajoutés par M31 à M36 |
 
 **Synergies (décision d'Antoine, 2026-10-10).** Chaque extension se lie à l'existant (les fraises à la jauge, le temps
 aux voies, les familles aux alliances, le miel aux envolées) plutôt que d'ajouter un multiplicateur isolé.
