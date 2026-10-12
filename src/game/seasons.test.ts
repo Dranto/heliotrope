@@ -19,9 +19,12 @@ import {
 } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { earnLight, tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function lateGame(allTimeLight: number, extra: Partial<GameState> = {}): GameState {
-  const base = createInitialState(1000);
+  const base = openGame(1000);
   return {
     ...base,
     resources: { water: 0, light: 1234 },
@@ -107,7 +110,7 @@ describe('new Season', () => {
     const next = startNewSeason(state);
     expect(state).toEqual(before);
     expect(next).toEqual({
-      ...createInitialState(1000),
+      ...openGame(1000),
       allTimeLight: 2e9,
       seeds: 10,
       seasons: 1,

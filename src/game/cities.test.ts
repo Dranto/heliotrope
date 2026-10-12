@@ -16,10 +16,13 @@ import { sourcesToGain, waterForSources } from './cycles';
 import { DELTA, DELTA_IDS, deltaSourcesSpent } from './delta';
 import { deserialize, serialize } from './save';
 import { createInitialState, type GameState } from './state';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A player at the end of the delta: every arm open, `sources` Sources earned. */
 function endOfDelta(sources = 100, extra: Partial<GameState> = {}): GameState {
-  const fresh = createInitialState(0);
+  const fresh = openGame(0);
   const levels = Object.fromEntries(
     DELTA_IDS.map((id) => [id, DELTA[id].costs.length]),
   ) as GameState['delta']['levels'];
@@ -39,7 +42,7 @@ function endOfDelta(sources = 100, extra: Partial<GameState> = {}): GameState {
 
 describe('the sister cities (§7.6)', () => {
   it('open with the whole delta, and need Sources earned in the city', () => {
-    expect(areCitiesOpen(createInitialState(0))).toBe(false);
+    expect(areCitiesOpen(openGame(0))).toBe(false);
     expect(areCitiesOpen(endOfDelta())).toBe(true);
     expect(canSwarm(endOfDelta(SWARM_SOURCES - 1))).toBe(false);
     expect(canSwarm(endOfDelta())).toBe(true);

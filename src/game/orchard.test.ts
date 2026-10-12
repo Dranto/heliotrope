@@ -18,10 +18,13 @@ import { deserialize, serialize } from './save';
 import { SPECIES_IDS } from './species';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A player with the Bioregion open and baskets to spend. */
 function opened(extra: Partial<GameState> = {}): GameState {
-  const fresh = createInitialState(0);
+  const fresh = openGame(0);
   return { ...fresh, seasons: 3, garden: { ...fresh.garden, baskets: 100 }, ...extra };
 }
 
@@ -33,12 +36,12 @@ function wait(state: GameState, seconds: number): GameState {
 
 describe('the orchard (§9.8)', () => {
   it('opens with the Bioregion', () => {
-    expect(isOrchardOpen(createInitialState(0))).toBe(false);
+    expect(isOrchardOpen(openGame(0))).toBe(false);
     expect(isOrchardOpen(opened())).toBe(true);
   });
 
   it('plants the first tree for free, the others for baskets, once', () => {
-    let state = opened({ garden: { ...createInitialState(0).garden, baskets: 5 } });
+    let state = opened({ garden: { ...openGame(0).garden, baskets: 5 } });
     expect(canPlant(state, 'pear')).toBe(false);
     state = plant(state, 'apple');
     expect(treeStage(state.orchard.trees.apple)).toBe('sapling');
@@ -91,7 +94,7 @@ describe('the orchard (§9.8)', () => {
   });
 
   it('pays the last stages of the great works with honey', () => {
-    const fresh = createInitialState(0);
+    const fresh = openGame(0);
     let state: GameState = {
       ...opened(),
       resources: { light: 1e30, water: 1e12 },

@@ -3,6 +3,7 @@
 // pollinate the garden and the trees and fill with honey, which the great works (§6.6) ask for.
 // Like the garden, everything grows online and offline and nothing ever wilts. A harvest can
 // give the tree's old variety, a bonus kept for good.
+import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
 import { factorOf } from './bonuses';
@@ -69,7 +70,10 @@ export function createOrchardState(): OrchardState {
 
 /** The orchard opens with the Bioregion (3rd Season) and stays open once a tree is planted. */
 export function isOrchardOpen(state: GameState): boolean {
-  return isBioregionOpen(state) || FRUIT_IDS.some((id) => state.orchard.trees[id].age !== null);
+  return (
+    isIntroduced(state, 'orchard') &&
+    (isBioregionOpen(state) || FRUIT_IDS.some((id) => state.orchard.trees[id].age !== null))
+  );
 }
 
 /** How much faster the hives make things grow: ×1.2 per hive. */

@@ -4,9 +4,12 @@ import { availableUpgrades, globalMultiplier, maxAffordable } from './production
 import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { buyGenerator, canBuyGenerator, tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 function state(patch: Partial<GameState> = {}): GameState {
-  return { ...createInitialState(0), ...patch };
+  return { ...openGame(0), ...patch };
 }
 
 /** A game ready for its third Season, rich enough to buy anything. */

@@ -17,13 +17,23 @@ import {
 import { deserialize, serialize } from './save';
 import { createInitialState, type GameState } from './state';
 import { clickHeliotrope, tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 const CLICKS_PER_FLIGHT = Math.round(1 / POLLEN_PER_CLICK);
 
+/** A second Season, where the gauge is always on the flower (§10.8). */
 function fresh(extra: Partial<GameState> = {}): GameState {
-  const state = createInitialState(0);
+  const state = openGame(0);
   // Past the first seconds of the Season, when the gauge fills faster (§5.7).
-  return { ...state, generators: { ...state.generators, pot: 10 }, seasonSeconds: 60, ...extra };
+  return {
+    ...state,
+    seasons: 1,
+    generators: { ...state.generators, pot: 10 },
+    seasonSeconds: 60,
+    ...extra,
+  };
 }
 
 function clicked(state: GameState, count: number): GameState {
@@ -33,6 +43,15 @@ function clicked(state: GameState, count: number): GameState {
 }
 
 describe('the pollen (§5.6, M27)', () => {
+  it('joins the flower with the first click upgrade (§10.8)', () => {
+    const first = openGame(0);
+    expect(clickHeliotrope(first).pollen.gauge).toBe(0);
+    const warm = { ...first, upgrades: ['warmHands' as const] };
+    expect(clickHeliotrope(warm).pollen.gauge).toBeGreaterThan(0);
+    const unintroduced = { ...warm, intro: createInitialState(0).intro };
+    expect(clickHeliotrope(unintroduced).pollen.gauge).toBe(0);
+  });
+
   it('fills the gauge with each click and sends a flight once full', () => {
     const almost = clicked(fresh(), CLICKS_PER_FLIGHT - 1);
     expect(almost.pollen.gauge).toBeCloseTo(1 - POLLEN_PER_CLICK);
@@ -111,7 +130,7 @@ describe('the pollen (§5.6, M27)', () => {
       lengthened,
     );
     expect(validPollen({ gauge: 3, flights: -1 })).toEqual({ gauge: 0, flights: 0 });
-    const { pollen: _pollen, ...old } = JSON.parse(serialize(createInitialState(0)));
+    const { pollen: _pollen, ...old } = JSON.parse(serialize(openGame(0)));
     expect(deserialize(JSON.stringify({ ...old, version: 27 }), 0)!.pollen).toEqual({
       gauge: 0,
       flights: 0,

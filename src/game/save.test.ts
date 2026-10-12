@@ -9,9 +9,17 @@ import {
   serialize,
 } from './save';
 import { createInitialState, DEFAULT_SETTINGS, STATE_VERSION, type GameState } from './state';
+import { INTRO_GAP_SECONDS, withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
+/** A save without introductions counts as older: nothing it shows is held back, nothing is new. */
+const olderNewGame = (now: number) => ({
+  ...createInitialState(now),
+  intro: { introduced: [], sinceLast: INTRO_GAP_SECONDS },
+});
 function playedState(): GameState {
-  const base = createInitialState(1000);
+  const base = openGame(1000);
   return {
     ...base,
     resources: { water: 0, light: 42.5 },
@@ -96,12 +104,12 @@ describe('save', () => {
       clicks: 'many',
       upgrades: 'all',
     });
-    expect(deserialize(json, 500)).toEqual(createInitialState(500));
+    expect(deserialize(json, 500)).toEqual(olderNewGame(500));
   });
 
   it('migrates a v1 placeholder save to a fresh game that keeps its timestamp', () => {
     const v1 = JSON.stringify({ version: 1, resources: { sunlight: 9000 }, lastUpdate: 1234 });
-    expect(deserialize(v1, 0)).toEqual({ ...createInitialState(0), lastUpdate: 1234 });
+    expect(deserialize(v1, 0)).toEqual({ ...olderNewGame(0), lastUpdate: 1234 });
   });
 
   it('keeps known upgrades once and drops unknown ones', () => {
@@ -248,7 +256,7 @@ describe('export and import', () => {
   it('migrates a v12 save with no visit yet, and keeps a visitor on the map (§9.6)', () => {
     const v12 = deserialize(JSON.stringify({ version: 12, resources: { light: 5 } }), 0)!;
     expect(v12.version).toBe(STATE_VERSION);
-    expect(v12.visits).toEqual(createInitialState(0).visits);
+    expect(v12.visits).toEqual(openGame(0).visits);
     expect(v12.visit.kind).toBeNull();
     const json = JSON.stringify({
       version: STATE_VERSION,
@@ -260,7 +268,7 @@ describe('export and import', () => {
       ],
     });
     const state = deserialize(json, 0)!;
-    expect(state.visits).toEqual({ ...createInitialState(0).visits, cuttings: 3 });
+    expect(state.visits).toEqual({ ...openGame(0).visits, cuttings: 3 });
     expect(state.visit).toEqual({ nextIn: 0, kind: 'birds', visible: 12 });
     expect(state.effects).toEqual([{ kind: 'shower', remaining: 30 }]);
     const unknown = JSON.stringify({
@@ -341,7 +349,7 @@ describe('export and import', () => {
       settings: { notation: 'roman', reducedMotion: 'yes', volume: 3, muted: 'no' },
     });
     const state = deserialize(json, 0)!;
-    const fresh = createInitialState(0);
+    const fresh = openGame(0);
     expect(state.achievements).toEqual(['pot.1']);
     expect(state.butterflies).toBe(0);
     expect(state.butterfly).toEqual({ nextIn: 8 * 60, visible: 12 });
@@ -400,7 +408,7 @@ describe('export and import', () => {
     expect(state.seeds).toBe(10);
     expect(state.parcels).toEqual(['river']);
     expect(state.talents).toEqual([]);
-    expect(state.cooperatives).toEqual(createInitialState(0).cooperatives);
+    expect(state.cooperatives).toEqual(openGame(0).cooperatives);
   });
 
   it('keeps only talents learnt after their parent and paid for by the Seeds', () => {

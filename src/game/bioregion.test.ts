@@ -13,17 +13,20 @@ import { generatorMultiplier } from './production';
 import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A third Season: the Bioregion is open (§7.4). */
 function open(overrides: Partial<GameState> = {}): GameState {
-  return { ...createInitialState(0), seasons: 2, seeds: 10, ...overrides };
+  return { ...openGame(0), seasons: 2, seeds: 10, ...overrides };
 }
 
 describe('the Bioregion (§7.4)', () => {
   it('opens at the start of the third Season', () => {
-    expect(isBioregionOpen(createInitialState(0))).toBe(false);
-    expect(isBioregionOpen({ seasons: 1, cycles: 0 })).toBe(false);
-    expect(isBioregionOpen({ seasons: 2, cycles: 0 })).toBe(true);
+    expect(isBioregionOpen(openGame(0))).toBe(false);
+    expect(isBioregionOpen({ seasons: 1, cycles: 0, intro: openGame(0).intro })).toBe(false);
+    expect(isBioregionOpen({ seasons: 2, cycles: 0, intro: openGame(0).intro })).toBe(true);
   });
 
   it('builds collectors with Light, each four times the price of the last', () => {

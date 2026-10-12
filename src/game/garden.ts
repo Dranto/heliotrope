@@ -3,6 +3,7 @@
 // click. Crops grow online and offline alike and never wilt: they wait for the player. Two
 // different crops side by side sometimes give a new variety for the seed bank, a lasting bonus.
 // Names live in src/i18n, the drawings in src/ui.
+import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
 import { factorOf } from './bonuses';
@@ -80,7 +81,10 @@ export function isCropId(value: unknown): value is CropId {
 
 /** The garden opens with the first heliotrope in a pot. */
 export function isGardenOpen(state: GameState): boolean {
-  return state.generators.pot > 0 || state.seasons > 0 || state.garden.harvests > 0;
+  return (
+    isIntroduced(state, 'garden') &&
+    (state.generators.pot > 0 || state.seasons > 0 || state.garden.harvests > 0)
+  );
 }
 
 /**

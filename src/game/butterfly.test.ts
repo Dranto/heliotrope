@@ -16,10 +16,13 @@ import {
   type GameState,
 } from './state';
 import { tick } from './tick';
+import { withAllIntroduced } from './introductions';
 
+/** A new game whose mechanics are all introduced (§10.8), to test them directly. */
+const openGame = (now: number) => withAllIntroduced(createInitialState(now));
 /** A state in phase 2, where the butterfly visits. */
 function quarter(patch: Partial<GameState> = {}): GameState {
-  const base = createInitialState(0);
+  const base = openGame(0);
   return {
     ...base,
     resources: { water: 0, light: 10_000 },
@@ -38,13 +41,13 @@ describe('Golden Butterfly schedule (§9.2)', () => {
   it('draws the next visit between 3 and 8 minutes', () => {
     expect(butterflyDelay(0)).toBe(BUTTERFLY_MIN_INTERVAL);
     expect(butterflyDelay(0.999999)).toBeCloseTo(BUTTERFLY_MAX_INTERVAL, 2);
-    const { nextIn } = createInitialState(42).butterfly;
+    const { nextIn } = openGame(42).butterfly;
     expect(nextIn).toBeGreaterThanOrEqual(3 * 60);
     expect(nextIn).toBeLessThanOrEqual(8 * 60);
   });
 
   it('only visits from phase 2 on', () => {
-    const balcony = createInitialState(0);
+    const balcony = openGame(0);
     expect(isButterflyUnlocked(balcony)).toBe(false);
     expect(advanceButterfly(balcony, 10_000)).toBe(balcony);
     expect(isButterflyUnlocked(quarter())).toBe(true);

@@ -2,6 +2,7 @@
 // 30 minutes of play, and each weather favours a family of buildings and systems, never a penalty.
 // The next three are forecast. The weather draws from its own seed, so it never changes what the
 // Golden Butterfly would have given.
+import { isIntroduced, type IntroState } from './introductions';
 import type { Bonus } from './bonuses';
 import { nextRandom } from './random';
 
@@ -74,13 +75,17 @@ export function createWeatherState(seed: number): WeatherState {
 }
 
 /** The sky starts to change with the second Season, once the first one has taught the basics. */
-export function isWeatherOpen(state: { seasons: number; cycles?: number }): boolean {
-  return state.seasons > 0 || (state.cycles ?? 0) > 0;
+export function isWeatherOpen(state: {
+  seasons: number;
+  cycles?: number;
+  intro: IntroState;
+}): boolean {
+  return isIntroduced(state, 'weather') && (state.seasons > 0 || (state.cycles ?? 0) > 0);
 }
 
 /** Move the sky forward by dtSeconds of play, online or offline, once it is open. */
 export function advanceWeather<
-  S extends { weather: WeatherState; seasons: number; cycles: number },
+  S extends { weather: WeatherState; seasons: number; cycles: number; intro: IntroState },
 >(state: S, dtSeconds: number): S {
   if (!isWeatherOpen(state)) return state;
   const { weather } = state;
@@ -112,6 +117,7 @@ export function weatherBonuses(source: {
   weather: Pick<WeatherState, 'current'>;
   seasons: number;
   cycles?: number;
+  intro: IntroState;
 }): readonly Bonus[] {
   return isWeatherOpen(source) ? WEATHER_BONUSES[source.weather.current] : [];
 }

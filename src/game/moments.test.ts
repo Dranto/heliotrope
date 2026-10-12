@@ -14,11 +14,14 @@ import {
 import { lightPerSecond } from './production';
 import { createInitialState, type GameState } from './state';
 import { welcomeVisit } from './visits';
+import { withAllIntroduced } from './introductions';
 
+/** A second Season whose mechanics are all introduced (§10.8). */
 function fresh(extra: Partial<GameState> = {}): GameState {
-  const state = createInitialState(0);
+  const state = withAllIntroduced(createInitialState(0));
   return {
     ...state,
+    seasons: 1,
     generators: { ...state.generators, pot: 10, balconyPanel: 5 },
     seasonSeconds: SEASON_START_SECONDS + 1,
     ...extra,
@@ -66,7 +69,7 @@ describe('the moments that chain together (§5.7, M31)', () => {
   });
 
   it('gives the butterfly the colour of the weather once the sky is open', () => {
-    const first = fresh();
+    const first = fresh({ seasons: 0 });
     expect(butterflyOdds(first)).toEqual(BUTTERFLY_ODDS);
     const sunny = fresh({ seasons: 1, weather: { ...first.weather, current: 'sun' } });
     const windy = fresh({ seasons: 1, weather: { ...first.weather, current: 'wind' } });

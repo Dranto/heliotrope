@@ -1,5 +1,6 @@
 // The Golden Butterfly (docs/game-design.md §9.2): a random visitor that grants a temporary
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
+import { isIntroduced } from './introductions';
 import { addPollen, FLIGHT_BUTTERFLY_FACTOR, POLLEN_PER_MOMENT } from './pollen';
 import { isWeatherOpen, type WeatherId } from './weather';
 import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
@@ -63,7 +64,7 @@ export function butterflyOutcome(
 
 /** The butterfly visits from phase 2 (Le Quartier, §6) on. */
 export function isButterflyUnlocked(state: GameState): boolean {
-  return phaseOf(state) >= 2;
+  return isIntroduced(state, 'butterfly') && phaseOf(state) >= 2;
 }
 
 /** Light a Récolte would bring right now. */

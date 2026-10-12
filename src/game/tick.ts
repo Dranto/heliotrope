@@ -1,3 +1,4 @@
+import { advanceIntroductions } from './onboarding';
 import {
   generatorCost,
   isUpgradeBought,
@@ -92,14 +93,17 @@ export function tick(state: GameState, dtSeconds: number): GameState {
   );
   return runSower(
     runLockKeeper(
-      unlockProgress(
-        recordProduction({
-          ...next,
-          playSeconds: state.playSeconds + dtSeconds,
-          seasonSeconds: state.seasonSeconds + dtSeconds,
-          idleSeconds: state.idleSeconds + dtSeconds,
-          lastUpdate: state.lastUpdate + dtSeconds * 1000,
-        }),
+      advanceIntroductions(
+        unlockProgress(
+          recordProduction({
+            ...next,
+            playSeconds: state.playSeconds + dtSeconds,
+            seasonSeconds: state.seasonSeconds + dtSeconds,
+            idleSeconds: state.idleSeconds + dtSeconds,
+            lastUpdate: state.lastUpdate + dtSeconds * 1000,
+          }),
+        ),
+        dtSeconds,
       ),
     ),
   );

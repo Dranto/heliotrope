@@ -2,6 +2,7 @@
 // and a full gauge sends a flight of golden pollen across the city: every building produces more
 // for a few seconds, the courtyard garden grows a step, and a butterfly caught meanwhile lasts
 // longer. The gauge slowly empties when the clicks stop, and never takes anything else away.
+import { isIntroduced } from './introductions';
 import { factorOf } from './bonuses';
 import { EFFECTS } from './effects';
 import { growGarden } from './garden';
@@ -51,6 +52,17 @@ export function isSeasonStart(state: Pick<GameState, 'seasonSeconds'>): boolean 
   return state.seasonSeconds < SEASON_START_SECONDS;
 }
 
+/**
+ * The gauge joins the flower once a click upgrade has made the clicks matter (§10.8), and stays
+ * from the second Season on.
+ */
+export function isPollenOpen(state: GameState): boolean {
+  return (
+    isIntroduced(state, 'pollen') &&
+    (clickUpgradeCount(state) > 0 || state.seasons > 0 || state.cycles > 0)
+  );
+}
+
 export function isFlying(state: GameState): boolean {
   return state.effects.some((effect) => effect.kind === 'flight');
 }
@@ -67,10 +79,11 @@ export function pollinate(state: GameState, clicks = 1): GameState {
 
 /**
  * Fill the gauge by `share` (1 is a full gauge), sending a flight each time it is full: the
- * clicks, and the butterfly caught or a visitor welcomed (§5.7).
+ * clicks, and the butterfly caught or a visitor welcomed (§5.7). Nothing while the gauge is not
+ * on the flower yet (§10.8).
  */
 export function addPollen(state: GameState, share: number): GameState {
-  if (share <= 0) return state;
+  if (share <= 0 || !isPollenOpen(state)) return state;
   const filled = state.pollen.gauge + share;
   const flights = Math.floor(filled);
   const next: GameState = {
