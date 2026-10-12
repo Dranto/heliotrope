@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
+import { lightPerSecond } from '../game/production';
+import type { GameState } from '../game/state';
 import {
   ADVISED_FIRST_SEASON_SEEDS,
   areSeedsRipe,
@@ -55,6 +57,13 @@ function SeasonsOrnament() {
 }
 
 /** Seasons screen (docs/game-design.md §7, §10.2): Seeds, bonus before/after, new Season. */
+/** Production time before the next Seed grows, rounded up, or null while nothing is produced. */
+function timeToNextSeed(state: GameState): string | null {
+  const perSecond = lightPerSecond(state);
+  if (perSecond <= 0) return null;
+  return t.duration(Math.ceil(lightToNextSeed(state) / perSecond));
+}
+
 export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTree: () => void }) {
   const store = useGameStore();
   const state = useGameState();
@@ -129,7 +138,7 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
       </p>
 
       <p className="hint">
-        {t.seeds.nextSeed(formatCost(lightToNextSeed(state)))}{' '}
+        {t.seeds.nextSeed(formatCost(lightToNextSeed(state)), timeToNextSeed(state))}{' '}
         {t.seeds.formula(t.duration(ripeningSeconds(state)), formatNumber(DEEP_SOIL_SEEDS))}
       </p>
 

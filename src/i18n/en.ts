@@ -852,7 +852,8 @@ export const en: Texts = {
     toGainRipening: (time: string) => `ripe in ${time}`,
     bonus: 'Production bonus',
     bonusAfter: 'after the new Season',
-    nextSeed: (light: string) => `Next Seed in ${light} Light.`,
+    nextSeed: (light: string, time: string | null) =>
+      `Next Seed in ${light} Light${time ? `, about ${time} of production` : ''}.`,
     formula: (minutes: string, deepSoil: string) =>
       `Each Seed adds 5% to all production. Seeds come from the Light harvested over every Season and ripen in ${minutes} of Season. Past ${deepSoil} Seeds, the soil deepens: each one asks for more Light.`,
     ripening: (time: string) => `The Seeds are ripening: ${time} of Season to go.`,
