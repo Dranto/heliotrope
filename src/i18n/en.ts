@@ -150,6 +150,7 @@ export const en: Texts = {
   },
   layout: {
     views: 'Map view',
+    viewNames: { 1: 'Balcony', 2: 'Neighbourhood', 3: 'City', 4: 'Bioregion' },
     panels: 'Menus',
     hidePanels: 'Fold the menus to enlarge the map',
     showPanels: 'Unfold the menus',

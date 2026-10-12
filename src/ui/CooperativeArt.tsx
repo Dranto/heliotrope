@@ -5,6 +5,7 @@ import { memo } from 'react';
 import type { CooperativeId } from '../game/cooperatives';
 import { t } from '../i18n';
 import { COOPERATIVE_ROUTES } from './cooperativeMap';
+import './cooperatives.css';
 
 interface BikeProps {
   id: CooperativeId;

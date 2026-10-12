@@ -196,6 +196,10 @@ export const fr = {
   },
   layout: {
     views: 'Vue de la carte',
+    viewNames: { 1: 'Balcon', 2: 'Quartier', 3: 'Ville', 4: 'Biorégion' } as Record<
+      1 | 2 | 3 | 4,
+      string
+    >,
     panels: 'Menus',
     hidePanels: 'Replier les menus pour agrandir la carte',
     showPanels: 'Déplier les menus',
