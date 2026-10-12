@@ -207,7 +207,7 @@ rejoue le simulateur et, si l'état change, ajoute une migration de sauvegarde (
 | Jalon | Contenu | Pourquoi dans cet ordre |
 |---|---|---|
 | M5 à M24 | *Livrés* (voir §7) | — |
-| **M25 — Une interface rangée** | P24 : menu par couches, pastilles et halo pour ce qui s'ouvre, barre des écrans avec jauges, budget mobile mesuré, sons manquants | Chaque jalon suivant ajoute des panneaux : on range d'abord |
+| **M25 — Une interface rangée** *(livré)* | P24 : menu par couches, pastilles et halo pour ce qui s'ouvre, barre des écrans avec jauges, budget mobile mesuré, sons manquants | Chaque jalon suivant ajoute des panneaux : on range d'abord |
 | **M26 — Les bâtiments qui grandissent** | P25 : trois paliers par bâtiment, deux voies au choix, nouveaux dessins | Profite à tous les joueurs dès la 1ʳᵉ Saison ; les voies servent ensuite de points d'accroche à M27-M29 |
 | **M27 — Le pollen** | P26 : jauge de clic, envolée sur la carte, ses synergies | Petit jalon, rend le clic vivant ; se branche sur les voies de M26 |
 | **M28 — Le temps qu'il fait** | P27 : cinq temps, prévision en icônes, dessins des deux rendus, espèces et Jalons du temps | Donne du rythme d'heure en heure ; ses liens avec les voies et le pollen supposent M26-M27 |

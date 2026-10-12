@@ -22,11 +22,12 @@ import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { SpeciesId } from './species';
 import { createCanopyState, type CanopyState, type TalentId } from './talents';
+import type { PanelId } from './panels';
 import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 25;
+export const STATE_VERSION = 26;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -139,6 +140,8 @@ export interface GameState {
   city: CityState;
   /** The alliances chosen and the grand bloom (§9.9, M24). */
   alliances: AlliancesState;
+  /** Side menu panels the player has touched (§10.1, M25); the others glow until then. */
+  seenPanels: PanelId[];
   /** Golden Butterflies caught over all Seasons (§9.2). */
   butterflies: number;
   butterfly: ButterflyState;
@@ -219,6 +222,7 @@ export function createInitialState(now: number): GameState {
     orchard: createOrchardState(),
     city: createCityState(),
     alliances: createAlliancesState(),
+    seenPanels: ['generators'],
     butterflies: 0,
     butterfly: { nextIn: butterflyDelay(random), visible: 0 },
     // Drawn from the same number as the butterfly, so a quick one comes with a slow visit.

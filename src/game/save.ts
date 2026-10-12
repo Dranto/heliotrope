@@ -15,6 +15,7 @@ import { validGreatWorks } from './greatWorks';
 import { validOrchard } from './orchard';
 import { validCity } from './cities';
 import { validAlliances } from './alliances';
+import { isPanelId, shownPanels, type PanelId } from './panels';
 import { isFlowerColour, validDecorSlots } from './decor';
 import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
@@ -102,6 +103,9 @@ const migrations: Record<number, Migration> = {
   23: (raw) => ({ ...raw, version: 24 }),
   // v25 adds the alliances and the grand bloom (§9.9, M24): none chosen, no bloom yet.
   24: (raw) => ({ ...raw, version: 25 }),
+  // v26 remembers the side menu panels touched (§10.1, M25): an older save has seen every panel
+  // it shows, filled in below once the state is read.
+  25: (raw) => ({ ...raw, version: 26 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -317,6 +321,9 @@ export function deserialize(json: string, now: number): GameState | null {
   state.orchard = validOrchard(data.orchard);
   state.city = validCity(data.city);
   state.alliances = validAlliances(data.alliances);
+  if (Array.isArray(data.seenPanels)) {
+    state.seenPanels = [...new Set<PanelId>(data.seenPanels.filter(isPanelId))];
+  }
   state.city.sourcesBase = Math.min(state.city.sourcesBase, state.sources);
   state.city.waterBase = Math.min(state.city.waterBase, state.allTimeWater);
   if (isCount(data.butterflies)) state.butterflies = data.butterflies;
@@ -382,6 +389,8 @@ export function deserialize(json: string, now: number): GameState | null {
     state.settings = { ...state.settings, language: settings.language };
   }
   if (isFiniteNumber(data.lastUpdate)) state.lastUpdate = data.lastUpdate;
+  // An older save has seen every panel it shows (v26).
+  if (!Array.isArray(data.seenPanels)) state.seenPanels = shownPanels(state);
   return state;
 }
 

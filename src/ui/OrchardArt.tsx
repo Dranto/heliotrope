@@ -140,6 +140,7 @@ function OrchardPaths({
           >
             <title>{label}</title>
             <circle className="orchard-ring" r="19" />
+            <circle className="tap-hit" r="28" />
             <Tree id={id} stage={stage} />
           </g>
         );

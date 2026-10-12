@@ -40,7 +40,7 @@ describe('App', () => {
     expect(screen.getByLabelText('Encore à découvrir')).toHaveTextContent('100');
   });
 
-  it('shows the next goal, the time before a purchase, and buys with the keyboard (§10.5)', () => {
+  it('shows the next goal, the time before a purchase, and buys with the keyboard (§10.5)', async () => {
     const store = renderApp();
     expect(screen.getByTestId('next-goal')).toHaveTextContent(/Prochain\s+: Encore à découvrir/);
     for (let i = 0; i < 15; i++) fireEvent.click(flower());
@@ -56,6 +56,7 @@ describe('App', () => {
     expect(screen.getByRole('radio', { name: 'Max' })).toBeChecked();
     // No shortcut while a dialog is open.
     fireEvent.click(screen.getByRole('button', { name: /statistiques/i }));
+    await screen.findByRole('dialog');
     fireEvent.keyDown(document, { key: 'm' });
     expect(screen.getByRole('radio', { name: 'Max' })).toBeChecked();
   });
@@ -201,7 +202,7 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: /saisons/i })).not.toBeInTheDocument();
   });
 
-  it('starts a new Season after a confirmation, keeping the Seeds', () => {
+  it('starts a new Season after a confirmation, keeping the Seeds', async () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
@@ -217,7 +218,7 @@ describe('App', () => {
     const store = renderApp(new GameStore(localStorage, () => 0));
     // The Seeds grow before they are ripe: they are shown, but not harvested yet (§7).
     fireEvent.click(screen.getByRole('button', { name: 'Saisons' }));
-    expect(screen.getByRole('dialog', { name: 'Les Saisons' })).toBeInTheDocument();
+    expect(await screen.findByRole('dialog', { name: 'Les Saisons' })).toBeInTheDocument();
     expect(screen.getByTestId('seeds-gain')).toHaveTextContent('+2');
     expect(screen.getByText('mûres dans 5 min')).toBeInTheDocument();
     expect(screen.getByText('Les Graines mûrissent : encore 5 min de Saison.')).toBeInTheDocument();
@@ -256,7 +257,7 @@ describe('App', () => {
     expect(new GameStore(localStorage, () => 0).getState().seeds).toBe(2);
   });
 
-  it('starts a challenge Season, shows its goal and lifts it once won (§7.3)', () => {
+  it('starts a challenge Season, shows its goal and lifts it once won (§7.3)', async () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
@@ -269,7 +270,7 @@ describe('App', () => {
     });
     const store = renderApp(new GameStore(localStorage, () => 0));
     fireEvent.click(screen.getByRole('button', { name: /^Saisons/ }));
-    const dialog = screen.getByRole('dialog', { name: 'Les Saisons' });
+    const dialog = await screen.findByRole('dialog', { name: 'Les Saisons' });
     expect(dialog).toHaveTextContent('Saison à défi');
     fireEvent.click(screen.getByRole('radio', { name: /La Saison des nuages/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' }));
@@ -285,13 +286,13 @@ describe('App', () => {
     expect(screen.getByText(/De retour dans le quartier.*Martin-pêcheur/)).toBeInTheDocument();
   });
 
-  it('shows the Herbier, with the species back drawn on the map (§9.5)', () => {
+  it('shows the Herbier, with the species back drawn on the map (§9.5)', async () => {
     const base = createInitialState(0);
     saveGame({ ...base, parcels: ['river'], species: ['frog'] });
     renderApp(new GameStore(localStorage, () => 0));
     expect(document.querySelector('.species [data-species="frog"]')).not.toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /Herbier/ }));
-    const dialog = screen.getByRole('dialog', { name: 'L’Herbier' });
+    const dialog = await screen.findByRole('dialog', { name: 'L’Herbier' });
     expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 27');
     expect(dialog.querySelector('[data-species="frog"]')).toHaveAttribute('data-found', 'true');
     expect(dialog.querySelector('[data-species="hedgehog"]')).toHaveTextContent(
@@ -299,7 +300,7 @@ describe('App', () => {
     );
   });
 
-  it('shows Season and all-time statistics', () => {
+  it('shows Season and all-time statistics', async () => {
     const base = createInitialState(0);
     saveGame({
       ...base,
@@ -313,7 +314,7 @@ describe('App', () => {
     });
     renderApp(new GameStore(localStorage, () => 0));
     fireEvent.click(screen.getByRole('button', { name: 'Statistiques' }));
-    const dialog = screen.getByRole('dialog', { name: 'Statistiques' });
+    const dialog = await screen.findByRole('dialog', { name: 'Statistiques' });
     expect(dialog).toHaveTextContent('Cette Saison (2ᵉ Saison)');
     expect(screen.getByTestId('stat-season-light')).toHaveTextContent(/1.234/);
     expect(screen.getByTestId('stat-all-light')).toHaveTextContent('5,00 Md');
@@ -343,12 +344,12 @@ describe('App', () => {
     ).toBeInTheDocument();
   });
 
-  it('lists Milestones, with hidden ones as a question mark', () => {
+  it('lists Milestones, with hidden ones as a question mark', async () => {
     const base = createInitialState(0);
     saveGame({ ...base, totalLight: 20_000, achievements: ['light.3', 'pot.1'] });
     renderApp(new GameStore(localStorage, () => 0));
     fireEvent.click(screen.getByRole('button', { name: /^Jalons/ }));
-    const dialog = screen.getByRole('dialog', { name: 'Jalons' });
+    const dialog = await screen.findByRole('dialog', { name: 'Jalons' });
     expect(screen.getByTestId('achievements-summary')).toHaveTextContent(
       /^2 sur \d+ jalons, production \+2.%$/,
     );
@@ -451,12 +452,29 @@ describe('App', () => {
     expect(store.getState().parcels).toEqual(['gardenStreet']);
   });
 
+  it('sorts the side menu by layers and makes new panels glow until touched (M25)', () => {
+    saveGame({ ...createInitialState(0), seasons: 2, seenPanels: ['generators'] });
+    const store = renderApp();
+    const layers = screen.getByRole('navigation', { name: 'Couches du menu' });
+    expect(layers).toHaveTextContent('La villeLe vivant (nouveau)La région (nouveau)');
+    const living = within(layers).getByRole('button', { name: /Le vivant/ });
+    expect(living).toHaveAttribute('data-new', 'true');
+    fireEvent.click(living);
+    expect(living).toHaveAttribute('aria-current', 'page');
+    expect(document.querySelector('.app')).toHaveAttribute('data-layer', 'living');
+    const panels = document.querySelector('.side-panels')!;
+    expect(panels.getAttribute('data-new')).toContain('garden');
+    fireEvent.pointerDown(document.querySelector('.garden-panel h2')!);
+    expect(store.getState().seenPanels).toContain('garden');
+    expect(panels.getAttribute('data-new')).not.toContain('garden');
+  });
+
   it('offers a tab bar for small screens (§10.3)', () => {
     renderApp();
     const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });
-    expect(tabs).toHaveTextContent('RécolteBâtirAméliorerPlus');
-    fireEvent.click(within(tabs).getByRole('button', { name: 'Bâtir' }));
-    expect(within(tabs).getByRole('button', { name: 'Bâtir' })).toHaveAttribute(
+    expect(tabs).toHaveTextContent('BâtirAméliorerPlus');
+    fireEvent.click(within(tabs).getByRole('button', { name: 'Améliorer' }));
+    expect(within(tabs).getByRole('button', { name: 'Améliorer' })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -508,13 +526,13 @@ describe('App', () => {
     expect(document.querySelector('.app')).toHaveAttribute('data-side', 'closed');
   });
 
-  it('spends Seeds in the Tree of Seasons and brings in a cooperative (§7.1, §7.2)', () => {
+  it('spends Seeds in the Tree of Seasons and brings in a cooperative (§7.1, §7.2)', async () => {
     const base = createInitialState(0);
     saveGame({ ...base, seeds: 3, seasons: 1, allTimeLight: 2e8 });
     const store = renderApp(new GameStore(localStorage, () => 0));
     expect(screen.queryByRole('region', { name: 'Coopératives' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Arbre des Saisons, 3 Graines à semer' }));
-    const tree = screen.getByRole('dialog', { name: 'L’Arbre des Saisons' });
+    const tree = await screen.findByRole('dialog', { name: 'L’Arbre des Saisons' });
     expect(screen.getByTestId('seeds-available')).toHaveTextContent('3');
     fireEvent.click(screen.getByRole('button', { name: 'Les jardiniers, à semer' }));
     fireEvent.click(screen.getByRole('button', { name: 'Apprendre Les jardiniers pour 1 Graine' }));
@@ -543,7 +561,7 @@ describe('App', () => {
       'false',
     );
   });
-  it('gathers Water in the Bioregion, raises a site and opens the Water Cycle (§7.4)', () => {
+  it('gathers Water in the Bioregion, raises a site and opens the Water Cycle (§7.4)', async () => {
     saveGame({
       ...createInitialState(0),
       seasons: 2,
@@ -567,7 +585,7 @@ describe('App', () => {
     expect(document.querySelectorAll('[data-site="wetlands"] .marsh').length).toBeGreaterThan(0);
     // One Source is already in reach.
     fireEvent.click(screen.getByRole('button', { name: /Cycle de l’eau, 1 Sources à gagner/ }));
-    expect(screen.getByTestId('sources-gain')).toHaveTextContent('+1');
+    expect(await screen.findByTestId('sources-gain')).toHaveTextContent('+1');
     expect(screen.getByText('La rivière n’est pas encore prête')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Commencer un nouveau Cycle' }));
     fireEvent.click(screen.getByRole('button', { name: 'Oui, recommencer le Cycle' }));

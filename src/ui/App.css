@@ -265,6 +265,175 @@ button {
   order: 5;
 }
 
+.side .orchard-panel {
+  order: 6;
+}
+
+.side .alliances-panel {
+  order: 7;
+}
+
+.side .works-panel {
+  order: 8;
+}
+
+/* M25: the side menu by layers (the city, the living, the region), one shown at a time below the
+   very large screens, which show them all in two columns. */
+.layerbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  order: 0;
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+
+.layerbar button {
+  position: relative;
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0 0.8rem;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.layerbar button[aria-current='page'] {
+  background: rgb(246 213 143 / 0.55);
+  color: var(--ink);
+}
+
+.layerbar button:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: -2px;
+}
+
+.layerbar svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* A gold dot on a tab whose layer holds a panel the player has not opened yet. */
+:is(.layerbar, .tabbar) button[data-new='true']::after {
+  content: '';
+  position: absolute;
+  top: 0.35rem;
+  right: 0.6rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--cream);
+  animation: fresh-dot 2.4s ease-in-out infinite;
+}
+
+@media (min-width: 40.01rem) and (max-width: 109.99rem) {
+  .app[data-layer='city'] .side :is(.garden-panel, .orchard-panel, .alliances-panel),
+  .app[data-layer='city'] .side :is(.bioregion, .works-panel),
+  .app[data-layer='living'] .side :is(.upgrades, .generators, .restoration, .cooperatives),
+  .app[data-layer='living'] .side :is(.bioregion, .works-panel),
+  .app[data-layer='region'] .side :is(.upgrades, .generators, .restoration, .cooperatives),
+  .app[data-layer='region'] .side :is(.garden-panel, .orchard-panel, .alliances-panel) {
+    display: none;
+  }
+
+  .side-panels .layerbar {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 110rem), (max-width: 40rem) {
+  .layerbar {
+    display: none;
+  }
+}
+
+/* A panel the player has not touched yet glows with a soft gold ring until then. */
+.side-panels[data-new~='upgrades'] .upgrades,
+.side-panels[data-new~='generators'] .generators,
+.side-panels[data-new~='restoration'] .restoration,
+.side-panels[data-new~='cooperatives'] .cooperatives,
+.side-panels[data-new~='garden'] .garden-panel,
+.side-panels[data-new~='orchard'] .orchard-panel,
+.side-panels[data-new~='alliances'] .alliances-panel,
+.side-panels[data-new~='bioregion'] .bioregion,
+.side-panels[data-new~='greatWorks'] .works-panel {
+  animation: fresh-panel 2.4s ease-in-out infinite;
+}
+
+/* A folded panel with something to do now shows a gold dot after its title. */
+.side-panels[data-action~='upgrades'] .upgrades,
+.side-panels[data-action~='generators'] .generators,
+.side-panels[data-action~='restoration'] .restoration,
+.side-panels[data-action~='garden'] .garden-panel,
+.side-panels[data-action~='orchard'] .orchard-panel,
+.side-panels[data-action~='alliances'] .alliances-panel,
+.side-panels[data-action~='bioregion'] .bioregion,
+.side-panels[data-action~='greatWorks'] .works-panel {
+  --action-dot: var(--gold);
+}
+
+.panel[data-open='false'] .panel-title button::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--action-dot, transparent);
+}
+
+@keyframes fresh-panel {
+  0%,
+  100% {
+    box-shadow:
+      var(--shadow),
+      0 0 0 2px rgb(233 169 59 / 0.55);
+  }
+
+  50% {
+    box-shadow:
+      var(--shadow),
+      0 0 0 5px rgb(233 169 59 / 0.2),
+      0 0 24px 4px rgb(246 213 143 / 0.6);
+  }
+}
+
+@keyframes fresh-dot {
+  50% {
+    transform: scale(1.35);
+  }
+}
+
+.app[data-motion='reduced'] :is(.side-panels .panel, .layerbar button, .tabbar button) {
+  animation-iteration-count: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-panels .panel,
+  :is(.layerbar, .tabbar) button::after {
+    animation-iteration-count: 1 !important;
+  }
+}
+
 /* Folding a panel keeps only its title, so the others and the map get the room. */
 .panel-title {
   margin: 0;
@@ -319,6 +488,11 @@ button {
   background: var(--glass);
   backdrop-filter: blur(16px) saturate(1.15);
   box-shadow: var(--shadow);
+}
+
+/* The panels of M14 to M24 had no inner margin of their own (M25). */
+:is(.garden-panel, .orchard-panel, .works-panel, .alliances-panel) {
+  padding: 1.25rem;
 }
 
 /* Flower ----------------------------------------------------------------- */
@@ -2760,7 +2934,7 @@ button {
     height: clamp(15rem, 36vh, 22rem);
   }
 
-  .app[data-tab='harvest'] .scene-map {
+  .app[data-tab='living'] .scene-map {
     height: clamp(20rem, 58vh, 34rem);
   }
 
@@ -2794,9 +2968,10 @@ button {
   }
 
   /* §10.3: one section at a time, picked in the tab bar. */
-  .app[data-tab='harvest'] :is(.upgrades, .generators, .bioregion, .cooperatives),
-  .app[data-tab='build'] :is(.upgrades, .restoration, .garden-panel, .cooperatives),
-  .app[data-tab='improve'] :is(.generators, .bioregion, .restoration, .garden-panel),
+  .app:not([data-tab='build']) :is(.generators, .cooperatives),
+  .app:not([data-tab='improve']) :is(.upgrades, .restoration),
+  .app:not([data-tab='living']) :is(.garden-panel, .orchard-panel, .alliances-panel),
+  .app:not([data-tab='region']) :is(.bioregion, .works-panel),
   .app[data-tab='more'] .layout {
     display: none;
   }
@@ -2825,7 +3000,8 @@ button {
     left: 0.75rem;
     z-index: 5;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
     padding: 0.35rem;
     border: 1px solid var(--glass-border);
     border-radius: 1.5rem;
@@ -2835,6 +3011,7 @@ button {
   }
 
   .tabbar button {
+    position: relative;
     display: grid;
     justify-items: center;
     gap: 0.1rem;
