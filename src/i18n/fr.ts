@@ -915,7 +915,8 @@ export const fr = {
     toGainRipening: (time: string) => `mûres dans ${time}`,
     bonus: 'Bonus de production',
     bonusAfter: 'après la nouvelle Saison',
-    nextSeed: (light: string) => `Prochaine Graine dans ${light} Lumière.`,
+    nextSeed: (light: string, time: string | null) =>
+      `Prochaine Graine dans ${light} Lumière${time ? `, environ ${time} de production` : ''}.`,
     formula: (minutes: string, deepSoil: string) =>
       `Chaque Graine ajoute 5\u00a0% à toute la production. Les Graines viennent de la Lumière récoltée au fil de toutes les Saisons et mûrissent en ${minutes} de Saison. Au-delà de ${deepSoil} Graines, le sol s’approfondit\u00a0: chacune demande plus de Lumière.`,
     ripening: (time: string) => `Les Graines mûrissent\u00a0: encore ${time} de Saison.`,
