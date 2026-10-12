@@ -29,6 +29,7 @@ import {
 import { Dialog } from './Dialog';
 import { SpeciesArt } from './SpeciesArt';
 import { useGameState, useGameStore } from './useGame';
+import './tree.css';
 
 /** A sprouting seed under an Art nouveau arch (§10.4: arches frame the Seasons screen). */
 function SeasonsOrnament() {

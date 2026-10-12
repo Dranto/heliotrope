@@ -171,16 +171,23 @@
 
 .garden-crops {
   display: grid;
-  gap: 0.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.3rem;
+}
+
+/* The bed being sown spreads over the whole row: the crops to choose from keep room to read,
+   and the bare beds beside it stay small instead of stretching to its height. */
+.garden-bed:has(.garden-crops) {
+  grid-column: 1 / -1;
 }
 
 .garden-crop {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  padding: 0.3rem 0.6rem 0.3rem 0.3rem;
   border: 1px solid rgb(31 42 36 / 0.1);
-  border-radius: 999px;
+  border-radius: 0.9rem;
   background: rgb(255 255 255 / 0.6);
   font: inherit;
   font-size: 0.78rem;

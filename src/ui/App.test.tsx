@@ -563,7 +563,7 @@ describe('App', () => {
     expect(
       within(views)
         .getAllByRole('radio')
-        .map((b) => b.textContent),
+        .map((b) => b.getAttribute('aria-label')),
     ).toEqual(['Le Balcon', 'Le Quartier']);
     expect(within(views).getByRole('radio', { name: 'Le Quartier' })).toHaveAttribute(
       'aria-checked',

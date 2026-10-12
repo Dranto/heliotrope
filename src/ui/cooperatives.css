@@ -1,0 +1,263 @@
+/* The Cooperatives (docs/game-design.md §7.2, §10.4): their panel and their bikes on the map. */
+
+/* ---------- Cooperatives panel ---------- */
+
+.cooperatives {
+  padding: 1.25rem;
+}
+
+.cooperatives h2 {
+  margin-bottom: 0.5rem;
+}
+
+.cooperatives .hint {
+  margin-top: 0;
+}
+
+.coop-list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 0.7rem;
+  padding: 0;
+  list-style: none;
+}
+
+.coop {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.5rem 0.6rem 0.5rem 0.55rem;
+  border: 1px solid rgb(255 255 255 / 0.75);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.5);
+  transition: opacity 0.4s ease;
+}
+
+.coop[data-working='false'] {
+  opacity: 0.62;
+}
+
+.coop-icon {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--coop-soft);
+}
+
+.coop-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  fill: none;
+  stroke: var(--coop);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The bike pedals while its cooperative works. */
+.coop[data-working='true'] .coop-icon svg {
+  animation: pedal 1.6s ease-in-out infinite;
+}
+
+@keyframes pedal {
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+.coop-text {
+  display: grid;
+  min-width: 0;
+}
+
+.coop-name {
+  font-weight: 700;
+}
+
+.coop-buys {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.coop-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--leaf);
+  font-variant-numeric: tabular-nums;
+}
+
+.coop-count span {
+  display: inline-block;
+  animation: count-pop 0.5s ease-out;
+}
+
+@keyframes count-pop {
+  from {
+    transform: translateY(-2px);
+    color: #c98a1d;
+  }
+}
+
+.coop-switch {
+  position: relative;
+  min-width: 5.6rem;
+  min-height: 2.2rem;
+  padding: 0 0.7rem 0 2.1rem;
+  border: 1px solid rgb(47 107 79 / 0.25);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.7);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.coop-switch::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.45rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: -0.6rem;
+  border-radius: 50%;
+  background: var(--concrete);
+  transition: background 0.3s ease;
+}
+
+.coop-switch[aria-checked='true'] {
+  border-color: rgb(47 107 79 / 0.45);
+  background: rgb(188 211 181 / 0.45);
+  color: var(--leaf);
+}
+
+.coop-switch[aria-checked='true']::before {
+  background: var(--leaf);
+  box-shadow: 0 0 0 3px rgb(143 174 139 / 0.35);
+}
+
+.coop-thrifty {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.coop-thrifty input {
+  margin-top: 0.25rem;
+  accent-color: var(--leaf);
+}
+
+.coop-thrifty > span {
+  display: grid;
+}
+
+.coop-thrifty-label {
+  font-weight: 700;
+}
+
+[data-cooperative='gardeners'] {
+  --coop: #2f6b4f;
+  --coop-soft: #d6e5cf;
+}
+
+[data-cooperative='roofers'] {
+  --coop: #c8734f;
+  --coop-soft: #f3d9c6;
+}
+
+[data-cooperative='farmers'] {
+  --coop: #c98a1d;
+  --coop-soft: #f7e3b5;
+}
+
+[data-cooperative='foresters'] {
+  --coop: #4f7f3a;
+  --coop-soft: #d9e8c7;
+}
+
+[data-cooperative='council'] {
+  --coop: #8a66b8;
+  --coop-soft: #e4d8f2;
+}
+
+[data-cooperative='fountaineers'] {
+  --coop: #3f86a8;
+  --coop-soft: #d3e8f1;
+}
+
+/* ---------- Bikes on the map ---------- */
+
+.coop-bike .crate {
+  fill: var(--coop);
+  stroke: #fffaf0;
+  stroke-width: 0.7;
+}
+
+.coop-bike .crate-lid {
+  stroke: rgb(255 255 255 / 0.55);
+  stroke-width: 0.6;
+}
+
+.coop-bike .wheel {
+  stroke: #3e463f;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+.coop-bike .rider {
+  fill: #f7efe0;
+  stroke: #6b5a48;
+  stroke-width: 0.5;
+}
+
+.coop-bike .rider-head {
+  fill: #e9c7a4;
+  stroke: #6b5a48;
+  stroke-width: 0.35;
+}
+
+.coop-bike .rider-hair {
+  fill: none;
+  stroke: #6b5a48;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.coop-bike .rider-arm,
+.coop-bike .handlebar {
+  stroke: #6b5a48;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.coop-bike .load-leaf {
+  fill: #5d9a62;
+}
+
+.coop-bike .load-bloom {
+  fill: var(--lilac);
+}
+
+.coop-bike .load-bloom.gold {
+  fill: #f4c063;
+}
+
+.coop-bike[data-working='false'] {
+  opacity: 0.7;
+}
+
+.coop-ring {
+  stroke: #f4c063;
+  stroke-width: 1.4;
+}
+
+.coop-bike .bike-shadow {
+  fill: rgb(31 42 36 / 0.16);
+}
