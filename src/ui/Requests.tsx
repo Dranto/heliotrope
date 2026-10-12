@@ -20,9 +20,14 @@ import { RequestIcon } from './RequestArt';
 import { useGameState, useGameStore } from './useGame';
 
 function needText(need: Need): string {
-  return need.kind === 'owned'
-    ? t.requests.needs.owned(need.count, t.generators[need.generator].name)
-    : t.requests.needs[need.kind](need.count);
+  switch (need.kind) {
+    case 'owned':
+      return t.requests.needs.owned(need.count, t.generators[need.generator].name);
+    case 'greet':
+      return t.requests.needs.greet(t.herbier.names[need.species]);
+    default:
+      return t.requests.needs[need.kind](need.count);
+  }
 }
 
 /**

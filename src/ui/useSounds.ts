@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { GENERATOR_IDS } from '../game/generators';
 import { WORK_IDS } from '../game/greatWorks';
+import { totalGreetings } from '../game/greetings';
 import { phaseOf } from '../game/phases';
 import type { GameState } from '../game/state';
 import { VISIT_KINDS } from '../game/visits';
@@ -30,6 +31,7 @@ function counters(state: GameState): Record<Exclude<SoundName, 'bird'>, number> 
     work:
       WORK_IDS.reduce((sum, id) => sum + state.greatWorks.works[id].stage, 0) + state.orchard.hives,
     alliance: state.alliances.chosen.length,
+    greet: totalGreetings(state),
   };
 }
 
@@ -42,6 +44,7 @@ const PRIORITY = [
   'project',
   'milestone',
   'butterfly',
+  'greet',
   'harvest',
   'upgrade',
   'build',

@@ -37,6 +37,8 @@ import {
 } from './neighbourhood';
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
+import { canGreet, greetSpecies } from '../game/greetings';
+import type { SpeciesId } from '../game/species';
 import { NightLights, VisitLayer } from './VisitArt';
 import { GardenBeds } from './GardenArt';
 import { cropStage, encodeBeds } from './gardenMap';
@@ -283,6 +285,9 @@ export function Scene({
   // The landscape of the sister city lived in (§7.6).
   const landscape = state.city.landscape;
   const orchard = encodeOrchard(state.orchard);
+  // The species that can be greeted now (M35), joined so the layer redraws only on a change.
+  const greetable = species.filter((id) => canGreet(state, id)).join();
+  const greet = useCallback((id: SpeciesId) => store.dispatch((s) => greetSpecies(s, id)), [store]);
   const onPick = useCallback(
     (id: FruitId) => store.dispatch((s) => pickFruit(s, id)?.state ?? s),
     [store],
@@ -329,7 +334,7 @@ export function Scene({
         <PollenWave flights={flights} flying={flying} reduced={reduced} />
         <RequestBubbles bubbles={requests} />
         <ProjectMarks projects={projects} />
-        <SpeciesLife species={species} />
+        <SpeciesLife species={species} greetable={greetable} onGreet={greet} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <GardenBeds beds={beds} onHarvest={onHarvest} />
         <DecorLayer slots={decor} editing={editing} onSlot={setDecor} />
@@ -365,6 +370,8 @@ export function Scene({
       restoreNeighbour,
       projects,
       species,
+      greetable,
+      greet,
       bikes,
       reduced,
       visitor,
