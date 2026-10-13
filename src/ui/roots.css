@@ -1,0 +1,62 @@
+/* The roots of the heliotrope tree (§10.4): fine veins of wood under the map, with light running
+   out along them to the places they reach. They grow in once, when they first reach a place. */
+.tree-roots {
+  pointer-events: none;
+}
+
+.root {
+  fill: none;
+  stroke: rgb(110 78 50 / 0.42);
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  animation: root-grow 3.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.root-sap {
+  fill: none;
+  stroke: rgb(246 213 143 / 0.85);
+  stroke-linecap: round;
+  stroke-dasharray: 0.05 0.2;
+  animation: root-sap 9s linear infinite;
+}
+
+.tree-roots[data-reduced] .root-sap {
+  stroke-dasharray: none;
+  opacity: 0.35;
+  animation: none;
+}
+
+.root-shoot path {
+  fill: #4f8a5e;
+  stroke: rgb(255 255 255 / 0.5);
+  stroke-width: 0.4;
+}
+
+.root-shoot .shoot-bud {
+  fill: #f4c063;
+  filter: drop-shadow(0 0 1.5px rgb(246 213 143 / 0.95));
+}
+
+.root-shoot {
+  animation: fade-in 1.6s ease both;
+}
+
+@keyframes root-grow {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes root-sap {
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root-shoot,
+  .root-sap {
+    animation: none;
+  }
+}

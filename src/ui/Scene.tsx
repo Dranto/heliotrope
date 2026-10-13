@@ -12,7 +12,7 @@ import {
 import type { ParcelId } from '../game/parcels';
 import { canRestoreParcel, futureOf, offeredParcels, restoreParcel } from '../game/restoration';
 import { BUTTERFLY_VISIBLE_SECONDS, catchButterfly, type CatchResult } from '../game/butterfly';
-import { isBioregionOpen, waterPerSecond } from '../game/bioregion';
+import { isBioregionOpen, SITE_IDS, waterPerSecond } from '../game/bioregion';
 import { phaseOf, visualSeason } from '../game/phases';
 import { lightPerSecond } from '../game/production';
 import { t } from '../i18n';
@@ -69,6 +69,8 @@ import { encodeGrowth } from './growthMap';
 import { reachedTiers } from '../game/growth';
 import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
 import { CorridorLayer } from './CorridorArt';
+import { RootsLayer } from './RootsArt';
+import { treeAge } from './tree';
 import { AllianceThreads, BloomLayer } from './AllianceArt';
 import { workingAlliances } from '../game/alliances';
 import { OrchardLayer } from './OrchardArt';
@@ -333,6 +335,12 @@ export function Scene({
     opened.current = furthest;
   }, [furthest, choose]);
   const view = Math.min(chosen ?? furthest, furthest) as View;
+  // The tree's roots (§10.4), joined so the layer only redraws when they reach somewhere new.
+  const rootAge = Math.floor(treeAge(state.seasons, state.totalLight) * 2) / 2;
+  const rootSites = SITE_IDS.filter((id) => sites[id] > 0).join();
+  const rootParcels = parcels.join();
+  const rootDistricts = districts.join();
+  const { treeSeed } = state;
   const [mapRef, size] = useSize<HTMLDivElement>(WORLD);
   const { width, height } = size;
   // Kept as one object while nothing moves, so the map does not redraw at every tick.
@@ -345,6 +353,15 @@ export function Scene({
   const marks = useMemo(
     () => (
       <>
+        <RootsLayer
+          seed={treeSeed}
+          view={furthest}
+          parcels={rootParcels}
+          districts={rootDistricts}
+          sites={rootSites}
+          age={rootAge}
+          reduced={reduced}
+        />
         {weather && <WeatherLayer weather={weather} reduced={reduced} />}
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
@@ -380,6 +397,12 @@ export function Scene({
       </>
     ),
     [
+      treeSeed,
+      furthest,
+      rootParcels,
+      rootDistricts,
+      rootSites,
+      rootAge,
       districts,
       districtOffer,
       works,

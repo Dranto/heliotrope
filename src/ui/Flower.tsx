@@ -19,19 +19,25 @@ import { arrivedFeature } from '../game/introductions';
 import './pollen.css';
 import { t } from '../i18n';
 import {
-  ARCH_ORNAMENTS,
   MAX_POT_BANDS,
-  SOIL,
-  flowerShape,
   flowerStage,
   florets,
   floretPath,
   leafPaths,
-  stemPath,
   type FlowerStage,
   type Head,
-  type Leaf,
 } from './flower';
+import {
+  BASE,
+  crownPaths,
+  leafOut,
+  limbLight,
+  limbPath,
+  treeAge,
+  treeShape,
+  treeSkeleton,
+  type SaplingLeaf,
+} from './tree';
 import { clickLevel } from './neighbourhood';
 import { guideStep } from '../game/guide';
 import { useGameState, useGameStore } from './useGame';
@@ -48,47 +54,33 @@ interface Floater {
 
 let nextFloaterId = 0;
 
-/** The arbour's hoop, on the line where the click upgrades' sprigs hang (`ARCH_ORNAMENTS`). */
-/** Radius of the pollen gauge around the crown (§5.6). */
-const POLLEN_RADIUS = 36;
-
-const ARBOUR = 'M20 256 V100 C20 40 60 8 100 8 C140 8 180 40 180 100 V256';
-
-/** Leaves of the vine climbing the arbour: [x, y, angle], up both posts and over the top. */
-const VINE_LEAVES: [number, number, number][] = [
-  [23, 236, -40],
-  [17, 206, 35],
-  [23, 172, -35],
-  [17, 138, 40],
-  [26, 84, -60],
-  [44, 46, -25],
-  [70, 20, 20],
-  [130, 20, -20],
-  [156, 46, 25],
-  [174, 84, 60],
-  [183, 138, -40],
-  [177, 172, 35],
-  [183, 206, -35],
-  [177, 236, 40],
-];
+/** The pollen gauge (§5.6): a golden ring on the planter around the foot of the tree. */
+const GAUGE = { rx: 40, ry: 10.5 } as const;
+const GAUGE_PATH = `M${BASE.x} ${BASE.y - GAUGE.ry} A${GAUGE.rx} ${GAUGE.ry} 0 1 1 ${BASE.x} ${BASE.y + GAUGE.ry} A${GAUGE.rx} ${GAUGE.ry} 0 1 1 ${BASE.x} ${BASE.y - GAUGE.ry}`;
 
 /** Florets are drawn from one corolla of size 10, scaled to each floret. */
 const COROLLA = floretPath(10);
 
-/** Pollen motes around the solar heliotrope (stage 5 and up): [dx, dy, delay in s]. */
+/** Pollen motes around the crown in full bloom (stage 5 and up): [dx, dy, delay in s]. */
 const MOTES: [number, number, number][] = [
-  [-38, 10, 0],
-  [30, -6, 1.6],
-  [-12, -30, 3.1],
-  [44, 18, 4.4],
-  [6, 24, 5.7],
+  [-0.8, 0.1, 0],
+  [0.7, -0.3, 1.6],
+  [-0.2, -0.75, 3.1],
+  [0.9, 0.35, 4.4],
+  [0.15, 0.5, 5.7],
 ];
+
+/** Gilded sprigs planted around the foot of the tree, one per click upgrade (§5.2 has ten). */
+const SPRIGS = 11;
+
+/** Size of the arrival rings (§10.8) as they leave the crown. */
+const ARRIVAL_RADIUS = 36;
 
 function motionReduced(setting: boolean): boolean {
   return setting || (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
 }
 
-function LeafArt({ x, y, length, angle }: Leaf) {
+function LeafArt({ x, y, length, angle }: SaplingLeaf) {
   const { blade, veins } = leafPaths(length);
   return (
     <g transform={`translate(${x} ${y}) rotate(${angle})`} className="leaf-art">
@@ -105,21 +97,14 @@ function HeadArt({ head, solar }: { head: Head; solar: boolean }) {
       <ellipse
         cx={head.x}
         cy={head.y + head.radius * 0.12}
-        rx={head.radius * 0.9}
-        ry={head.radius * 0.5}
+        rx={head.radius * 0.95}
+        ry={head.radius * 0.55}
         className="head-shade"
       />
       {list.map((f, i) =>
         f.bud ? (
           <g key={i} transform={`translate(${f.x} ${f.y}) rotate(${((i * 41) % 60) - 30})`}>
             <ellipse rx={f.size * 0.42} ry={f.size * 0.58} className="bud" />
-            <ellipse
-              cx={-f.size * 0.12}
-              cy={-f.size * 0.2}
-              rx={f.size * 0.14}
-              ry={f.size * 0.22}
-              className="bud-light"
-            />
           </g>
         ) : (
           <g key={i} transform={`translate(${f.x} ${f.y}) rotate(${(i * 37) % 72})`}>
@@ -129,8 +114,8 @@ function HeadArt({ head, solar }: { head: Head; solar: boolean }) {
               fill={`url(#corolla-${f.shade})`}
               className="corolla"
             />
-            <circle r={f.size * 0.26} className="eye" />
-            <circle r={f.size * 0.1} className={solar ? 'pistil solar' : 'pistil'} />
+            <circle r={f.size * 0.24} className="eye" />
+            <circle r={f.size * 0.11} className={solar ? 'pistil solar' : 'pistil'} />
           </g>
         ),
       )}
@@ -138,115 +123,152 @@ function HeadArt({ head, solar }: { head: Head; solar: boolean }) {
   );
 }
 
-/** A gilded sprig on the arch, pointing outwards: two small leaves around a golden bud. */
-function Ornament({
-  x,
-  y,
-  rotation,
-  crown,
-}: {
-  x: number;
-  y: number;
-  rotation: number;
-  crown: boolean;
-}) {
+/** A gilded sprig at the foot of the tree, leaning outwards: two small leaves and a bud. */
+function Sprig({ index }: { index: number }) {
+  // Spread along the front of the planter, from the middle outwards.
+  const side = index % 2 === 0 ? 1 : -1;
+  const step = Math.ceil(index / 2);
+  const a = Math.PI / 2 + side * step * 0.27;
+  const x = BASE.x + Math.cos(a) * (GAUGE.rx + 5);
+  const y = BASE.y + Math.sin(a) * (GAUGE.ry + 2.5);
   return (
-    <g transform={`translate(${x} ${y}) rotate(${rotation})`} className="ornament">
-      {crown ? (
-        <path d={COROLLA} transform="translate(0 -1) scale(0.55)" />
-      ) : (
-        <>
-          <path d="M0 0 C-5 -2 -8 -7 -7 -11 C-3 -9 -1 -5 0 0Z" />
-          <path d="M0 0 C5 -2 8 -7 7 -11 C3 -9 1 -5 0 0Z" />
-          <circle cy="-8" r="1.8" />
-        </>
-      )}
+    <g
+      transform={`translate(${round(x)} ${round(y)}) rotate(${round(-side * step * 9)}) scale(0.8)`}
+      className="ornament"
+    >
+      <path d="M0 0 C-5 -2 -8 -7 -7 -11 C-3 -9 -1 -5 0 0Z" />
+      <path d="M0 0 C5 -2 8 -7 7 -11 C3 -9 1 -5 0 0Z" />
+      <circle cy="-8" r="1.8" />
     </g>
   );
 }
 
-interface PlantProps {
+interface TreeProps {
+  seed: number;
+  age: number;
+  leaves: number;
   stage: FlowerStage;
-  ornaments: number;
+  sprigs: number;
   bands: number;
   plantRef: RefObject<SVGGElement | null>;
   headsRef: RefObject<SVGGElement | null>;
 }
 
 /**
- * The plant itself, redrawn only when the stage, the click upgrades or the Seasons completed
- * change, not on every tick.
+ * The tree itself, redrawn only when it grows, leafs out, blooms or gains a sprig or a seed, not
+ * on every tick.
  */
-const Plant = memo(function Plant({ stage, ornaments, bands, plantRef, headsRef }: PlantProps) {
-  const shape = useMemo(() => flowerShape(stage), [stage]);
+const Tree = memo(function Tree({
+  seed,
+  age,
+  leaves,
+  stage,
+  sprigs,
+  bands,
+  plantRef,
+  headsRef,
+}: TreeProps) {
+  const skeleton = useMemo(() => treeSkeleton(seed), [seed]);
+  const shape = useMemo(
+    () => treeShape(skeleton, age, leaves, stage),
+    [skeleton, age, leaves, stage],
+  );
   const solar = stage >= 6;
-  const main = shape.heads[0];
-  const topX = main?.x ?? SOIL.x;
+  const centre = shape.crown;
+  const wood = useMemo(() => shape.limbs.map(limbPath).join(''), [shape.limbs]);
+  const crown = useMemo(() => crownPaths(shape.clusters), [shape.clusters]);
 
   return (
     <>
-      {ARCH_ORNAMENTS.slice(0, ornaments).map(([x, y, rotation], i) => (
-        <Ornament key={i} x={x} y={y} rotation={rotation} crown={i === 0} />
-      ))}
-
-      {stage >= 6 && main && (
-        <g className="rays" style={{ transformOrigin: `${main.x}px ${main.y}px` }}>
+      {solar && (
+        <g className="rays" style={{ transformOrigin: `${centre.x}px ${centre.y}px` }}>
           {Array.from({ length: 18 }, (_, i) => {
             const a = (i / 18) * Math.PI * 2;
-            const from = main.radius + 8;
-            const to = main.radius + (i % 2 ? 26 : 40);
+            const from = centre.radius + 4;
+            const to = centre.radius + (i % 2 ? 14 : 24);
             return (
               <path
                 key={i}
-                d={`M${main.x + Math.cos(a) * from} ${main.y + Math.sin(a) * from} L${main.x + Math.cos(a) * to} ${main.y + Math.sin(a) * to}`}
+                d={`M${round(centre.x + Math.cos(a) * from)} ${round(centre.y + Math.sin(a) * from * 0.8)} L${round(centre.x + Math.cos(a) * to)} ${round(centre.y + Math.sin(a) * to * 0.8)}`}
               />
             );
           })}
         </g>
       )}
 
+      <g className="pit">
+        <ellipse cx={BASE.x} cy={BASE.y + 0.6} rx="19" ry="4.6" className="soil" />
+        {shape.roots.map((root) => (
+          <path key={root.d} d={root.d} className="foot-root" strokeWidth={root.width} />
+        ))}
+        {Array.from({ length: bands }, (_, k) => (
+          <circle
+            key={k}
+            className="season-seed"
+            cx={BASE.x + (k - (bands - 1) / 2) * 8}
+            cy={BASE.y + 6.4}
+            r="1.7"
+          />
+        ))}
+      </g>
+      {Array.from({ length: sprigs }, (_, i) => (
+        <Sprig key={i} index={i} />
+      ))}
+
       <g ref={plantRef} className="plant">
         <g className="plant-idle">
-          <path className="stem" d={stemPath(shape.stemTop)} />
-          <path className="stem-light" d={stemPath(shape.stemTop)} />
-          {shape.branches.map((d) => (
-            <g key={d}>
-              <path className="stem branch" d={d} />
-              <path className="stem-light" d={d} />
-            </g>
-          ))}
-          {stage === 0 ? (
+          <g className="wood">
+            <path d={wood} className="limb" />
+            {shape.limbs
+              .filter((s) => s.depth <= 2 && s.w0 > 1.6)
+              .map((s) => (
+                <path
+                  key={s.index}
+                  d={limbLight(s)}
+                  className="limb-light"
+                  strokeWidth={round(s.w0 * 0.22)}
+                />
+              ))}
+          </g>
+          {shape.seedling && (
             <g className="sprout">
               <path
                 className="leaf"
-                d={`M${topX} ${shape.stemTop} C${topX - 6} ${shape.stemTop - 10} ${topX - 20} ${shape.stemTop - 8} ${topX - 22} ${shape.stemTop + 2} C${topX - 14} ${shape.stemTop + 6} ${topX - 5} ${shape.stemTop + 4} ${topX} ${shape.stemTop}Z`}
+                d={`M${BASE.x} ${BASE.y - 10} C${BASE.x - 6} ${BASE.y - 20} ${BASE.x - 20} ${BASE.y - 18} ${BASE.x - 22} ${BASE.y - 8} C${BASE.x - 14} ${BASE.y - 4} ${BASE.x - 5} ${BASE.y - 6} ${BASE.x} ${BASE.y - 10}Z`}
               />
               <path
                 className="leaf"
-                d={`M${topX} ${shape.stemTop} C${topX + 6} ${shape.stemTop - 12} ${topX + 20} ${shape.stemTop - 12} ${topX + 23} ${shape.stemTop - 2} C${topX + 15} ${shape.stemTop + 4} ${topX + 5} ${shape.stemTop + 3} ${topX} ${shape.stemTop}Z`}
+                d={`M${BASE.x} ${BASE.y - 10} C${BASE.x + 6} ${BASE.y - 22} ${BASE.x + 20} ${BASE.y - 22} ${BASE.x + 23} ${BASE.y - 12} C${BASE.x + 15} ${BASE.y - 6} ${BASE.x + 5} ${BASE.y - 7} ${BASE.x} ${BASE.y - 10}Z`}
               />
-              <ellipse cx={topX} cy={shape.stemTop - 5} rx="3" ry="5" className="bud green" />
             </g>
-          ) : (
-            shape.leaves.map((leaf) => <LeafArt key={`${leaf.x},${leaf.y}`} {...leaf} />)
           )}
+          {shape.leaves.map((leaf) => (
+            <LeafArt key={`${leaf.x},${leaf.y}`} {...leaf} />
+          ))}
           <g
             ref={headsRef}
             className="heads"
-            style={{ transformOrigin: `${topX}px ${main?.y ?? shape.stemTop}px` }}
+            style={{ transformOrigin: `${centre.x}px ${centre.y}px` }}
           >
-            {/* Side heads behind, main head in front. */}
-            {[...shape.heads].reverse().map((head) => (
+            {/* The crown in three passes, so its tufts read as one mass of leaves lit from the
+                upper left: the shade under every tuft, then the leaves, then the light. */}
+            <g className="crown">
+              <path d={crown.shade} className="crown-shade" />
+              {crown.tones.map((d, k) => (
+                <path key={k} d={d} className={`crown-leaves tone-${k}`} />
+              ))}
+              <path d={crown.light} className="crown-light" />
+            </g>
+            {shape.heads.map((head) => (
               <HeadArt key={`${head.x},${head.y}`} head={head} solar={solar} />
             ))}
             {stage >= 5 &&
-              main &&
               MOTES.map(([dx, dy, delay]) => (
                 <circle
                   key={dx}
                   className="mote"
-                  cx={main.x + dx}
-                  cy={main.y + dy}
+                  cx={round(centre.x + dx * centre.radius)}
+                  cy={round(centre.y + dy * centre.radius)}
                   r="1.6"
                   style={{ animationDelay: `${delay}s` }}
                 />
@@ -254,33 +276,19 @@ const Plant = memo(function Plant({ stage, ornaments, bands, plantRef, headsRef 
           </g>
         </g>
       </g>
-
-      <g className="pot-art">
-        <path
-          className="pot-body"
-          d="M70 228 H130 C128.5 240 126 250 121 256 H79 C74 250 71.5 240 70 228Z"
-        />
-        <path className="pot-sheen" d="M76 231 C77 240 79 248 82 253" />
-        <rect className="pot-rim" x="64" y="218" width="72" height="11" rx="3" />
-        <ellipse className="soil" cx={SOIL.x} cy={SOIL.y - 2.5} rx="31" ry="2.6" />
-        {Array.from({ length: bands }, (_, k) => (
-          <circle
-            key={k}
-            className="season-seed"
-            cx={SOIL.x + (k - (bands - 1) / 2) * 9}
-            cy="224"
-            r="1.7"
-          />
-        ))}
-      </g>
     </>
   );
 });
 
+function round(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 /**
- * The clickable heliotrope, standing in the home courtyard of the map under a garden arbour (docs/game-design.md §10.1, §10.4). It
- * grows through seven stages with the Light earned this Season, each click upgrade gilds the
- * arch with a sprig, and each Season completed leaves a golden seed on the pot.
+ * The clickable heliotrope tree, standing in the home courtyard of the map (docs/game-design.md
+ * §10.1, §10.4). It grows over the whole game, one Season after another, from a seed of its own;
+ * the Light of the current Season leafs it out and makes it bloom through seven stages. Each
+ * click upgrade plants a gilded sprig at its foot, and each Season completed a golden seed.
  */
 export function Flower() {
   const store = useGameStore();
@@ -291,6 +299,12 @@ export function Flower() {
   const plant = useRef<SVGGElement>(null);
   const value = clickValue(state);
   const stage = flowerStage(state.totalLight);
+  const age = treeAge(state.seasons, state.totalLight);
+  const leaves = leafOut(state.seasons, state.totalLight);
+  const crown = useMemo(
+    () => treeShape(treeSkeleton(state.treeSeed), age, leaves, stage).crown,
+    [state.treeSeed, age, leaves, stage],
+  );
   const season = visualSeason(state);
   const reduced = state.settings.reducedMotion;
   const arrived = arrivedFeature(state);
@@ -324,7 +338,7 @@ export function Flower() {
     store.dispatch(clickHeliotrope);
     const element = heads.current;
     if (element && typeof element.animate === 'function' && !motionReduced(reduced)) {
-      // The florets open a little wider at each touch.
+      // The crown rustles and its florets open a little wider at each touch.
       element.animate(
         [
           { transform: 'scale(0.95)' },
@@ -335,13 +349,14 @@ export function Flower() {
       );
     }
     const rect = event.currentTarget.getBoundingClientRect();
-    // Keyboard activation (detail 0) has no pointer position: float from the blossoms.
+    // Keyboard activation (detail 0) has no pointer position: float from the crown.
     const fromPointer = event.detail > 0;
     // A little scatter, so quick clicks on the same spot never stack their numbers into one blur.
     const x =
       (fromPointer ? event.clientX - rect.left : rect.width / 2) + (Math.random() - 0.5) * 40;
     const y =
-      (fromPointer ? event.clientY - rect.top : rect.height / 3) + (Math.random() - 0.5) * 18;
+      (fromPointer ? event.clientY - rect.top : (rect.height * crown.y) / 260) +
+      (Math.random() - 0.5) * 18;
     const drift = Math.random() * 2 - 1;
     const floater = { id: nextFloaterId++, x, y, drift, text: `+${formatNumber(value)}` };
     setFloaters((list) => [...list.slice(-12), floater]);
@@ -353,14 +368,13 @@ export function Flower() {
     setTilt(Math.max(-1, Math.min(1, offset * 2)) * 6);
   }
 
-  const headY = flowerShape(stage).heads[0]?.y ?? SOIL.y - 30;
-
   return (
     <section
       className="flower-panel"
       aria-label={t.light}
       data-season={season ?? 'none'}
       data-stage={stage}
+      data-age={age}
       data-flight={flying || undefined}
     >
       {pollenOpen && (
@@ -400,18 +414,24 @@ export function Flower() {
               <stop offset="0%" stopColor="#5E9471" />
               <stop offset="100%" stopColor="#2F6B4F" />
             </linearGradient>
-            <linearGradient id="pot-fill" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#B5603F" />
-              <stop offset="40%" stopColor="#D58A63" />
-              <stop offset="100%" stopColor="#A8553A" />
+            <linearGradient id="bark-fill" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#8A6A4E" />
+              <stop offset="45%" stopColor="#6B4E3A" />
+              <stop offset="100%" stopColor="#4A3528" />
             </linearGradient>
           </defs>
-          {/* Its shadow on the courtyard paving, and the glow of its light around the heads. */}
-          <ellipse cx="100" cy="257" rx="46" ry="6" className="ground-shadow" />
+          {/* Its shadow on the courtyard paving, and the glow of its light around the crown. */}
+          <ellipse
+            cx={BASE.x + 6}
+            cy={BASE.y + 3}
+            rx={round(28 + crown.radius * 0.7)}
+            ry={round(6 + crown.radius * 0.12)}
+            className="ground-shadow"
+          />
           <circle
-            cx="100"
-            cy={headY}
-            r={48 + stage * 8}
+            cx={crown.x}
+            cy={crown.y}
+            r={round(crown.radius * 1.5 + 18)}
             fill="url(#flower-halo)"
             className="halo"
             style={{ opacity: 0.4 + stage * 0.08 }}
@@ -420,30 +440,25 @@ export function Flower() {
               crown, once, over a brief glow. */}
           {arrived && (
             <g key={arrived} className="arrival" aria-hidden="true">
-              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-glow" />
-              <circle cx="100" cy={headY} r={POLLEN_RADIUS} />
-              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-late" />
-              <circle cx="100" cy={headY} r={POLLEN_RADIUS} className="arrival-late arrival-last" />
+              <circle cx={crown.x} cy={crown.y} r={ARRIVAL_RADIUS} className="arrival-glow" />
+              <circle cx={crown.x} cy={crown.y} r={ARRIVAL_RADIUS} />
+              <circle cx={crown.x} cy={crown.y} r={ARRIVAL_RADIUS} className="arrival-late" />
+              <circle
+                cx={crown.x}
+                cy={crown.y}
+                r={ARRIVAL_RADIUS}
+                className="arrival-late arrival-last"
+              />
             </g>
           )}
-          {/* The pollen gauge (§5.6): a golden arc around the crown, filling with the clicks. It
-              joins the flower with the first click upgrade (§10.8) and draws itself in. */}
+          {/* The pollen gauge (§5.6): a golden ring on the planter around the foot of the tree,
+              filling with the clicks. It joins the tree with the first click upgrade (§10.8) and
+              draws itself in. */}
           {pollenOpen && (
-            <g
-              transform={`rotate(-90 100 ${headY})`}
-              className={arrived === 'pollen' ? 'pollen-gauge pollen-arriving' : 'pollen-gauge'}
-            >
-              <circle
-                cx="100"
-                cy={headY}
-                r={POLLEN_RADIUS}
-                className="pollen-track"
-                pathLength={1}
-              />
-              <circle
-                cx="100"
-                cy={headY}
-                r={POLLEN_RADIUS}
+            <g className={arrived === 'pollen' ? 'pollen-gauge pollen-arriving' : 'pollen-gauge'}>
+              <path d={GAUGE_PATH} className="pollen-track" pathLength={1} />
+              <path
+                d={GAUGE_PATH}
                 className="pollen-fill"
                 pathLength={1}
                 strokeDasharray="1 1"
@@ -451,45 +466,36 @@ export function Flower() {
               />
             </g>
           )}
-          {/* A garden arbour over the courtyard bed: a climbing vine on a fine gilded hoop, where
-              the click upgrades hang their sprigs. */}
-          <g className="arbour">
-            <path className="arch" d={ARBOUR} fill="none" />
-            <path className="arch-inner" d={ARBOUR} fill="none" />
-            {VINE_LEAVES.map(([x, y, angle]) => (
-              <ellipse
-                key={`${x},${y}`}
-                cx={x}
-                cy={y}
-                rx="4.2"
-                ry="1.9"
-                transform={`rotate(${angle} ${x} ${y})`}
-                className="vine-leaf"
-              />
-            ))}
-            <ellipse cx="20" cy="256" rx="6" ry="2.4" className="arbour-foot" />
-            <ellipse cx="180" cy="256" rx="6" ry="2.4" className="arbour-foot" />
-          </g>
-          {/* A generous touch target around the plant, so a tap between two leaves still counts. */}
+          {/* A generous touch target around the tree, so a tap between two tufts still counts. */}
           <ellipse cx="100" cy="170" rx="62" ry="88" fill="transparent" className="flower-hit" />
           <g className="flower-sway" style={{ transform: `rotate(${tilt}deg)` }}>
-            <Plant
+            <Tree
+              seed={state.treeSeed}
+              age={age}
+              leaves={leaves}
               stage={stage}
-              ornaments={clickLevel(state.upgrades)}
+              sprigs={Math.min(clickLevel(state.upgrades), SPRIGS)}
               bands={Math.min(state.seasons, MAX_POT_BANDS)}
               plantRef={plant}
               headsRef={heads}
             />
           </g>
           {/* The bouquet (§5.7): a golden petal around the gauge for each effect running beside
-              the first, over the plant. */}
+              the first, over the planter. */}
           {bouquet > 1 && (
             <g className="bouquet-petals" data-count={bouquet}>
-              {Array.from({ length: Math.min(bouquet - 1, 7) }, (_, i) => (
-                <g key={i} transform={`rotate(${(i * 360) / 7 - 51} 100 ${headY})`}>
-                  <ellipse cx="100" cy={headY - POLLEN_RADIUS - 8} rx="3" ry="5.5" />
-                </g>
-              ))}
+              {Array.from({ length: Math.min(bouquet - 1, 7) }, (_, i) => {
+                const a = Math.PI + ((i + 0.5) / 7) * Math.PI;
+                return (
+                  <ellipse
+                    key={i}
+                    cx={round(BASE.x + Math.cos(a) * (GAUGE.rx + 9))}
+                    cy={round(BASE.y - 2 + Math.sin(a) * (GAUGE.ry + 6))}
+                    rx="3"
+                    ry="5.5"
+                  />
+                );
+              })}
             </g>
           )}
         </svg>

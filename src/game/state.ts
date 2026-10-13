@@ -34,7 +34,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 38;
+export const STATE_VERSION = 39;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -176,6 +176,8 @@ export interface GameState {
   history: SeasonCurve[];
   /** Seed of the pseudo-random generator used by random events. */
   rngSeed: number;
+  /** Seed of the heliotrope tree's shape (§10.4): each game grows its own tree. Kept forever. */
+  treeSeed: number;
   settings: Settings;
   /** Epoch milliseconds of the last simulated moment. */
   lastUpdate: number;
@@ -260,6 +262,7 @@ export function createInitialState(now: number): GameState {
     effects: [],
     history: [emptyCurve(1)],
     rngSeed,
+    treeSeed: (rngSeed ^ 0x2545f491) >>> 0,
     settings: DEFAULT_SETTINGS,
     lastUpdate: now,
   };

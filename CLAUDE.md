@@ -71,7 +71,7 @@ a design decision changes, update that document in the same PR.
 - `src/ui/`: React components. `Neighbourhood.tsx` draws the top-down city scene from the plan and
   rules in `neighbourhood.ts` (design doc §6); `RestorationArt.tsx` and `restorationMap.ts` draw
   the restored parcels and project marks, `Restoration.tsx` is their panel in the side menu.
-  `Scene.tsx` frames the map with the view switch (`fitCamera`) and stands the clickable `Flower.tsx` in the courtyard (`flowerFrame`);
+  `Scene.tsx` frames the map with the view switch (`fitCamera`) and stands the clickable heliotrope tree (`Flower.tsx`, procedural shape in `tree.ts`, its map roots in `treeRoots.ts` and `RootsArt.tsx`) in the courtyard (`flowerFrame`);
   `DecorArt.tsx` and `decorMap.ts` draw the decor, `MapTools.tsx` holds the decor and photo toolbars,
   `photo.ts` composes the photo PNG.
   `PanelTitle.tsx` and `layoutPrefs.ts` fold the panels and remember layout choices per browser.

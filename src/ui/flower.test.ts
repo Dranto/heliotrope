@@ -1,15 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  FLOWER_STAGE_THRESHOLDS,
-  SOIL,
-  flowerShape,
-  flowerStage,
-  florets,
-  floretPath,
-  type FlowerStage,
-} from './flower';
-
-const STAGES: FlowerStage[] = [0, 1, 2, 3, 4, 5, 6];
+import { FLOWER_STAGE_THRESHOLDS, flowerStage, florets, floretPath } from './flower';
 
 describe('flowerStage', () => {
   it('starts as a sprout and follows the Light earned this Season', () => {
@@ -26,43 +16,6 @@ describe('flowerStage', () => {
       expect(flowerStage(threshold)).toBe(stage);
       if (stage > 0) expect(flowerStage(threshold * 0.999)).toBe(stage - 1);
     });
-  });
-});
-
-describe('flowerShape', () => {
-  it('grows taller, with more heads and florets, at every stage', () => {
-    for (let i = 1; i < STAGES.length; i++) {
-      const before = flowerShape(STAGES[i - 1]!);
-      const after = flowerShape(STAGES[i]!);
-      expect(after.stemTop).toBeLessThan(before.stemTop);
-      const count = (s: typeof after) => s.heads.reduce((sum, h) => sum + h.florets, 0);
-      expect(count(after)).toBeGreaterThan(count(before));
-      expect(after.heads.length).toBeGreaterThanOrEqual(before.heads.length);
-    }
-  });
-
-  it('shows a sprout without flowers, then buds before the first open florets', () => {
-    expect(flowerShape(0).heads).toEqual([]);
-    expect(flowerShape(1).heads[0]!.open).toBe(0);
-    expect(flowerShape(2).heads[0]!.open).toBeGreaterThan(0);
-    expect(flowerShape(6).heads[0]!.open).toBe(1);
-  });
-
-  it('keeps every head and leaf inside the arch and above the pot', () => {
-    for (const stage of STAGES) {
-      const { heads, leaves, branches } = flowerShape(stage);
-      expect(branches).toHaveLength(Math.max(0, heads.length - 1));
-      for (const head of heads) {
-        expect(head.x - head.radius).toBeGreaterThan(20);
-        expect(head.x + head.radius).toBeLessThan(180);
-        expect(head.y - head.radius).toBeGreaterThan(8);
-      }
-      for (const leaf of leaves) {
-        expect(leaf.y).toBeLessThan(SOIL.y);
-        expect(leaf.x + leaf.length).toBeLessThan(180);
-        expect(leaf.x - leaf.length).toBeGreaterThan(20);
-      }
-    }
   });
 });
 

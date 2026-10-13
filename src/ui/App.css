@@ -467,7 +467,7 @@ button {
   }
 }
 
-/* ...and three golden rings spread once from the flower's crown, over a brief glow. */
+/* ...and three golden rings spread once from the tree's crown, over a brief glow. */
 .arrival circle {
   fill: none;
   stroke: rgb(233 169 59 / 0.9);
@@ -599,11 +599,10 @@ button {
   padding: 1.25rem;
 }
 
-/* Flower ----------------------------------------------------------------- */
+/* Heliotrope tree ----------------------------------------------------------------- */
 
-/* The heliotrope rises from the home courtyard, at the heart of the city, inside a light gilded
-   arch that leaves the city visible behind it. Only the plant catches the pointer, so the map
-   around it stays clickable. It glides with the camera. */
+/* The heliotrope tree rises from the home courtyard, at the heart of the city. Only the tree
+   catches the pointer, so the map around it stays clickable. It glides with the camera. */
 .map-flower {
   position: absolute;
   z-index: 1;
@@ -690,31 +689,6 @@ button {
     opacity 1.6s ease;
 }
 
-/* The arbour: a sage hoop with a gilded thread, wound with a vine, standing on the bed. */
-.arch {
-  stroke: #6f8f6c;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  opacity: 0.85;
-}
-
-.arch-inner {
-  stroke: var(--gold);
-  stroke-width: 0.8;
-  stroke-dasharray: 0.6 4;
-  stroke-linecap: round;
-}
-
-.vine-leaf {
-  fill: var(--foliage, #2f6b4f);
-  opacity: 0.85;
-  transition: fill 2s ease;
-}
-
-.arbour-foot {
-  fill: rgb(59 51 40 / 0.25);
-}
-
 .ground-shadow {
   fill: rgb(59 51 40 / 0.22);
 }
@@ -744,24 +718,65 @@ button {
   }
 }
 
-.stem {
+/* The tree: bark lit from the upper left, a crown of leaf tufts in three tones of the season. */
+.limb {
+  fill: url(#bark-fill);
+  stroke: rgb(52 37 28 / 0.35);
+  stroke-width: 0.35;
+}
+
+.limb-light {
   fill: none;
-  stroke: #2f6b4f;
-  stroke-width: 3.4;
+  stroke: rgb(232 210 180 / 0.45);
   stroke-linecap: round;
 }
 
-.stem.branch {
-  stroke-width: 2.2;
+.flower-panel {
+  --leaf-a: #3f7d58;
+  --leaf-b: #2f6b4f;
+  --leaf-c: #5a9468;
+  --leaf-shade: rgb(22 48 34 / 0.7);
+  --leaf-light: rgb(222 240 196 / 0.42);
 }
 
-.stem-light {
+.flower-panel[data-season='spring'] {
+  --leaf-c: #79ad6d;
+  --leaf-light: rgb(232 246 200 / 0.55);
+}
+
+.flower-panel[data-season='autumn'] {
+  --leaf-a: #c07f35;
+  --leaf-b: #9a5f2c;
+  --leaf-c: #d0893f;
+  --leaf-shade: rgb(70 38 18 / 0.65);
+  --leaf-light: rgb(255 226 168 / 0.45);
+}
+
+.crown-shade {
+  fill: var(--leaf-shade);
+}
+
+.crown-leaves {
+  fill: var(--leaf-a);
+  transition: fill 2s ease;
+}
+
+.crown-leaves.tone-1 {
+  fill: var(--leaf-b);
+}
+
+.crown-leaves.tone-2 {
+  fill: var(--leaf-c);
+}
+
+.crown-light {
+  fill: var(--leaf-light);
+}
+
+.foot-root {
   fill: none;
-  stroke: #8fae8b;
-  stroke-width: 0.8;
+  stroke: #5a4232;
   stroke-linecap: round;
-  opacity: 0.7;
-  transform: translateX(-0.8px);
 }
 
 .leaf {
@@ -803,35 +818,10 @@ button {
   fill: #6e4c9a;
 }
 
-.bud.green {
-  fill: #6f9a6c;
-}
-
-.bud-light {
-  fill: rgb(255 255 255 / 0.28);
-}
-
 .mote {
   fill: #f4c063;
   opacity: 0;
   animation: pollen 7s ease-in-out infinite;
-}
-
-.pot-body {
-  fill: url(#pot-fill);
-}
-
-.pot-sheen {
-  fill: none;
-  stroke: rgb(255 236 220 / 0.55);
-  stroke-width: 1.4;
-  stroke-linecap: round;
-}
-
-.pot-rim {
-  fill: #c97753;
-  stroke: rgb(255 240 225 / 0.5);
-  stroke-width: 0.6;
 }
 
 .soil {
@@ -845,20 +835,20 @@ button {
 }
 
 .flower-sway {
-  transform-origin: 100px 222px;
+  transform-origin: 100px 246px;
   transform-box: view-box;
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
   filter: drop-shadow(0 4px 5px rgb(59 51 40 / 0.25));
 }
 
 .plant {
-  transform-origin: 100px 222px;
+  transform-origin: 100px 246px;
   transform-box: view-box;
 }
 
 /* The plant breathes in the breeze, very slowly. */
 .plant-idle {
-  transform-origin: 100px 222px;
+  transform-origin: 100px 246px;
   transform-box: view-box;
   animation: breeze 9s ease-in-out infinite;
 }
