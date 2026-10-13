@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 
 interface DialogProps {
   title: string;
@@ -36,12 +36,14 @@ export function Dialog({
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  // Read while rendering: by the time effects run, the ✕ button's autoFocus has already moved
+  // focus inside the dialog, and the opener would be lost.
+  const [opener] = useState(() => document.activeElement);
   useEffect(() => {
-    const opener = document.activeElement;
     return () => {
       if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
     };
-  }, []);
+  }, [opener]);
 
   function trapFocus(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== 'Tab' || !panel.current) return;
