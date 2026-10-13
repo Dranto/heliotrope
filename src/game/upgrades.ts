@@ -111,8 +111,15 @@ export const SYNERGY_OWNED_LATE = 5;
 const LATE_GENERATORS: readonly GeneratorId[] = GENERATOR_IDS.slice(-3);
 /** Synergy cost, in base costs of the more expensive of the two generators (§5.3). */
 export const SYNERGY_COST_FACTOR = 2_000;
-/** ...or this many for the synergies of the last three buildings, so they arrive in reach. */
-export const SYNERGY_COST_FACTOR_LATE = 100;
+/** ...or this many when the dearer one is the Vertical farm, whose base cost jumps ×33. */
+export const SYNERGY_COST_FACTOR_FARM = 100;
+/** ...or this many for the synergies of the last three buildings, so they pay off in time. */
+export const SYNERGY_COST_FACTOR_LATE = 10;
+
+function synergyCostFactor(dearer: GeneratorId): number {
+  if (LATE_GENERATORS.includes(dearer)) return SYNERGY_COST_FACTOR_LATE;
+  return dearer === 'verticalFarm' ? SYNERGY_COST_FACTOR_FARM : SYNERGY_COST_FACTOR;
+}
 
 function generatorUpgrades(): UpgradeDef[] {
   return GENERATOR_IDS.flatMap((generator) =>
@@ -196,11 +203,10 @@ function synergy(
 ): UpgradeDef {
   const late = LATE_GENERATORS.includes(generator) || LATE_GENERATORS.includes(source);
   const owned = late ? SYNERGY_OWNED_LATE : SYNERGY_OWNED;
+  const dearer = GENERATORS[generator].baseCost >= GENERATORS[source].baseCost ? generator : source;
   return {
     id,
-    cost:
-      (late ? SYNERGY_COST_FACTOR_LATE : SYNERGY_COST_FACTOR) *
-      Math.max(GENERATORS[generator].baseCost, GENERATORS[source].baseCost),
+    cost: synergyCostFactor(dearer) * GENERATORS[dearer].baseCost,
     condition: { owned: { [generator]: owned, [source]: owned } },
     effect: { kind: 'synergy', generator, source, bonusPerUnit },
   };

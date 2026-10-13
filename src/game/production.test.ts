@@ -37,10 +37,11 @@ describe('upgrade data', () => {
     expect(UPGRADES['greenhouse.3'].condition).toEqual({ owned: { greenhouse: 25 } });
   });
 
-  it('prices synergies at 2 000 × the dearer base cost, 100 × for the last buildings (§5.3)', () => {
+  it('prices synergies at 2 000 × the dearer base cost, less for the dearest buildings (§5.3)', () => {
     expect(UPGRADES.sharedCompost.cost).toBe(12_000_000);
-    expect(UPGRADES.usefulShade.cost).toBe(2_800_000_000);
-    expect(UPGRADES.recoveredHeat.cost).toBe(300_000_000);
+    expect(UPGRADES.seedlingTowers.cost).toBe(20_000_000);
+    expect(UPGRADES.usefulShade.cost).toBe(280_000_000);
+    expect(UPGRADES.recoveredHeat.cost).toBe(30_000_000);
   });
 
   it('links every pair of neighbouring buildings both ways (§5.3)', () => {
