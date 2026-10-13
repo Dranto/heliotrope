@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { guideStep } from '../game/guide';
 import { upgradesAllowed } from '../game/challenges';
 import { formatCost, formatNumber } from '../game/format';
 import { availableUpgrades, upgradeInSight } from '../game/production';
-import { buyUpgrade, canBuyUpgrade } from '../game/tick';
+import { affordableUpgrades, buyAffordableUpgrades, buyUpgrade, canBuyUpgrade } from '../game/tick';
 import type { UpgradeId } from '../game/upgrades';
 import { t } from '../i18n';
 import { Eta } from './Goals';
+import { isElsewhere } from './shortcuts';
 import { upgradeEffectText, upgradeText } from '../i18n/upgrades';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
@@ -28,14 +29,41 @@ export function Upgrades() {
   const selected = available.find((u) => u.id === selectedId) ?? available[0];
   const wild = !upgradesAllowed(state);
   const guide = guideStep(state);
+  const affordable = affordableUpgrades(state).length;
+
+  // §10.5: U buys every upgrade the reserve covers, like the button.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (isElsewhere(event) || (event.key !== 'u' && event.key !== 'U')) return;
+      store.dispatch(buyAffordableUpgrades);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [store]);
+
   // Nothing to show before the first upgrade unlocks.
   if (selected === undefined && state.upgrades.length === 0 && !wild) return null;
 
   return (
     <section className="panel upgrades" aria-labelledby="upgrades-title" data-open={open}>
-      <PanelTitle id="upgrades-title" open={open} onToggle={toggle}>
-        {t.upgradesTitle}
-      </PanelTitle>
+      <div className="panel-head">
+        <PanelTitle id="upgrades-title" open={open} onToggle={toggle}>
+          {t.upgradesTitle}
+        </PanelTitle>
+        {affordable > 1 && (
+          <button
+            type="button"
+            className="buy-all"
+            aria-keyshortcuts="U"
+            aria-label={t.buyAllUpgradesLabel(affordable)}
+            title={t.buyAllUpgradesLabel(affordable)}
+            onClick={() => store.dispatch(buyAffordableUpgrades)}
+          >
+            {t.buyAllUpgrades}
+            <span className="buy-all-count">{affordable}</span>
+          </button>
+        )}
+      </div>
       {selected === undefined ? (
         <>
           <p className="empty">{wild ? t.challenges.noUpgrades : t.noUpgrades}</p>

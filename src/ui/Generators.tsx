@@ -35,6 +35,7 @@ import { t } from '../i18n';
 import { Eta } from './Goals';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
+import { isElsewhere } from './shortcuts';
 import { useGameState, useGameStore } from './useGame';
 
 type BuyAmount = 1 | 10 | 100 | 'max';
@@ -48,19 +49,6 @@ function unitsFor(state: GameState, id: GeneratorId, amount: BuyAmount): number 
 /** Light per second one more unit would add, with current multipliers. */
 function unitProduction(state: GameState, id: GeneratorId): number {
   return GENERATORS[id].baseProduction * generatorMultiplier(state, id) * globalMultiplier(state);
-}
-
-/** True when a key press belongs to a text field or a modal dialog, not to the game. */
-function isElsewhere(event: KeyboardEvent): boolean {
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return true;
-  const target = event.target;
-  if (
-    target instanceof HTMLElement &&
-    (target.isContentEditable || target.closest('input, textarea, select'))
-  ) {
-    return true;
-  }
-  return document.querySelector('[aria-modal="true"]') !== null;
 }
 
 /**
