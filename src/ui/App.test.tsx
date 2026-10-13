@@ -33,10 +33,10 @@ describe('App', () => {
 
   it('reveals generators one at a time, the next one as a priced silhouette', () => {
     renderApp();
-    expect(screen.queryByText('Héliotrope en pot')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Encore à découvrir')).toHaveTextContent('15');
-    for (let i = 0; i < 8; i++) fireEvent.click(flower());
+    // The first building is named from the start, the next one is a silhouette.
     expect(screen.getByText('Héliotrope en pot')).toBeInTheDocument();
+    expect(screen.getByLabelText('Encore à découvrir')).toHaveTextContent('100');
+    for (let i = 0; i < 8; i++) fireEvent.click(flower());
     expect(
       screen.getByRole('button', { name: /acheter héliotrope en pot pour 15/i }),
     ).toBeDisabled();
@@ -46,7 +46,7 @@ describe('App', () => {
 
   it('shows the next goal, the time before a purchase, and buys with the keyboard (§10.5)', async () => {
     const store = renderApp();
-    expect(screen.getByTestId('next-goal')).toHaveTextContent(/Prochain\s+: Encore à découvrir/);
+    expect(screen.getByTestId('next-goal')).toHaveTextContent(/Prochain\s+: Héliotrope en pot/);
     for (let i = 0; i < 15; i++) fireEvent.click(flower());
     fireEvent.keyDown(document, { key: '1' });
     expect(store.getState().generators.pot).toBe(1);

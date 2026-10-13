@@ -138,6 +138,10 @@ describe('isGeneratorRevealed', () => {
     expect(isGeneratorRevealed(withState({ totalLight: 50 }), 'balconyPanel')).toBe(true);
   });
 
+  it('shows the first building from the very start (§4)', () => {
+    expect(isGeneratorRevealed(withState({ totalLight: 0 }), 'pot')).toBe(true);
+  });
+
   it('keeps owned generators revealed', () => {
     expect(
       isGeneratorRevealed(withState({ generators: owned({ greenhouse: 1 }) }), 'greenhouse'),

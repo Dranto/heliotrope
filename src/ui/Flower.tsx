@@ -337,8 +337,11 @@ export function Flower() {
     const rect = event.currentTarget.getBoundingClientRect();
     // Keyboard activation (detail 0) has no pointer position: float from the blossoms.
     const fromPointer = event.detail > 0;
-    const x = fromPointer ? event.clientX - rect.left : rect.width / 2;
-    const y = fromPointer ? event.clientY - rect.top : rect.height / 3;
+    // A little scatter, so quick clicks on the same spot never stack their numbers into one blur.
+    const x =
+      (fromPointer ? event.clientX - rect.left : rect.width / 2) + (Math.random() - 0.5) * 40;
+    const y =
+      (fromPointer ? event.clientY - rect.top : rect.height / 3) + (Math.random() - 0.5) * 18;
     const drift = Math.random() * 2 - 1;
     const floater = { id: nextFloaterId++, x, y, drift, text: `+${formatNumber(value)}` };
     setFloaters((list) => [...list.slice(-12), floater]);

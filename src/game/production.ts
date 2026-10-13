@@ -238,6 +238,8 @@ export function maxAffordable(state: GameState, id: GeneratorId): number {
  * Owning one keeps it shown.
  */
 export function isGeneratorRevealed(state: GameState, id: GeneratorId): boolean {
+  // The first building is shown from the very start, so a new garden opens on a named goal.
+  if (id === GENERATOR_IDS[0]) return true;
   return state.generators[id] > 0 || state.totalLight >= GENERATORS[id].baseCost / 2;
 }
 
