@@ -158,6 +158,8 @@ function useSize<T extends HTMLElement>(fallback: Size): [RefObject<T | null>, S
 
 /** Room kept free under the view switch at the top of the map. */
 const CAPTION_ROOM = 52;
+/** Half of the 44 px touch target of §10.3, in screen pixels, around a species that can be greeted. */
+const HIT_PIXELS = 22;
 
 /**
  * The neighbourhood scene (docs/game-design.md §6, §10.4): the city seen from above, where each
@@ -320,6 +322,26 @@ export function Scene({
   );
   const { roofTanks, swales } = collectors;
   // What moves on its own or answers the pointer: over both maps, drawn in SVG.
+  const phase = phaseOf(state);
+  const furthest = furthestView(phase, state.generators, bioregion);
+  const [chosen, choose] = useLayoutPref<View | null>('view', null);
+  // When a further view opens during play, the map moves to it once, so the new places are seen
+  // being built; the player can go back closer at any time.
+  const opened = useRef(furthest);
+  useEffect(() => {
+    if (furthest > opened.current) choose(furthest);
+    opened.current = furthest;
+  }, [furthest, choose]);
+  const view = Math.min(chosen ?? furthest, furthest) as View;
+  const [mapRef, size] = useSize<HTMLDivElement>(WORLD);
+  const { width, height } = size;
+  // Kept as one object while nothing moves, so the map does not redraw at every tick.
+  const camera = useMemo(() => {
+    const top = width >= height ? 0 : CAPTION_ROOM;
+    // The City view grows with the neighbouring districts restored (§6.4).
+    const frame = view === 3 ? cityFrame(districts) : undefined;
+    return fitCamera(view, width, height, { top, left: 0, bottom: 0 }, frame);
+  }, [view, width, height, districts]);
   const marks = useMemo(
     () => (
       <>
@@ -335,7 +357,6 @@ export function Scene({
         <PollenWave flights={flights} flying={flying} reduced={reduced} />
         <RequestBubbles bubbles={requests} />
         <ProjectMarks projects={projects} />
-        <SpeciesLife species={species} greetable={greetable} onGreet={greet} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <GardenBeds beds={beds} onHarvest={onHarvest} />
         <DecorLayer slots={decor} editing={editing} onSlot={setDecor} />
@@ -348,6 +369,13 @@ export function Scene({
           affordable={split(affordable)}
           highlight={highlight}
           onRestore={restore}
+        />
+        {/* Last, so a species that can be greeted stays reachable over a parcel on offer. */}
+        <SpeciesLife
+          species={species}
+          greetable={greetable}
+          onGreet={greet}
+          hitRadius={HIT_PIXELS / camera.scale}
         />
       </>
     ),
@@ -388,6 +416,7 @@ export function Scene({
       affordable,
       highlight,
       restore,
+      camera.scale,
     ],
   );
   const overlay = useMemo(
@@ -399,26 +428,6 @@ export function Scene({
     ),
     [roofTanks, swales, marks],
   );
-  const phase = phaseOf(state);
-  const furthest = furthestView(phase, state.generators, bioregion);
-  const [chosen, choose] = useLayoutPref<View | null>('view', null);
-  // When a further view opens during play, the map moves to it once, so the new places are seen
-  // being built; the player can go back closer at any time.
-  const opened = useRef(furthest);
-  useEffect(() => {
-    if (furthest > opened.current) choose(furthest);
-    opened.current = furthest;
-  }, [furthest, choose]);
-  const view = Math.min(chosen ?? furthest, furthest) as View;
-  const [mapRef, size] = useSize<HTMLDivElement>(WORLD);
-  const { width, height } = size;
-  // Kept as one object while nothing moves, so the map does not redraw at every tick.
-  const camera = useMemo(() => {
-    const top = width >= height ? 0 : CAPTION_ROOM;
-    // The City view grows with the neighbouring districts restored (§6.4).
-    const frame = view === 3 ? cityFrame(districts) : undefined;
-    return fitCamera(view, width, height, { top, left: 0, bottom: 0 }, frame);
-  }, [view, width, height, districts]);
   // The heliotrope stands in the home courtyard, at the heart of the city, and follows the camera.
   const flower = flowerFrame(camera, width, height, PLANTER);
   const season = photo ? look.season : visualSeason(state);
