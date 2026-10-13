@@ -28,7 +28,7 @@ describe('time before purchase (§10.5)', () => {
 describe('next goal (§2, §10.5)', () => {
   it('starts with the first generator', () => {
     const goal = nextGoal(createInitialState(0));
-    expect(goal).toMatchObject({ kind: 'generator', id: 'pot', discovered: false });
+    expect(goal).toMatchObject({ kind: 'generator', id: 'pot', discovered: true });
   });
 
   it('is the cheapest purchase the reserve does not cover', () => {

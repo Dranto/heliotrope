@@ -105,7 +105,7 @@ Huit générateurs, du balcon à la ville entière. Les valeurs de base partent 
 
 - Coût du n-ième exemplaire (n commençant à 0) : `coût(n) = coûtBase × 1,15^n`.
 - Production d'un type : `prodBase × nombrePossédé × multiplicateursDuType × multiplicateurGlobal`.
-- Un générateur est **visible** (silhouette + prix) dès que le joueur a gagné au total la moitié de son coût de base, et **achetable** dès qu'il a assez de Lumière. Seul le prochain générateur non découvert est montré en silhouette, pour garder un objectif visible sans tout dévoiler.
+- Un générateur est **visible** (silhouette + prix) dès que le joueur a gagné au total la moitié de son coût de base (l'Héliotrope en pot dès la première seconde, pour que la partie s'ouvre sur un objectif nommé), et **achetable** dès qu'il a assez de Lumière. Seul le prochain générateur non découvert est montré en silhouette, pour garder un objectif visible sans tout dévoiler.
 - Achat par lot : ×1, ×10, ×100, Max. Coût de k exemplaires à partir de n : `coûtBase × 1,15^n × (1,15^k − 1) / 0,15`.
 - Pas de revente dans le MVP (simplifie l'équilibrage, et le joueur n'en a pas besoin).
 
