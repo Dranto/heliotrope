@@ -13,7 +13,7 @@ import type { GameState } from './state';
 import { CLICK_UPGRADE_IDS, UPGRADES, type UpgradeDef, type UpgradeId } from './upgrades';
 
 /** §5.4: each generator type owned at these counts adds BIODIVERSITY_STEP to global production. */
-export const BIODIVERSITY_THRESHOLDS = [10, 50, 100] as const;
+export const BIODIVERSITY_THRESHOLDS = [10, 50, 100, 150, 250] as const;
 export const BIODIVERSITY_STEP = 0.02;
 
 function boughtUpgrades(state: GameState): UpgradeDef[] {
@@ -81,7 +81,7 @@ export function typesOwned(state: GameState): number {
 }
 
 /**
- * §5.4: +2% global production per generator type at 10, 50 and 100 units owned, and per species
+ * §5.4: +2% global production per generator type at 10, 50, 100, 150 and 250 units owned, and per species
  * of the Herbier (§9.5); ×1.5 with the complete Herbier, ×2 while migrating birds stay (§9.6).
  */
 export function biodiversityBonus(state: GameState): number {

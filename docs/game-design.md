@@ -119,13 +119,15 @@ Les améliorations sont des achats uniques, affichés au-dessus de la liste des 
 
 Pour chaque générateur, une amélioration qui **double** sa production se débloque à chaque seuil de possession.
 
-| Seuil possédé | 1 | 5 | 25 | 50 | 100 | 150 | 200 |
-|---|---|---|---|---|---|---|---|
-| Coût (× coût de base du générateur) | 10 | 50 | 500 | 50 000 | 5 000 000 | 500 000 000 | 50 000 000 000 |
+| Seuil possédé | 1 | 5 | 25 | 50 | 100 | 150 | 200 | 225 | 250 | 300 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Coût (× coût de base du générateur) | 10 | 50 | 500 | 50 000 | 5 M | 500 M | 50 Md | 500 Md | 5 000 Md | 500 000 Md |
 
-Soit 8 générateurs × 7 seuils = 56 améliorations, chacune avec un nom et une ligne d'ambiance (ex. « Terreau de compost » pour le Potager, « Miroirs auto-orientables » pour la Centrale).
+Soit 8 générateurs × 10 seuils = 80 améliorations, chacune avec un nom et une ligne d'ambiance (ex. « Terreau de compost » pour le Potager, « Miroirs auto-orientables » pour la Centrale).
 
-Quand aucune amélioration n'est proposée (fréquent après le 1ᵉʳ Cycle, quand les seuils de 200 sont atteints), le panneau « Améliorer » montre la prochaine en vue : le seuil de bâtiment le plus proche d'être atteint, avec son compte et une barre (« Prochaine : Façades nourricières · Ferme verticale 149 / 150 »). Le panneau garde ainsi un objectif, selon la règle d'or du §2. Une Saison à défi qui plafonne les bâtiments écarte les seuils hors d'atteinte.
+Quand aucune amélioration n'est proposée (par moments après le 1ᵉʳ Cycle, entre deux seuils), le panneau « Améliorer » montre la prochaine en vue : le seuil de bâtiment le plus proche d'être atteint, avec son compte et une barre (« Prochaine : Façades nourricières · Ferme verticale 149 / 150 »). Le panneau garde ainsi un objectif, selon la règle d'or du §2. Une Saison à défi qui plafonne les bâtiments écarte les seuils hors d'atteinte.
+
+> Paliers de fin de partie (2026-10-13) : Antoine a demandé des paliers pour que les mécaniques ne s'estompent pas trop vite. Après le 1ᵉʳ Cycle, le joueur de référence possède 140 à 280 exemplaires de chaque bâtiment au fil d'une Saison : les seuils s'arrêtaient à 200, et le panneau « Améliorer » se vidait pour le reste de la partie. Les seuils de 225, 250 et 300 tombent là où le joueur se trouve. Leur coût suit la progression (×10 puis ×100 par seuil) ; c'est le nombre d'exemplaires qui les retient, pas le prix. Avec les deux paliers de biodiversité ajoutés au §5.4, les Cycles 2 à 4 durent 36, 40 et 55 min (cibles 35, 35 et 45, dans les ±30 %) : le 3ᵉ Cycle finit avec 21 Sources au lieu de 20, si bien que le 4ᵉ, qui en vise ×1,5, demande une Saison de plus. La boucle ne s'emballe pas : la 1ʳᵉ Saison, le 1ᵉʳ Cycle et les villes sœurs ne bougent pas.
 
 ### 5.2 Améliorations de clic
 
@@ -202,7 +204,7 @@ Condition : 10 exemplaires de chacun des deux générateurs, ou 5 quand l'un des
 
 ### 5.4 Bonus de biodiversité
 
-Mécanique passive propre au thème : **chaque type de générateur possédé à 10 exemplaires ou plus donne +2 % de production globale** ; +2 % supplémentaires à 50, et encore à 100. Avec 8 types, le maximum est +48 %. Cela pousse doucement à faire grandir tout le quartier, et non une seule monoculture.
+Mécanique passive propre au thème : **chaque type de générateur possédé à 10 exemplaires ou plus donne +2 % de production globale** ; +2 % supplémentaires à 50, à 100, à 150 et à 250. Avec 8 types, le maximum est +80 %. Les paliers de 150 et 250 (2026-10-13) prolongent la mécanique après le 1ᵉʳ Cycle : elle était complète dès la 3ᵉ Saison, quand tous les types dépassent 100. Cela pousse doucement à faire grandir tout le quartier, et non une seule monoculture.
 
 ---
 
@@ -836,12 +838,12 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 
 | Cycle | Cible | Simulé | Saisons | Sources à la fin |
 |---|---|---|---|---|
-| 1ᵉʳ (conseillé) | ~2 h 45 | 2 h 46 | une dizaine | 5 |
-| 2ᵉ | ~35 min | 36 min | 3 de 12 min | 9 |
-| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 15 |
-| 4ᵉ | ~45 min | 45 min | 4, de 10 à 15 min | 25 |
-| 5ᵉ | (~1 h) | 55 min | 5, de 10 à 15 min | 38 |
-| 6ᵉ | (~1 h 10) | 1 h 08 | 5, la dernière de 28 min | 59 |
+| 1ᵉʳ (conseillé) | ~2 h 45 | 2 h 08 | une dizaine | 5 |
+| 2ᵉ | ~35 min | 36 min | 3 de 12 min | 13 |
+| 3ᵉ | ~35 min | 40 min | 4 de 10 min | 21 |
+| 4ᵉ | ~45 min | 55 min | 5, de 10 à 15 min | 35 |
+| 5ᵉ | (~1 h) | 1 h 10 | 6, de 10 à 16 min | 57 |
+| 6ᵉ | (~1 h 10) | 1 h 28 | 6, la dernière de 29 min | 90 |
 
 Ce qu'en tire la feuille de route (décision D11) :
 

@@ -26,8 +26,8 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 });
 
 describe('upgrade data', () => {
-  it('has 7 ×2 upgrades per generator, 10 click upgrades and 24 synergies (§5)', () => {
-    expect(UPGRADE_LIST).toHaveLength(8 * 7 + 10 + 18 + 3 + 3);
+  it('has 10 ×2 upgrades per generator, 10 click upgrades and 24 synergies (§5)', () => {
+    expect(UPGRADE_LIST).toHaveLength(8 * 10 + 10 + 18 + 3 + 3);
     expect(new Set(UPGRADE_LIST.map((u) => u.id)).size).toBe(UPGRADE_LIST.length);
   });
 
@@ -35,6 +35,8 @@ describe('upgrade data', () => {
     expect(UPGRADES['pot.1'].cost).toBe(150);
     expect(UPGRADES['pot.4'].cost).toBe(750_000);
     expect(UPGRADES['arcology.7'].cost).toBe(200_000_000 * 50_000_000_000);
+    expect(UPGRADES['pot.8'].condition).toEqual({ owned: { pot: 225 } });
+    expect(UPGRADES['pot.10'].condition).toEqual({ owned: { pot: 300 } });
     expect(UPGRADES['greenhouse.3'].condition).toEqual({ owned: { greenhouse: 25 } });
   });
 
@@ -133,7 +135,7 @@ describe('upgrade synergies', () => {
 });
 
 describe('biodiversityBonus', () => {
-  it('gives +2% per generator type at 10, 50 and 100 units (§5.4)', () => {
+  it('gives +2% per generator type at 10, 50, 100, 150 and 250 units (§5.4)', () => {
     expect(biodiversityBonus(withState({ generators: owned({ pot: 9 }) }))).toBe(0);
     expect(biodiversityBonus(withState({ generators: owned({ pot: 10 }) }))).toBeCloseTo(0.02);
     expect(
@@ -141,9 +143,11 @@ describe('biodiversityBonus', () => {
     ).toBeCloseTo(0.1);
   });
 
-  it('caps at +48% with every type at 100', () => {
+  it('gives +48% with every type at 100, +80% at 250', () => {
     const all = Object.fromEntries(GENERATOR_IDS.map((id) => [id, 120]));
     expect(biodiversityBonus(withState({ generators: owned(all) }))).toBeCloseTo(0.48);
+    const grown = Object.fromEntries(GENERATOR_IDS.map((id) => [id, 250]));
+    expect(biodiversityBonus(withState({ generators: owned(grown) }))).toBeCloseTo(0.8);
   });
 
   it('applies to the whole production', () => {

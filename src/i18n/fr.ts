@@ -35,7 +35,11 @@ export interface UpgradeText {
   flavour: string;
 }
 
-type SevenTexts = [
+/** One text per ×2 tier of a generator (§5.1). */
+type TierTexts = [
+  UpgradeText,
+  UpgradeText,
+  UpgradeText,
   UpgradeText,
   UpgradeText,
   UpgradeText,
@@ -133,7 +137,7 @@ export const fr = {
     `Prochain objectif\u00a0: ${name}, dans ${duration}`,
   biodiversity: (percent: string) => `Biodiversité +${percent}\u00a0%`,
   biodiversityHint:
-    'Chaque type de bâtiment possédé à 10, 50 puis 100 exemplaires ajoute 2\u00a0% à toute la production.',
+    'Chaque type de bâtiment possédé à 10, 50, 100, 150 puis 250 exemplaires ajoute 2\u00a0% à toute la production.',
   upgradesTitle: 'Améliorer',
   upgradeTile: (name: string, cost: string, affordable: boolean) =>
     `${name}, ${cost}\u00a0Lumière${affordable ? ', à portée' : ''}`,
@@ -1558,6 +1562,9 @@ export const fr = {
       u('Héliotropes géants', 'Elles dépassent maintenant la rambarde.'),
       u('Graines choisies', 'Nous gardons les plus lumineuses.'),
       u('Floraison perpétuelle', 'Elle ne fane plus, elle se repose.'),
+      u('Jardinières en cascade', 'Chaque fenêtre déborde de fleurs.'),
+      u('Héliotropes de collection', 'Chaque rue a sa variété.'),
+      u('Mer d’héliotropes', 'Le quartier entier sent la vanille.'),
     ],
     balconyPanel: [
       u('Câblage soigné', 'Moins de pertes, plus de lumière.'),
@@ -1567,6 +1574,9 @@ export const fr = {
       u('Microréseau d’immeuble', 'Les voisins partagent leurs surplus.'),
       u('Vitres solaires', 'Même les fenêtres s’y mettent.'),
       u('Cellules recyclées', 'Rien ne se perd, tout se transforme.'),
+      u('Garde-corps solaires', 'Même les rambardes travaillent.'),
+      u('Coopérative d’énergie', 'Chaque balcon a sa part.'),
+      u('Façades photosynthétiques', 'Toute la rue boit la lumière.'),
     ],
     rooftopGarden: [
       u('Terreau de compost', 'Les épluchures d’hier, les tomates de demain.'),
@@ -1576,6 +1586,9 @@ export const fr = {
       u('Permaculture', 'Chaque plante aide sa voisine.'),
       u('Châssis d’hiver', 'Des récoltes même sous la neige.'),
       u('Forêt-jardin suspendue', 'Un verger à vingt mètres du sol.'),
+      u('Toits reliés', 'On passe d’un potager à l’autre par des passerelles.'),
+      u('Semences paysannes', 'Des variétés que l’on croyait perdues.'),
+      u('Prairies suspendues', 'Les toits ondulent sous le vent.'),
     ],
     greenhouse: [
       u('Grainothèque', 'Chacun dépose, chacun emprunte.'),
@@ -1585,6 +1598,9 @@ export const fr = {
       u('Aquaponie', 'Les poissons nourrissent les salades.'),
       u('Calendrier partagé', 'Tout le quartier a sa demi-journée.'),
       u('Serre-cathédrale', 'Une nef de verre ouverte à tous.'),
+      u('Serres ouvertes la nuit', 'On y lit à la lueur des lucioles.'),
+      u('Pépinière de quartier', 'Chaque arbre de la ville est né ici.'),
+      u('Jardin d’hiver public', 'Le printemps tient toute l’année.'),
     ],
     verticalFarm: [
       u('LED horticoles', 'Une lumière taillée pour les feuilles.'),
@@ -1594,6 +1610,9 @@ export const fr = {
       u('Substrat de chanvre', 'Léger, local, compostable.'),
       u('Façades nourricières', 'Les murs eux-mêmes produisent.'),
       u('Tours jumelles', 'Deux tours, une seule récolte.'),
+      u('Étages fruitiers', 'Des cerisiers au trentième.'),
+      u('Récoltes partagées', 'Chaque étage nourrit une rue.'),
+      u('Ville potagère', 'On cueille son déjeuner en montant l’escalier.'),
     ],
     mirrorPlant: [
       u('Miroirs auto-orientables', 'Ils suivent le soleil sans qu’on y pense.'),
@@ -1603,6 +1622,9 @@ export const fr = {
       u('Vergers entre les rangs', 'Les pommiers aiment cette ombre légère.'),
       u('Tour de concentration', 'Mille rayons, un seul point.'),
       u('Soleil apprivoisé', 'Une étoile, tout en douceur.'),
+      u('Miroirs de rosée', 'Ils boivent la brume du matin.'),
+      u('Champs de lumière', 'Les moutons broutent entre les rangs.'),
+      u('Aube permanente', 'Un soleil doux de l’aube au soir.'),
     ],
     urbanCanopy: [
       u('Arbres d’alignement', 'Chaque rue choisit son essence.'),
@@ -1612,6 +1634,9 @@ export const fr = {
       u('Réseau mycorhizien', 'Sous nos pieds, les racines se parlent.'),
       u('Canopée étagée', 'Trois strates de verdure, du sol au ciel.'),
       u('Forêt habitée', 'On y vit, on y travaille, on y respire.'),
+      u('Cimes habitées', 'Des cabanes dans chaque grand arbre.'),
+      u('Forêt nourricière', 'Noix, fruits et baies à portée de main.'),
+      u('Ville-forêt', 'On ne sait plus où finit le parc.'),
     ],
     arcology: [
       u('Murs respirants', 'Le bâtiment inspire, la ville expire.'),
@@ -1621,8 +1646,11 @@ export const fr = {
       u('Bois vivant', 'Les murs poussent encore un peu chaque année.'),
       u('Terrasses pollinisatrices', 'Nos fleurs nourrissent toute la région.'),
       u('Symbiose', 'La ville et la forêt ne font plus qu’une.'),
+      u('Sols vivants', 'La terre des terrasses grouille de vie.'),
+      u('Bioclimat', 'Il fait doux dedans comme dehors.'),
+      u('Cité-jardin', 'La ville est devenue un paysage.'),
     ],
-  } satisfies Record<GeneratorId, SevenTexts>,
+  } satisfies Record<GeneratorId, TierTexts>,
   clickUpgrades: {
     warmHands: u('Mains tièdes', 'Le premier geste du matin réveille la fleur.'),
     gloves: u('Gants de jardinage', 'Des mains protégées récoltent plus.'),
