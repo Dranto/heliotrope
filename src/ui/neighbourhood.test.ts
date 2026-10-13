@@ -142,6 +142,19 @@ describe('views', () => {
     expect(close.width).toBeLessThanOrEqual(FLOWER_SIZE.max);
   });
 
+  it('shrinks the arch on a short map so it stays below the top edge', () => {
+    const maps: [number, number][] = [
+      [822, 630],
+      [880, 690],
+      [1200, 800],
+    ];
+    for (const [width, height] of maps) {
+      const frame = flowerFrame(fitCamera(1, width, height), width, height, PLANTER);
+      expect(frame.y).toBeGreaterThanOrEqual(5);
+      expect(frame.width).toBeGreaterThanOrEqual(FLOWER_SIZE.min);
+    }
+  });
+
   it('zooms closer on the courtyard than on the city', () => {
     expect(fitCamera(1, 1000, 700).scale).toBeGreaterThan(fitCamera(2, 1000, 700).scale);
     expect(fitCamera(2, 1000, 700).scale).toBeGreaterThan(fitCamera(3, 1000, 700).scale);

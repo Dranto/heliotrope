@@ -137,6 +137,8 @@ export const FLOWER_SIZE = { min: 136, perScale: 75, max: 290, share: 0.24 } as 
 const FLOWER_RATIO = 260 / 200;
 /** Part of the drawing's height above the bottom of its pot. */
 const POT_BASE = 0.96;
+/** Room kept between the top of the arch and the top of the map. */
+const FLOWER_TOP_ROOM = 6;
 
 /**
  * Where the flower stands on screen: its pot on the courtyard planter, its arch rising above the
@@ -151,9 +153,12 @@ export function flowerFrame(
 ): { x: number; y: number; width: number } {
   // On a narrow map the smallest flower still leaves most of the city in sight.
   const min = Math.min(FLOWER_SIZE.min, width * FLOWER_SIZE.share);
-  const size = Math.min(FLOWER_SIZE.max, Math.max(min, camera.scale * FLOWER_SIZE.perScale));
   const sx = width / 2 + (at.x - camera.x) * camera.scale;
   const sy = height / 2 + (at.y - camera.y) * camera.scale;
+  // On a short map the arch shrinks rather than run past the top edge, down to the smallest size.
+  const fits = (sy - FLOWER_TOP_ROOM) / (FLOWER_RATIO * POT_BASE);
+  const zoomed = Math.min(FLOWER_SIZE.max, camera.scale * FLOWER_SIZE.perScale);
+  const size = Math.max(min, Math.min(zoomed, fits));
   return {
     x: round(sx - size / 2),
     y: round(sy - size * FLOWER_RATIO * POT_BASE),
