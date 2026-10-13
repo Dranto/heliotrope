@@ -50,7 +50,7 @@ export const CHALLENGE_LIST: readonly ChallengeDef[] = [
   {
     // The frugal season: at most 25 of each building.
     id: 'frugal',
-    goal: 2e9,
+    goal: 3e9,
     species: 'stagBeetle',
     maxPerGenerator: 25,
     bonuses: [{ kind: 'discount', fraction: 0.05 }],

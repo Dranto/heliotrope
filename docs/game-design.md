@@ -176,7 +176,9 @@ Petites améliorations qui lient deux générateurs, pour récompenser une ville
 | Mille pots | Arcologie vivante | Héliotrope en pot | +0,5 % |
 | Réseau citoyen | Centrale à miroirs | Panneau de balcon | +0,5 % |
 
-Condition : 10 exemplaires de chacun des deux générateurs, ou 5 quand l'un des deux fait partie des trois derniers (Centrale, Canopée, Arcologie), plus rares. Coût : 2 000 × le coût de base du plus cher des deux, ou 100 × pour les synergies des trois derniers, pour qu'elles restent à portée. Celles des derniers bâtiments arrivent surtout à partir de la 2ᵉ Saison, ce qui laisse quelque chose à découvrir après le premier prestige.
+Condition : 10 exemplaires de chacun des deux générateurs, ou 5 quand l'un des deux fait partie des trois derniers (Centrale, Canopée, Arcologie), plus rares. Coût : 2 000 × le coût de base du plus cher des deux, 100 × quand le plus cher est la Ferme verticale (son coût de base fait un bond ×33), et 10 × quand c'est l'un des trois derniers, pour qu'elles se rentabilisent en une vingtaine à une quarantaine de minutes, comme un bâtiment, au moment où elles apparaissent. Celles de la Canopée et de l'Arcologie arrivent surtout après le premier prestige, ce qui laisse quelque chose à découvrir après le premier prestige.
+
+> Peaufinage (2026-10-13) : mesurées dans le simulateur, 12 des 18 synergies entre bâtiments et Les communs n'étaient jamais achetées pendant la 1ʳᵉ Saison (11 pendant la 2ᵉ). À 36 min de 1ʳᵉ Saison, Lumière réfléchie, Chaleur récupérée ou Tours à semis demandaient 4 h 30 à 23 h de production pour se rembourser, contre 25 à 30 min pour un bâtiment : elles restaient grisées dans le panneau, et la 1ʳᵉ Saison passait 9 min (de 39 à 48 min) sans rien de nouveau à acheter. Elles coûtent maintenant 10 fois moins (Tours à semis et Étages pépinière 20 fois moins). Le joueur de référence achète Tours à semis et Étages pépinière vers 32 min, les synergies de la Centrale entre 45 et 55 min ; le plus long moment sans nouveauté de la 1ʳᵉ Saison passe de 9 min à 4 min. Comme Antoine préfère adoucir par les synergies, la 1ʳᵉ Saison conseillée passe de 66 à 59 min et le 1ᵉʳ Cycle de 2 h 39 à 2 h 08, dans les ±30 % de leurs cibles ; la Saison sobre, où ces synergies comptent double, demande 3 Md au lieu de 2 Md pour rester au-delà de 20 min.
 
 **Entre améliorations.** Trois améliorations grandissent avec les autres améliorations achetées. Leur bonus s'ajoute à toute la production (multiplicateur global, §8) :
 
@@ -588,7 +590,7 @@ Des voisins achètent à la place du joueur : ce sont les talents de la branche 
 |---|---|---|---|---|---|
 | La Saison des nuages | Ni Panneaux de balcon ni Centrales à miroirs | 2 Md | Martin-pêcheur | +2 % de production par parcelle restaurée | Ombres de nuages qui glissent sur les toits |
 | La Saison sauvage | Aucune amélioration (ni le joueur ni le conseil de quartier) | 200 M | Orchis pyramidal | Synergies ×1,25 | Herbes hautes au bord de la carte |
-| La Saison sobre | Au plus 25 exemplaires de chaque bâtiment | 2 Md | Lucane cerf-volant | Bâtiments 5 % moins chers | Lumière chaude et sèche |
+| La Saison sobre | Au plus 25 exemplaires de chaque bâtiment | 3 Md | Lucane cerf-volant | Bâtiments 5 % moins chers | Lumière chaude et sèche |
 | La Saison des mains | Production des bâtiments ÷10 | 50 M | Chouette hulotte | Valeur du clic ×3 | Crépuscule sur les machines |
 
 - **Règles.** Un bâtiment interdit ou plein reste affiché avec l'étiquette « Pas cette Saison » ou « Au plus 25 » ; ni le joueur ni les Coopératives (§7.2) ne peuvent l'acheter. Les Boutures (§7.1) ne gardent que ce que le défi autorise. Les bonus des défis gagnés suivent la forme commune des parcelles, projets et talents (`Bonus`), donc se combinent avec eux comme des synergies.
@@ -788,7 +790,7 @@ L'équilibrage doit être vérifié par un **simulateur sans interface** qui rej
 
 **Implémentation (jalon 2).** `src/game/simulator.ts`, lancé par `npm run simulate`, et vérifié par un test qui échoue si un événement sort de ±30 % de sa cible (le 1ᵉʳ Héliotrope en pot n'a qu'un plafond de 15 s). Depuis le jalon 3, il joue aussi une **seconde Saison** : il lance la Nouvelle Saison dès les 10 Graines conseillées, rejoue la même stratégie avec le bonus de +50 %, et un test vérifie que chaque événement arrive plus tôt que dans la première Saison (critère de fin du jalon 3, §12). Le joueur de référence clique **2,5 fois par seconde**. À chaque décision, il choisit l'option qui minimise *attente pour se l'offrir + coût / gain de production* (gain mesuré clic compris), et il essaie chaque nouveau générateur dès qu'il peut se l'offrir. Depuis le jalon 4, les Jalons se débloquent pendant la simulation comme en jeu, et le joueur de référence **attrape chaque Papillon doré** dès qu'il apparaît (tirages aléatoires reproductibles, graine fixe). Le résultat dépend un peu de la graine, surtout en milieu de partie où un Papillon tombe plus ou moins tôt (chiffres sous le tableau ci-dessous).
 
-Sortie actuelle (mesurée après M37, graine 0) :
+Sortie actuelle (mesurée après le peaufinage des synergies du 2026-10-13, graine 0) :
 
 | Événement | Cible | Simulé, 1ʳᵉ Saison | Écart | Simulé, 2ᵉ Saison (10 Graines) |
 |---|---|---|---|---|
@@ -796,13 +798,13 @@ Sortie actuelle (mesurée après M37, graine 0) :
 | 1ᵉʳ Panneau de balcon | ~35 s | 31,5 s | −10 % | 6 s |
 | 1ᵉʳ Potager sur le toit | ~1 min 30 | 1,5 min | 0 % | 36 s |
 | 1ʳᵉ Serre communautaire | ~5 min 30 | 5,3 min | −3 % | 1,6 min |
-| 1ʳᵉ Ferme verticale | ~12 min | 10,2 min | −15 % | 4,5 min |
-| 1ʳᵉ Centrale à miroirs | ~21 min | 18,9 min | −10 % | 7 min |
-| 1ʳᵉ Canopée urbaine | ~37 min | 35 min | −5 % | 13,6 min |
-| 1ʳᵉ Arcologie vivante | ~57 min | 53,8 min | −6 % | 21,9 min |
-| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 07 | 1 h 06 | −2 % | 25 min |
+| 1ʳᵉ Ferme verticale | ~12 min | 10,2 min | −15 % | 3,5 min |
+| 1ʳᵉ Centrale à miroirs | ~21 min | 18,9 min | −10 % | 4,2 min |
+| 1ʳᵉ Canopée urbaine | ~37 min | 38,2 min | +3 % | 11,3 min |
+| 1ʳᵉ Arcologie vivante | ~57 min | 56,2 min | −1 % | 18,9 min |
+| Saison conseillée (2 Md de Lumière dans la Saison) | ~1 h 07 | 59 min | −13 % | 19 min |
 
-Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 39 améliorations (dont 8 de clic, 6 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, la 1ʳᵉ Saison suit ses cibles : Ferme verticale entre −15 % et 0 %, Centrale entre −18 % et +9 %, Canopée entre −10 % et +3 %, Arcologie entre −12 % et +4 %, Saison conseillée entre −9 % et +1 %, toutes dans les ±30 %. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
+Le joueur simulé atteint 20 Jalons, attrape 17 Papillons, achète 45 améliorations (dont 8 de clic, 12 synergies entre bâtiments, 3 avec le clic et 2 entre améliorations), restaure 5 parcelles et mène 5 projets pendant sa 1ʳᵉ Saison. Sur six graines de hasard, la 1ʳᵉ Saison suit ses cibles : Ferme verticale entre −15 % et 0 %, Centrale entre −18 % et +9 %, Canopée entre −10 % et +3 %, Arcologie entre −12 % et +4 %, Saison conseillée entre −9 % et +1 %, toutes dans les ±30 %. La 2ᵉ Saison, qui garde les parcelles, atteint les mêmes paliers environ 40 % plus vite. Les tout premiers achats, portés par le clic que les Graines n'augmentent pas, n'accélèrent que peu.
 
 > Restaurer le quartier (M6) : le joueur de référence considère aussi les parcelles et les projets, avec la même règle (attente + coût / gain de revenu). Ceux dont l'effet ne touche pas le revenu (Papillon, plafond hors ligne, remises) ne lui rapportent rien de mesurable et ne sont achetés que lorsqu'un autre effet les rend rentables (les Pistes cyclables, par exemple, donnent du prix à chaque parcelle). Dans sa 1ʳᵉ Saison, il restaure cinq parcelles et mène cinq projets, et le rythme s'accélère encore : Ferme verticale à 15,0 min (0 %), Centrale à 31,6 min (−10 %), Canopée à 55,2 min (−15 %), Arcologie à 1 h 28 (−16 %), Saison conseillée à 1 h 46 (−21 %, la marge la plus faible). Les effets ont été réduits pour rester dans les ±30 % (Batteries partagées +5 % par type au lieu de +25 %, Verger ×1,5 au lieu de ×2, Eau de pluie ×1,25, Pistes cyclables +2 % par parcelle). Comme les parcelles restent acquises, la 2ᵉ Saison est bien plus rapide : Saison conseillée en 1 h au lieu de 1 h 22.
 
