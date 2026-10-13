@@ -70,6 +70,7 @@ function playedState(): GameState {
       language: 'en',
       music: 0.2,
       reminders: true,
+      monkeyCries: true,
     },
   };
 }

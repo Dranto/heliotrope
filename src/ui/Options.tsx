@@ -170,6 +170,15 @@ export function Options({ onClose }: { onClose: () => void }) {
           </span>
         </label>
         <p className="hint">{t.options.musicHint}</p>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={settings.monkeyCries}
+            onChange={(event) => change({ monkeyCries: event.target.checked })}
+          />
+          {t.options.monkeyCries}
+        </label>
+        <p className="hint">{t.options.monkeyCriesHint}</p>
         {canNotify() && (
           <>
             <label className="toggle">

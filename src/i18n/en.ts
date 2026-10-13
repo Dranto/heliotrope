@@ -1419,6 +1419,9 @@ export const en: Texts = {
     remindersHint:
       'A notification when the Seeds are ripe or a crop is ready, while the game is open in the background.',
     remindersDenied: 'The browser blocks notifications for this site.',
+    monkeyCries: 'Monkey cries',
+    monkeyCriesHint:
+      'A click on the tree lets out a monkey cry, never quite the same twice, instead of its note.',
     soundHint:
       'Discreet sounds accompany harvesting, purchases and the neighbourhood’s restoration.',
     reducedMotionHint:

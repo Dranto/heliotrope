@@ -34,7 +34,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 39;
+export const STATE_VERSION = 40;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -65,6 +65,8 @@ export interface Settings {
   music: number | null;
   /** §10.6: notify when the Seeds are ripe or a crop is ready, off by default (decision D8). */
   reminders: boolean;
+  /** §6.3 easter egg: a click on the tree cries like a monkey instead of its note, off by default. */
+  monkeyCries: boolean;
 }
 
 export interface GameState {
@@ -200,6 +202,7 @@ export const DEFAULT_SETTINGS: Settings = {
   language: 'fr',
   music: null,
   reminders: false,
+  monkeyCries: false,
 };
 
 export function createInitialState(now: number): GameState {

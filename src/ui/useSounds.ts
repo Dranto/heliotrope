@@ -57,7 +57,7 @@ const PRIORITY = [
  * what was already there when the game loaded.
  */
 export function useSounds(state: GameState): void {
-  const { volume, muted } = state.settings;
+  const { volume, muted, monkeyCries } = state.settings;
   useEffect(() => sounds.setVolume(muted ? 0 : volume), [volume, muted]);
 
   const previous = useRef(counters(state));
@@ -66,8 +66,9 @@ export function useSounds(state: GameState): void {
     const before = previous.current;
     previous.current = now;
     const changed = PRIORITY.find((name) => now[name] > before[name]);
-    if (changed) sounds.play(changed, changed === 'click' ? Math.random() : 0);
-  }, [state]);
+    if (changed === 'click' && monkeyCries) sounds.playCry();
+    else if (changed) sounds.play(changed, changed === 'click' ? Math.random() : 0);
+  }, [state, monkeyCries]);
 
   const awake = phaseOf(state) >= 2 && !muted && volume > 0;
   useEffect(() => {

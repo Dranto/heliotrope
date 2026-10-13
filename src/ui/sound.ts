@@ -87,12 +87,81 @@ export function notesFor(name: SoundName, variant = 0): Note[] {
   }
 }
 
+/** The shapes of the monkey cries of the Options' easter egg (§6.3). */
+export const CRY_SHAPES = ['hoots', 'scream', 'chatter', 'howl', 'oohAah', 'squeak'] as const;
+export type CryShape = (typeof CRY_SHAPES)[number];
+
+/**
+ * A monkey cry, the easter egg that replaces the click's note (§6.3): one of the shapes, its
+ * pitch (×0.8 to ×1.25), loudness (×0.6 to ×1) and pace (×0.85 to ×1.2) drawn from `random`, so
+ * two cries in a row never sound alike. Each glide is doubled by a quiet sawtooth for the rasp.
+ */
+export function monkeyCry(random: () => number = Math.random): Note[] {
+  const shape = CRY_SHAPES[Math.floor(random() * CRY_SHAPES.length)]!;
+  const pitch = 0.8 + random() * 0.45;
+  const loudness = 0.6 + random() * 0.4;
+  const pace = 0.85 + random() * 0.35;
+  const notes: Note[] = [];
+  const call = (at: number, from: number, to: number, length: number, gain = 0.06) => {
+    const voice = {
+      at: at * pace,
+      length: length * pace,
+      frequency: from * pitch,
+      glide: to * pitch,
+    };
+    notes.push({ ...voice, gain: gain * loudness, type: 'triangle' });
+    notes.push({ ...voice, gain: gain * loudness * 0.3, type: 'sawtooth' });
+  };
+  switch (shape) {
+    // Ooh-ooh-ooh, each hoot higher than the one before.
+    case 'hoots': {
+      const count = 3 + Math.floor(random() * 4);
+      for (let i = 0; i < count; i++) {
+        const from = 380 * 1.12 ** i;
+        call(i * 0.17, from, from * 1.5, 0.13, 0.05 + i * 0.003);
+      }
+      break;
+    }
+    case 'scream':
+      call(0, 700, 1500, 0.18);
+      call(0.18, 1500, 900, 0.35, 0.055);
+      break;
+    case 'chatter':
+      for (let i = 0; i < 7; i++) {
+        const from = i % 2 ? 1300 : 1100;
+        call(i * 0.075, from, from * 0.85, 0.06, 0.04);
+      }
+      break;
+    // The long call of a howler monkey, low and rising, then falling back.
+    case 'howl':
+      call(0, 220, 420, 0.5, 0.065);
+      call(0.5, 420, 260, 0.6, 0.06);
+      break;
+    case 'oohAah':
+      call(0, 330, 420, 0.25, 0.05);
+      call(0.3, 900, 600, 0.35);
+      break;
+    case 'squeak':
+      call(0, 1600, 2200, 0.08, 0.035);
+      call(0.12, 1700, 2400, 0.1, 0.035);
+      break;
+  }
+  return notes;
+}
+
+/** Seconds a set of notes rings. */
+export function lengthOf(notes: Note[]): number {
+  return Math.max(0, ...notes.map((n) => n.at + n.length));
+}
+
 type AudioContextClass = typeof AudioContext;
 
 export class SoundEngine {
   private context: AudioContext | null = null;
   private master: GainNode | null = null;
   private volume = 0.5;
+  /** Context time before which a new monkey cry would cover the last one. */
+  private cryUntil = 0;
 
   constructor(private readonly Context: AudioContextClass | undefined = globalThis.AudioContext) {}
 
@@ -105,13 +174,30 @@ export class SoundEngine {
   }
 
   play(name: SoundName, variant = 0): void {
-    if (this.volume <= 0) return;
+    this.playNotes(notesFor(name, variant));
+  }
+
+  /**
+   * Plays a monkey cry (§6.3). Rapid clicks do not pile cries into noise: a new one waits until the
+   * last one is half over. Returns whether it played.
+   */
+  playCry(random: () => number = Math.random): boolean {
+    const now = this.context?.currentTime ?? 0;
+    if (this.volume <= 0 || now < this.cryUntil) return false;
+    const notes = monkeyCry(random);
+    if (!this.playNotes(notes)) return false;
+    this.cryUntil = (this.context?.currentTime ?? 0) + lengthOf(notes) / 2;
+    return true;
+  }
+
+  private playNotes(notes: Note[]): boolean {
+    if (this.volume <= 0) return false;
     const context = this.ensureContext();
-    if (!context || !this.master) return;
+    if (!context || !this.master) return false;
     // Browsers keep audio suspended until the first click or key press.
     if (context.state === 'suspended') void context.resume().catch(() => undefined);
     const start = context.currentTime + 0.01;
-    for (const n of notesFor(name, variant)) {
+    for (const n of notes) {
       const oscillator = context.createOscillator();
       const envelope = context.createGain();
       oscillator.type = n.type ?? 'sine';
@@ -127,6 +213,7 @@ export class SoundEngine {
       oscillator.start(start + n.at);
       oscillator.stop(start + n.at + n.length + 0.05);
     }
+    return true;
   }
 
   private ensureContext(): AudioContext | null {

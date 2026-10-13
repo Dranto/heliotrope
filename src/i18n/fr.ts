@@ -1514,6 +1514,9 @@ export const fr = {
     remindersHint:
       'Une notification quand les Graines sont mûres ou qu’une culture est prête, pendant que le jeu est ouvert en arrière-plan.',
     remindersDenied: 'Le navigateur refuse les notifications pour ce site.',
+    monkeyCries: 'Cris de singe',
+    monkeyCriesHint:
+      'Le clic sur l’arbre pousse un cri de singe, jamais deux fois le même, au lieu de sa note.',
     soundHint:
       'Des sons discrets accompagnent la récolte, les achats et la restauration du quartier.',
     reducedMotionHint:
