@@ -645,7 +645,7 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
 - **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
 - **Conservé :** les Sources, **le delta et ses bras** (§7.5), les **talents et la Canopée de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
 - Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
-- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 45** ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
+- **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 10** (2 h 45 avant le peaufinage des synergies du 2026-10-13, §8) ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
 
 **Écrans.** Un panneau **« La Biorégion »** sous « Bâtir » (onglet Bâtir sur mobile) liste les collecteurs (Bâtir ☀) puis les sites (Étendre 💧), avec l'Eau en réserve et par seconde. Une pastille d'Eau rejoint le compteur, puis une pastille des Sources. L'écran **« Le Cycle de l'eau »** (menu, dès qu'une Source est à gagner) reprend celui des Saisons : Sources, à faire jaillir, bonus avant/après, ce qui repart de zéro et ce qui reste, confirmation ; son ornement est une goutte qui tombe sous l'arche et ses ronds dans l'eau.
 
@@ -840,12 +840,14 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 
 | Cycle | Cible | Simulé | Saisons | Sources à la fin |
 |---|---|---|---|---|
-| 1ᵉʳ (conseillé) | ~2 h 45 | 2 h 08 | une dizaine | 5 |
+| 1ᵉʳ (conseillé) | ~2 h 10 | 2 h 08 | une dizaine | 5 |
 | 2ᵉ | ~35 min | 36 min | 3 de 12 min | 13 |
 | 3ᵉ | ~35 min | 40 min | 4 de 10 min | 21 |
 | 4ᵉ | ~45 min | 55 min | 5, de 10 à 15 min | 35 |
 | 5ᵉ | (~1 h) | 1 h 10 | 6, de 10 à 16 min | 57 |
 | 6ᵉ | (~1 h 10) | 1 h 28 | 6, la dernière de 29 min | 90 |
+
+Cible du 1ᵉʳ Cycle (2026-10-13) : les synergies de milieu et de fin de Saison, dix fois moins chères depuis le peaufinage (§5.3), ont avancé le 1ᵉʳ Cycle de 2 h 39 à 2 h 08. Sur six graines de hasard, il arrivait entre 2 h 04 et 2 h 15, soit −25 % à −18 % de l'ancienne cible de 2 h 45, au bord de la marge. Comme ce rythme est voulu, la cible le suit (2 h 45 → 2 h 10, écarts −5 % à +4 %), sans changer le jeu. Les Cycles 2 et 3 dépendent surtout du nombre de Saisons de 10 à 12 min qu'il faut pour atteindre ×1,5 Sources : selon la graine, deux ou trois, d'où 24 ou 36 min.
 
 Ce qu'en tire la feuille de route (décision D11) :
 
