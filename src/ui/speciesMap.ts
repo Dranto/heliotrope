@@ -1,5 +1,7 @@
 // Where the species of the Herbier live on the top-down map (docs/game-design.md §9.5): near the
 // parcel, building or project that brought them back. Pure data in world coordinates.
+// Every spot keeps clear of the heliotrope, which stands over the map and would catch the tap
+// meant for a species there.
 import type { SpeciesId } from '../game/species';
 import { STREETS, TREES } from './neighbourhood';
 
@@ -23,7 +25,7 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   poppy: {
     spots: [
       [246, NORTH + 5],
-      [262, NORTH + 17],
+      [252, NORTH + 17],
       [372, NORTH + 6],
     ],
     motion: 'still',
@@ -31,7 +33,7 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   },
   bee: {
     spots: [
-      [296, 192],
+      [268, 198],
       [338, 270],
     ],
     motion: 'buzz',
@@ -97,7 +99,7 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   glowWorm: {
     spots: [
       [326, SOUTH + MID],
-      [300, NORTH + MID],
+      [232, NORTH + MID],
     ],
     motion: 'glow',
     size: 11,
@@ -130,8 +132,8 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   snail: { spots: [[352, 262]], motion: 'still', size: 12 },
   // M33: the lizard on the courtyard's sunny wall, the kestrel hovering over the roofs, the
   // salamander in the courtyard's damp corner, the cicada in a street tree.
-  wallLizard: { spots: [[276, 212]], motion: 'still', size: 12 },
+  wallLizard: { spots: [[266, 214]], motion: 'still', size: 12 },
   kestrel: { spots: [[420, 64]], motion: 'fly', size: 18 },
   salamander: { spots: [[268, 260]], motion: 'still', size: 12 },
-  cicada: { spots: [[TREES[2]!.x, TREES[2]!.y]], motion: 'buzz', size: 11 },
+  cicada: { spots: [[TREES[21]!.x, TREES[21]!.y]], motion: 'buzz', size: 11 },
 };
