@@ -1,6 +1,8 @@
 // Discreet sounds (docs/game-design.md §1, §10.2), synthesised with the Web Audio API so the game
-// ships no audio files. Every sound is short, soft and tuned to one pentatonic scale, so they
-// never clash when they overlap. Without Web Audio (tests, old browsers) every call is a no-op.
+// ships no audio files, but for the recorded monkey cries of the Options' easter egg (§6.3). Every
+// sound is short, soft and tuned to one pentatonic scale, so they never clash when they overlap. Without Web Audio (tests, old browsers) every call is a no-op.
+
+import { cryVoice } from './monkeyCries';
 
 /** C major pentatonic, in Hz, from C5. */
 const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760];
@@ -162,6 +164,10 @@ export class SoundEngine {
   private volume = 0.5;
   /** Context time before which a new monkey cry would cover the last one. */
   private cryUntil = 0;
+  /** The recorded cries, decoded; until they are, the synthesised ones stand in. */
+  private cries: AudioBuffer[] = [];
+  private loadingCries = false;
+  private lastCry = -1;
 
   constructor(private readonly Context: AudioContextClass | undefined = globalThis.AudioContext) {}
 
@@ -177,16 +183,53 @@ export class SoundEngine {
     this.playNotes(notesFor(name, variant));
   }
 
+  /** Fetches and decodes the recorded monkey cries once (§6.3); a clip that fails is left out. */
+  loadCries(urls: string[]): Promise<void> {
+    if (this.loadingCries || urls.length === 0 || typeof fetch !== 'function') {
+      return Promise.resolve();
+    }
+    const context = this.ensureContext();
+    if (!context) return Promise.resolve();
+    this.loadingCries = true;
+    return Promise.all(
+      urls.map((url) =>
+        fetch(url)
+          .then((response) => response.arrayBuffer())
+          .then((data) => context.decodeAudioData(data))
+          .catch(() => null),
+      ),
+    ).then((buffers) => {
+      this.cries = buffers.filter((buffer): buffer is AudioBuffer => buffer !== null);
+    });
+  }
+
   /**
-   * Plays a monkey cry (§6.3). Rapid clicks do not pile cries into noise: a new one waits until the
+   * Plays a monkey cry (§6.3): a recorded one at a drawn pitch and intensity, or a synthesised one
+   * while the recordings load. Rapid clicks do not pile cries into noise: a new one waits until the
    * last one is half over. Returns whether it played.
    */
   playCry(random: () => number = Math.random): boolean {
     const now = this.context?.currentTime ?? 0;
     if (this.volume <= 0 || now < this.cryUntil) return false;
-    const notes = monkeyCry(random);
-    if (!this.playNotes(notes)) return false;
-    this.cryUntil = (this.context?.currentTime ?? 0) + lengthOf(notes) / 2;
+    if (this.cries.length === 0) {
+      const notes = monkeyCry(random);
+      if (!this.playNotes(notes)) return false;
+      this.cryUntil = (this.context?.currentTime ?? 0) + lengthOf(notes) / 2;
+      return true;
+    }
+    const context = this.context!;
+    if (context.state === 'suspended') void context.resume().catch(() => undefined);
+    const voice = cryVoice(this.cries.length, this.lastCry, random);
+    const buffer = this.cries[voice.index]!;
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    source.buffer = buffer;
+    source.playbackRate.value = voice.rate;
+    gain.gain.value = voice.gain;
+    source.connect(gain).connect(this.master!);
+    source.start();
+    this.lastCry = voice.index;
+    this.cryUntil = context.currentTime + buffer.duration / voice.rate / 2;
     return true;
   }
 

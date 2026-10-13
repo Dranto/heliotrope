@@ -5,6 +5,7 @@ import { totalGreetings } from '../game/greetings';
 import { phaseOf } from '../game/phases';
 import type { GameState } from '../game/state';
 import { VISIT_KINDS } from '../game/visits';
+import { CRY_URLS } from './monkeyCries';
 import { sounds, type SoundName } from './sound';
 
 /** Seconds between two birdsongs, once the neighbourhood wakes up (phase 2). */
@@ -59,6 +60,9 @@ const PRIORITY = [
 export function useSounds(state: GameState): void {
   const { volume, muted, monkeyCries } = state.settings;
   useEffect(() => sounds.setVolume(muted ? 0 : volume), [volume, muted]);
+  useEffect(() => {
+    if (monkeyCries) void sounds.loadCries(CRY_URLS);
+  }, [monkeyCries]);
 
   const previous = useRef(counters(state));
   useEffect(() => {
