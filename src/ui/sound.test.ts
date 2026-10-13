@@ -1,3 +1,4 @@
+import { CRY_GAIN, CRY_URLS, cryVoice } from './monkeyCries';
 import { CRY_SHAPES, lengthOf, monkeyCry, notesFor, SoundEngine, type SoundName } from './sound';
 
 /** Just enough of the Web Audio API to count the notes played. */
@@ -103,5 +104,50 @@ describe('sounds', () => {
     engine.setVolume(0);
     context.currentTime = 10;
     expect(engine.playCry()).toBe(false);
+  });
+
+  it('ships the recorded cries and never plays the same one twice in a row', () => {
+    expect(CRY_URLS.length).toBeGreaterThanOrEqual(6);
+    let last = -1;
+    let draws = 0;
+    const random = () => ((draws = (draws * 7 + 3) % 11) + 0.5) / 11;
+    for (let i = 0; i < 200; i++) {
+      const voice = cryVoice(CRY_URLS.length, last, random);
+      expect(voice.index).not.toBe(last);
+      expect(voice.index).toBeGreaterThanOrEqual(0);
+      expect(voice.index).toBeLessThan(CRY_URLS.length);
+      expect(voice.rate).toBeGreaterThanOrEqual(0.8);
+      expect(voice.rate).toBeLessThanOrEqual(1.25);
+      expect(voice.gain).toBeGreaterThanOrEqual(CRY_GAIN * 0.6);
+      expect(voice.gain).toBeLessThanOrEqual(CRY_GAIN);
+      last = voice.index;
+    }
+  });
+
+  it('plays a recorded cry once loaded, at its drawn rate', async () => {
+    const started: number[] = [];
+    class LoadingContext extends FakeContext {
+      decodeAudioData = () => Promise.resolve({ duration: 1 });
+      createBufferSource() {
+        return {
+          buffer: null,
+          playbackRate: { value: 1 },
+          connect: (node: unknown) => node,
+          start() {
+            started.push(this.playbackRate.value);
+          },
+        };
+      }
+    }
+    vi.stubGlobal('fetch', () =>
+      Promise.resolve({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) }),
+    );
+    const engine = new SoundEngine(LoadingContext as unknown as typeof AudioContext);
+    await engine.loadCries(['a.mp3', 'b.mp3']);
+    vi.unstubAllGlobals();
+    const oscillators = FakeContext.oscillators;
+    expect(engine.playCry(() => 0)).toBe(true);
+    expect(FakeContext.oscillators).toBe(oscillators);
+    expect(started).toEqual([0.8]);
   });
 });
