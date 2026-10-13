@@ -1560,6 +1560,16 @@ button {
   color: var(--leaf);
 }
 
+.upgrade-sight {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
 .empty {
   margin: 0;
   font-family: var(--serif);
