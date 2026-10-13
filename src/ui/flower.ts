@@ -1,6 +1,6 @@
-// Growth stages and geometry of the clickable heliotrope (docs/game-design.md §10.4, "La fleur
-// grandit"). Framework-free so the mapping from progression to what the flower shows stays
-// testable.
+// Bloom stages and flower geometry of the heliotrope tree (docs/game-design.md §10.4, "L'arbre
+// héliotrope"): how far the current Season has come, and the heliotrope heads the tree carries.
+// Framework-free so the mapping from progression to what the tree shows stays testable.
 
 /** Light earned this Season at which the flower reaches each stage (§6 phases fall on 3 and 5). */
 export const FLOWER_STAGE_THRESHOLDS = [0, 100, 2_000, 1e4, 1e6, 1e7, 1e9] as const;
@@ -8,8 +8,9 @@ export const FLOWER_STAGE_THRESHOLDS = [0, 100, 2_000, 1e4, 1e6, 1e7, 1e9] as co
 export type FlowerStage = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 /**
- * The heliotrope grows with the Light earned in the current Season: a sprout, a bud, its first
- * flowers, a full head, a bouquet, a crown, then the solar heliotrope. A new Season replants it.
+ * The tree blooms with the Light earned in the current Season: bare buds, then buds on its
+ * twigs, its first flowers, full heads, more and more of them, then the solar heliotrope. A new
+ * Season starts it again from bare buds.
  */
 export function flowerStage(seasonLight: number): FlowerStage {
   let stage = 0;
@@ -19,9 +20,6 @@ export function flowerStage(seasonLight: number): FlowerStage {
   return stage as FlowerStage;
 }
 
-/** Where the stem leaves the soil of the pot, in the 200 × 260 flower view. */
-export const SOIL = { x: 100, y: 222 } as const;
-
 /** A flower head: a dome of florets, the inner ones open, the outer ones still in bud. */
 export interface Head {
   x: number;
@@ -30,135 +28,6 @@ export interface Head {
   florets: number;
   /** Fraction of the florets that are open, from the centre outwards. */
   open: number;
-}
-
-export interface Leaf {
-  /** Point of the stem it grows from. */
-  x: number;
-  y: number;
-  length: number;
-  /** Degrees; 0 points right. */
-  angle: number;
-}
-
-export interface FlowerShape {
-  /** Top of the main stem. */
-  stemTop: number;
-  leaves: Leaf[];
-  /** Main head first, then the side heads. */
-  heads: Head[];
-  /** Side branches from the main stem to the side heads, as SVG paths. */
-  branches: string[];
-}
-
-interface StageSpec {
-  stemTop: number;
-  leafPairs: number;
-  main: Omit<Head, 'x' | 'y'> | null;
-  side: Omit<Head, 'x' | 'y'> | null;
-  sideCount: 0 | 1 | 2;
-}
-
-const STAGES: Record<FlowerStage, StageSpec> = {
-  0: { stemTop: 194, leafPairs: 0, main: null, side: null, sideCount: 0 },
-  1: {
-    stemTop: 166,
-    leafPairs: 1,
-    main: { radius: 13, florets: 9, open: 0 },
-    side: null,
-    sideCount: 0,
-  },
-  2: {
-    stemTop: 140,
-    leafPairs: 2,
-    main: { radius: 22, florets: 20, open: 0.45 },
-    side: null,
-    sideCount: 0,
-  },
-  3: {
-    stemTop: 120,
-    leafPairs: 3,
-    main: { radius: 30, florets: 32, open: 0.75 },
-    side: null,
-    sideCount: 0,
-  },
-  4: {
-    stemTop: 112,
-    leafPairs: 3,
-    main: { radius: 34, florets: 40, open: 0.85 },
-    side: { radius: 17, florets: 13, open: 0.55 },
-    sideCount: 1,
-  },
-  5: {
-    stemTop: 106,
-    leafPairs: 4,
-    main: { radius: 38, florets: 48, open: 0.9 },
-    side: { radius: 20, florets: 18, open: 0.75 },
-    sideCount: 2,
-  },
-  6: {
-    stemTop: 104,
-    leafPairs: 4,
-    main: { radius: 41, florets: 56, open: 1 },
-    side: { radius: 22, florets: 22, open: 0.95 },
-    sideCount: 2,
-  },
-};
-
-/** Point of the main stem at height `y`: it leans slightly, like a plant turned to the sun. */
-export function stemX(y: number, stemTop: number): number {
-  const t = (SOIL.y - y) / (SOIL.y - stemTop);
-  return round(SOIL.x + Math.sin(t * Math.PI) * -3 + t * 2);
-}
-
-/** The main stem as an SVG path. */
-export function stemPath(stemTop: number): string {
-  const span = SOIL.y - stemTop;
-  return `M${SOIL.x} ${SOIL.y} C${SOIL.x - 4} ${round(SOIL.y - span * 0.4)} ${SOIL.x + 4} ${round(stemTop + span * 0.35)} ${stemX(stemTop, stemTop)} ${stemTop}`;
-}
-
-export function flowerShape(stage: FlowerStage): FlowerShape {
-  const spec = STAGES[stage];
-  const { stemTop } = spec;
-  const top = stemX(stemTop, stemTop);
-
-  // Leaves alternate left and right, the lowest the largest. The sprout only has its two round
-  // seed leaves, drawn by the component.
-  const leaves: Leaf[] = [];
-  if (stage > 0) {
-    const count = spec.leafPairs * 2;
-    const highest = stemTop + (spec.main ? spec.main.radius * 0.55 + 14 : 12);
-    for (let i = 0; i < count; i++) {
-      const t = i / (count - 1);
-      const y = round(SOIL.y - 22 - t * (SOIL.y - 22 - highest));
-      const right = i % 2 === 1;
-      // Lower leaves are the largest and droop a little; upper ones reach up towards the light.
-      const length = round(31 - t * 15 + Math.min(stage, 4) * 1.5 - (i % 3) * 1.5);
-      const lean = 6 - t * 46;
-      leaves.push({ x: stemX(y, stemTop), y, length, angle: right ? lean : 180 - lean });
-    }
-  }
-
-  const heads: Head[] = [];
-  const branches: string[] = [];
-  if (spec.main) heads.push({ x: top, y: stemTop, ...spec.main });
-  if (spec.side) {
-    const sides: [number, number][] = [
-      [-1, 36],
-      [1, 26],
-    ];
-    for (const [dir, drop] of sides.slice(0, spec.sideCount)) {
-      const fromY = stemTop + drop + 22;
-      const fromX = stemX(fromY, stemTop);
-      const x = round(top + dir * 46);
-      const y = stemTop + drop;
-      heads.push({ x, y, ...spec.side });
-      branches.push(
-        `M${fromX} ${fromY} C${round(fromX + dir * 10)} ${fromY - 4} ${round(x - dir * 8)} ${y + 12} ${x} ${y}`,
-      );
-    }
-  }
-  return { stemTop, leaves, heads, branches };
 }
 
 export interface Floret {
@@ -231,25 +100,7 @@ export function leafPaths(length: number): { blade: string; veins: string } {
   return { blade, veins: veins.join(' ') };
 }
 
-/**
- * Gilded sprigs on the arch, one per click upgrade (§5.2): [x, y, rotation in degrees]. The
- * first crowns the arch, the others climb down both sides in pairs (§5.2 has ten).
- */
-export const ARCH_ORNAMENTS: [number, number, number][] = [
-  [100, 8, 0],
-  [45, 31, -52],
-  [155, 31, 52],
-  [20, 112, -90],
-  [180, 112, 90],
-  [27, 60, -70],
-  [173, 60, 70],
-  [20, 160, -90],
-  [180, 160, 90],
-  [20, 208, -90],
-  [180, 208, 90],
-];
-
-/** Seasons completed are counted by gold bands on the pot, up to this many. */
+/** Seasons completed are counted by golden seeds at the foot of the tree, up to this many. */
 export const MAX_POT_BANDS = 6;
 
 function round(value: number): number {

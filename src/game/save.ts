@@ -141,6 +141,11 @@ const migrations: Record<number, Migration> = {
   36: (raw) => ({ ...raw, version: 37 }),
   // v38 adds the laurels to the Canopy and the gifts of the Milestones (M37): none yet.
   37: (raw) => ({ ...raw, version: 38 }),
+  // v39 gives each game its own heliotrope tree (§10.4), drawn from the random seed it had.
+  38: (raw) =>
+    typeof raw.rngSeed === 'number' && raw.treeSeed === undefined
+      ? { ...raw, version: 39, treeSeed: (raw.rngSeed ^ 0x2545f491) >>> 0 }
+      : { ...raw, version: 39 },
 };
 
 function isLanguage(value: string): value is Language {
@@ -417,6 +422,7 @@ export function deserialize(json: string, now: number): GameState | null {
       .filter((effect, i, list) => list.findIndex((e) => e.kind === effect.kind) === i);
   }
   if (isCount(data.rngSeed) && data.rngSeed <= 0xffffffff) state.rngSeed = data.rngSeed;
+  if (isCount(data.treeSeed) && data.treeSeed <= 0xffffffff) state.treeSeed = data.treeSeed;
   const settings = data.settings as Record<string, unknown> | undefined;
   if (settings?.notation === 'short' || settings?.notation === 'scientific') {
     state.settings = { ...state.settings, notation: settings.notation };

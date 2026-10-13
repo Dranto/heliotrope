@@ -255,6 +255,18 @@ describe('export and import', () => {
     expect(state.history).toEqual([{ season: 5, step: 30, points: [] }]);
   });
 
+  it('migrates a v38 save to a tree of its own that stays the same from load to load (§10.4)', () => {
+    const v38 = JSON.stringify({ version: 38, rngSeed: 4242 });
+    const first = deserialize(v38, 0)!;
+    const again = deserialize(v38, 99_999)!;
+    expect(first.treeSeed).toBe(again.treeSeed);
+    expect(deserialize(JSON.stringify({ version: 38, rngSeed: 4243 }), 0)!.treeSeed).not.toBe(
+      first.treeSeed,
+    );
+    // Saved again, the seed is kept as it is.
+    expect(deserialize(serialize(first), 5)!.treeSeed).toBe(first.treeSeed);
+  });
+
   it('migrates a v12 save with no visit yet, and keeps a visitor on the map (§9.6)', () => {
     const v12 = deserialize(JSON.stringify({ version: 12, resources: { light: 5 } }), 0)!;
     expect(v12.version).toBe(STATE_VERSION);
