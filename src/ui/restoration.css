@@ -630,23 +630,27 @@
 
 /* ---------- Parcels on offer ---------- */
 
+/* A string of golden seeds around a parcel on offer, the same fine width at every zoom, that
+   breathes softly instead of marching like a building-site tape. */
 .offer-outline {
-  fill: rgb(244 192 99 / 0.08);
-  stroke: var(--gold);
-  stroke-width: 1;
-  stroke-dasharray: 3 3;
-  animation: offer 2.6s ease-in-out infinite alternate;
+  fill: rgb(244 192 99 / 0.07);
+  stroke: #e2a43e;
+  stroke-width: 3.2px;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 8;
+  vector-effect: non-scaling-stroke;
+  animation: offer 3.2s ease-in-out infinite alternate;
 }
 
 .offer[data-highlight='true'] .offer-outline {
-  fill: rgb(244 192 99 / 0.28);
-  stroke-width: 1.8;
+  fill: rgb(244 192 99 / 0.24);
+  stroke-width: 4.2px;
 }
 
 @keyframes offer {
   to {
-    stroke-dashoffset: -12;
-    fill: rgb(244 192 99 / 0.18);
+    fill: rgb(244 192 99 / 0.15);
+    stroke-opacity: 0.55;
   }
 }
 
