@@ -146,6 +146,8 @@ const migrations: Record<number, Migration> = {
     typeof raw.rngSeed === 'number' && raw.treeSeed === undefined
       ? { ...raw, version: 39, treeSeed: (raw.rngSeed ^ 0x2545f491) >>> 0 }
       : { ...raw, version: 39 },
+  // v40 adds the monkey cries easter egg to the Options (§6.3): off.
+  39: (raw) => ({ ...raw, version: 40 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -441,6 +443,9 @@ export function deserialize(json: string, now: number): GameState | null {
   }
   if (typeof settings?.reminders === 'boolean') {
     state.settings = { ...state.settings, reminders: settings.reminders };
+  }
+  if (typeof settings?.monkeyCries === 'boolean') {
+    state.settings = { ...state.settings, monkeyCries: settings.monkeyCries };
   }
   if (typeof settings?.language === 'string' && isLanguage(settings.language)) {
     state.settings = { ...state.settings, language: settings.language };
