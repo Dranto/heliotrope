@@ -1,13 +1,46 @@
 /* The courtyard garden (§9.7): beds on the map and its panel. */
 
+/* The map's `.bed` rule (App.css) would ring every part of the bed in white. */
+.garden .bed {
+  stroke: none;
+}
+
 .bed-edge {
   fill: #b98a5a;
   stroke: #8a6239;
   stroke-width: 0.4;
 }
 
+.bed-rim {
+  stroke: rgb(255 238 205 / 0.55);
+  stroke-width: 0.4;
+  stroke-linecap: round;
+}
+
 .bed-soil {
   fill: #7a5537;
+  stroke: #5c3d26;
+  stroke-width: 0.3;
+}
+
+.bed-shade {
+  fill: rgb(60 36 20 / 0.16);
+}
+
+.bed-groove {
+  stroke: #664530;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.bed-ridge {
+  stroke: rgb(255 226 190 / 0.22);
+  stroke-width: 0.45;
+  stroke-linecap: round;
+}
+
+.bed-pebbles {
+  fill: #bf9d74;
 }
 
 .bed-furrow {

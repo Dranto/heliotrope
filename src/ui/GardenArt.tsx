@@ -149,6 +149,10 @@ function Bed({ crop, stage }: { crop: CropId | null; stage: CropStage }) {
         height={height + 1.6}
         rx="1.2"
       />
+      <path
+        className="bed-rim"
+        d={`M${-width / 2 - 0.2} ${-height / 2 - 0.4}H${width / 2 + 0.2}`}
+      />
       <rect
         className="bed-soil"
         x={-width / 2}
@@ -157,7 +161,28 @@ function Bed({ crop, stage }: { crop: CropId | null; stage: CropStage }) {
         height={height}
         rx="0.8"
       />
+      {/* Tilled soil: the low sun of the top edge, two ridged furrows beside the sowing line,
+          and a few pebbles, so even a bare bed reads as worked earth. */}
+      <rect
+        className="bed-shade"
+        x={-width / 2}
+        y={-height / 2}
+        width={width}
+        height="1.6"
+        rx="0.8"
+      />
+      {[-2.4, 2.4].map((x) => (
+        <g key={x}>
+          <path className="bed-groove" d={`M${x} ${-height / 2 + 1.8}V${height / 2 - 1.4}`} />
+          <path className="bed-ridge" d={`M${x + 0.7} ${-height / 2 + 2}V${height / 2 - 1.6}`} />
+        </g>
+      ))}
       <path className="bed-furrow" d={`M0 ${-height / 2 + 1.5}V${height / 2 - 1.5}`} />
+      <g className="bed-pebbles">
+        <circle cx="-3.1" cy="-5.6" r="0.24" />
+        <circle cx="3.2" cy="2.4" r="0.2" />
+        <circle cx="-1.2" cy="6.1" r="0.18" />
+      </g>
       {crop !== null &&
         [-5, 0, 5].map((y) => (
           <g key={y} transform={`translate(0 ${y})`}>
