@@ -342,8 +342,11 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
   return { first, second };
 }
 
-/** §7.4 pacing target: the first Cycle of water advisable, in seconds of play. */
-export const ADVISED_CYCLE_TARGET = 2.75 * 3600;
+/**
+ * §7.4 pacing target: the first Cycle of water advisable, in seconds of play. Brought from 2 h 45
+ * to 2 h 10 once the cheaper mid and late synergies (2026-10-13) quickened it for every seed.
+ */
+export const ADVISED_CYCLE_TARGET = (2 + 1 / 6) * 3600;
 
 /** §8 pacing targets for a first active playthrough, in seconds. */
 export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
