@@ -342,6 +342,8 @@ Des décisions uniques du quartier qui **changent une règle** plutôt que de mu
 | Assemblée de quartier | 5 parcelles restaurées, phase 3 | 10 Md | Synergies (§5.3) ×1,5 | Des gradins autour de l'héliotrope |
 | Fête des lumières | 1 Arcologie | 30 Md | Toute la production +25 % | Des lanternes le long de toutes les rues |
 
+**Tout lancer.** Dès que deux projets au moins sont à portée, un bouton « Tout lancer » et leur nombre s'affichent à côté du titre du panneau : il les lance du moins cher au plus cher tant que la réserve suffit (le panneau n'en montre que quatre à la fois). Les parcelles restent à restaurer une à une, pour choisir leur avenir (§6.5). Après une nouvelle Saison, relancer tous les projets tient ainsi en un geste, avant que l'assemblée de quartier de la Canopée ne les confie au conseil (§7.1).
+
 Les effets des parcelles et des projets s'ajoutent aux formules du §8 : les multiplicateurs par générateur se multiplient aux ×2, les bonus globaux s'additionnent entre eux puis multiplient la production, les remises se multiplient (deux remises de 10 % donnent ×0,81).
 
 ### 6.3 Sons discrets (M6, post-MVP)

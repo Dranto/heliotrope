@@ -130,3 +130,23 @@ export function carryOutProject(state: GameState, id: ProjectId): GameState {
     idleSeconds: 0,
   };
 }
+
+/** Offered projects the reserve can pay for one after the other, cheapest first. */
+export function affordableProjects(state: GameState): ProjectId[] {
+  const ids: ProjectId[] = [];
+  let light = state.resources.light;
+  for (const { id, cost } of [...offeredProjects(state)].sort((a, b) => a.cost - b.cost)) {
+    if (cost > light) break;
+    light -= cost;
+    ids.push(id);
+  }
+  return ids;
+}
+
+/**
+ * Player action (§6.2): carry out every offered project the reserve covers, cheapest first,
+ * until the next one is out of reach.
+ */
+export function carryOutAffordableProjects(state: GameState): GameState {
+  return affordableProjects(state).reduce(carryOutProject, state);
+}
