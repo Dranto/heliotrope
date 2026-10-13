@@ -3,6 +3,8 @@ import { generatorCost, isGeneratorRevealed, lightPerSecond } from './production
 import { createInitialState, type GameState } from './state';
 import {
   buyGenerator,
+  buyAffordableUpgrades,
+  affordableUpgrades,
   buyUpgrade,
   canBuyGenerator,
   canBuyUpgrade,
@@ -146,6 +148,27 @@ describe('isGeneratorRevealed', () => {
     expect(
       isGeneratorRevealed(withState({ generators: owned({ greenhouse: 1 }) }), 'greenhouse'),
     ).toBe(true);
+  });
+});
+
+describe('buyAffordableUpgrades', () => {
+  it('buys the upgrades the reserve covers, cheapest first, and stops at the first out of reach', () => {
+    const state = withState({
+      resources: { water: 0, light: 2000 },
+      generators: owned({ pot: 25, balconyPanel: 1 }),
+    });
+    const ids = affordableUpgrades(state);
+    expect(ids.length).toBeGreaterThan(1);
+    const next = buyAffordableUpgrades(state);
+    expect(next.upgrades.slice(0, ids.length)).toEqual(ids);
+    expect(next.resources.light).toBeGreaterThanOrEqual(0);
+    expect(affordableUpgrades(next)).toEqual([]);
+    expect(state.upgrades).toEqual([]);
+  });
+
+  it('returns the same state when nothing is affordable', () => {
+    const poor = withState({ resources: { water: 0, light: 10 }, generators: owned({ pot: 1 }) });
+    expect(buyAffordableUpgrades(poor)).toBe(poor);
   });
 });
 

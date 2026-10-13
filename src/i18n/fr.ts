@@ -131,7 +131,7 @@ export const fr = {
   /** §10.5: time before a purchase, under its price. */
   eta: (duration: string) => `dans ${duration}`,
   shortcutsHint:
-    'Raccourcis\u00a0: les touches 1 à 8 achètent un bâtiment, M passe à Max et revient',
+    'Raccourcis\u00a0: les touches 1 à 8 achètent un bâtiment, M passe à Max et revient, U achète les améliorations à portée',
   nextGoal: (name: string) => `Prochain\u00a0: ${name}`,
   nextGoalLabel: (name: string, duration: string) =>
     `Prochain objectif\u00a0: ${name}, dans ${duration}`,
@@ -139,6 +139,9 @@ export const fr = {
   biodiversityHint:
     'Chaque type de bâtiment possédé à 10, 50, 100, 150 puis 250 exemplaires ajoute 2\u00a0% à toute la production.',
   upgradesTitle: 'Améliorer',
+  buyAllUpgrades: 'Tout acheter',
+  buyAllUpgradesLabel: (count: number) =>
+    `Acheter les ${count} améliorations à portée, la moins chère d’abord (touche U)`,
   upgradeTile: (name: string, cost: string, affordable: boolean) =>
     `${name}, ${cost}\u00a0Lumière${affordable ? ', à portée' : ''}`,
   noUpgrades: 'De nouvelles améliorations apparaîtront à mesure que le quartier grandit.',

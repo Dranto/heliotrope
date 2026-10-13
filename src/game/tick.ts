@@ -1,5 +1,6 @@
 import { advanceIntroductions } from './onboarding';
 import {
+  availableUpgrades,
   generatorCost,
   isUpgradeBought,
   isUpgradeUnlocked,
@@ -158,4 +159,29 @@ export function buyUpgrade(state: GameState, id: UpgradeId): GameState {
     upgrades: [...state.upgrades, id],
     idleSeconds: 0,
   };
+}
+
+/** Upgrades the reserve can pay for one after the other, cheapest first. */
+export function affordableUpgrades(state: GameState): UpgradeId[] {
+  const ids: UpgradeId[] = [];
+  let light = state.resources.light;
+  for (const upgrade of availableUpgrades(state)) {
+    if (upgrade.cost > light) break;
+    light -= upgrade.cost;
+    ids.push(upgrade.id);
+  }
+  return ids;
+}
+
+/**
+ * Player action (§10.5): buy every upgrade the reserve covers, cheapest first, until the next one
+ * is out of reach. An upgrade unlocked by the ones just bought is bought too when it fits.
+ */
+export function buyAffordableUpgrades(state: GameState): GameState {
+  let next = state;
+  for (;;) {
+    const [cheapest] = affordableUpgrades(next);
+    if (cheapest === undefined) return next;
+    next = buyUpgrade(next, cheapest);
+  }
 }

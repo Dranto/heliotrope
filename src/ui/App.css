@@ -1442,6 +1442,42 @@ button {
   padding: 1.25rem;
 }
 
+.buy-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.4rem 0.3rem 0.8rem;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff8e6, #fdebc4);
+  color: var(--leaf);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px -6px rgb(233 169 59 / 0.8);
+  transition: transform 0.15s ease;
+}
+
+.buy-all:hover {
+  transform: translateY(-1px);
+}
+
+.buy-all:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
+}
+
+.buy-all-count {
+  min-width: 1.3rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: var(--leaf);
+  color: #fff8e6;
+  font-size: 0.72rem;
+  text-align: center;
+}
+
 .upgrade-grid {
   display: flex;
   flex-wrap: wrap;

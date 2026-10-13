@@ -86,13 +86,17 @@ export const en: Texts = {
   buyAmount: 'Amount to buy',
   buyMax: 'Max',
   eta: (duration: string) => `in ${duration}`,
-  shortcutsHint: 'Shortcuts: keys 1 to 8 buy a building, M switches to Max and back',
+  shortcutsHint:
+    'Shortcuts: keys 1 to 8 buy a building, M switches to Max and back, U buys the affordable upgrades',
   nextGoal: (name: string) => `Next: ${name}`,
   nextGoalLabel: (name: string, duration: string) => `Next goal: ${name}, in ${duration}`,
   biodiversity: (percent: string) => `Biodiversity +${percent}%`,
   biodiversityHint:
     'Each building type owned 10, 50, 100, 150 then 250 times adds 2% to all production.',
   upgradesTitle: 'Improve',
+  buyAllUpgrades: 'Buy all',
+  buyAllUpgradesLabel: (count: number) =>
+    `Buy the ${count} affordable upgrades, cheapest first (key U)`,
   upgradeTile: (name: string, cost: string, affordable: boolean) =>
     `${name}, ${cost} Light${affordable ? ', affordable' : ''}`,
   noUpgrades: 'New upgrades will appear as the neighbourhood grows.',
