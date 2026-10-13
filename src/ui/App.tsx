@@ -464,7 +464,7 @@ export function App() {
       )}
       <button
         type="button"
-        className="ghost menu-button"
+        className="ghost menu-button stats-button"
         aria-haspopup="dialog"
         onClick={() => setScreen('stats')}
       >
@@ -475,7 +475,7 @@ export function App() {
       </button>
       <button
         type="button"
-        className="ghost menu-button"
+        className="ghost menu-button options-button"
         aria-haspopup="dialog"
         onClick={() => setScreen('options')}
       >
