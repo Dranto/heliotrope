@@ -10,6 +10,7 @@ import {
   isUpgradeUnlocked,
   lightPerSecond,
   maxAffordable,
+  upgradeInSight,
   upgradeSynergyBonus,
 } from './production';
 import { createInitialState, type GameState } from './state';
@@ -269,5 +270,29 @@ describe('upgrade availability', () => {
       'pot.2',
       'balconyPanel.1',
     ]);
+  });
+});
+
+describe('upgradeInSight (§2, §5.1)', () => {
+  it('points at the building tier nearest its count', () => {
+    const state = withState({
+      generators: owned({ pot: 40, balconyPanel: 3 }),
+      upgrades: ['pot.1', 'pot.2', 'pot.3', 'balconyPanel.1'],
+    });
+    expect(upgradeInSight(state)).toMatchObject({
+      upgrade: { id: 'pot.4' },
+      generator: 'pot',
+      owned: 40,
+      required: 50,
+    });
+  });
+
+  it('skips tiers a challenge Season keeps out of reach (§7.3)', () => {
+    const state = withState({
+      challenge: 'frugal',
+      generators: owned({ pot: 25, balconyPanel: 20 }),
+      upgrades: ['pot.1', 'pot.2', 'pot.3', 'balconyPanel.1', 'balconyPanel.2'],
+    });
+    expect(upgradeInSight(state)).toMatchObject({ upgrade: { id: 'balconyPanel.3' } });
   });
 });

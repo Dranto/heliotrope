@@ -125,6 +125,8 @@ Pour chaque générateur, une amélioration qui **double** sa production se déb
 
 Soit 8 générateurs × 7 seuils = 56 améliorations, chacune avec un nom et une ligne d'ambiance (ex. « Terreau de compost » pour le Potager, « Miroirs auto-orientables » pour la Centrale).
 
+Quand aucune amélioration n'est proposée (fréquent après le 1ᵉʳ Cycle, quand les seuils de 200 sont atteints), le panneau « Améliorer » montre la prochaine en vue : le seuil de bâtiment le plus proche d'être atteint, avec son compte et une barre (« Prochaine : Façades nourricières · Ferme verticale 149 / 150 »). Le panneau garde ainsi un objectif, selon la règle d'or du §2. Une Saison à défi qui plafonne les bâtiments écarte les seuils hors d'atteinte.
+
 ### 5.2 Améliorations de clic
 
 | Nom *(provisoire)* | Condition | Coût | Effet |

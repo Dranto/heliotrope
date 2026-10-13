@@ -138,6 +138,8 @@ export const fr = {
   upgradeTile: (name: string, cost: string, affordable: boolean) =>
     `${name}, ${cost}\u00a0Lumière${affordable ? ', à portée' : ''}`,
   noUpgrades: 'De nouvelles améliorations apparaîtront à mesure que le quartier grandit.',
+  upgradeInSight: (name: string, generator: string, owned: string, required: string) =>
+    `Prochaine\u00a0: ${name} · ${generator} ${owned}\u00a0/\u00a0${required}`,
   upgradeEffect: {
     generatorMultiplier: (generator: string) => `${generator}\u00a0: production ×2`,
     clickMultiplier: 'Valeur du clic ×2',

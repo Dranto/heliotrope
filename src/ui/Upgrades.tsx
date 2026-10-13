@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { guideStep } from '../game/guide';
 import { upgradesAllowed } from '../game/challenges';
-import { formatCost } from '../game/format';
-import { availableUpgrades } from '../game/production';
+import { formatCost, formatNumber } from '../game/format';
+import { availableUpgrades, upgradeInSight } from '../game/production';
 import { buyUpgrade, canBuyUpgrade } from '../game/tick';
 import type { UpgradeId } from '../game/upgrades';
 import { t } from '../i18n';
@@ -37,7 +37,10 @@ export function Upgrades() {
         {t.upgradesTitle}
       </PanelTitle>
       {selected === undefined ? (
-        <p className="empty">{wild ? t.challenges.noUpgrades : t.noUpgrades}</p>
+        <>
+          <p className="empty">{wild ? t.challenges.noUpgrades : t.noUpgrades}</p>
+          {!wild && <UpgradeInSightLine />}
+        </>
       ) : (
         <>
           <ul className="upgrade-grid">
@@ -83,6 +86,29 @@ export function Upgrades() {
         </>
       )}
     </section>
+  );
+}
+
+/** The nearest upgrade still locked, with the building count it waits for. */
+function UpgradeInSightLine() {
+  const state = useGameState();
+  const sight = upgradeInSight(state);
+  if (!sight) return null;
+  const progress = Math.min(1, sight.owned / sight.required);
+  return (
+    <div className="upgrade-sight" data-testid="upgrade-in-sight">
+      <span>
+        {t.upgradeInSight(
+          upgradeText(sight.upgrade).name,
+          t.generators[sight.generator].name,
+          formatNumber(sight.owned),
+          formatNumber(sight.required),
+        )}
+      </span>
+      <span className="achievement-next-bar" aria-hidden="true">
+        <span style={{ width: `${Math.round(progress * 100)}%` }} />
+      </span>
+    </div>
   );
 }
 

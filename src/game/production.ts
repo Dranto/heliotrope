@@ -270,6 +270,42 @@ export function isUpgradeUnlocked(state: GameState, id: UpgradeId): boolean {
   return true;
 }
 
+/** The upgrade in sight while none is on offer: the building tier closest to its count (§5.1). */
+export interface UpgradeInSight {
+  upgrade: UpgradeDef;
+  generator: GeneratorId;
+  owned: number;
+  required: number;
+}
+
+/**
+ * The locked upgrade that only waits for more units of one building, nearest its count, so an
+ * empty upgrade panel still shows a goal (§2, golden rule). Null when none is left this Season.
+ */
+export function upgradeInSight(state: GameState): UpgradeInSight | null {
+  if (!upgradesAllowed(state)) return null;
+  let best: UpgradeInSight | null = null;
+  for (const upgrade of Object.values(UPGRADES)) {
+    const { owned, ...others } = upgrade.condition;
+    if (!owned || Object.keys(others).length > 0) continue;
+    if (isUpgradeBought(state, upgrade.id) || isUpgradeUnlocked(state, upgrade.id)) continue;
+    const entries = Object.entries(owned) as [GeneratorId, number][];
+    if (entries.length !== 1) continue;
+    const [generator, required] = entries[0]!;
+    if (required > generatorLimit(state, generator)) continue;
+    const candidate = { upgrade, generator, owned: state.generators[generator], required };
+    const ratio = candidate.owned / required;
+    if (
+      best === null ||
+      ratio > best.owned / best.required ||
+      (ratio === best.owned / best.required && upgrade.cost < best.upgrade.cost)
+    ) {
+      best = candidate;
+    }
+  }
+  return best;
+}
+
 /** Unlocked upgrades not bought yet, cheapest first (§5). */
 export function availableUpgrades(state: GameState): UpgradeDef[] {
   return Object.values(UPGRADES)
