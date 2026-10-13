@@ -18,11 +18,14 @@ export const SpeciesLife = memo(function SpeciesLife({
   species,
   greetable = '',
   onGreet,
+  hitRadius = 0,
 }: {
   species: readonly SpeciesId[];
   /** The species that can be greeted now, joined by commas. */
   greetable?: string;
   onGreet?: (id: SpeciesId) => void;
+  /** The least radius, in map units, where a tap still greets a species. */
+  hitRadius?: number;
 }) {
   const open = new Set(greetable.split(','));
   return (
@@ -55,6 +58,10 @@ export const SpeciesLife = memo(function SpeciesLife({
               <Appear key={`${x},${y}`} at={[x, y]} size={size}>
                 <g transform={`translate(${x} ${y})`}>
                   <g className="species-individual" style={{ animationDelay: `${-i * 1.7}s` }}>
+                    {/* A thumb-sized ring around a species that can be greeted, whatever the zoom. */}
+                    {greet && (
+                      <circle r={Math.max(size * 0.55, hitRadius)} className="species-hit" />
+                    )}
                     {motion !== 'fly' && <circle r={size * 0.55} className="species-halo" />}
                     <g transform={`scale(${size / 32}) translate(-16 -16)`}>
                       <Art />

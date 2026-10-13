@@ -10,6 +10,12 @@
   outline: none;
 }
 
+/* Its invisible hit disc, sized from the camera zoom, lets a small species be tapped on a phone. */
+.species-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
 .species [data-greet] .species-halo {
   stroke: rgb(233 169 59 / 1);
   stroke-width: 1.2;
