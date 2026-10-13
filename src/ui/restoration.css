@@ -707,6 +707,18 @@
   gap: 0.4rem 1rem;
 }
 
+.restoration-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem 0.8rem;
+}
+
+.restoration[data-open='false'] .buy-all {
+  display: none;
+}
+
 .restoration h2 {
   margin: 0;
   font-family: var(--serif);

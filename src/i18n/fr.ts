@@ -634,6 +634,9 @@ export const fr = {
     projectsHint: 'Menés pour cette Saison.',
     restore: 'Restaurer',
     carryOut: 'Lancer',
+    carryOutAll: 'Tout lancer',
+    carryOutAllLabel: (count: number) =>
+      `Lancer les ${count} projets à portée, le moins cher d’abord`,
     restoreLabel: (name: string, cost: string) => `Restaurer ${name} pour ${cost} Lumière`,
     carryOutLabel: (name: string, cost: string) => `Lancer le projet ${name} pour ${cost} Lumière`,
     restored: (name: string) => `${name} restaurée`,

@@ -18,9 +18,11 @@ import {
 } from '../game/parcels';
 import type { ProjectDef } from '../game/projects';
 import {
+  affordableProjects,
   canCarryOutProject,
   canChangeFuture,
   canRestoreParcel,
+  carryOutAffordableProjects,
   carryOutProject,
   changeFuture,
   futureOf,
@@ -235,6 +237,7 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
     .sort((a, b) => a.def.cost - b.def.cost)
     .slice(0, MAX_OFFERS);
   if (offers.length === 0 && state.parcels.length === 0) return null;
+  const affordable = affordableProjects(state).length;
 
   return (
     <section className="panel restoration" aria-labelledby="restoration-title" data-open={open}>
@@ -242,39 +245,53 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
         <PanelTitle id="restoration-title" open={open} onToggle={toggle}>
           {t.restoration.title}
         </PanelTitle>
-        {/* Once the neighbourhood is whole, the dots count the neighbouring districts (§6.4). */}
-        {areDistrictsOpen(state) ? (
-          <ol className="restored-dots" data-kind="district" aria-label={t.restoration.districts}>
-            {DISTRICT_IDS.map((id) => {
-              const done = state.districts.includes(id);
-              const name = t.restoration.districtNames[id];
-              return (
-                <li key={id} data-done={done} title={done ? name : undefined}>
-                  <span className="visually-hidden">
-                    {done ? t.restoration.districtRestored(name) : '…'}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <ol className="restored-dots" aria-label={t.restoration.parcels}>
-            {PARCEL_IDS.map((id) => {
-              const done = state.parcels.includes(id);
-              return (
-                <li
-                  key={id}
-                  data-done={done}
-                  title={done ? t.restoration.parcelNames[id] : undefined}
-                >
-                  <span className="visually-hidden">
-                    {done ? t.restoration.restored(t.restoration.parcelNames[id]) : '…'}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        )}
+        <div className="restoration-tools">
+          {affordable > 1 && (
+            <button
+              type="button"
+              className="buy-all"
+              aria-label={t.restoration.carryOutAllLabel(affordable)}
+              title={t.restoration.carryOutAllLabel(affordable)}
+              onClick={() => store.dispatch(carryOutAffordableProjects)}
+            >
+              {t.restoration.carryOutAll}
+              <span className="buy-all-count">{affordable}</span>
+            </button>
+          )}
+          {/* Once the neighbourhood is whole, the dots count the neighbouring districts (§6.4). */}
+          {areDistrictsOpen(state) ? (
+            <ol className="restored-dots" data-kind="district" aria-label={t.restoration.districts}>
+              {DISTRICT_IDS.map((id) => {
+                const done = state.districts.includes(id);
+                const name = t.restoration.districtNames[id];
+                return (
+                  <li key={id} data-done={done} title={done ? name : undefined}>
+                    <span className="visually-hidden">
+                      {done ? t.restoration.districtRestored(name) : '…'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <ol className="restored-dots" aria-label={t.restoration.parcels}>
+              {PARCEL_IDS.map((id) => {
+                const done = state.parcels.includes(id);
+                return (
+                  <li
+                    key={id}
+                    data-done={done}
+                    title={done ? t.restoration.parcelNames[id] : undefined}
+                  >
+                    <span className="visually-hidden">
+                      {done ? t.restoration.restored(t.restoration.parcelNames[id]) : '…'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
       </header>
       {offers.length > 0 && (
         <ul className="restoration-list">

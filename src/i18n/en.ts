@@ -567,6 +567,8 @@ export const en: Texts = {
     projectsHint: 'Carried out for this Season.',
     restore: 'Restore',
     carryOut: 'Launch',
+    carryOutAll: 'Launch all',
+    carryOutAllLabel: (count: number) => `Launch the ${count} affordable projects, cheapest first`,
     restoreLabel: (name: string, cost: string) => `Restore ${name} for ${cost} Light`,
     carryOutLabel: (name: string, cost: string) => `Launch the ${name} project for ${cost} Light`,
     restored: (name: string) => `${name} restored`,

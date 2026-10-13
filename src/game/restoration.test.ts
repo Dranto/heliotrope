@@ -12,8 +12,10 @@ import {
 } from './production';
 import { PROJECT_LIST } from './projects';
 import {
+  affordableProjects,
   canCarryOutProject,
   canRestoreParcel,
+  carryOutAffordableProjects,
   carryOutProject,
   isParcelOffered,
   isProjectUnlocked,
@@ -128,6 +130,21 @@ describe('neighbourhood projects', () => {
     expect(next.projects).toEqual(['seedSwap']);
     expect(carryOutProject(next, 'seedSwap')).toBe(next);
     expect(offeredProjects(next)).toEqual([]);
+  });
+
+  it('carries out every affordable project, cheapest first, until one is out of reach', () => {
+    const state = rich({
+      generators: owned({ pot: 100, balconyPanel: 100, rooftopGarden: 100, greenhouse: 100 }),
+    });
+    const offered = [...offeredProjects(state)].sort((a, b) => a.cost - b.cost);
+    expect(offered.length).toBeGreaterThan(2);
+    const budget = offered[0]!.cost + offered[1]!.cost;
+    const twoOnly = { ...state, resources: { ...state.resources, light: budget } };
+    expect(affordableProjects(twoOnly)).toEqual([offered[0]!.id, offered[1]!.id]);
+    const next = carryOutAffordableProjects(twoOnly);
+    expect(next.projects).toEqual([...state.projects, offered[0]!.id, offered[1]!.id]);
+    expect(next.resources.light).toBe(0);
+    expect(carryOutAffordableProjects(next)).toBe(next);
   });
 });
 
