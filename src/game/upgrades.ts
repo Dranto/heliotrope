@@ -11,9 +11,13 @@ export const GENERATOR_UPGRADE_TIERS = [
   { owned: 100, costFactor: 5_000_000 },
   { owned: 150, costFactor: 500_000_000 },
   { owned: 200, costFactor: 50_000_000_000 },
+  // Later tiers, so the ×2 upgrades keep coming after the first Cycle of water.
+  { owned: 225, costFactor: 5e11 },
+  { owned: 250, costFactor: 5e12 },
+  { owned: 300, costFactor: 5e14 },
 ] as const;
 
-export type GeneratorUpgradeTier = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type GeneratorUpgradeTier = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export type GeneratorUpgradeId = `${GeneratorId}.${GeneratorUpgradeTier}`;
 
 export const CLICK_UPGRADE_IDS = [

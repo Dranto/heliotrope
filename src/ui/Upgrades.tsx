@@ -13,7 +13,7 @@ import { PanelTitle } from './PanelTitle';
 import { UpgradeIcon } from './UpgradeIcon';
 import { useGameState, useGameStore } from './useGame';
 
-const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
 /**
  * Available upgrades (docs/game-design.md §5, §10.1), cheapest first, as icon tiles. Selecting a

@@ -90,7 +90,8 @@ export const en: Texts = {
   nextGoal: (name: string) => `Next: ${name}`,
   nextGoalLabel: (name: string, duration: string) => `Next goal: ${name}, in ${duration}`,
   biodiversity: (percent: string) => `Biodiversity +${percent}%`,
-  biodiversityHint: 'Each building type owned 10, 50 then 100 times adds 2% to all production.',
+  biodiversityHint:
+    'Each building type owned 10, 50, 100, 150 then 250 times adds 2% to all production.',
   upgradesTitle: 'Improve',
   upgradeTile: (name: string, cost: string, affordable: boolean) =>
     `${name}, ${cost} Light${affordable ? ', affordable' : ''}`,
@@ -1462,6 +1463,9 @@ export const en: Texts = {
       u('Giant heliotropes', 'They now reach over the railing.'),
       u('Chosen seeds', 'We keep the brightest ones.'),
       u('Perpetual bloom', 'It no longer wilts, it rests.'),
+      u('Cascading planters', 'Every window overflows with flowers.'),
+      u('Collector heliotropes', 'Every street has its own variety.'),
+      u('Sea of heliotropes', 'The whole neighbourhood smells of vanilla.'),
     ],
     balconyPanel: [
       u('Careful wiring', 'Fewer losses, more light.'),
@@ -1471,6 +1475,9 @@ export const en: Texts = {
       u('Building microgrid', 'Neighbours share their surplus.'),
       u('Solar windows', 'Even the windows join in.'),
       u('Recycled cells', 'Nothing is lost, everything is transformed.'),
+      u('Solar railings', 'Even the railings are working.'),
+      u('Energy cooperative', 'Every balcony gets its share.'),
+      u('Photosynthetic façades', 'The whole street drinks the light.'),
     ],
     rooftopGarden: [
       u('Compost soil', 'Yesterday’s peelings, tomorrow’s tomatoes.'),
@@ -1480,6 +1487,9 @@ export const en: Texts = {
       u('Permaculture', 'Every plant helps its neighbour.'),
       u('Winter cold frames', 'Harvests even under snow.'),
       u('Hanging forest garden', 'An orchard twenty metres above the ground.'),
+      u('Linked roofs', 'Footbridges lead from one garden to the next.'),
+      u('Heirloom seeds', 'Varieties we thought were lost.'),
+      u('Hanging meadows', 'The roofs ripple in the wind.'),
     ],
     greenhouse: [
       u('Seed library', 'Everyone drops off, everyone borrows.'),
@@ -1489,6 +1499,9 @@ export const en: Texts = {
       u('Aquaponics', 'The fish feed the salads.'),
       u('Shared calendar', 'The whole neighbourhood gets its half-day.'),
       u('Cathedral greenhouse', 'A glass nave open to all.'),
+      u('Greenhouses open at night', 'We read by the glow of fireflies.'),
+      u('Neighbourhood nursery', 'Every tree in town was born here.'),
+      u('Public winter garden', 'Spring lasts all year.'),
     ],
     verticalFarm: [
       u('Horticultural LEDs', 'A light cut for leaves.'),
@@ -1498,6 +1511,9 @@ export const en: Texts = {
       u('Hemp substrate', 'Light, local, compostable.'),
       u('Feeding facades', 'The walls themselves produce.'),
       u('Twin towers', 'Two towers, a single harvest.'),
+      u('Fruit floors', 'Cherry trees on the thirtieth floor.'),
+      u('Shared harvests', 'Every floor feeds a street.'),
+      u('Kitchen-garden city', 'We pick lunch on the way upstairs.'),
     ],
     mirrorPlant: [
       u('Self-aiming mirrors', 'They follow the sun without a thought.'),
@@ -1507,6 +1523,9 @@ export const en: Texts = {
       u('Orchards between the rows', 'Apple trees love this light shade.'),
       u('Concentration tower', 'A thousand rays, a single point.'),
       u('Tamed sun', 'A star, very gently.'),
+      u('Dew mirrors', 'They drink the morning mist.'),
+      u('Fields of light', 'Sheep graze between the rows.'),
+      u('Endless dawn', 'A gentle sun from dawn to dusk.'),
     ],
     urbanCanopy: [
       u('Street trees', 'Each street picks its species.'),
@@ -1516,6 +1535,9 @@ export const en: Texts = {
       u('Mycorrhizal network', 'Under our feet, the roots talk.'),
       u('Layered canopy', 'Three layers of green, from ground to sky.'),
       u('Inhabited forest', 'We live, work and breathe in it.'),
+      u('Inhabited treetops', 'A cabin in every tall tree.'),
+      u('Food forest', 'Nuts, fruit and berries within reach.'),
+      u('Forest city', 'No one knows where the park ends.'),
     ],
     arcology: [
       u('Breathing walls', 'The building breathes in, the city breathes out.'),
@@ -1525,6 +1547,9 @@ export const en: Texts = {
       u('Living wood', 'The walls still grow a little every year.'),
       u('Pollinator terraces', 'Our flowers feed the whole region.'),
       u('Symbiosis', 'The city and the forest are now one.'),
+      u('Living soils', 'The terrace soil teems with life.'),
+      u('Bioclimate', 'Mild inside and out.'),
+      u('Garden city', 'The city has become a landscape.'),
     ],
   },
   clickUpgrades: {
