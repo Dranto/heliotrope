@@ -81,6 +81,7 @@ import {
   type Palette,
   type Sun,
 } from './model';
+import { GradeFilter, ReliefFilter } from './light';
 import { mapPicture } from '../mapPicture';
 import { Snapshots } from './snapshot';
 import { mapSources, type SourceGroup } from './sources';
@@ -118,6 +119,21 @@ export interface MapProps {
 
 /** Shadows a little longer than the SVG scene's: real depth, now that their edges are soft. */
 const SHADOW_LENGTH = 1.6;
+
+/** World units a contact shadow reaches past the foot of a building. */
+const CONTACT = 1.4;
+
+/** Groups standing up from the ground, lit together by the relief (light.ts). */
+const RAISED: Group[] = [
+  'buildings',
+  'rooftopGarden',
+  'balconyPanel',
+  'pot',
+  'greenhouse',
+  'verticalFarm',
+  'mirrorPlant',
+  'arcology',
+];
 
 /** Arcology terraces appear at these units owned, as in the SVG scene. */
 const ARCOLOGY_RINGS = [1, 3, 6, 12, 25];
@@ -402,15 +418,24 @@ export class MapRenderer {
   private shadowLayer = new Container();
   private treeShadows = new Graphics();
   private treeShadowLayer = new Container();
+  /** Contact shadows: a tight shade all round the foot of whatever stands up, grounding it. */
+  private contact = new Graphics();
+  private contactLayer = new Container();
   /**
    * The blurred shadows are kept as textures, redrawn only when the sun has moved. They are drawn
    * into textures of their own size: cached with `cacheAsTexture`, the blur was cut at the size of
    * the canvas, leaving straight edges across the map on small or low-density screens.
    */
-  private shadowSprites = [new Sprite(), new Sprite()];
-  private shadowTextures: (RenderTexture | null)[] = [null, null];
+  private shadowSprites = [new Sprite(), new Sprite(), new Sprite()];
+  private shadowTextures: (RenderTexture | null)[] = [null, null, null];
   private shadowRes = 0;
   private items = new Container();
+  /** Buildings and generators, lit together by the relief filter. */
+  private raised = new Container();
+  private grade = new GradeFilter();
+  private relief = new ReliefFilter();
+  /** The trees' own relief, kept under an upgrade's flash. */
+  private treeRelief = new ReliefFilter();
   private groups = new Map<Group, Container>();
   private effects = new Container();
   private clouds = new Container();
@@ -518,6 +543,8 @@ export class MapRenderer {
     this.shadowLayer.filters = [new BlurFilter({ strength: 3, quality: 3 })];
     this.treeShadowLayer.addChild(this.treeShadows);
     this.treeShadowLayer.filters = [new BlurFilter({ strength: 2, quality: 2 })];
+    this.contactLayer.addChild(this.contact);
+    this.contactLayer.filters = [new BlurFilter({ strength: 1, quality: 2 })];
     for (const group of [
       'river',
       'parcels',
@@ -537,12 +564,18 @@ export class MapRenderer {
       const container = new Container();
       this.groups.set(group, container);
       // Buildings cast on the ground, under every roof; trees on roofs and gardens too.
-      if (group === 'buildings') this.items.addChild(this.shadowSprites[0]!);
+      if (group === 'buildings')
+        this.items.addChild(this.shadowSprites[2]!, this.shadowSprites[0]!);
       if (group === 'urbanCanopy') this.items.addChild(this.shadowSprites[1]!);
       // Water lies over the river's banks and in the arcology's heart, under its footbridges.
       if (group === 'bridges') this.items.addChild(this.water);
-      this.items.addChild(container);
+      // What stands up, from the buildings to the arcology, is lit as one relief.
+      if (group === 'buildings') this.items.addChild(this.raised);
+      if (RAISED.includes(group)) this.raised.addChild(container);
+      else this.items.addChild(container);
     }
+    this.raised.filters = [this.relief];
+    this.groups.get('urbanCanopy')!.filters = [this.treeRelief];
     this.hearth = new Sprite(this.glow);
     this.hearth.anchor.set(0.5);
     this.hearth.tint = 0xf4c063;
@@ -595,6 +628,7 @@ export class MapRenderer {
       this.effects,
       this.clouds,
     );
+    this.world.filters = [this.grade];
     this.app.stage.addChild(this.world, this.screen);
   }
 
@@ -670,6 +704,7 @@ export class MapRenderer {
       this.signature = signature;
       this.res = res;
       this.palette = palette(props.phase, props.season);
+      this.grade.tone(this.palette);
       this.sync(props);
     }
     this.requestRender();
@@ -1227,6 +1262,7 @@ export class MapRenderer {
       props.width / 2 - camera.x * camera.scale,
       props.height / 2 - camera.y * camera.scale,
     );
+    this.grade.place(this.world.position.x, this.world.position.y, camera.scale);
   }
 
   private layoutScreen(): void {
@@ -1267,6 +1303,11 @@ export class MapRenderer {
     ) {
       this.drawShadows();
     }
+    if (this.camera) {
+      this.relief.light(this.sun, this.camera, this.palette);
+      this.treeRelief.light(this.sun, this.camera, this.palette);
+    }
+    this.grade.light(this.sun, props.width, props.height);
 
     // Entrances of newly built elements: restored parcels are unveiled, the others grow.
     for (const placed of this.placed.values()) {
@@ -1309,16 +1350,18 @@ export class MapRenderer {
     // Upgrades: the generator's layer brightens once.
     for (const [id, start] of this.flashes) {
       const group = this.groups.get(id)!;
+      const base = id === 'urbanCanopy' ? [this.treeRelief] : [];
       const p = (t - start) / 1.8;
       if (p >= 1) {
-        group.filters = [];
+        group.filters = base;
         this.flashes.delete(id);
         continue;
       }
       const filter =
-        (group.filters?.[0] as ColorMatrixFilter | undefined) ?? new ColorMatrixFilter();
+        (group.filters?.find((f) => f instanceof ColorMatrixFilter) as
+          ColorMatrixFilter | undefined) ?? new ColorMatrixFilter();
       filter.brightness(1 + Math.sin(Math.min(1, p) * Math.PI) * 0.35, false);
-      group.filters = [filter];
+      group.filters = [filter, ...base];
     }
 
     // Light: the bloom breathes on the sun's side, the hearth glows under the flower.
@@ -1331,7 +1374,8 @@ export class MapRenderer {
     this.bloom.alpha = 0.16 + Math.sin(t * 0.4) * 0.04;
     this.daylight.scale.x = Math.abs(this.daylight.scale.x) * (fromLeft ? 1 : -1);
     this.daylight.x = fromLeft ? 0 : width;
-    this.daylight.alpha = this.palette.lightAlpha * 0.62;
+    // The grade (light.ts) warms the sun's side: the veil of light stays thin, so colours keep.
+    this.daylight.alpha = this.palette.lightAlpha * 0.32;
     this.hearth.alpha = 0.6 + Math.sin(t * 1.3) * 0.12;
 
     // Clouds drift across the world and come back round.
@@ -1426,12 +1470,17 @@ export class MapRenderer {
     this.shadowsDirty = false;
     const ground = this.shadows.clear();
     const trees = this.treeShadows.clear();
+    const contact = this.contact.clear();
     for (const { item, sprite } of this.placed.values()) {
       const shadow = item.shadow;
       if (!shadow || !sprite.visible) continue;
       const g = item.group === 'urbanCanopy' ? trees : ground;
       if (shadow.kind === 'box') {
         g.poly(shadowPolygon(shadow.box, shadow.height * SHADOW_LENGTH, sun)).fill(0x46372a);
+        const [x, y, w, h] = shadow.box;
+        contact
+          .roundRect(x - CONTACT, y - CONTACT, w + CONTACT * 2, h + CONTACT * 2, CONTACT * 1.5)
+          .fill(0x3a2f3f);
       } else {
         const squash = shadow.squash ?? 1;
         g.ellipse(
@@ -1444,6 +1493,7 @@ export class MapRenderer {
     }
     this.shadowSprites[0]!.alpha = this.palette.shadowAlpha;
     this.shadowSprites[1]!.alpha = this.palette.shadowAlpha * 1.1;
+    this.shadowSprites[2]!.alpha = this.palette.shadowAlpha * 0.7;
     // Blurred once into a texture of a few pixels per world unit: soft edges of about two
     // world units, and no blur to redo at every frame.
     const res = Math.min(this.res, 3);
@@ -1451,8 +1501,11 @@ export class MapRenderer {
       this.shadowRes = res;
       (this.shadowLayer.filters?.[0] as BlurFilter).strength = res * 2;
       (this.treeShadowLayer.filters?.[0] as BlurFilter).strength = res * 1.2;
+      (this.contactLayer.filters?.[0] as BlurFilter).strength = res * 0.9;
     }
-    [this.shadowLayer, this.treeShadowLayer].forEach((layer, i) => this.bakeShadows(layer, i, res));
+    [this.shadowLayer, this.treeShadowLayer, this.contactLayer].forEach((layer, i) =>
+      this.bakeShadows(layer, i, res),
+    );
   }
 
   /** Draws one blurred shadow layer into its texture, with room around it for the blur. */

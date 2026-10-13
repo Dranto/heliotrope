@@ -3,12 +3,16 @@ import {
   appearScale,
   approachSun,
   blendCamera,
+  channels,
   easeInOut,
   hull,
+  lightStrength,
   palette,
+  reliefWidth,
   shadowPolygon,
   sunAt,
   textureResolution,
+  towardSun,
 } from './model';
 
 describe('sun and shadows', () => {
@@ -72,6 +76,31 @@ describe('palette', () => {
     expect(palette(2, 'autumn').foliage).toBe('#a65f3a');
     expect(palette(2, null).foliage).toBe('#2f6b4f');
     expect(palette(3, null).light).not.toBe(palette(1, null).light);
+  });
+});
+
+describe('light', () => {
+  it('lights the edges facing the sun: against the shadows, a set width', () => {
+    const [x, y] = towardSun(PHASE_SUN[3], 2);
+    expect(Math.hypot(x, y)).toBeCloseTo(2);
+    // Late afternoon: shadows fall to the south-east, the lit edges face the north-west.
+    expect(x).toBeLessThan(0);
+    expect(y).toBeLessThan(0);
+  });
+
+  it('keeps the relief about a world unit wide, between one pixel and a soft edge', () => {
+    expect(reliefWidth(0.3)).toBe(1);
+    expect(reliefWidth(2)).toBeCloseTo(2.4);
+    expect(reliefWidth(12)).toBe(4);
+  });
+
+  it('grades a little less in winter light', () => {
+    expect(lightStrength(palette(2, null))).toBe(1);
+    expect(lightStrength(palette(2, 'winter'))).toBeLessThan(0.9);
+  });
+
+  it('reads colours as channels for the shaders', () => {
+    expect(channels(0xff8000)).toEqual([1, 128 / 255, 0]);
   });
 });
 

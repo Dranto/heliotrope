@@ -752,7 +752,8 @@ button {
   --leaf-light: rgb(255 226 168 / 0.45);
 }
 
-.crown-shade {
+/* Scoped: parcels and the Bioregion draw their own .crown-shade, outside the flower panel. */
+.flower-panel .crown-shade {
   fill: var(--leaf-shade);
 }
 

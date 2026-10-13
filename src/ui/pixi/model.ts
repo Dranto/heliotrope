@@ -144,6 +144,36 @@ export function palette(phase: Phase, season: VisualSeason | null): Palette {
   };
 }
 
+/** `0xrrggbb` as three channels from 0 to 1. */
+export function channels(colour: number): [number, number, number] {
+  return [((colour >> 16) & 255) / 255, ((colour >> 8) & 255) / 255, (colour & 255) / 255];
+}
+
+/** Lilac ink the shadows lean to (the heliotrope of §10.4, darkened). */
+export const INK = 0x6a5a8a;
+
+/**
+ * Screen pixels from an edge where the relief's rim and shade fade out: about a world unit,
+ * so it follows the size of things, but never thinner than a pixel nor a soft blur.
+ */
+export function reliefWidth(cameraScale: number): number {
+  return Math.min(4, Math.max(1, cameraScale * 1.2));
+}
+
+/** Direction towards the sun on screen, `width` pixels long: the sun's shadow offset reversed. */
+export function towardSun(sun: Sun, width: number): [number, number] {
+  const length = Math.hypot(sun.x, sun.y) || 1;
+  return [(-sun.x / length) * width, (-sun.y / length) * width];
+}
+
+/**
+ * Strength of the light effects (light.ts) for a palette, following how dark its shadows are:
+ * full under a clear sun, a little less in winter's pale light.
+ */
+export function lightStrength(palette: Palette): number {
+  return Math.min(1, 0.4 + palette.shadowAlpha * 1.5);
+}
+
 /** Same easing as the SVG camera's CSS transition: cubic-bezier(0.65, 0, 0.35, 1). */
 export function easeInOut(t: number): number {
   const c = Math.min(1, Math.max(0, t));
