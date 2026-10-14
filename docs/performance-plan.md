@@ -2,7 +2,7 @@
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
 > l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
-> l'ordre. Fait : lots 0 et 1.
+> l'ordre. Fait : lots 0, 1 et 2.
 
 ## 1. Ce qui a été mesuré
 
@@ -97,17 +97,21 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
 - Mesuré avec `npm run perf` : JS du fil principal sur la sauvegarde `cycle` de 65 à 40 ms/s sur ordinateur et
   de 297 à 164 ms/s sur le téléphone simulé ; 163 → 66 composants par tick dans le test de plafond.
 
-### Lot 2 : la carte PixiJS économe (gain fort sur téléphone, à valider par Antoine)
+### Lot 2 : la carte PixiJS économe (fait, à valider par Antoine)
 
-- Plafonner le ticker : 30 images/s pour l'animation d'ambiance, 60 pendant un glissement de caméra, une
-  apparition ou un clic, et aucune image quand rien ne bouge (le mode mouvement réduit le fait déjà).
-- Réduire les passes : appliquer l'étalonnage (qui porte déjà le grain de papier) une seule fois sur l'image
-  finale plutôt qu'au conteneur du monde ; calculer relief et eau à demi-résolution quand le DPR vaut 2 ou plus ; ne recuire les ombres que par paliers fixes de la course
-  du soleil (ou toutes les ~5 s), pas à chaque déplacement de 0,01.
-- Qualité adaptative : si la durée d'image reste au-dessus de 20 ms pendant quelques secondes, descendre d'un cran
-  (résolution 1,5 puis 1, puis sans relief ni ondulation de l'eau), sans jamais toucher au contenu de la scène.
-- Démarrage : garder en `localStorage` le résultat de `drawsWebGLWell()` et réutiliser ce contexte ou éviter les
-  contextes de test de Pixi ; précharger le fichier de la carte PixiJS dès que ce rendu est choisi.
+- Images par seconde (`frameCap`) : ~30 pour la vie d'ambiance, toutes celles de l'écran pendant un glissement
+  de caméra, une apparition, un anneau de clic ou l'éclat d'une amélioration. Sur un écran 120 Hz, la carte
+  dessinait jusqu'ici 120 images par seconde en continu : quatre fois moins de travail graphique au repos.
+- Ombres : recuites quand le soleil a bougé de 0,03 au lieu de 0,01 (`SHADOW_STEP`). Le soleil se déplace
+  d'environ 0,025 par seconde : trois flous recuits toutes les ~1,2 s au lieu de ~2,5 fois par seconde.
+- Qualité adaptative (`nextTier`) : quand la médiane des écarts entre images calmes dépasse 1,6 fois l'écart
+  visé pendant 4 s, la carte descend d'un cran : résolution 1,5, puis 1, puis sans le relief des bâtiments et des
+  arbres. Elle ne remonte pas pendant la partie. Le cran atteint s'affiche dans le compteur `?perf` (`q0` à
+  `q3`).
+- Pas fait : l'étalonnage reste appliqué au monde (le passer sur l'image finale teinterait aussi le voile de
+  lumière, le pollen et le vignettage) ; les filtres de relief étaient déjà à la résolution de l'écran et l'eau
+  doit le rester (sinon les ruisseaux fins crénellent) ; les contextes WebGL de test au démarrage ne coûtent
+  cher qu'en rendu logiciel, le gain sur un vrai appareil ne justifie pas de contourner Pixi.
 
 ### Lot 3 : animations d'ambiance (gain fort quand il n'y a pas de GPU)
 

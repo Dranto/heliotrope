@@ -57,6 +57,8 @@ export function PerfMeter() {
   }, []);
   if (!shown) return null;
   const { renderer } = mapRenderer();
+  // The quality tier the WebGL map settled on (0 = full), see pixi/model.ts.
+  const quality = document.querySelector<HTMLElement>('.pixi-canvas')?.dataset.quality;
   const dpr = Math.round((window.devicePixelRatio || 1) * 100) / 100;
   return (
     <output className="perf-meter" aria-hidden="true" data-testid="perf-meter">
@@ -64,7 +66,8 @@ export function PerfMeter() {
       <br />
       React {shown.commits}/s × {shown.perCommit}
       <br />
-      {renderer} · dpr {dpr} · {shown.nodes} nodes
+      {renderer}
+      {quality !== undefined && ` q${quality}`} · dpr {dpr} · {shown.nodes} nodes
     </output>
   );
 }

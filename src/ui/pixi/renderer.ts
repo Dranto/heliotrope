@@ -74,10 +74,14 @@ import {
   approachSun,
   blendCamera,
   easeInOut,
+  frameCap,
+  nextTier,
   palette,
+  SHADOW_STEP,
   shadowPolygon,
   sunAt,
   textureResolution,
+  tierResolution,
   type Palette,
   type Sun,
 } from './model';
@@ -488,6 +492,12 @@ export class MapRenderer {
   private synced = false;
   private shadowsDirty = true;
   private pending = 0;
+  /** Lot 2 of docs/performance-plan.md: the quality tier, and the frame gaps that decide it. */
+  private tier = 0;
+  private deviceResolution = 1;
+  private gaps: number[] = [];
+  private gapsSince = 0;
+  private host: HTMLElement | null = null;
 
   /** `sources`: the hidden SVG holding the drawings taken from the SVG scene (see sources.tsx). */
   constructor(sources: SVGSVGElement | null = null) {
@@ -521,6 +531,9 @@ export class MapRenderer {
       return false;
     }
     this.ready = true;
+    this.host = host;
+    this.deviceResolution = this.app.renderer.resolution;
+    host.dataset.quality = '0';
     // The photo mode reads the canvas right after drawing it (§6.5).
     mapPicture.renderNow = () => this.app.render();
     this.app.stage.eventMode = 'none';
@@ -1298,7 +1311,7 @@ export class MapRenderer {
     this.sun = still || Number.isNaN(this.drawnSun.x) ? target : approachSun(this.sun, target, dt);
     if (this.shadowsDirty) this.drawnSun = { x: NaN, y: NaN };
     if (
-      Math.hypot(this.sun.x - this.drawnSun.x, this.sun.y - this.drawnSun.y) > 0.01 ||
+      Math.hypot(this.sun.x - this.drawnSun.x, this.sun.y - this.drawnSun.y) > SHADOW_STEP ||
       Number.isNaN(this.drawnSun.x)
     ) {
       this.drawShadows();
@@ -1310,8 +1323,10 @@ export class MapRenderer {
     this.grade.light(this.sun, props.width, props.height);
 
     // Entrances of newly built elements: restored parcels are unveiled, the others grow.
+    let busy = this.glide !== null || this.rings.length > 0 || this.flashes.size > 0;
     for (const placed of this.placed.values()) {
       if (placed.born === null || placed.born < 0) continue;
+      busy = true;
       const unveil = placed.item.unveil;
       if (unveil && placed.mask) {
         const p = Math.min(1, (t - placed.born) / UNVEIL);
@@ -1350,7 +1365,7 @@ export class MapRenderer {
     // Upgrades: the generator's layer brightens once.
     for (const [id, start] of this.flashes) {
       const group = this.groups.get(id)!;
-      const base = id === 'urbanCanopy' ? [this.treeRelief] : [];
+      const base = id === 'urbanCanopy' && !this.lite() ? [this.treeRelief] : [];
       const p = (t - start) / 1.8;
       if (p >= 1) {
         group.filters = base;
@@ -1461,6 +1476,59 @@ export class MapRenderer {
       const wobble = Math.sin(t * 0.8 + mote.phase) * 0.012;
       mote.sprite.position.set((mote.x + wobble) * width, (mote.y + wobble * 0.6) * height);
       mote.sprite.alpha = 0.35 + Math.sin(t * 1.4 + mote.phase) * 0.3;
+    }
+    if (!still) this.pace(busy, dt);
+  }
+
+  /**
+   * Lot 2 of docs/performance-plan.md: about 30 frames per second for the ambient life, every
+   * frame while something moves, and a quality tier lower when calm frames come too far apart.
+   */
+  private pace(busy: boolean, dt: number): void {
+    const cap = frameCap(busy);
+    if (this.app.ticker.maxFPS !== cap) this.app.ticker.maxFPS = cap;
+    // Starting, building and gliding make uneven frames: only calm ones decide the quality. The
+    // map's own clock slows down on slow frames, so the window is measured in real time.
+    const now = performance.now();
+    if (busy || !this.synced || dt <= 0 || dt > 3) {
+      this.gaps = [];
+      this.gapsSince = now;
+      return;
+    }
+    this.gaps.push(dt * 1000);
+    if (now - this.gapsSince < 4000 || this.gaps.length < 8) return;
+    let tier = nextTier(this.gaps, 1000 / frameCap(false), this.tier);
+    // A step that would change nothing here (the resolution is already 1) is skipped.
+    const device = this.deviceResolution;
+    while (
+      tier > this.tier &&
+      tier < 3 &&
+      tierResolution(device, tier) === tierResolution(device, this.tier)
+    ) {
+      tier += 1;
+    }
+    this.gaps = [];
+    this.gapsSince = now;
+    if (tier !== this.tier) this.setTier(tier);
+  }
+
+  private lite(): boolean {
+    return this.tier >= 3;
+  }
+
+  private setTier(tier: number): void {
+    this.tier = tier;
+    if (this.host) this.host.dataset.quality = String(tier);
+    const resolution = tierResolution(this.deviceResolution, tier);
+    if (this.app.renderer.resolution !== resolution && this.props) {
+      this.app.renderer.resize(this.props.width, this.props.height, resolution);
+      // Textures follow the new resolution: lighter for the graphics card too.
+      this.signature = '';
+      this.update(this.props);
+    }
+    this.raised.filters = this.lite() ? [] : [this.relief];
+    if (!this.flashes.has('urbanCanopy')) {
+      this.groups.get('urbanCanopy')!.filters = this.lite() ? [] : [this.treeRelief];
     }
   }
 

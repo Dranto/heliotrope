@@ -212,3 +212,44 @@ export function appearScale(t: number, duration = 0.9): number {
   // Damped spring from 0.4 to 1.
   return 1 - 0.6 * Math.exp(-5 * p) * Math.cos(p * Math.PI * 2.2);
 }
+
+/**
+ * How far the sun moves before the shadows are drawn again (docs/performance-plan.md, lot 2):
+ * each redraw blurs three layers, and a smaller step does not show under the blur.
+ */
+export const SHADOW_STEP = 0.03;
+
+/**
+ * Most frames per second the map draws (lot 2), as Pixi's `maxFPS`: the slow ambient life needs
+ * about 30; a camera glide, an entrance or a ring answering a click gets every frame of the
+ * screen (0, no limit). 31 rather than 30: Pixi rounds frame gaps down to whole milliseconds, and
+ * two frames of a 60 Hz screen (33.3 ms) must pass a 30 fps limit (33.3 ms) or it falls to 20.
+ */
+export function frameCap(busy: boolean): number {
+  return busy ? 0 : 31;
+}
+
+/**
+ * Quality steps of the map on a device that cannot keep up (lot 2): the drawing resolution comes
+ * down, then the relief lighting goes. The scene itself never changes.
+ */
+export const QUALITY_TIERS = 4;
+
+/** Drawing resolution at `tier`, from the device's own (at most 2). */
+export function tierResolution(device: number, tier: number): number {
+  if (tier >= 2) return Math.min(device, 1);
+  if (tier === 1) return Math.min(device, 1.5);
+  return device;
+}
+
+/**
+ * The quality tier after a few seconds of calm frames: one step down when the median gap between
+ * frames is well above what was asked for, so a slow device stays fluid; never back up during the
+ * session, so the picture does not flicker between tiers.
+ */
+export function nextTier(intervals: readonly number[], targetMs: number, tier: number): number {
+  if (intervals.length < 8 || tier >= QUALITY_TIERS - 1) return tier;
+  const sorted = [...intervals].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)]!;
+  return median > targetMs * 1.6 ? tier + 1 : tier;
+}
