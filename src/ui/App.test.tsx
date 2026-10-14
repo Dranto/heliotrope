@@ -52,6 +52,11 @@ describe('App', () => {
     expect(store.getState().generators.pot).toBe(1);
     // The first click upgrade is now the cheapest thing out of reach.
     expect(screen.getByTestId('next-goal')).toHaveTextContent(/Mains tièdes\s*dans \d/);
+    // Screen readers get the whole sentence as text: an aria-label on a plain span is ignored.
+    expect(screen.getByText(/^Prochain objectif\s+: Mains tièdes, dans \d/)).toHaveClass(
+      'visually-hidden',
+    );
+    expect(screen.getByTestId('next-goal')).not.toHaveAttribute('aria-label');
     // 0,1 Light per second: the second pot (17,25) is about 2 min 53 away.
     expect(
       screen.getByRole('button', { name: /acheter héliotrope en pot pour/i }),
