@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { CLICK_UPGRADE_IDS, UPGRADES } from '../game/upgrades';
-import { UpgradeIcon, upgradeFamily } from './UpgradeIcon';
+import { GeneratorIcon, UpgradeIcon, upgradeFamily } from './UpgradeIcon';
 
 function paths(id: keyof typeof UPGRADES): string[] {
   const { container } = render(<UpgradeIcon upgrade={UPGRADES[id]} />);
@@ -26,5 +26,13 @@ describe('UpgradeIcon', () => {
     expect(upgradeFamily(UPGRADES.tendedPots)).toBe('pot');
     expect(upgradeFamily(UPGRADES.sharedKnowledge)).toBe('synergy');
     expect(upgradeFamily(UPGRADES[CLICK_UPGRADE_IDS[0]])).toBe('click');
+  });
+
+  it('gives a building card the emblem and colour of its upgrade tiles', () => {
+    const { container } = render(<GeneratorIcon id="mirrorPlant" />);
+    const emblem = container.querySelector('.generator-icon')!;
+    expect(emblem).toHaveAttribute('data-family', upgradeFamily(UPGRADES['mirrorPlant.1']));
+    expect(emblem).toHaveAttribute('aria-hidden', 'true');
+    expect(emblem.querySelector('path')!.getAttribute('d')).toBe(paths('mirrorPlant.1')[0]);
   });
 });

@@ -15,6 +15,7 @@ import {
   WEATHER_PATH_FACTOR,
 } from '../game/weather';
 import { WeatherIcon } from './WeatherArt';
+import { GeneratorIcon } from './UpgradeIcon';
 import { bonusText } from '../i18n/restoration';
 import { guideStep } from '../game/guide';
 import { generatorLimit } from '../game/challenges';
@@ -132,6 +133,7 @@ export function Generators() {
             <li key={id} className="generator">
               <div className="generator-text">
                 <h3>
+                  <GeneratorIcon id={id} />
                   {text.name}
                   {limit !== Infinity && (
                     <span className="generator-limit">
