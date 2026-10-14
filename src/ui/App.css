@@ -1711,12 +1711,14 @@ button {
 }
 
 /* The building's emblem, pinned on the card's left edge beside its name, in the colour its
-   upgrade tiles wear. It takes no room from the name. */
-.generator {
+   upgrade tiles wear. It takes no room from the name. The chosen upgrade's card wears the
+   tile's own icon the same way. */
+.generator,
+.upgrade-detail {
   position: relative;
 }
 
-.generator-icon {
+:is(.generator-icon, .detail-emblem) {
   position: absolute;
   top: 0.72rem;
   left: -0.8rem;
@@ -1737,6 +1739,26 @@ button {
   width: 1.05rem;
   height: 1.05rem;
   stroke-width: 1.6;
+}
+
+.upgrade-detail .detail-emblem {
+  top: 0.78rem;
+  left: -0.95rem;
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.detail-emblem .upgrade-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+/* The card takes a faint wash of the same colour, so it reads as the open tile. */
+.upgrade-detail[data-family] {
+  border-color: rgb(var(--tint) / 0.22);
+  background:
+    linear-gradient(180deg, rgb(var(--tint) / 0.07), rgb(var(--tint) / 0.02)),
+    rgb(255 255 255 / 0.5);
 }
 
 .flavour {
