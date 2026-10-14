@@ -47,6 +47,9 @@ describe('the controls used all game long on a touch screen', () => {
     const rules = coarseRules();
     const photo = screen.getByRole('button', { name: 'Photo' });
     expect(photo).toHaveClass('scene-tool');
+    // On phones the label is hidden visually but still names the button.
+    expect(photo.querySelector('.tool-icon')).toHaveAttribute('aria-hidden', 'true');
+    expect(photo.querySelector('.tool-label')).toHaveTextContent('Photo');
     expect(least(rules, photo, 'min-height')).toBeGreaterThanOrEqual(2.75);
 
     // A view button, as the scene draws it once a second view opens.
