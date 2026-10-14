@@ -32,6 +32,23 @@ export function clickUpgradeCount(state: GameState): number {
  * Bioregion (§5, §6.1, §6.2, §7.4) for one generator type.
  */
 export function generatorMultiplier(state: GameState, id: GeneratorId): number {
+  // A state never changes, and the UI and the tick ask for the same multipliers many times.
+  let cached = multiplierCache.get(state);
+  if (!cached) {
+    cached = new Map();
+    multiplierCache.set(state, cached);
+  }
+  let value = cached.get(id);
+  if (value === undefined) {
+    value = computeGeneratorMultiplier(state, id);
+    cached.set(id, value);
+  }
+  return value;
+}
+
+const multiplierCache = new WeakMap<GameState, Map<GeneratorId, number>>();
+
+function computeGeneratorMultiplier(state: GameState, id: GeneratorId): number {
   let factor = 1;
   let synergyBonus = 0;
   for (const { effect } of boughtUpgrades(state)) {
@@ -119,6 +136,17 @@ export function upgradeSynergyBonus(state: GameState): number {
  * the effects running together (§5.7), and the constraint of a challenge Season (§7.3).
  */
 export function globalMultiplier(state: GameState): number {
+  let cached = globalCache.get(state);
+  if (cached === undefined) {
+    cached = computeGlobalMultiplier(state);
+    globalCache.set(state, cached);
+  }
+  return cached;
+}
+
+const globalCache = new WeakMap<GameState, number>();
+
+function computeGlobalMultiplier(state: GameState): number {
   return (
     (1 + seedBonus(state.seeds, state.sources)) *
     (1 + sourceBonus(state.sources)) *

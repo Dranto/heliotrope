@@ -8,7 +8,7 @@ import { BED_PLACES, BED_SIZE, decodeBeds, type CropStage } from './gardenMap';
 import './garden.css';
 
 /** One plant of a crop at a stage, drawn around (0, 0), about 6 units across when ripe. */
-export function Plant({ crop, stage }: { crop: CropId; stage: CropStage }) {
+export const Plant = memo(function Plant({ crop, stage }: { crop: CropId; stage: CropStage }) {
   if (stage === 0) return <ellipse className="plant-seed" rx="0.9" ry="0.6" />;
   if (stage === 1) {
     return (
@@ -134,7 +134,7 @@ export function Plant({ crop, stage }: { crop: CropId; stage: CropStage }) {
         </g>
       );
   }
-}
+});
 
 /** A bed seen from above: its soil, its wooden edge, and three plants of its crop. */
 function Bed({ crop, stage }: { crop: CropId | null; stage: CropStage }) {
@@ -248,10 +248,16 @@ export const GardenBeds = memo(function GardenBeds({
 });
 
 /** A crop on its own, for the garden panel: one plant at its ripe stage, or at `stage`. */
-export function CropArt({ crop, stage = 3 }: { crop: CropId; stage?: CropStage }) {
+export const CropArt = memo(function CropArt({
+  crop,
+  stage = 3,
+}: {
+  crop: CropId;
+  stage?: CropStage;
+}) {
   return (
     <svg viewBox="-4 -4.5 8 8" className="crop-art" data-crop={crop} aria-hidden="true">
       <Plant crop={crop} stage={stage} />
     </svg>
   );
-}
+});

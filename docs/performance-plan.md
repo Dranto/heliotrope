@@ -2,7 +2,7 @@
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
 > l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
-> l'ordre. Fait : lot 0.
+> l'ordre. Fait : lots 0 et 1.
 
 ## 1. Ce qui a été mesuré
 
@@ -86,15 +86,16 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
 - Un test Vitest qui rend l'application sur une sauvegarde de fin de partie, avance d'un tick et vérifie que le
   nombre de composants rendus reste sous un plafond, pour que le gain du lot 1 ne se perde pas.
 
-### Lot 1 : ne redessiner que ce qui change (gain modéré, sûr)
+### Lot 1 : ne redessiner que ce qui change (fait)
 
-- Ne rendre que les panneaux visibles, et mémoriser les icônes et tuiles qui ne dépendent pas du tick
-  (`UpgradeIcon`, icônes d'onglets et de bâtiments).
-- Mettre en cache par état les calculs dérivés appelés pendant le rendu (`bonusesOf`, `generatorMultiplier`,
-  `payback`, `computeLightPerSecond`) avec une `WeakMap` sur l'état, comme #38 l'a fait pour le multiplicateur
-  global dans le tick.
-- Objectif : diviser par deux à trois le JS du fil principal par tick (≈300 → ≈120 ms/s sur le téléphone
-  simulé) ; le test de plafond du lot 0 suit le nombre de composants.
+- Les panneaux que la feuille de style cache (onglets du téléphone, couches du menu sur écran moyen) dorment :
+  ils ne sont plus rendus (`panelVisibility.ts`). Les améliorations et les bâtiments restent toujours montés,
+  pour leurs raccourcis clavier.
+- Les icônes qui ne dépendent pas du tick sont mémorisées (`UpgradeIcon`, `GeneratorIcon`, onglets, météo…).
+- Les multiplicateurs de production sont calculés une fois par état (`generatorMultiplier`,
+  `globalMultiplier`), comme #38 l'a fait pour la production totale.
+- Mesuré avec `npm run perf` : JS du fil principal sur la sauvegarde `cycle` de 65 à 40 ms/s sur ordinateur et
+  de 297 à 164 ms/s sur le téléphone simulé ; 163 → 66 composants par tick dans le test de plafond.
 
 ### Lot 2 : la carte PixiJS économe (gain fort sur téléphone, à valider par Antoine)
 
