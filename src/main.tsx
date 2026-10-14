@@ -4,6 +4,7 @@ import '@fontsource-variable/manrope';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GameStore } from './game/store';
+import { loadLanguage } from './i18n';
 import { App } from './ui/App';
 import { GameStoreContext } from './ui/useGame';
 import { PerfMeter } from './ui/PerfMeter';
@@ -12,6 +13,8 @@ import './ui/App.css';
 
 const store = new GameStore();
 store.start();
+// A player who chose English gets its texts before the first picture (lot 4 of the plan).
+await loadLanguage(store.getState().settings.language).catch(() => {});
 
 // Save when the tab is hidden or closed so offline progress starts from the right moment.
 document.addEventListener('visibilitychange', () => {

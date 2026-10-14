@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { exportSave, saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
 import { withAllIntroduced } from '../game/introductions';
@@ -394,7 +394,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('radio', { name: /suffixes courts/i }));
   });
 
-  it('switches the whole interface to English from the options (§14 Q1)', () => {
+  it('switches the whole interface to English from the options (§14 Q1)', async () => {
     const base = openGame(0);
     saveGame({ ...base, resources: { water: 0, light: 12_345 }, totalLight: 12_345 });
     const store = renderApp(new GameStore(localStorage, () => 0));
@@ -402,8 +402,11 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Options' }));
     fireEvent.click(screen.getByRole('radio', { name: 'English' }));
     expect(store.getState().settings.language).toBe('en');
+    // English is fetched the first time it is chosen.
+    await waitFor(() =>
+      expect(screen.getByRole('dialog', { name: 'Options' })).toHaveTextContent('Language'),
+    );
     expect(document.documentElement.lang).toBe('en');
-    expect(screen.getByRole('dialog', { name: 'Options' })).toHaveTextContent('Language');
     expect(screen.getByRole('button', { name: /harvest the heliotrope/i })).toBeInTheDocument();
     expect(screen.getByTestId('light')).toHaveTextContent('12,345');
     expect(screen.getByText('Potted heliotrope')).toBeInTheDocument();

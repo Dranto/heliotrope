@@ -2,7 +2,7 @@
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
 > l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
-> l'ordre. Fait : lots 0 à 3.
+> l'ordre. Fait : lots 0 à 4.
 
 ## 1. Ce qui a été mesuré
 
@@ -127,13 +127,15 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
   dessins). Sans GPU, le conteneur ne peut pas mesurer leur gain : à décider avec les chiffres du compteur
   `?perf` sur l'appareil d'Antoine.
 
-### Lot 4 : chargement (gain modéré, première visite)
+### Lot 4 : chargement (fait)
 
-- Charger la langue non choisie à la demande (≈−20 Ko gzip).
-- Réduire Fraunces aux axes réellement utilisés (graisse et `SOFT`) par un sous-ensemble généré
-  (≈−60 Ko de police).
-- Vérifier ce que contient le paquet initial (dessins des écrans et des espèces, données des Jalons) et passer
-  en chargement différé ce qui ne sert pas à la première minute ; objectif < 180 Ko gzip.
+- Fait : l'anglais est chargé à la demande (`loadLanguage` dans `src/i18n/index.ts`) ; le français, langue par
+  défaut, reste dans le paquet. Au démarrage d'une partie en anglais, le jeu attend ce petit fichier avant de
+  s'afficher ; quand on change de langue, l'ancienne reste affichée jusqu'à l'arrivée de la nouvelle. JavaScript
+  initial : 222 → 200 Ko gzip ; l'anglais pèse 19 Ko gzip à part.
+- Pas fait : réduire Fraunces. Le sous-ensemble disponible avec l'axe `SOFT` garde aussi l'axe de taille
+  optique, et le figer changerait le dessin des titres. Le reste du paquet initial sert dès la première minute
+  (carte, panneaux, données des Jalons pour leurs bonus) : rien d'autre à différer sans découper le moteur.
 
 ### Lot 5 : retour après une longue absence (gain modéré, téléphone)
 
