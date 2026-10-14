@@ -47,6 +47,20 @@ function pathFor({ effect }: UpgradeDef): string {
   }
 }
 
+/** What an upgrade's tile is tinted after: the building it boosts, the click, or a synergy. */
+export function upgradeFamily({ effect }: UpgradeDef): GeneratorId | 'click' | 'synergy' {
+  switch (effect.kind) {
+    case 'generatorMultiplier':
+    case 'synergy':
+    case 'clickSynergy':
+      return effect.generator;
+    case 'upgradeSynergy':
+      return 'synergy';
+    default:
+      return 'click';
+  }
+}
+
 /**
  * A synergy shows the building it boosts, with the one that feeds it in a small round badge, so
  * each synergy tile reads at a glance instead of repeating the same sprout.
