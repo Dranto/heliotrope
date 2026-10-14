@@ -73,4 +73,18 @@ describe('the controls used all game long on a touch screen', () => {
       expect(least(rules, amount, 'min-height')).toBeGreaterThanOrEqual(2.75);
     }
   });
+
+  it('lets each panel fold from a full-size title', () => {
+    render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const rules = coarseRules();
+    const titles = document.querySelectorAll('.panel-title button');
+    expect(titles.length).toBeGreaterThan(0);
+    for (const title of titles) {
+      expect(least(rules, title, 'min-height')).toBeGreaterThanOrEqual(2.75);
+    }
+  });
 });
