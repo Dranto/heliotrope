@@ -152,8 +152,13 @@ describe('App', () => {
     // Each tile names its price and whether it is within reach, without relying on colour.
     expect(gloves).toHaveAccessibleName('Gants de jardinage, 100\u00a0Lumière, à portée');
     expect(gloves).toHaveAttribute('title', 'Gants de jardinage, 100\u00a0Lumière, à portée');
+    // The open card wears the chosen tile's family: the click for the gloves, the pot here.
+    const detail = () => document.querySelector('.upgrade-detail')!;
+    expect(detail()).toHaveAttribute('data-family', 'click');
     fireEvent.click(screen.getByRole('button', { name: /^Terreau maison,/ }));
     expect(screen.getByText(/^Héliotrope en pot.: production ×2$/)).toBeInTheDocument();
+    expect(detail()).toHaveAttribute('data-family', 'pot');
+    expect(detail().querySelector('.detail-emblem')).toHaveAttribute('aria-hidden', 'true');
     fireEvent.click(screen.getByRole('button', { name: /acheter terreau maison pour 150/i }));
     expect(store.getState().upgrades).toEqual(['pot.1']);
     expect(screen.queryByRole('button', { name: /^Terreau maison,/ })).not.toBeInTheDocument();

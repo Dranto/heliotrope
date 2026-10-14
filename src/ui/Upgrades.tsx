@@ -4,7 +4,7 @@ import { upgradesAllowed } from '../game/challenges';
 import { formatCost, formatNumber } from '../game/format';
 import { availableUpgrades, upgradeInSight } from '../game/production';
 import { affordableUpgrades, buyAffordableUpgrades, buyUpgrade, canBuyUpgrade } from '../game/tick';
-import type { UpgradeId } from '../game/upgrades';
+import type { UpgradeDef, UpgradeId } from '../game/upgrades';
 import { t } from '../i18n';
 import { Eta } from './Goals';
 import { isElsewhere } from './shortcuts';
@@ -104,6 +104,7 @@ export function Upgrades() {
           </ul>
           <UpgradeDetail
             key={selected.id}
+            upgrade={selected}
             name={upgradeText(selected).name}
             flavour={upgradeText(selected).flavour}
             effect={upgradeEffectText(selected)}
@@ -142,6 +143,7 @@ function UpgradeInSightLine() {
 }
 
 interface DetailProps {
+  upgrade: UpgradeDef;
   name: string;
   flavour: string;
   effect: string;
@@ -151,9 +153,22 @@ interface DetailProps {
   onBuy: () => void;
 }
 
-function UpgradeDetail({ name, flavour, effect, cost, price, affordable, onBuy }: DetailProps) {
+function UpgradeDetail({
+  upgrade,
+  name,
+  flavour,
+  effect,
+  cost,
+  price,
+  affordable,
+  onBuy,
+}: DetailProps) {
+  const family = upgradeFamily(upgrade);
   return (
-    <div className="upgrade-detail" aria-live="polite">
+    <div className="upgrade-detail" data-family={family} aria-live="polite">
+      <span className="detail-emblem" data-family={family} aria-hidden="true">
+        <UpgradeIcon upgrade={upgrade} />
+      </span>
       <div>
         <h3>{name}</h3>
         <p className="upgrade-effect">{effect}</p>
