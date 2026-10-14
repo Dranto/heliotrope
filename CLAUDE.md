@@ -15,6 +15,9 @@ a design decision changes, update that document in the same PR.
 - `npm test`: tests only; `npx vitest run path/to/file.test.ts` for one file (fast; use it while
   iterating, then `npm run check` once before pushing)
 - `npm run build`: production build
+- `npm run perf [scene]`: build, play simulator saves in Chromium and print React work per tick,
+  main-thread time and WebGL calls (`docs/performance-plan.md`); `?perf` in the address shows the
+  same meter in the game, for real devices
 - `npm run simulate [clicksPerSecond]`: print the balancing simulator's pacing table
 - `npm run format`: fix formatting
 - `npm run -s doc -- design [section]`: print one section of `docs/game-design.md` (e.g. `7.1`),

@@ -1,7 +1,8 @@
 # Heliotrope — Plan d'optimisation des performances
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
-> l'application »). Rien n'est encore implémenté : chaque lot ci-dessous est une PR, à lancer dans l'ordre.
+> l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
+> l'ordre. Fait : lot 0.
 
 ## 1. Ce qui a été mesuré
 
@@ -21,25 +22,25 @@ partie neuve. « Téléphone » = 390 × 844 px, DPR 3, CPU ralenti ×4.
 À 10 ticks par seconde, la simulation coûte moins de 0,3 % d'un cœur. Le seul point à surveiller est le retour
 après 8 h d'absence : ~0,3 s sur ordinateur, sans doute plus d'une seconde sur un téléphone modeste.
 
-### Interface React : le premier coût mesurable
+### Interface React : un coût modéré
 
 Chaque tick (10 par seconde) crée un nouvel état ; `useGameState()` est lu par 26 composants dont `App` et
-`Scene`, donc tout l'arbre se redessine à chaque tick, carte comprise.
+`Scene`. Les dessins de la carte sont déjà mémorisés (`memo`, `useMemo`) et ne se redessinent pas ; ce sont les
+panneaux et leurs icônes qui se redessinent à chaque tick.
 
-| Scène | Composants rendus / s | DOM modifié / s | JS du fil principal |
+| Scène (`npm run perf`) | Composants rendus par tick | JS du fil principal | Fil principal en tout |
 | --- | --- | --- | --- |
-| Partie neuve, SVG, ordinateur | 830 | 0 | 17 ms/s |
-| s1mid, SVG, ordinateur | 3 460 | 0 | 43 ms/s |
-| s2, SVG, ordinateur | 4 650 | 30 | 50 ms/s |
-| cycle, SVG, ordinateur (13 900 nœuds DOM) | 14 750 | 31 | 63 ms/s |
-| cycle, PixiJS, ordinateur | 6 600 | 32 | 77 ms/s |
-| s1mid, SVG, téléphone CPU ×4 | 3 500 | 0 | 152 ms/s |
-| cycle, SVG, téléphone CPU ×4 | 14 440 | 30 | **296 ms/s (30 % du fil principal)** |
+| Partie neuve, SVG, ordinateur | 22 | 23 ms/s | 38 ms/s |
+| s1mid, SVG, ordinateur | 83 | 35 ms/s | 51 ms/s |
+| s2, SVG, ordinateur | 106 | 55 ms/s | 67 ms/s |
+| cycle, SVG, ordinateur (13 900 nœuds DOM) | 133 | 65 ms/s | 85 ms/s |
+| cycle, SVG, téléphone CPU ×4 | 132 | **297 ms/s** | 371 ms/s |
 
-Soit ~1 450 composants par tick en fin de partie, alors que le DOM ne change presque pas (3 modifications par
-tick). Les plus redessinés sont des dessins fixes de la carte : `Appear` (430 par tick), `LobedCrown` (240, les
-couronnes d'arbres de la Biorégion, redessinées même en rendu PixiJS), `TreeArt`, `OldCrown`, `FieldArt`, `Tree`,
-`Flowers`, `Shadow`. Ces huit composants font les deux tiers du total.
+Correction du 2026-10-14 : la première version de ce plan annonçait ~1 450 composants par tick. Le compteur
+comptait aussi les sous-arbres que React n'avait pas touchés ; corrigé avec le lot 0, il en trouve ~130. Le
+temps de JS mesuré, lui, était juste : il vient surtout des panneaux (icônes des améliorations, temps
+d'attente `Eta`, onglets) et des calculs dérivés refaits à chaque rendu (`bonusesOf`, `generatorMultiplier`,
+formatage des nombres), plus le travail du DOM qu'ils entraînent.
 
 ### Carte et animations : le coût GPU, à confirmer sur un vrai appareil
 
@@ -85,18 +86,15 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
 - Un test Vitest qui rend l'application sur une sauvegarde de fin de partie, avance d'un tick et vérifie que le
   nombre de composants rendus reste sous un plafond, pour que le gain du lot 1 ne se perde pas.
 
-### Lot 1 : ne redessiner que ce qui change (gain sûr, fort)
+### Lot 1 : ne redessiner que ce qui change (gain modéré, sûr)
 
-- Sortir la carte du rendu à chaque tick : `React.memo` sur les couches de dessin (`Neighbourhood`, Biorégion,
-  parcelles, arbre central, racines, décor, espèces), avec des props dérivées stables (nombres de bâtiments,
-  niveaux, parcelles, phase, saison, météo) au lieu de l'état entier.
-- Un `useGameSelector(selector, isEqual)` à côté de `useGameState()` : chaque panneau s'abonne à la tranche qui le
-  concerne. Les compteurs (Lumière, Eau, production) restent à 10 Hz ; le reste ne bouge qu'à l'achat.
+- Ne rendre que les panneaux visibles, et mémoriser les icônes et tuiles qui ne dépendent pas du tick
+  (`UpgradeIcon`, icônes d'onglets et de bâtiments).
 - Mettre en cache par état les calculs dérivés appelés pendant le rendu (`bonusesOf`, `generatorMultiplier`,
   `payback`, `computeLightPerSecond`) avec une `WeakMap` sur l'état, comme #38 l'a fait pour le multiplicateur
   global dans le tick.
-- Objectif : moins de 150 composants par tick en fin de partie (contre ~1 450), soit ~5 à 10 fois moins de JS
-  sur le fil principal (≈300 → ≈40 ms/s sur le téléphone simulé).
+- Objectif : diviser par deux à trois le JS du fil principal par tick (≈300 → ≈120 ms/s sur le téléphone
+  simulé) ; le test de plafond du lot 0 suit le nombre de composants.
 
 ### Lot 2 : la carte PixiJS économe (gain fort sur téléphone, à valider par Antoine)
 
