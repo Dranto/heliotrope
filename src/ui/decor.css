@@ -307,3 +307,10 @@
 .scene-tool:focus-visible {
   background: rgb(255 244 214 / 0.95);
 }
+
+/* A full touch target on phones and tablets (§10.3: 44 px). */
+@media (pointer: coarse) {
+  .scene-tool {
+    min-height: 2.75rem;
+  }
+}

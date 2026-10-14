@@ -1798,6 +1798,13 @@ button {
     inset: -0.55rem;
     border-radius: 50%;
   }
+
+  /* The map's view switch is used all game long: a full touch target (§10.3: 44 px), even where
+     the phone layout narrows its buttons. */
+  .scene .views button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
 }
 
 .growth-fork {
