@@ -1892,6 +1892,13 @@ button {
   .scene .views button {
     min-width: 2.75rem;
   }
+
+  /* Each panel folds from its title, many times a game: the title answers over 44 px while the
+     negative margins keep the panel head as tall as before. */
+  .panel-title button {
+    min-height: 2.75rem;
+    margin-block: -0.375rem;
+  }
 }
 
 .growth-fork {
