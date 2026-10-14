@@ -1,4 +1,13 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, memo, useState } from 'react';
+import {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { cycleWater, isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { activeChallenge } from '../game/challenges';
 import { activeCycleChallenge } from '../game/cycleChallenges';
@@ -43,7 +52,7 @@ import {
   cycleChallengeTitle,
   speciesName,
 } from '../i18n/herbier';
-import { setLanguage, t } from '../i18n';
+import { setLanguage, shownLanguage, subscribeTexts, t, textsVersion } from '../i18n';
 import { Bioregion, WaterIcon } from './Bioregion';
 import { Cooperatives } from './Cooperatives';
 import { Generators } from './Generators';
@@ -235,8 +244,10 @@ export function App() {
   // Every number on screen follows the notation chosen in the Options (§8), every text the
   // language (§14 Q1).
   setNotation(state.settings.notation);
+  // English arrives after a first choice of it (lot 4): render again when it does.
+  useSyncExternalStore(subscribeTexts, textsVersion);
   setLanguage(state.settings.language);
-  const { language } = state.settings;
+  const language = shownLanguage();
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
