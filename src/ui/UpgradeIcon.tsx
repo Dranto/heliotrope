@@ -90,3 +90,14 @@ export function UpgradeIcon({ upgrade }: { upgrade: UpgradeDef }) {
     </svg>
   );
 }
+
+/** A building's emblem in a round medallion, tinted like its upgrade tiles. */
+export function GeneratorIcon({ id }: { id: GeneratorId }) {
+  return (
+    <span className="generator-icon" data-family={id} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="upgrade-icon">
+        <path d={GENERATOR_PATHS[id]} />
+      </svg>
+    </span>
+  );
+}
