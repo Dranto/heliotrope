@@ -91,7 +91,6 @@ export function notesFor(name: SoundName, variant = 0): Note[] {
 
 /** The shapes of the monkey cries of the Options' easter egg (§6.3). */
 export const CRY_SHAPES = ['hoots', 'scream', 'chatter', 'howl', 'oohAah', 'squeak'] as const;
-export type CryShape = (typeof CRY_SHAPES)[number];
 
 /**
  * A monkey cry, the easter egg that replaces the click's note (§6.3): one of the shapes, its
