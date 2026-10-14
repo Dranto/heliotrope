@@ -1496,6 +1496,60 @@ button {
     background 0.2s ease;
 }
 
+/* Each tile takes the colour of the building it boosts (the click and the synergies have their
+   own), so a row of upgrades reads at a glance; affordable tiles still turn gold. */
+.upgrade-tile[data-family] {
+  border-color: rgb(var(--tint) / 0.3);
+  background:
+    linear-gradient(180deg, rgb(var(--tint) / 0.12), rgb(var(--tint) / 0.04)),
+    rgb(255 255 255 / 0.55);
+  color: color-mix(in srgb, rgb(var(--tint)) 72%, var(--ink));
+}
+
+.upgrade-tile[data-family='pot'] {
+  --tint: 166 108 82;
+}
+
+.upgrade-tile[data-family='balconyPanel'] {
+  --tint: 79 159 179;
+}
+
+.upgrade-tile[data-family='rooftopGarden'] {
+  --tint: 111 154 98;
+}
+
+.upgrade-tile[data-family='greenhouse'] {
+  --tint: 84 148 128;
+}
+
+.upgrade-tile[data-family='verticalFarm'] {
+  --tint: 47 107 79;
+}
+
+.upgrade-tile[data-family='mirrorPlant'] {
+  --tint: 214 104 70;
+}
+
+.upgrade-tile[data-family='urbanCanopy'] {
+  --tint: 92 128 70;
+}
+
+.upgrade-tile[data-family='arcology'] {
+  --tint: 124 108 176;
+}
+
+.upgrade-tile[data-family='click'] {
+  --tint: 205 104 120;
+}
+
+.upgrade-tile[data-family='synergy'] {
+  --tint: 143 174 139;
+}
+
+.upgrade-tile[data-family] .tier {
+  color: inherit;
+}
+
 .upgrade-tile[data-affordable='true'] {
   border-color: var(--gold);
   background: linear-gradient(180deg, #fff8e6, #fdebc4);

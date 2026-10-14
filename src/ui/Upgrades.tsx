@@ -11,7 +11,7 @@ import { isElsewhere } from './shortcuts';
 import { upgradeEffectText, upgradeText } from '../i18n/upgrades';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
-import { UpgradeIcon } from './UpgradeIcon';
+import { UpgradeIcon, upgradeFamily } from './UpgradeIcon';
 import { useGameState, useGameStore } from './useGame';
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
@@ -89,6 +89,7 @@ export function Upgrades() {
                     title={label}
                     aria-pressed={upgrade.id === selected.id}
                     data-affordable={affordable}
+                    data-family={upgradeFamily(upgrade)}
                     data-guide={
                       (guide?.kind === 'upgrade' && guide.upgrade === upgrade.id) || undefined
                     }
