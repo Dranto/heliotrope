@@ -18,6 +18,7 @@ interface Fiber {
   type: unknown;
   child: Fiber | null;
   sibling: Fiber | null;
+  alternate: Fiber | null;
 }
 
 interface Hook {
@@ -41,17 +42,24 @@ function nameOf(type: unknown): string {
   return '?';
 }
 
-function count(stats: RenderStats, root: Fiber | null): void {
-  const stack: Fiber[] = root ? [root] : [];
+/**
+ * Counts the components rendered by the commit of `root`. A subtree React left untouched keeps the
+ * very same child fibers as at the previous commit, with the flags of the render that made them:
+ * it is skipped, as the React DevTools do.
+ */
+function count(stats: RenderStats, root: Fiber): void {
+  const stack: Fiber[] = [root];
   while (stack.length > 0) {
     const fiber = stack.pop()!;
-    if (COMPONENT_TAGS.has(fiber.tag) && (fiber.flags & PERFORMED_WORK) !== 0) {
-      stats.rendered += 1;
-      const name = nameOf(fiber.type);
-      stats.byName.set(name, (stats.byName.get(name) ?? 0) + 1);
+    if (fiber.alternate && fiber.alternate.child === fiber.child) continue;
+    for (let child = fiber.child; child; child = child.sibling) {
+      if (COMPONENT_TAGS.has(child.tag) && (child.flags & PERFORMED_WORK) !== 0) {
+        stats.rendered += 1;
+        const name = nameOf(child.type);
+        stats.byName.set(name, (stats.byName.get(name) ?? 0) + 1);
+      }
+      stack.push(child);
     }
-    if (fiber.sibling) stack.push(fiber.sibling);
-    if (fiber.child) stack.push(fiber.child);
   }
 }
 
@@ -79,7 +87,7 @@ export function installRenderCounter(scope: Record<string, unknown> = globalThis
   const previous = hook.onCommitFiberRoot;
   hook.onCommitFiberRoot = (id, root, ...rest) => {
     stats.commits += 1;
-    count(stats, root.current.child);
+    count(stats, root.current);
     previous?.call(hook, id, root, ...rest);
   };
   if (!existing) scope[key] = hook;
