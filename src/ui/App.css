@@ -1799,11 +1799,14 @@ button {
     border-radius: 50%;
   }
 
-  /* The map's view switch is used all game long: a full touch target (§10.3: 44 px), even where
-     the phone layout narrows its buttons. */
+  /* The map's view switch and the ×1 / ×10 / ×100 / Max choice are used all game long: full
+     touch targets (§10.3: 44 px), even where the phone layout narrows the views. */
+  .segmented button {
+    min-height: 2.75rem;
+  }
+
   .scene .views button {
     min-width: 2.75rem;
-    min-height: 2.75rem;
   }
 }
 

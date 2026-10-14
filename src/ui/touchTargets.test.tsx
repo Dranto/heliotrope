@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { GameStore } from '../game/store';
 import { App } from './App';
@@ -35,7 +35,7 @@ function least(rules: CSSStyleRule[], element: Element, property: string): numbe
  * photo buttons, used all game long on phones, were 30 to 35 px tall. Layout is not computed
  * here, so the test reads the stylesheets.
  */
-describe('the map caption on a touch screen', () => {
+describe('the controls used all game long on a touch screen', () => {
   beforeEach(() => localStorage.clear());
 
   it('gives the photo button and each view a full touch target', () => {
@@ -56,5 +56,21 @@ describe('the map caption on a touch screen', () => {
     const view = scene.querySelector('button')!;
     expect(least(rules, view, 'min-height')).toBeGreaterThanOrEqual(2.75);
     expect(least(rules, view, 'min-width')).toBeGreaterThanOrEqual(2.75);
+  });
+
+  it('gives each choice of how many to buy a full touch target', () => {
+    render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const rules = coarseRules();
+    const amounts = within(
+      screen.getByRole('radiogroup', { name: 'Quantité à acheter' }),
+    ).getAllByRole('radio');
+    expect(amounts).toHaveLength(4);
+    for (const amount of amounts) {
+      expect(least(rules, amount, 'min-height')).toBeGreaterThanOrEqual(2.75);
+    }
   });
 });
