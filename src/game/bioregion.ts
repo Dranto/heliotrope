@@ -76,14 +76,6 @@ export const BASIN_SITE_IDS = ['wetlands', 'meadows', 'foodForests', 'oldForest'
 /** §7.4: each Source of the Cycle of water adds +10% to the Water gathered (additive). */
 export const SOURCE_WATER_BONUS = 0.1;
 
-export function isCollectorId(value: unknown): value is CollectorId {
-  return typeof value === 'string' && Object.hasOwn(COLLECTORS, value);
-}
-
-export function isSiteId(value: unknown): value is SiteId {
-  return typeof value === 'string' && Object.hasOwn(SITES, value);
-}
-
 /** The Bioregion opens from the third Season and, once opened, stays open. */
 export function isBioregionOpen(state: Pick<GameState, 'seasons' | 'cycles' | 'intro'>): boolean {
   return (

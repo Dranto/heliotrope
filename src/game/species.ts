@@ -148,10 +148,6 @@ export const WEATHER_SPECIES: readonly SpeciesId[] = [
   'cicada',
 ];
 
-export const SPECIES: Record<SpeciesId, SpeciesDef> = Object.fromEntries(
-  SPECIES_LIST.map((s) => [s.id, s]),
-) as Record<SpeciesId, SpeciesDef>;
-
 export function isSpeciesId(value: unknown): value is SpeciesId {
   return typeof value === 'string' && (SPECIES_IDS as readonly string[]).includes(value);
 }

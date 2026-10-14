@@ -281,7 +281,6 @@ export const CANOPY = Object.fromEntries(CANOPY_LIST.map((c) => [c.id, c])) as R
 
 /** The sower's settings: relaunch the Season once its ripe Seeds multiply the ones owned. */
 export const SOWER_FACTORS = [1.5, 2, 3, 5] as const;
-export const DEFAULT_SOWER_FACTOR = 2;
 
 export interface CanopyState {
   /** Level of each canopy talent, 0 when not sown. Kept across Seasons and Cycles. */
@@ -298,10 +297,6 @@ export function createCanopyState(): CanopyState {
     sowerFactor: 0,
     sowerSeasons: 0,
   };
-}
-
-export function isCanopyId(value: unknown): value is CanopyId {
-  return typeof value === 'string' && Object.hasOwn(CANOPY, value);
 }
 
 /** Seeds asked for the level after `level` of a canopy talent. */

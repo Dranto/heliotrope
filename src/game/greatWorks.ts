@@ -119,10 +119,6 @@ export function createGreatWorksState(): GreatWorksState {
   };
 }
 
-export function isWorkId(value: unknown): value is WorkId {
-  return typeof value === 'string' && Object.hasOwn(WORKS, value);
-}
-
 /** The great works open with the Bioregion, whose Water they need, and stay open. */
 export function areGreatWorksOpen(state: GameState): boolean {
   return isIntroduced(state, 'greatWorks') && (isBioregionOpen(state) || worksBuilt(state) > 0);
@@ -140,11 +136,6 @@ export function isWorkComplete(state: Pick<GameState, 'greatWorks'>, id: WorkId)
 export function nextStageCost(state: Pick<GameState, 'greatWorks'>, id: WorkId): StageCost | null {
   const { stage } = state.greatWorks.works[id];
   return stage >= stageCount(id) ? null : (STAGE_COSTS[stage] ?? null);
-}
-
-/** Stages built over every work. */
-export function stagesBuilt(state: Pick<GameState, 'greatWorks'>): number {
-  return WORK_IDS.reduce((sum, id) => sum + state.greatWorks.works[id].stage, 0);
 }
 
 /** Works complete. */

@@ -55,7 +55,6 @@ export const MEMORY_KEPT = 0.5;
 
 /** The lock keeper's settings: start the Cycle once its Sources multiply the ones owned. */
 export const LOCK_FACTORS = [1.25, 1.5, 2, 3] as const;
-export const DEFAULT_LOCK_FACTOR = 1.5;
 
 /** Cycles the lock keeper started that unlock the Milestone "L'éclusier veille". */
 export const LOCK_MILESTONE_CYCLES = 5;
@@ -87,10 +86,6 @@ export function createDeltaState(): DeltaState {
     lockCycles: 0,
     widths: createWidths(),
   };
-}
-
-export function isDeltaId(value: unknown): value is DeltaId {
-  return typeof value === 'string' && Object.hasOwn(DELTA, value);
 }
 
 /** The delta opens with the first Cycle of water, once Sources exist to spend. */
@@ -165,11 +160,6 @@ export function widenArm(state: GameState, id: WideArmId): GameState {
   if (!canWidenArm(state, id)) return state;
   const { widths } = state.delta;
   return { ...state, delta: { ...state.delta, widths: { ...widths, [id]: widths[id] + 1 } } };
-}
-
-/** Widening levels over the whole delta. */
-export function deltaWidths(state: Pick<GameState, 'delta'>): number {
-  return WIDE_ARM_IDS.reduce((sum, id) => sum + state.delta.widths[id], 0);
 }
 
 /** Ripening time with the seed arm at `level` and widened `width` times. */
