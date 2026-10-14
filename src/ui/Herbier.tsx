@@ -43,9 +43,14 @@ export function Herbier({ onClose }: { onClose: () => void }) {
           return (
             <li key={family} className="herbier-family" data-complete={complete}>
               <strong>{t.herbier.familyNames[family]}</strong>{' '}
-              <span>
+              <span className="family-count">
                 {formatNumber(familyProgress(state.species, family))}/
                 {formatNumber(FAMILIES[family].length)}
+                <span className="family-beads" aria-hidden="true">
+                  {FAMILIES[family].map((id) => (
+                    <i key={id} data-found={found.has(id)} />
+                  ))}
+                </span>
               </span>
               <small>{bonuses.length > 0 ? bonusesText(bonuses) : t.herbier.weatherFamily}</small>
             </li>

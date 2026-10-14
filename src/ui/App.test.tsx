@@ -313,6 +313,11 @@ describe('App', () => {
     expect(dialog.querySelector('[data-species="hedgehog"]')).toHaveTextContent(
       'Restaurer Parc du parking',
     );
+    // One bead per species of the family, the frog's filled.
+    const river = within(dialog).getByText('Gens de la rivière').closest('li')!;
+    const beads = river.querySelectorAll('.family-beads i');
+    expect(beads).toHaveLength(7);
+    expect(river.querySelectorAll('.family-beads i[data-found="true"]')).toHaveLength(1);
   });
 
   it('shows Season and all-time statistics', async () => {

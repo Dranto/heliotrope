@@ -3959,6 +3959,37 @@ button {
   background: linear-gradient(160deg, rgb(255 240 200 / 0.95), rgb(255 248 228 / 0.8));
 }
 
+/* One bead per species of the family, filled as each one comes back. */
+.family-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.family-beads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.family-beads i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid rgb(74 124 89 / 0.45);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.6);
+}
+
+.family-beads i[data-found='true'] {
+  border-color: var(--leaf);
+  background: radial-gradient(circle at 35% 35%, #a6cf8f, var(--leaf));
+}
+
+.herbier-family[data-complete='true'] .family-beads i {
+  border-color: rgb(196 134 30);
+  background: radial-gradient(circle at 35% 35%, #ffe3a1, #e5a63b);
+}
+
 .plate[data-golden] {
   border-color: rgb(217 154 43 / 0.85);
   box-shadow: 0 0 0 2px rgb(244 192 99 / 0.35);
