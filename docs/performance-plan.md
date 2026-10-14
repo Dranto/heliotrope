@@ -1,7 +1,8 @@
 # Heliotrope — Plan d'optimisation des performances
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
-> l'application »). Rien n'est encore implémenté : chaque lot ci-dessous est une PR, à lancer dans l'ordre.
+> l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
+> l'ordre. Fait : lot 0.
 
 ## 1. Ce qui a été mesuré
 

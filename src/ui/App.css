@@ -4253,3 +4253,19 @@ button {
 .sower-option input {
   accent-color: var(--leaf);
 }
+
+/* `?perf`: the performance meter (docs/performance-plan.md, lot 0). */
+.perf-meter {
+  position: fixed;
+  left: 8px;
+  bottom: 8px;
+  z-index: 1000;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgb(20 18 28 / 0.78);
+  color: #f6efe0;
+  font:
+    11px/1.4 ui-monospace,
+    monospace;
+  pointer-events: none;
+}

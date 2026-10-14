@@ -1,3 +1,4 @@
+import './perfHook';
 import '@fontsource-variable/fraunces/full.css';
 import '@fontsource-variable/manrope';
 import { StrictMode } from 'react';
@@ -5,6 +6,8 @@ import { createRoot } from 'react-dom/client';
 import { GameStore } from './game/store';
 import { App } from './ui/App';
 import { GameStoreContext } from './ui/useGame';
+import { PerfMeter } from './ui/PerfMeter';
+import { perfRequested } from './ui/renderCounter';
 import './ui/App.css';
 
 const store = new GameStore();
@@ -28,3 +31,10 @@ createRoot(document.getElementById('root')!).render(
     </GameStoreContext.Provider>
   </StrictMode>,
 );
+
+// `?perf`: the performance meter, in a root of its own (docs/performance-plan.md, lot 0).
+if (perfRequested()) {
+  const host = document.createElement('div');
+  document.body.append(host);
+  createRoot(host).render(<PerfMeter />);
+}
