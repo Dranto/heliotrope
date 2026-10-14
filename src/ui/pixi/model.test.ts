@@ -1,5 +1,9 @@
 import {
   PHASE_SUN,
+  QUALITY_TIERS,
+  frameCap,
+  nextTier,
+  tierResolution,
   appearScale,
   approachSun,
   blendCamera,
@@ -137,5 +141,31 @@ describe('entrance', () => {
     const peak = Math.max(...Array.from({ length: 90 }, (_, i) => appearScale(i / 100)));
     expect(peak).toBeGreaterThan(1);
     expect(appearScale(0.9)).toBe(1);
+  });
+});
+
+describe('frame pacing and quality (performance plan, lot 2)', () => {
+  it('lets two frames of a 60 Hz screen through the ambient limit', () => {
+    const cap = frameCap(false);
+    expect(Math.floor(2 * (1000 / 60))).toBeGreaterThanOrEqual(1000 / cap);
+    expect(frameCap(true)).toBe(0);
+  });
+
+  it('lowers the resolution, then stops there', () => {
+    expect(tierResolution(2, 0)).toBe(2);
+    expect(tierResolution(2, 1)).toBe(1.5);
+    expect(tierResolution(2, 2)).toBe(1);
+    expect(tierResolution(1, 1)).toBe(1);
+    expect(tierResolution(2, 3)).toBe(1);
+  });
+
+  it('steps down one tier when calm frames come too far apart', () => {
+    const fine = Array.from({ length: 60 }, (_, i) => (i % 10 === 0 ? 120 : 33));
+    const slow = Array.from({ length: 30 }, () => 70);
+    expect(nextTier(fine, 32, 0)).toBe(0);
+    expect(nextTier(slow, 32, 0)).toBe(1);
+    expect(nextTier(slow, 32, QUALITY_TIERS - 1)).toBe(QUALITY_TIERS - 1);
+    expect(nextTier(slow.slice(0, 5), 32, 0)).toBe(0);
+    expect(nextTier(slow.slice(0, 8), 32, 0)).toBe(1);
   });
 });

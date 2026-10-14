@@ -115,6 +115,8 @@ async function measure(scene) {
     { save, renderer: scene.renderer },
   );
   const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
   const cdp = await context.newCDPSession(page);
   await cdp.send('Performance.enable');
   if (scene.throttle) await cdp.send('Emulation.setCPUThrottlingRate', { rate: scene.throttle });
@@ -137,6 +139,9 @@ async function measure(scene) {
   await page.waitForTimeout(SECONDS * 1000);
   const [b, rb] = [await metrics(), await read()];
   const nodes = await page.evaluate(() => document.getElementsByTagName('*').length);
+  const quality = await page.evaluate(
+    () => document.querySelector('.pixi-canvas')?.getAttribute('data-quality') ?? '',
+  );
   await context.close();
   const perSecond = (key) => Math.round(((b[key] - a[key]) * 1000) / SECONDS);
   const commits = rb.commits - ra.commits;
@@ -150,6 +155,8 @@ async function measure(scene) {
     'gl draws/s': Math.round((rb.draw - ra.draw) / SECONDS),
     'gl targets/s': Math.round((rb.target - ra.target) / SECONDS),
     nodes,
+    quality,
+    errors: errors.length,
   };
 }
 
