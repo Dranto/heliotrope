@@ -2,7 +2,7 @@
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
 > l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
-> l'ordre. Fait : lots 0 à 4.
+> l'ordre. Fait : lots 0 à 5.
 
 ## 1. Ce qui a été mesuré
 
@@ -137,10 +137,17 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
   optique, et le figer changerait le dessin des titres. Le reste du paquet initial sert dès la première minute
   (carte, panneaux, données des Jalons pour leurs bonus) : rien d'autre à différer sans découper le moteur.
 
-### Lot 5 : retour après une longue absence (gain modéré, téléphone)
+### Lot 5 : retour après une longue absence (fait)
 
-- Le calcul hors ligne de 8 h prend ~0,3 s sur ordinateur. Afficher d'abord l'écran de retour, calculer
-  ensuite par morceaux sans bloquer le fil principal, ou agrandir les pas de simulation quand rien ne s'achète.
+- Fait : les multiplicateurs de chaque bâtiment sont calculés en un seul passage sur les améliorations et les
+  bonus, une fois par état (`generatorMultipliers`), et les bonus d'un même genre sont regroupés une fois par
+  état (`bonusesOf`). Le calcul est fait dans le même ordre : résultats identiques, au chiffre près (même
+  tableau du simulateur). Progrès hors ligne de 8 h sur la sauvegarde `cycle` : 237 → ~150 ms ; chaque tick en
+  profite aussi.
+- Pas fait : agrandir les pas de simulation hors ligne (les achats des Coopératives et les événements
+  tomberaient autrement, donc le gameplay changerait) et afficher l'écran de retour avant la fin du calcul (à
+  ~0,15 s sur ordinateur, le gain ne vaut pas un état de chargement de plus ; à revoir si le compteur `?perf`
+  montre un retour lent sur le téléphone d'Antoine).
 
 ## 3. Ce que seul l'appareil d'Antoine peut confirmer
 
@@ -151,6 +158,6 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
 
 ## 4. Ce qui n'est pas à faire
 
-- Optimiser le moteur de jeu : il pèse moins de 0,3 ms par tick.
+- Réécrire le moteur de jeu : il pèse moins de 0,3 ms par tick ; le lot 5 n'a retiré que des calculs refaits.
 - Passer à une bibliothèque de grands nombres ou changer la fréquence du tick : pas de gain mesurable.
 - Retirer des détails graphiques : les lots 2 et 3 gardent la même scène et ne changent que la façon de la dessiner.

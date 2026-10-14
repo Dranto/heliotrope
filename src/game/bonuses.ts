@@ -233,9 +233,26 @@ function collectBonuses(source: BonusSource): Bonus[] {
   ];
 }
 
-export function bonusesOf<K extends BonusKind>(source: BonusSource, kind: K): BonusOf<K>[] {
-  return activeBonuses(source).filter((b): b is BonusOf<K> => b.kind === kind);
+export function bonusesOf<K extends BonusKind>(
+  source: BonusSource,
+  kind: K,
+): readonly BonusOf<K>[] {
+  // Sorted by kind once per state: the formulas ask for one kind at a time, many times.
+  let byKind = kindCache.get(source);
+  if (!byKind) {
+    byKind = new Map();
+    for (const bonus of activeBonuses(source)) {
+      const list = byKind.get(bonus.kind);
+      if (list) list.push(bonus);
+      else byKind.set(bonus.kind, [bonus]);
+    }
+    kindCache.set(source, byKind);
+  }
+  return (byKind.get(kind) ?? NONE) as readonly BonusOf<K>[];
 }
+
+const kindCache = new WeakMap<BonusSource, Map<BonusKind, Bonus[]>>();
+const NONE: readonly Bonus[] = [];
 
 /** Product of the `factor` of every bonus of a kind (1 with none). */
 export function factorOf(
