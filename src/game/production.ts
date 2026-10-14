@@ -32,64 +32,72 @@ export function clickUpgradeCount(state: GameState): number {
  * Bioregion (§5, §6.1, §6.2, §7.4) for one generator type.
  */
 export function generatorMultiplier(state: GameState, id: GeneratorId): number {
-  // A state never changes, and the UI and the tick ask for the same multipliers many times.
-  let cached = multiplierCache.get(state);
-  if (!cached) {
-    cached = new Map();
-    multiplierCache.set(state, cached);
-  }
-  let value = cached.get(id);
-  if (value === undefined) {
-    value = computeGeneratorMultiplier(state, id);
-    cached.set(id, value);
-  }
-  return value;
+  return generatorMultipliers(state)[id];
 }
 
-const multiplierCache = new WeakMap<GameState, Map<GeneratorId, number>>();
+/** The multipliers of a state, computed together once: the tick and the UI read them often. */
+const multiplierCache = new WeakMap<GameState, Record<GeneratorId, number>>();
 
-function computeGeneratorMultiplier(state: GameState, id: GeneratorId): number {
-  let factor = 1;
-  let synergyBonus = 0;
+/**
+ * Every generator type's multiplier in one pass over the upgrades and bonuses, instead of one
+ * pass per type. Each type's factors are applied in the same order as before, so the numbers
+ * are exactly the same.
+ */
+function generatorMultipliers(state: GameState): Record<GeneratorId, number> {
+  const cached = multiplierCache.get(state);
+  if (cached) return cached;
+  const factor = {} as Record<GeneratorId, number>;
+  const synergyBonus = {} as Record<GeneratorId, number>;
+  const typeBonus = {} as Record<GeneratorId, number>;
+  for (const id of GENERATOR_IDS) {
+    factor[id] = 1;
+    synergyBonus[id] = 0;
+    typeBonus[id] = 0;
+  }
+  const clicks = clickUpgradeCount(state);
   for (const { effect } of boughtUpgrades(state)) {
-    if (effect.kind === 'generatorMultiplier' && effect.generator === id) factor *= effect.factor;
-    if (effect.kind === 'synergy' && effect.generator === id) {
-      synergyBonus += effect.bonusPerUnit * state.generators[effect.source];
+    if (effect.kind === 'generatorMultiplier') factor[effect.generator] *= effect.factor;
+    if (effect.kind === 'synergy') {
+      synergyBonus[effect.generator] += effect.bonusPerUnit * state.generators[effect.source];
     }
-    if (effect.kind === 'clickSynergy' && effect.generator === id) {
-      synergyBonus += effect.bonusPerUpgrade * clickUpgradeCount(state);
+    if (effect.kind === 'clickSynergy') {
+      synergyBonus[effect.generator] += effect.bonusPerUpgrade * clicks;
     }
   }
   for (const bonus of bonusesOf(state, 'generatorMultiplier')) {
-    if (bonus.generator === id) factor *= bonus.factor;
+    factor[bonus.generator] *= bonus.factor;
   }
-  let typeBonus = 0;
-  for (const bonus of bonusesOf(state, 'perType')) {
-    if (bonus.generator === id) typeBonus += bonus.bonus * typesOwned(state);
-  }
+  const types = typesOwned(state);
+  for (const bonus of bonusesOf(state, 'perType'))
+    typeBonus[bonus.generator] += bonus.bonus * types;
   // §5.5 (M26): the paths of the buildings that grow.
   for (const bonus of bonusesOf(state, 'feeds')) {
-    if (bonus.generator === id) synergyBonus += bonus.bonusPerUnit * state.generators[bonus.source];
+    synergyBonus[bonus.generator] += bonus.bonusPerUnit * state.generators[bonus.source];
   }
   for (const bonus of bonusesOf(state, 'perSpecies')) {
-    if (bonus.generator === id) typeBonus += bonus.bonus * state.species.length;
+    typeBonus[bonus.generator] += bonus.bonus * state.species.length;
   }
   for (const bonus of bonusesOf(state, 'generatorPerParcel')) {
-    if (bonus.generator === id) typeBonus += bonus.bonus * state.parcels.length;
+    typeBonus[bonus.generator] += bonus.bonus * state.parcels.length;
   }
   // §9.6: the summer shower waters the rooftop gardens and the greenhouses.
   // §9.7: so do the climbing beans of the courtyard garden.
-  if (id === 'rooftopGarden' || id === 'greenhouse') {
-    factor *= effectFactor(state.effects, 'shower') * effectFactor(state.effects, 'beans');
-  }
+  const watered = effectFactor(state.effects, 'shower') * effectFactor(state.effects, 'beans');
+  factor.rooftopGarden *= watered;
+  factor.greenhouse *= watered;
   // §9.6, M18: the transhumance's sheep graze under the panels.
-  if (id === 'balconyPanel') factor *= effectFactor(state.effects, 'grazing');
-  return (
-    factor *
-    (1 + synergyBonus * factorOf(state, 'synergyFactor')) *
-    (1 + typeBonus) *
-    siteFactor(state, id)
-  );
+  factor.balconyPanel *= effectFactor(state.effects, 'grazing');
+  const synergyFactor = factorOf(state, 'synergyFactor');
+  const result = {} as Record<GeneratorId, number>;
+  for (const id of GENERATOR_IDS) {
+    result[id] =
+      factor[id] *
+      (1 + synergyBonus[id] * synergyFactor) *
+      (1 + typeBonus[id]) *
+      siteFactor(state, id);
+  }
+  multiplierCache.set(state, result);
+  return result;
 }
 
 /** Number of generator types owned at least once. */

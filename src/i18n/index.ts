@@ -31,7 +31,9 @@ export function loadLanguage(language: Language): Promise<void> {
 export function setLanguage(language: Language): void {
   const texts = loaded[language];
   if (!texts) {
-    void loadLanguage(language);
+    // Offline before the texts were ever cached: the game stays in the current language until the
+    // next start, without an error at every render.
+    loadLanguage(language).catch(() => {});
     return;
   }
   t = texts;
