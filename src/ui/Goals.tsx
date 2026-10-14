@@ -44,12 +44,12 @@ export function NextGoal() {
   const seconds = secondsToAfford(state, goal.cost);
   const finite = Number.isFinite(seconds);
   return (
-    <span
-      className="counter-goal"
-      data-testid="next-goal"
-      data-kind={goal.kind}
-      aria-label={finite ? t.nextGoalLabel(name, etaText(seconds)) : t.nextGoal(name)}
-    >
+    <span className="counter-goal" data-testid="next-goal" data-kind={goal.kind}>
+      {/* A plain span has no role, so an aria-label on it is never read: the full sentence goes
+          to screen readers as hidden text instead. */}
+      <span className="visually-hidden">
+        {finite ? t.nextGoalLabel(name, etaText(seconds)) : t.nextGoal(name)}
+      </span>
       <span aria-hidden="true">{t.nextGoal(name)}</span>
       {finite && (
         <span className="counter-goal-eta" aria-hidden="true">
