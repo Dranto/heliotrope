@@ -357,6 +357,9 @@ export function App() {
   const withAction = shownPanels(state).filter((id) => panelHasAction(state, id));
   const isFresh = (panels: readonly PanelId[]) => panels.some((id) => unseen.includes(id));
   const screenSize = useScreen();
+  // A screen covers the map, or the phone shows the "more" tab without it: the map rests
+  // (docs/performance-plan.md, lot 3).
+  const mapPaused = screen !== null || (screenSize === 'phone' && tab === 'more');
   const awake = (panel: SleepingPanel) => !isPanelHidden(panel, screenSize, tab);
   const layerPanels = (id: LayerId) => PANEL_IDS.filter((panel) => PANEL_LAYER[panel] === id);
   const touchPanel = (target: EventTarget) => {
@@ -497,6 +500,7 @@ export function App() {
       data-layer={layer}
       data-side={sideOpen ? 'open' : 'closed'}
       data-motion={state.settings.reducedMotion ? 'reduced' : undefined}
+      data-map-paused={mapPaused || undefined}
       data-arrived={arrivedFeature(state) ?? undefined}
     >
       <header className="topbar">
@@ -655,7 +659,13 @@ export function App() {
 
       {/* Memoised drawings keep their texts until their props change: redraw on a new language. */}
       <main className="layout" key={language}>
-        <Scene onCatch={onCatch} onVisit={onVisit} onHarvest={onHarvest} highlight={highlight} />
+        <Scene
+          onCatch={onCatch}
+          onVisit={onVisit}
+          onHarvest={onHarvest}
+          highlight={highlight}
+          paused={mapPaused}
+        />
         <aside className="side" aria-label={t.layout.panels}>
           <button
             type="button"

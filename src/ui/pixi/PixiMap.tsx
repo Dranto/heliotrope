@@ -68,7 +68,7 @@ export default function PixiMap({
 
   const { generators, upgrades, parcels, seconds, phase, season, greenness, reduced, camera } =
     props;
-  const { width, height, sites, collectors, raining, bioregion, landscape, strict } = props;
+  const { width, height, sites, collectors, raining, bioregion, landscape, strict, paused } = props;
   const sources = useMemo(
     () => mapSources({ parcels, seconds, sites, collectors, bioregion, landscape }),
     [parcels, seconds, sites, collectors, bioregion, landscape],
@@ -92,6 +92,7 @@ export default function PixiMap({
       bioregion,
       landscape,
       strict,
+      paused,
     });
   }, [
     generators,
@@ -111,6 +112,7 @@ export default function PixiMap({
     bioregion,
     landscape,
     strict,
+    paused,
   ]);
 
   return (

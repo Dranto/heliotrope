@@ -2,7 +2,7 @@
 
 > Statut : proposé le 2026-10-14 à la demande d'Antoine (« établis un plan pour optimiser les performances de
 > l'application »). Le 2026-10-14, Antoine a demandé de l'appliquer : chaque lot ci-dessous est une PR, dans
-> l'ordre. Fait : lots 0, 1 et 2.
+> l'ordre. Fait : lots 0 à 3.
 
 ## 1. Ce qui a été mesuré
 
@@ -113,16 +113,19 @@ Chaque lot est une PR, sans changement de gameplay ni d'équilibrage, et se mesu
   doit le rester (sinon les ruisseaux fins crénellent) ; les contextes WebGL de test au démarrage ne coûtent
   cher qu'en rendu logiciel, le gain sur un vrai appareil ne justifie pas de contourner Pixi.
 
-### Lot 3 : animations d'ambiance (gain fort quand il n'y a pas de GPU)
+### Lot 3 : animations d'ambiance (fait en partie)
 
-- Le rendu SVG est choisi justement sur les appareils sans bon GPU, et c'est lui que les animations continues
-  pénalisent le plus. Quand le SVG a été choisi automatiquement, limiter l'ambiance aux animations qui ne font
-  que des `transform`/`opacity` sur des éléments HTML (composées par le navigateur sans redessin), et mettre les
-  rayons, poussières et nuages en pause.
-- Isoler les éléments animés de la carte SVG dans leurs propres calques (`<svg>` superposés ou HTML) pour qu'une
-  poussière animée ne fasse plus redessiner les 13 000 nœuds de la ville.
-- Option « Économie d'énergie » dans les Options (affichage) : animations d'ambiance en pause, 30 images/s,
-  pas de flou d'arrière-plan. Le jeu reste identique.
+- Fait : quand un écran couvre le jeu (Options, Jalons, Herbier, Saisons, Arbre, Cycles, Villes, Statistiques)
+  ou que le téléphone montre l'onglet « Plus » sans la carte, la vie de la carte se repose : les animations
+  CSS sous l'écran sont en pause (108 → 0 animations en cours sur la sauvegarde `season1`) et la carte PixiJS
+  ne dessine plus. Seuls l'écran ouvert et le papillon, qui suit son minuteur, bougent encore. Sous le flou de
+  l'écran, la différence ne se voit pas.
+- L'option « Économie d'énergie » existe déjà : c'est « Mouvement réduit » dans les Options. Elle arrête
+  l'ambiance et la carte PixiJS ne dessine plus qu'à chaque changement.
+- Pas fait pour l'instant : couper l'ambiance quand le SVG a été choisi faute de GPU (cela change ce que voit le
+  joueur) et isoler les éléments animés de la carte SVG dans leurs propres calques (gros chantier sur tous les
+  dessins). Sans GPU, le conteneur ne peut pas mesurer leur gain : à décider avec les chiffres du compteur
+  `?perf` sur l'appareil d'Antoine.
 
 ### Lot 4 : chargement (gain modéré, première visite)
 

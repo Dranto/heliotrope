@@ -177,7 +177,10 @@ export function Scene({
   onVisit,
   onHarvest,
   highlight,
+  paused = false,
 }: {
+  /** Covered by a screen or out of sight (docs/performance-plan.md, lot 3): the map rests. */
+  paused?: boolean;
   onCatch: (result: CatchResult) => void;
   onVisit: (result: WelcomeResult) => void;
   onHarvest: (index: number) => void;
@@ -505,6 +508,7 @@ export function Scene({
               bioregion={bioregion}
               landscape={landscape}
               strict={!rendererChosen}
+              paused={paused}
               overlay={marks}
               onFail={() => setWebglFailed(true)}
             />

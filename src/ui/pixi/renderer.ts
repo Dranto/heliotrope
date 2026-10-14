@@ -119,6 +119,8 @@ export interface MapProps {
   landscape?: LandscapeId | null;
   /** Gives up on devices that would draw it slowly, so the SVG map stays: the automatic choice. */
   strict?: boolean;
+  /** Covered by a screen or out of sight: the picture holds still and nothing is drawn. */
+  paused?: boolean;
 }
 
 /** Shadows a little longer than the SVG scene's: real depth, now that their edges are soft. */
@@ -1633,6 +1635,10 @@ export class MapRenderer {
    */
   private requestRender(): void {
     if (!this.ready || this.destroyed) return;
+    if (this.props?.paused) {
+      if (this.app.ticker.started) this.app.ticker.stop();
+      return;
+    }
     if (!this.props?.reduced) {
       if (!this.app.ticker.started) this.app.ticker.start();
       return;
