@@ -203,7 +203,53 @@
 }
 
 .garden-bed[data-state='locked'] {
+  border-style: dashed;
+  border-color: rgb(138 98 64 / 0.35);
   opacity: 0.55;
+}
+
+/* Each open square stands on its strip of tilled earth: bare furrows, then a row of shoots
+   while it grows, then gold fruit once ripe, so the panel reads like the beds on the map. */
+.garden-bed:not([data-state='locked']) {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 1.2rem;
+}
+
+.garden-bed:not([data-state='locked'])::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 0.55rem;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 0.55rem, rgb(74 50 30 / 0.3) 0.55rem 0.7rem),
+    linear-gradient(#a27a55, #8a6240);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.garden-bed[data-state='growing']::after,
+.garden-bed[data-state='ripe']::after {
+  --leaf-h: calc(0.08rem + 0.3rem * var(--grown, 0));
+  height: 0.85rem;
+  background:
+    radial-gradient(0.12rem var(--leaf-h) at 32% 100%, var(--sprout) 92%, transparent) 0 0 / 0.7rem
+      0.5rem repeat-x,
+    radial-gradient(0.12rem var(--leaf-h) at 68% 100%, var(--sprout) 92%, transparent) 0 0 / 0.7rem
+      0.5rem repeat-x,
+    repeating-linear-gradient(90deg, transparent 0 0.55rem, rgb(74 50 30 / 0.3) 0.55rem 0.7rem) 0
+      0.5rem / 100% 0.35rem no-repeat,
+    linear-gradient(#a27a55, #8a6240) 0 0.5rem / 100% 0.35rem no-repeat;
+}
+
+.garden-bed[data-state='growing'] {
+  --sprout: #6f9a62;
+}
+
+.garden-bed[data-state='ripe'] {
+  --sprout: #e9a93b;
 }
 
 .garden-bed-head {

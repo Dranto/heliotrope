@@ -1,0 +1,41 @@
+import { render } from '@testing-library/react';
+import { saveGame } from '../game/save';
+import { createInitialState } from '../game/state';
+import { GameStore } from '../game/store';
+import { Garden } from './Garden';
+import { GameStoreContext } from './useGame';
+
+describe('the garden beds', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('let the shoots on each strip of earth grow with the crop', () => {
+    const base = createInitialState(0);
+    const plot = (crop: 'radish' | 'sunflower' | null, grown: number) => ({
+      crop,
+      grown,
+      last: null,
+      rotated: false,
+    });
+    saveGame({
+      ...base,
+      generators: { ...base.generators, pot: 1 },
+      intro: { ...base.intro, introduced: [...base.intro.introduced, 'garden'] },
+      garden: {
+        ...base.garden,
+        // Radish ripe, sunflowers a quarter grown (20 min), the rest bare or locked.
+        plots: [plot('radish', 9999), plot('sunflower', 300), ...base.garden.plots.slice(2)],
+      },
+    });
+    render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <Garden onHarvest={() => {}} onHarvestAll={() => {}} />
+      </GameStoreContext.Provider>,
+    );
+    const beds = [...document.querySelectorAll<HTMLElement>('.garden-bed')];
+    expect(beds[0]).toHaveAttribute('data-state', 'ripe');
+    expect(beds[0]!.style.getPropertyValue('--grown')).toBe('1');
+    expect(beds[1]).toHaveAttribute('data-state', 'growing');
+    expect(beds[1]!.style.getPropertyValue('--grown')).toBe('0.25');
+    expect(beds[2]!.style.getPropertyValue('--grown')).toBe('');
+  });
+});
