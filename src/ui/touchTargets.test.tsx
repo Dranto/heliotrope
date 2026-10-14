@@ -7,7 +7,7 @@ import { GameStoreContext } from './useGame';
 /** Style rules that apply on a touch screen, as the browser parses the real stylesheets. */
 function coarseRules(): CSSStyleRule[] {
   const style = document.createElement('style');
-  style.textContent = ['./App.css', './decor.css']
+  style.textContent = ['./App.css', './decor.css', './restoration.css']
     .map((file) => readFileSync(new URL(file, import.meta.url), 'utf8'))
     .join('\n');
   document.head.append(style);
@@ -85,6 +85,24 @@ describe('the controls used all game long on a touch screen', () => {
     expect(titles.length).toBeGreaterThan(0);
     for (const title of titles) {
       expect(least(rules, title, 'min-height')).toBeGreaterThanOrEqual(2.75);
+    }
+  });
+
+  it('gives the buy-all buttons and the parcel futures a full touch target', () => {
+    const rules = coarseRules();
+    // As the Upgrades and quartier panels and the futures list draw them in later play.
+    const panel = document.createElement('div');
+    panel.innerHTML = `
+      <button type="button" class="buy-all">Tout lancer</button>
+      <details class="futures">
+        <summary>Les avenirs des parcelles</summary>
+        <div class="future-pills" role="radiogroup"><button type="button">Rue jardin</button></div>
+      </details>`;
+    const [buyAll, summary, pill] = ['.buy-all', '.futures summary', '.future-pills button'].map(
+      (selector) => panel.querySelector(selector)!,
+    );
+    for (const control of [buyAll, summary, pill]) {
+      expect(least(rules, control!, 'min-height')).toBeGreaterThanOrEqual(2.75);
     }
   });
 });

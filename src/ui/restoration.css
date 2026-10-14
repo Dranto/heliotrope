@@ -852,15 +852,21 @@
   font-weight: 600;
 }
 
-/* Easier to tap on a touch screen. */
+/* Easier to tap on a touch screen: full 44 px targets (§10.3), the fold of the list included. */
 @media (pointer: coarse) {
   .future-pills {
     gap: 0.4rem;
   }
 
   .future-pills button {
-    min-height: 2.25rem;
+    min-height: 2.75rem;
     padding-inline: 0.75rem;
+  }
+
+  .futures summary {
+    min-height: 2.75rem;
+    padding-block: 0.6rem;
+    box-sizing: border-box;
   }
 }
 
