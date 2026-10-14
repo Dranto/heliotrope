@@ -4274,3 +4274,12 @@ button {
     monospace;
   pointer-events: none;
 }
+
+/* A screen covers the game (docs/performance-plan.md, lot 3): the life under it rests beneath the
+   blur, so neither the map nor the blur is drawn again at every frame. The screen itself and the
+   butterfly, on its timer, keep moving. */
+.app[data-map-paused] *:not(.overlay, .overlay *, .butterfly, .butterfly *),
+.app[data-map-paused] *:not(.overlay, .overlay *, .butterfly, .butterfly *)::before,
+.app[data-map-paused] *:not(.overlay, .overlay *, .butterfly, .butterfly *)::after {
+  animation-play-state: paused !important;
+}
