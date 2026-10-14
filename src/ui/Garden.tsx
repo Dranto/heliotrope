@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import {
   canSow,
   CROP_IDS,
@@ -128,7 +128,13 @@ export function Garden({
             ? t.garden.ripe
             : t.garden.growing(t.duration(Math.ceil(secondsToRipe(state, plot))));
           return (
-            <li key={i} className="garden-bed" data-state={ripe ? 'ripe' : 'growing'}>
+            <li
+              key={i}
+              className="garden-bed"
+              data-state={ripe ? 'ripe' : 'growing'}
+              // The shoots on the bed's strip of earth grow with the crop.
+              style={{ '--grown': ripe ? 1 : growth } as CSSProperties}
+            >
               <span className="garden-bed-head">
                 <CropArt crop={plot.crop} stage={cropStage(growth)} />
                 <span>
