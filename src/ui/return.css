@@ -103,8 +103,34 @@
   animation: guide-halo 1.8s ease-in-out infinite;
 }
 
+/* The tree's drawing is mostly empty sky at the start: its halo is a ring in the drawing, around
+   the seedling (Flower.tsx), rather than the button's box. */
 .flower-button[data-guide='true'] {
-  border-radius: 50%;
+  animation: none;
+  box-shadow: none;
+}
+
+.guide-ring {
+  fill: none;
+  stroke: rgb(244 192 99 / 0.9);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: guide-ring 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes guide-ring {
+  0%,
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+
+  60% {
+    opacity: 0.35;
+    scale: 1.18;
+  }
 }
 
 @keyframes guide-halo {
@@ -126,5 +152,8 @@
   [data-guide='true'] {
     animation: none;
     box-shadow: 0 0 0 3px rgb(244 192 99 / 0.7);
+  }
+  .guide-ring {
+    animation: none;
   }
 }

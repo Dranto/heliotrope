@@ -920,6 +920,9 @@ button {
   display: flex;
   min-height: 0;
   overflow: hidden;
+  /* The map covers the whole panel, so blurring what lies behind it shows nothing; and Chrome
+     kept painting a stale copy of the map in the blur's margin after the page above it grew. */
+  backdrop-filter: none;
 }
 
 .scene-map {
@@ -2802,6 +2805,18 @@ button {
   display: none;
 }
 
+/* A tablet held upright: the views take their short names, so the caption keeps to one row over
+   the map in English too, whose names are longer. */
+@media (max-width: 52rem) {
+  .views .view-long {
+    display: none;
+  }
+
+  .views .view-short {
+    display: inline;
+  }
+}
+
 .pollen {
   fill: #f4c063;
   opacity: 0;
@@ -3530,8 +3545,10 @@ button {
     align-items: start;
   }
 
-  /* The living layer has all its panels in the first column: give them the whole width. */
-  .app[data-layer='living'] .side-panels {
+  /* The living layer has all its panels in the first column, and the first minutes have nothing
+     to improve yet: the panels left take the whole width rather than leave half of it empty. */
+  .app[data-layer='living'] .side-panels,
+  .side-panels:has(> .side-column:empty) {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -3561,6 +3578,10 @@ button {
   .side-column {
     display: grid;
     gap: 1rem;
+  }
+
+  .side-column:empty {
+    display: none;
   }
 }
 
