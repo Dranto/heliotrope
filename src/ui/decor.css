@@ -292,6 +292,9 @@
 
 /* The caption buttons that open decorating and the photo mode. */
 .scene-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.25rem 0.8rem;
   border: 1px solid rgb(255 255 255 / 0.8);
   border-radius: 999px;
@@ -301,6 +304,42 @@
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+}
+
+.scene-tool .tool-icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* On a phone the tools keep only their glyph, in a round button, so the map keeps its top
+   band; the label stays for screen readers. */
+@media (max-width: 40rem) {
+  .scene-tool {
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+  }
+
+  .scene-tool .tool-icon {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+
+  .scene-tool .tool-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 .scene-tool:hover,

@@ -562,7 +562,8 @@ export function Scene({
         )}
         {mode === 'play' && isDecorOpen(state) && (
           <button type="button" className="scene-tool decor-tool" onClick={() => setMode('decor')}>
-            {t.decor.open}
+            <ToolIcon path={DECOR_ICON} />
+            <span className="tool-label">{t.decor.open}</span>
           </button>
         )}
         {mode === 'play' && (
@@ -574,7 +575,8 @@ export function Scene({
               setMode('photo');
             }}
           >
-            {t.photo.open}
+            <ToolIcon path={PHOTO_ICON} />
+            <span className="tool-label">{t.photo.open}</span>
           </button>
         )}
       </figcaption>
@@ -622,4 +624,18 @@ function parseBikes(encoded: string) {
 
 function split(ids: string): ParcelId[] {
   return ids === '' ? [] : (ids.split(',') as ParcelId[]);
+}
+
+/** Fine-line glyphs of the map's tools: a flower to decorate, a camera for the photo. */
+const DECOR_ICON =
+  'M12 21v-8M12 13a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM12 8.6C11 6 11 4.5 12 3c1 1.5 1 3 0 5.6zM14.2 10.8c2.6-1 4.1-1 5.6 0-1.5 1-3 1-5.6 0zM9.8 10.8c-2.6-1-4.1-1-5.6 0 1.5 1 3 1 5.6 0zM12 17.5c-1.6-1.5-3.2-2-5-1.5 1.2 1.6 2.8 2 5 1.5z';
+const PHOTO_ICON =
+  'M4 8.5h3.2L8.8 6h6.4l1.6 2.5H20V19H4zM12 16.5a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6z';
+
+function ToolIcon({ path }: { path: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className="tool-icon" aria-hidden="true">
+      <path d={path} />
+    </svg>
+  );
 }
