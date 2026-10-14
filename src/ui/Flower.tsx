@@ -309,6 +309,7 @@ export function Flower() {
   const reduced = state.settings.reducedMotion;
   const arrived = arrivedFeature(state);
   const pollenOpen = isPollenOpen(state);
+  const guided = guideStep(state)?.kind === 'flower';
   const flying = isFlying(state);
   const bouquet = bouquetSize(state.effects);
 
@@ -390,7 +391,7 @@ export function Flower() {
       <button
         type="button"
         className="flower-button"
-        data-guide={guideStep(state)?.kind === 'flower' || undefined}
+        data-guide={guided || undefined}
         aria-label={t.clickFlower}
         onPointerMove={follow}
         onPointerLeave={() => setTilt(0)}
@@ -466,6 +467,9 @@ export function Flower() {
               />
             </g>
           )}
+          {/* The guided first minute (§10.6): the golden halo breathes around the seedling's
+              planter, not around the whole drawing, whose crown is still empty. */}
+          {guided && <ellipse cx={BASE.x} cy={BASE.y + 3} rx="68" ry="46" className="guide-ring" />}
           {/* A generous touch target around the tree, so a tap between two tufts still counts. */}
           <ellipse cx="100" cy="170" rx="62" ry="88" fill="transparent" className="flower-hit" />
           <g className="flower-sway" style={{ transform: `rotate(${tilt}deg)` }}>
