@@ -114,7 +114,10 @@ export function Garden({
                     ))}
                   </div>
                 ) : (
-                  <button type="button" className="ghost" onClick={() => setChoosing(i)}>
+                  <button type="button" className="ghost garden-sow" onClick={() => setChoosing(i)}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d={SOW_ICON} />
+                    </svg>
                     {t.garden.sow}
                   </button>
                 )}
@@ -194,3 +197,7 @@ export function Garden({
     </section>
   );
 }
+
+/** A shoot rising from a seed in the furrow, on the button that sows a bare square. */
+const SOW_ICON =
+  'M12 19v-7M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5zM12 14c0-2.4-1.6-4-4.2-4 0 2.4 1.6 4 4.2 4zM5 19.5h14';

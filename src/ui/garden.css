@@ -252,6 +252,32 @@
   --sprout: #e9a93b;
 }
 
+/* "Semer" on a bare square: a shoot and a sage wash, so an empty bed invites sowing. */
+.ghost.garden-sow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-color: rgb(47 107 79 / 0.35);
+  background: linear-gradient(180deg, rgb(236 245 226 / 0.95), rgb(255 255 255 / 0.75));
+  color: var(--leaf);
+}
+
+.garden-sow svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ghost.garden-sow:hover {
+  border-color: var(--leaf);
+  background: linear-gradient(180deg, rgb(222 238 206), rgb(246 251 240));
+}
+
 .garden-bed-head {
   display: flex;
   align-items: center;

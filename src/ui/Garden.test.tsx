@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, within } from '@testing-library/react';
 import { saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
 import { GameStore } from '../game/store';
@@ -37,5 +37,24 @@ describe('the garden beds', () => {
     expect(beds[1]).toHaveAttribute('data-state', 'growing');
     expect(beds[1]!.style.getPropertyValue('--grown')).toBe('0.25');
     expect(beds[2]!.style.getPropertyValue('--grown')).toBe('');
+  });
+
+  it('marks the sow button of a bare square with a shoot, still named "Semer"', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      generators: { ...base.generators, pot: 1 },
+      intro: { ...base.intro, introduced: [...base.intro.introduced, 'garden'] },
+    });
+    render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <Garden onHarvest={() => {}} onHarvestAll={() => {}} />
+      </GameStoreContext.Provider>,
+    );
+    // The first bare square lists its crops; the next ones offer to sow.
+    const bare = document.querySelectorAll<HTMLElement>('.garden-bed[data-state="bare"]')[1]!;
+    const sow = within(bare).getByRole('button', { name: 'Semer' });
+    expect(sow).toHaveClass('garden-sow');
+    expect(sow.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 });
