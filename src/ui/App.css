@@ -1921,6 +1921,11 @@ button {
     min-height: 2.75rem;
     margin-block: -0.375rem;
   }
+
+  /* "Tout acheter" and "Tout lancer" sit beside the titles and are tapped as often. */
+  .buy-all {
+    min-height: 2.75rem;
+  }
 }
 
 .growth-fork {
