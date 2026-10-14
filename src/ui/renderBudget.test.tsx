@@ -51,9 +51,9 @@ function renderedPerTick(): { total: number; byName: Map<string, number> } {
 }
 
 describe('render budget', () => {
-  // Measured at 163 before lot 1 (docs/performance-plan.md), most of them the icons of the
-  // upgrades panel: the ceiling keeps it from growing.
-  const CEILING = 200;
+  // 163 before lot 1 (docs/performance-plan.md), 66 since its icons are memoised: the ceiling
+  // keeps it from growing again.
+  const CEILING = 90;
 
   it(`renders at most ${CEILING} components per tick`, () => {
     const { total, byName } = renderedPerTick();

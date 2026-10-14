@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { GeneratorId } from '../game/generators';
 import type { UpgradeDef } from '../game/upgrades';
 
@@ -65,7 +66,7 @@ export function upgradeFamily({ effect }: UpgradeDef): GeneratorId | 'click' | '
  * A synergy shows the building it boosts, with the one that feeds it in a small round badge, so
  * each synergy tile reads at a glance instead of repeating the same sprout.
  */
-export function UpgradeIcon({ upgrade }: { upgrade: UpgradeDef }) {
+export const UpgradeIcon = memo(function UpgradeIcon({ upgrade }: { upgrade: UpgradeDef }) {
   const badge = badgeFor(upgrade);
   if (badge === undefined) {
     return (
@@ -89,10 +90,10 @@ export function UpgradeIcon({ upgrade }: { upgrade: UpgradeDef }) {
       />
     </svg>
   );
-}
+});
 
 /** A building's emblem in a round medallion, tinted like its upgrade tiles. */
-export function GeneratorIcon({ id }: { id: GeneratorId }) {
+export const GeneratorIcon = memo(function GeneratorIcon({ id }: { id: GeneratorId }) {
   return (
     <span className="generator-icon" data-family={id} aria-hidden="true">
       <svg viewBox="0 0 24 24" className="upgrade-icon">
@@ -100,4 +101,4 @@ export function GeneratorIcon({ id }: { id: GeneratorId }) {
       </svg>
     </span>
   );
-}
+});

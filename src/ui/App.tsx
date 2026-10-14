@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, memo, useState } from 'react';
 import { cycleWater, isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import { activeChallenge } from '../game/challenges';
 import { activeCycleChallenge } from '../game/cycleChallenges';
@@ -61,6 +61,7 @@ import { harvest, harvestAll } from '../game/garden';
 import { Scene } from './Scene';
 import { SpeciesArt } from './SpeciesArt';
 import { Upgrades } from './Upgrades';
+import { isPanelHidden, useScreen, type SleepingPanel } from './panelVisibility';
 import { useGameState, useGameStore } from './useGame';
 import { useSounds } from './useSounds';
 import { useMusic } from './useMusic';
@@ -150,13 +151,13 @@ function WelcomeReport({ report, state }: { report: OfflineReport; state: GameSt
   );
 }
 
-function SeedIcon() {
+const SeedIcon = memo(function SeedIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 21v-8M12 15c-4 0-6.5-2.5-7-6 4 0 6.5 2.5 7 6ZM12 13c3.2 0 5.3-2 5.8-5-3.3 0-5.3 2-5.8 5Z" />
     </svg>
   );
-}
+});
 
 const TAB_PATHS: Record<Tab | LayerId, string> = {
   build: 'M4 20V10l5-4 5 4v10M14 20V6l6-2v16M3 20h18',
@@ -168,13 +169,13 @@ const TAB_PATHS: Record<Tab | LayerId, string> = {
   more: 'M5 11.2v1.6M12 11.2v1.6M19 11.2v1.6',
 };
 
-function TabIcon({ tab }: { tab: Tab | LayerId }) {
+const TabIcon = memo(function TabIcon({ tab }: { tab: Tab | LayerId }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d={TAB_PATHS[tab]} />
     </svg>
   );
-}
+});
 
 /** A young tree with three branches, the mark of the Tree of Seasons. */
 function TreeIcon() {
@@ -355,6 +356,8 @@ export function App() {
   const unseen = unseenPanels(state);
   const withAction = shownPanels(state).filter((id) => panelHasAction(state, id));
   const isFresh = (panels: readonly PanelId[]) => panels.some((id) => unseen.includes(id));
+  const screenSize = useScreen();
+  const awake = (panel: SleepingPanel) => !isPanelHidden(panel, screenSize, tab);
   const layerPanels = (id: LayerId) => PANEL_IDS.filter((panel) => PANEL_LAYER[panel] === id);
   const touchPanel = (target: EventTarget) => {
     const section = target instanceof Element ? target.closest('section.panel') : null;
@@ -694,19 +697,21 @@ export function App() {
                 ))}
               </nav>
             )}
+            {/* Hidden panels sleep (docs/performance-plan.md, lot 1); the two with keyboard
+                shortcuts always stay. */}
             <div className="side-column">
               <Upgrades />
-              <Restoration onHighlight={setHighlight} />
-              <Garden onHarvest={onHarvest} onHarvestAll={onHarvestAll} />
-              <Orchard onHarvestAll={onHarvestAll} />
-              <Requests />
-              <GreatWorks />
-              <Alliances />
+              {awake('restoration') && <Restoration onHighlight={setHighlight} />}
+              {awake('garden') && <Garden onHarvest={onHarvest} onHarvestAll={onHarvestAll} />}
+              {awake('orchard') && <Orchard onHarvestAll={onHarvestAll} />}
+              {awake('requests') && <Requests />}
+              {awake('greatWorks') && <GreatWorks />}
+              {awake('alliances') && <Alliances />}
             </div>
             <div className="side-column">
               <Generators />
-              <Bioregion />
-              <Cooperatives />
+              {awake('bioregion') && <Bioregion />}
+              {awake('cooperatives') && <Cooperatives />}
             </div>
           </div>
         </aside>

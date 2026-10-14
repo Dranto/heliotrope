@@ -7,7 +7,7 @@ import type { HandId, Need } from '../game/requests';
 type NeedKind = Need['kind'];
 
 /** A small icon in a 20 × 20 box. */
-export function RequestIcon({ kind }: { kind: NeedKind | HandId }) {
+export const RequestIcon = memo(function RequestIcon({ kind }: { kind: NeedKind | HandId }) {
   return (
     <svg viewBox="0 0 20 20" className="request-icon" data-icon={kind} aria-hidden="true">
       {kind === 'harvests' && (
@@ -127,7 +127,7 @@ export function RequestIcon({ kind }: { kind: NeedKind | HandId }) {
       )}
     </svg>
   );
-}
+});
 
 /** Where the bubbles of the requests waiting stand, by the streets around the courtyard. */
 const SPOTS: [number, number][] = [

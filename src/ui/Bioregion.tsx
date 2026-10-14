@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   buyCollector,
   canBuyCollector,
@@ -27,13 +28,13 @@ import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
 
 /** A drop of water, the mark of the Bioregion's resource (§7.4). */
-export function WaterIcon() {
+export const WaterIcon = memo(function WaterIcon() {
   return (
     <svg viewBox="0 0 16 16" aria-hidden="true" className="water-icon">
       <path d="M8 1.8C6 4.6 3.6 7.4 3.6 10a4.4 4.4 0 0 0 8.8 0C12.4 7.4 10 4.6 8 1.8Z" />
     </svg>
   );
-}
+});
 
 /**
  * The Bioregion panel (docs/game-design.md §7.4): the water collectors, built with Light, then

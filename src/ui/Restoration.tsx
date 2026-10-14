@@ -8,7 +8,7 @@ import {
   type DistrictDef,
 } from '../game/districts';
 import { formatCost } from '../game/format';
-import { useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import {
   PARCEL_IDS,
   parcelBonuses,
@@ -37,15 +37,15 @@ import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
 
-function ParcelIcon() {
+const ParcelIcon = memo(function ParcelIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 18h16M7 18c0-3 2-5 5-5s5 2 5 5M12 13V8M12 10c-2 0-3.4-1.2-3.6-3 2 0 3.4 1.2 3.6 3ZM12 9c1.8 0 3-1 3.3-2.6-1.8 0-3 1-3.3 2.6Z" />
     </svg>
   );
-}
+});
 
-function ProjectIcon() {
+const ProjectIcon = memo(function ProjectIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
@@ -55,7 +55,7 @@ function ProjectIcon() {
       <path d="M12 6.5V9M17 15l-2.4-1.4M7 15l2.4-1.4" />
     </svg>
   );
-}
+});
 
 /** A neighbouring district (§6.4): blocks around a small tree. */
 function DistrictIcon() {
@@ -226,6 +226,8 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
   const store = useGameStore();
   const state = useGameState();
   const [open, toggle] = usePanelOpen('restoration');
+  // A hidden panel sleeps (App): no parcel stays highlighted on the map from it.
+  useEffect(() => () => onHighlight(null), [onHighlight]);
   // The future picked on each offered parcel's card before restoring it.
   const [picks, setPicks] = useState<Partial<Record<ParcelId, Future>>>({});
   // The cheapest few, so the list stays short under the map; the next ones follow.

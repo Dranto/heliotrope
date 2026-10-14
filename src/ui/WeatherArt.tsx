@@ -95,7 +95,7 @@ export const WeatherLayer = memo(function WeatherLayer({
 });
 
 /** A small icon for each weather, in a 20 × 20 box. */
-export function WeatherIcon({ id }: { id: WeatherId }) {
+export const WeatherIcon = memo(function WeatherIcon({ id }: { id: WeatherId }) {
   return (
     <svg viewBox="0 0 20 20" className="weather-icon" data-weather={id} aria-hidden="true">
       {(id === 'sun' || id === 'heat') && (
@@ -122,7 +122,7 @@ export function WeatherIcon({ id }: { id: WeatherId }) {
       {id === 'mist' && <path d="M3 7h14M5 10.4h12M3 13.8h12M6 17.2h8" />}
     </svg>
   );
-}
+});
 
 /**
  * The weather of the moment and the three forecast ones, in the map's caption. Once per Season the

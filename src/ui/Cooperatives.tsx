@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { formatNumber } from '../game/format';
 import {
   councilLeadsProjects,
@@ -15,7 +16,7 @@ import { useGameState, useGameStore } from './useGame';
 import './cooperatives.css';
 
 /** A cargo bike, the mark of the cooperatives in the panel and on the map. */
-export function CooperativeIcon() {
+export const CooperativeIcon = memo(function CooperativeIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="6" cy="17" r="3" />
@@ -23,7 +24,7 @@ export function CooperativeIcon() {
       <path d="M3 9h7v5H3zM10 14h4l3-6h2M14 14l-2-5h-2M18.5 17 16 10" />
     </svg>
   );
-}
+});
 
 /**
  * The Cooperatives (docs/game-design.md §7.2): who buys for the player, how often, and the
