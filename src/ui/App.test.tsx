@@ -678,3 +678,38 @@ describe('App', () => {
     expect(screen.getByTestId('sources-chip')).toHaveTextContent('1');
   });
 });
+
+describe('the phone tab bar', () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.scrollY = 0;
+  });
+
+  it('opens a tab picked from far down at its first panel, not mid-page', () => {
+    renderApp();
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    // Scrolled 2000 px down the "Bâtir" panels, which start 500 px into the page.
+    window.scrollY = 2000;
+    vi.spyOn(document.getElementById('side-panels')!, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(0, -1500, 390, 3000),
+    );
+    const tabs = within(screen.getByRole('navigation', { name: 'Sections du jeu' }));
+    fireEvent.click(tabs.getByRole('button', { name: 'Bâtir' }));
+    expect(scrollTo).not.toHaveBeenCalled();
+    fireEvent.click(tabs.getByRole('button', { name: /Améliorer/ }));
+    expect(scrollTo).toHaveBeenCalledWith({ top: 488 });
+  });
+
+  it('leaves the page where it is when the panels are already in view', () => {
+    renderApp();
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    window.scrollY = 200;
+    vi.spyOn(document.getElementById('side-panels')!, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(0, 300, 390, 3000),
+    );
+    const tabs = within(screen.getByRole('navigation', { name: 'Sections du jeu' }));
+    fireEvent.click(tabs.getByRole('button', { name: /Améliorer/ }));
+    expect(scrollTo).not.toHaveBeenCalled();
+  });
+});

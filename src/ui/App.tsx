@@ -4,6 +4,7 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -227,6 +228,9 @@ function LeafIcon() {
 
 let nextToastId = 0;
 
+/** Space kept above the first panel when a phone tab scrolls back to it, in CSS pixels. */
+const TAB_SCROLL_MARGIN = 12;
+
 export function App() {
   const store = useGameStore();
   const state = useGameState();
@@ -372,6 +376,20 @@ export function App() {
   // (docs/performance-plan.md, lot 3).
   const mapPaused = screen !== null || (screenSize === 'phone' && tab === 'more');
   const awake = (panel: SleepingPanel) => !isPanelHidden(panel, screenSize, tab);
+  // On a phone the tabs share one page: a tab picked from far down opens at its first panel,
+  // not wherever the previous, longer tab had been scrolled to.
+  const tabPicked = useRef(false);
+  useLayoutEffect(() => {
+    if (!tabPicked.current) return;
+    tabPicked.current = false;
+    const panels = document.getElementById('side-panels');
+    if (!panels || tab === 'more') return;
+    const top = Math.max(
+      0,
+      panels.getBoundingClientRect().top + window.scrollY - TAB_SCROLL_MARGIN,
+    );
+    if (window.scrollY > top) window.scrollTo({ top });
+  }, [tab]);
   const layerPanels = (id: LayerId) => PANEL_IDS.filter((panel) => PANEL_LAYER[panel] === id);
   const touchPanel = (target: EventTarget) => {
     const section = target instanceof Element ? target.closest('section.panel') : null;
@@ -745,7 +763,10 @@ export function App() {
             type="button"
             aria-current={tab === id ? 'page' : undefined}
             data-new={tab !== id && isFresh(TAB_PANELS[id])}
-            onClick={() => setTab(id)}
+            onClick={() => {
+              tabPicked.current = id !== tab;
+              setTab(id);
+            }}
           >
             <TabIcon tab={id} />
             {t.tabs[id]}
