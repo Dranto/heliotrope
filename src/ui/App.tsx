@@ -20,7 +20,9 @@ import {
 } from '../game/cycles';
 import type { CatchResult } from '../game/butterfly';
 import { VISIT_EFFECTS, type WelcomeResult } from '../game/visits';
+import { ACHIEVEMENT_LIST } from '../game/achievements';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
+import { SPECIES_LIST } from '../game/species';
 import { bouquetBonus, bouquetSize } from '../game/effects';
 import { arrivedFeature } from '../game/introductions';
 import { isAchievementsScreenOpen, isHerbierOpen, isTreeOpen } from '../game/onboarding';
@@ -124,6 +126,23 @@ const PANEL_CLASS: Record<PanelId, string> = {
   bioregion: 'bioregion',
   greatWorks: 'works-panel',
 };
+
+/**
+ * How many of a screen's entries are reached, on its menu button: "32/159", and to screen
+ * readers "32 sur 159" after the button's name.
+ */
+function MenuCount({ count, total }: { count: number; total: number }) {
+  const text = t.achievements.familyCount(formatNumber(count), formatNumber(total));
+  return (
+    <span className="menu-count">
+      <span className="visually-hidden">, {text}</span>
+      <span aria-hidden="true">
+        {formatNumber(count)}
+        <span className="menu-count-total">/{formatNumber(total)}</span>
+      </span>
+    </span>
+  );
+}
 
 interface Toast {
   id: number;
@@ -414,9 +433,11 @@ export function App() {
           </svg>
           {t.achievements.open}
           {/* Re-mounted on each new Milestone, so the count glints once (§9.3). */}
-          <span key={state.achievements.length} className="menu-count" aria-hidden="true">
-            {state.achievements.length}
-          </span>
+          <MenuCount
+            key={state.achievements.length}
+            count={state.achievements.length}
+            total={ACHIEVEMENT_LIST.length}
+          />
         </button>
       )}
       {isHerbierOpen(state) && (
@@ -428,9 +449,7 @@ export function App() {
         >
           <LeafIcon />
           {t.herbier.open}
-          <span className="menu-count" aria-hidden="true">
-            {state.species.length}
-          </span>
+          <MenuCount count={state.species.length} total={SPECIES_LIST.length} />
         </button>
       )}
       {isSeasonsScreenUnlocked(state) && (
