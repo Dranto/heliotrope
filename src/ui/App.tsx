@@ -374,7 +374,9 @@ export function App() {
   const screenSize = useScreen();
   // A screen covers the map, or the phone shows the "more" tab without it: the map rests
   // (docs/performance-plan.md, lot 3).
-  const mapPaused = screen !== null || (screenSize === 'phone' && tab === 'more');
+  // On the phone "Plus" tab the screen tiles are the page's content, so they move into <main>.
+  const menuInMain = screenSize === 'phone' && tab === 'more';
+  const mapPaused = screen !== null || menuInMain;
   const awake = (panel: SleepingPanel) => !isPanelHidden(panel, screenSize, tab);
   // On a phone the tabs share one page: a tab picked from far down opens at its first panel,
   // not wherever the previous, longer tab had been scrolled to.
@@ -666,7 +668,7 @@ export function App() {
             </span>
           )}
         </div>
-        {menu}
+        {!menuInMain && menu}
       </header>
       {showWelcome && (
         <div className="notice" role="status">
@@ -688,6 +690,7 @@ export function App() {
 
       {/* Memoised drawings keep their texts until their props change: redraw on a new language. */}
       <main className="layout" key={language}>
+        {menuInMain && menu}
         <Scene
           onCatch={onCatch}
           onVisit={onVisit}
