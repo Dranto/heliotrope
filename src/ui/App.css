@@ -1180,6 +1180,22 @@ button {
   stroke-width: 0.9;
 }
 
+.greenhouse-bench {
+  fill: #7d5a3e;
+  stroke: #6e4f36;
+  stroke-width: 0.6;
+}
+
+.greenhouse .greenhouse-row {
+  stroke-width: 4.4;
+  stroke-dasharray: 0 6;
+}
+
+.greenhouse .greenhouse-row-light {
+  stroke-width: 1.6;
+  stroke-dasharray: 0 6;
+}
+
 .greenhouse .warmth {
   fill: rgb(246 213 143 / 0.3);
 }

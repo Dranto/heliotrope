@@ -370,18 +370,30 @@ function Greenhouse({ box: [x, y, w, h], level }: { box: Box; level: number }) {
     <g className="greenhouse">
       <Shadow box={inner} storeys={1} />
       <rect x={inner[0]} y={inner[1]} width={inner[2]} height={inner[3]} rx="8" className="glass" />
-      {[0.3, 0.7].map((f) => (
-        <rect
-          key={f}
-          x={inner[0] + 6}
-          y={inner[1] + inner[3] * f - 3}
-          width={inner[2] - 12}
-          height="6"
-          rx="3"
-          className="foliage-light"
-          opacity="0.8"
-        />
-      ))}
+      {/* Benches of soil seen through the glass, each with a row of seedlings catching the sun;
+          flowers join them as the greenhouse is upgraded. */}
+      {[0.22, 0.5, 0.78].map((f) => {
+        const cy = inner[1] + inner[3] * f;
+        const row = `M${inner[0] + 9} ${cy} H${inner[0] + inner[2] - 9}`;
+        return (
+          <g key={f}>
+            <rect
+              x={inner[0] + 6}
+              y={cy - 3.5}
+              width={inner[2] - 12}
+              height="7"
+              rx="2.5"
+              className="greenhouse-bench"
+            />
+            <path d={row} className="row greenhouse-row foliage-stroke" />
+            <path
+              d={`M${inner[0] + 9.6} ${cy - 0.9} H${inner[0] + inner[2] - 9}`}
+              className="row-light greenhouse-row-light"
+            />
+            {level >= 3 && <path d={row} className="row-fruit blossom-stroke" />}
+          </g>
+        );
+      })}
       {level >= 2 && (
         <rect
           x={inner[0]}
