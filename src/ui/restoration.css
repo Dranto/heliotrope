@@ -809,6 +809,22 @@
   min-width: 5.5rem;
 }
 
+/* A parcel with two futures carries the pills and both effects: its text keeps the card's whole
+   width and the button moves under it, rather than squeezing the text into a narrow column. */
+.restoration-card[data-futures] {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.restoration-card[data-futures] .restoration-icon {
+  padding-top: 0.15rem;
+}
+
+.restoration-card[data-futures] .buy {
+  grid-column: 2;
+  justify-self: end;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .unveil,
   .burst,
