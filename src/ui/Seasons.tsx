@@ -28,6 +28,21 @@ import {
 } from '../i18n/herbier';
 import { Dialog } from './Dialog';
 import { SpeciesArt } from './SpeciesArt';
+
+/** Line icons of the three seed tiles: the Seeds kept, the Seeds to harvest, the bonus. */
+const SEED_TILE_ICONS = {
+  owned: 'M12 20c-3.6 0-6-2.6-6-6.2C6 9.6 9 6 12 4c3 2 6 5.6 6 9.8 0 3.6-2.4 6.2-6 6.2zM12 20v-8',
+  gain: 'M12 20v-7M12 13c0-3 1.8-5 5-5 0 3-1.8 5-5 5zM12 15c0-2.4-1.6-4-4.2-4 0 2.4 1.6 4 4.2 4zM5 4v5M2.5 6.5h5',
+  bonus: 'M4 19h16M6 15l4-4 3 3 5-6M14 8h4v4',
+} as const;
+
+function SeedTileIcon({ kind }: { kind: keyof typeof SEED_TILE_ICONS }) {
+  return (
+    <svg className="seed-tile-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d={SEED_TILE_ICONS[kind]} />
+    </svg>
+  );
+}
 import { useGameState, useGameStore } from './useGame';
 import './tree.css';
 
@@ -98,22 +113,31 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
       <p className="seasons-intro">{t.seeds.intro}</p>
 
       <dl className="seed-tiles">
-        <div className="seed-tile">
-          <dt>{t.seeds.owned}</dt>
+        <div className="seed-tile" data-kind="owned">
+          <dt>
+            <SeedTileIcon kind="owned" />
+            {t.seeds.owned}
+          </dt>
           <dd>
             <strong data-testid="seeds-owned">{formatNumber(state.seeds)}</strong>
             <span>{t.seeds.ownedHint(formatPercent(seedBonus(state.seeds, state.sources)))}</span>
           </dd>
         </div>
-        <div className="seed-tile gain">
-          <dt>{t.seeds.toGain}</dt>
+        <div className="seed-tile gain" data-kind="gain">
+          <dt>
+            <SeedTileIcon kind="gain" />
+            {t.seeds.toGain}
+          </dt>
           <dd>
             <strong data-testid="seeds-gain">+{formatNumber(growing)}</strong>
             <span>{ripe ? t.seeds.toGainHint : t.seeds.toGainRipening(ripening)}</span>
           </dd>
         </div>
-        <div className="seed-tile">
-          <dt>{t.seeds.bonus}</dt>
+        <div className="seed-tile" data-kind="bonus">
+          <dt>
+            <SeedTileIcon kind="bonus" />
+            {t.seeds.bonus}
+          </dt>
           <dd>
             <strong data-testid="seeds-bonus">
               {t.stats.percent(formatPercent(seedBonus(state.seeds, state.sources)))} →{' '}

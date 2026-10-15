@@ -2524,9 +2524,40 @@ button {
 }
 
 .seed-tile dt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--ink-soft);
+}
+
+/* §10.4: each tile wears its line icon in a tinted medallion, like the menu tiles. */
+.seed-tile {
+  --tint: 143 174 139;
+}
+
+.seed-tile[data-kind='gain'] {
+  --tint: 183 154 214;
+}
+
+.seed-tile[data-kind='bonus'] {
+  --tint: 232 178 74;
+}
+
+.seed-tile-icon {
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0.38rem;
+  border: 1px solid rgb(var(--tint) / 0.55);
+  border-radius: 50%;
+  background: rgb(var(--tint) / 0.18);
+  fill: none;
+  stroke: color-mix(in srgb, rgb(var(--tint)) 55%, #2f3d2c);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .seed-tile dd {

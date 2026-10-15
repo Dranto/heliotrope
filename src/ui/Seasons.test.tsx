@@ -30,4 +30,16 @@ describe('Seasons', () => {
     renderSeasons();
     expect(screen.getByText(/Prochaine Graine dans .+ Lumière\./)).not.toHaveTextContent('environ');
   });
+
+  it('marks each seed tile with its own hidden line icon, keeping the label as its name', () => {
+    saveGame(createInitialState(0));
+    renderSeasons();
+    const tiles = [...document.querySelectorAll<HTMLElement>('.seed-tile')];
+    expect(tiles.map((tile) => tile.dataset.kind)).toEqual(['owned', 'gain', 'bonus']);
+    for (const tile of tiles) {
+      const icon = tile.querySelector('dt > svg.seed-tile-icon');
+      expect(icon).toHaveAttribute('aria-hidden', 'true');
+    }
+    expect(screen.getByText('À récolter').tagName).toBe('DT');
+  });
 });
