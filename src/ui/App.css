@@ -2681,6 +2681,81 @@ button {
 
 /* Statistics ------------------------------------------------------------- */
 
+.stats {
+  padding-top: 0.75rem;
+  background:
+    radial-gradient(22rem 10rem at 50% 0%, rgb(246 213 143 / 0.4), transparent 70%),
+    rgb(251 246 236 / 0.94);
+}
+
+.stats-ornament {
+  display: block;
+  width: min(15rem, 70%);
+  margin: 0 auto 0.25rem;
+  overflow: visible;
+}
+
+.stats-sun {
+  fill: var(--gold-soft);
+}
+
+.stats-trend {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 5;
+}
+
+.stats-soil {
+  fill: none;
+  stroke: var(--terracotta);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.stats-grass {
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.stats-stem {
+  stroke: var(--leaf);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: stats-grow 1.2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.stats-leaf {
+  fill: var(--sage);
+  stroke-width: 0.8;
+}
+
+.stats-bud {
+  fill: var(--gold);
+  stroke: none;
+}
+
+.stats-bud.lilac {
+  fill: var(--lilac);
+}
+
+.stats-bud.heliotrope {
+  fill: #8e6bbf;
+}
+
+@keyframes stats-grow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+}
+
 .stats section {
   padding: 1rem 0 0.5rem;
   border-top: 1px solid rgb(143 174 139 / 0.35);
