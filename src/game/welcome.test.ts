@@ -1,5 +1,5 @@
 import { guideStep } from './guide';
-import { isReportEmpty, offlineReport } from './offline';
+import { offlineReport } from './offline';
 import { deserialize, serialize } from './save';
 import { createInitialState, DEFAULT_SETTINGS, type GameState } from './state';
 import { buyGenerator, buyUpgrade, clickHeliotrope } from './tick';
@@ -63,8 +63,13 @@ describe('The return in images (§9.1, M17)', () => {
       seasons: 0,
       weathers: [],
     });
-    expect(isReportEmpty(report)).toBe(false);
-    expect(isReportEmpty(offlineReport(before, before))).toBe(true);
+    expect(offlineReport(before, before)).toEqual({
+      built: [],
+      ripened: [],
+      seedsRipened: false,
+      seasons: 0,
+      weathers: [],
+    });
   });
 
   it('after Seasons started by the sower, shows every building standing', () => {
