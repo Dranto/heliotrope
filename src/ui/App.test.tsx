@@ -313,7 +313,10 @@ describe('App', () => {
     saveGame({ ...base, parcels: ['river'], species: ['frog'] });
     renderApp(new GameStore(localStorage, () => 0));
     expect(document.querySelector('.species [data-species="frog"]')).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /Herbier/ }));
+    // The menu button says how many species are back out of all of them, to screen readers too.
+    const button = screen.getByRole('button', { name: 'Herbier, 1 sur 32' });
+    expect(button.querySelector('.menu-count > [aria-hidden="true"]')).toHaveTextContent('1/32');
+    fireEvent.click(button);
     const dialog = await screen.findByRole('dialog', { name: 'L’Herbier' });
     expect(screen.getByTestId('herbier-summary')).toHaveTextContent('1 espèces revenues sur 32');
     expect(dialog.querySelector('[data-species="frog"]')).toHaveAttribute('data-found', 'true');
@@ -375,7 +378,11 @@ describe('App', () => {
     const base = openGame(0);
     saveGame({ ...base, totalLight: 20_000, achievements: ['light.3', 'pot.1'] });
     renderApp(new GameStore(localStorage, () => 0));
-    fireEvent.click(screen.getByRole('button', { name: /^Jalons/ }));
+    const button = screen.getByRole('button', { name: /^Jalons, 2 sur \d+$/ });
+    expect(button.querySelector('.menu-count > [aria-hidden="true"]')).toHaveTextContent(
+      /^2\/\d+$/,
+    );
+    fireEvent.click(button);
     const dialog = await screen.findByRole('dialog', { name: 'Jalons' });
     expect(screen.getByTestId('achievements-summary')).toHaveTextContent(
       /^2 sur \d+ jalons, production \+2.%$/,

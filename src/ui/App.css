@@ -3094,6 +3094,12 @@ button {
   text-align: center;
 }
 
+/* The total reads softer than the count reached. */
+.menu-count-total {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
 /* Milestones (§9.3) ----------------------------------------------------- */
 
 .menu-count {
