@@ -736,6 +736,12 @@ export const en: Texts = {
     plot: (index: number) => `Bed ${index}`,
     bare: 'Bare bed',
     locked: 'Bed to come',
+    lockedBy: {
+      season: 'Opens after the first Season',
+      parcels: (restored: number, needed: number) =>
+        `Opens with ${needed} parcels restored (${restored}/${needed})`,
+      bioregion: 'Opens with the Bioregion',
+    },
     choose: 'What to sow?',
     sow: 'Sow',
     sowLabel: (crop: string, plot: string) => `Sow ${crop} in ${plot.toLowerCase()}`,

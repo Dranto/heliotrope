@@ -10,6 +10,8 @@ import {
   isRipe,
   MAX_PLOTS,
   openPlots,
+  PLOT_PARCELS,
+  plotsToCome,
   plotGrowth,
   secondsToRipe,
   sow,
@@ -43,6 +45,7 @@ export function Garden({
   if (!isGardenOpen(state)) return null;
   const plots = state.garden.plots;
   const opened = openPlots(state);
+  const toCome = plotsToCome(state);
   const firstBare = plots.findIndex((p, i) => i < opened && p.crop === null);
   const picking = choosing !== null && plots[choosing]?.crop === null ? choosing : firstBare;
   const crops = CROP_IDS.filter((id) => isCropUnlocked(state, id));
@@ -75,12 +78,22 @@ export function Garden({
         {plots.slice(0, MAX_PLOTS).map((plot, i) => {
           const name = t.garden.plot(i + 1);
           if (i >= opened) {
+            const condition = toCome[i - opened];
             return (
               <li key={i} className="garden-bed" data-state="locked">
                 <span className="garden-bed-head">
                   <strong>{name}</strong>
                 </span>
-                <span className="hint">{t.garden.locked}</span>
+                <span className="hint">
+                  {condition === 'parcels'
+                    ? t.garden.lockedBy.parcels(
+                        Math.min(state.parcels.length, PLOT_PARCELS),
+                        PLOT_PARCELS,
+                      )
+                    : condition
+                      ? t.garden.lockedBy[condition]
+                      : t.garden.locked}
+                </span>
               </li>
             );
           }

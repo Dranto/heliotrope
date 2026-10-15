@@ -9,6 +9,7 @@ import {
   isRipe,
   neighbourPlots,
   openPlots,
+  plotsToCome,
   possibleVarieties,
   RADISH_MIN,
   secondsToRipe,
@@ -46,6 +47,15 @@ describe('Courtyard garden (§9.7, M14)', () => {
     expect(openPlots(started({ seasons: 2 }))).toBe(5);
     expect(canSow(openGame(0), 0, 'radish')).toBe(false);
     expect(canSow(started(), 3, 'radish')).toBe(false);
+  });
+
+  it('names what opens each locked bed, in order', () => {
+    expect(plotsToCome(started())).toEqual(['season', 'parcels', 'bioregion']);
+    expect(
+      plotsToCome(started({ parcels: ['river', 'park', 'gardenStreet', 'rainGardens'] })),
+    ).toEqual(['season', 'bioregion']);
+    const later = started({ seasons: 2 });
+    expect(plotsToCome(later)).toHaveLength(6 - openPlots(later));
   });
 
   it('unlocks crops step by step', () => {

@@ -159,9 +159,25 @@ export function openPlots(state: GameState): number {
   return (
     3 +
     Number(state.seasons > 0) +
-    Number(state.parcels.length >= 4) +
+    Number(state.parcels.length >= PLOT_PARCELS) +
     Number(isBioregionOpen(state))
   );
+}
+
+/** What opens one more bed (§9.7): the first Season, four parcels restored, the Bioregion. */
+export type PlotCondition = 'season' | 'parcels' | 'bioregion';
+
+/** Parcels to restore for a bed (§9.7). */
+export const PLOT_PARCELS = 4;
+
+/** The conditions still to meet, one per locked bed, in the order the beds count them. */
+export function plotsToCome(state: GameState): PlotCondition[] {
+  const met: Record<PlotCondition, boolean> = {
+    season: state.seasons > 0,
+    parcels: state.parcels.length >= PLOT_PARCELS,
+    bioregion: isBioregionOpen(state),
+  };
+  return (['season', 'parcels', 'bioregion'] as const).filter((c) => !met[c]);
 }
 
 /**
