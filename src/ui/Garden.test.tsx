@@ -82,4 +82,25 @@ describe('the garden beds', () => {
     }
     expect(items.filter((item) => item.dataset.found === 'true')).toHaveLength(1);
   });
+
+  it('say what opens each locked bed', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      generators: { ...base.generators, pot: 1 },
+      parcels: ['river', 'park'],
+      intro: { ...base.intro, introduced: [...base.intro.introduced, 'garden'] },
+    });
+    render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <Garden onHarvest={() => {}} onHarvestAll={() => {}} />
+      </GameStoreContext.Provider>,
+    );
+    const locked = [...document.querySelectorAll<HTMLElement>('.garden-bed[data-state="locked"]')];
+    expect(locked.map((bed) => bed.querySelector('.hint')?.textContent)).toEqual([
+      'S’ouvre après la première Saison',
+      'S’ouvre avec 4 parcelles restaurées (2/4)',
+      'S’ouvre avec la Biorégion',
+    ]);
+  });
 });

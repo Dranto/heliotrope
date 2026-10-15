@@ -810,6 +810,12 @@ export const fr = {
     plot: (index: number) => `Carré ${index}`,
     bare: 'Carré libre',
     locked: 'Carré à venir',
+    lockedBy: {
+      season: 'S’ouvre après la première Saison',
+      parcels: (restored: number, needed: number) =>
+        `S’ouvre avec ${needed} parcelles restaurées (${restored}/${needed})`,
+      bioregion: 'S’ouvre avec la Biorégion',
+    },
     choose: 'Que semer\u00a0?',
     sow: 'Semer',
     sowLabel: (crop: string, plot: string) => `Semer ${crop} dans le ${plot.toLowerCase()}`,
