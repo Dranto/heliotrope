@@ -46,8 +46,15 @@ describe('App', () => {
 
   it('shows the next goal, the time before a purchase, and buys with the keyboard (§10.5)', async () => {
     const store = renderApp();
-    expect(screen.getByTestId('next-goal')).toHaveTextContent(/Prochain\s+: Héliotrope en pot/);
-    for (let i = 0; i < 15; i++) fireEvent.click(flower());
+    // Nothing is produced yet, so the goal says how much Light is still missing.
+    expect(screen.getByTestId('next-goal')).toHaveTextContent(
+      /Prochain\s+: Héliotrope en pot\s*encore 15\s+Lumière/,
+    );
+    fireEvent.click(flower());
+    expect(
+      screen.getByText(/^Prochain objectif\s+: Héliotrope en pot, encore 14\s+Lumière/),
+    ).toHaveClass('visually-hidden');
+    for (let i = 0; i < 14; i++) fireEvent.click(flower());
     fireEvent.keyDown(document, { key: '1' });
     expect(store.getState().generators.pot).toBe(1);
     // The first click upgrade is now the cheapest thing out of reach.
