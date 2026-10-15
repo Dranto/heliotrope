@@ -181,6 +181,7 @@ function Card({ kind, name, effect, future, cost, affordable, onBuy, onFocus, on
     <li
       className="restoration-card"
       data-kind={kind}
+      data-futures={future ? true : undefined}
       data-affordable={affordable}
       onMouseEnter={onFocus}
       onMouseLeave={onBlur}

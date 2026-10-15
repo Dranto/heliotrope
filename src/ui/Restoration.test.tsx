@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { withAllIntroduced } from '../game/introductions';
 import { saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
 import { GameStore } from '../game/store';
@@ -24,5 +25,14 @@ describe('Restoration', () => {
     expect(document.querySelector('.future-other')?.textContent).toMatch(
       /^Ou Rivière baignade\s: /,
     );
+  });
+
+  it('marks the cards of parcels with two futures, so their button can sit under the text', () => {
+    saveGame({ ...withAllIntroduced(createInitialState(0)), totalLight: 750 });
+    renderRestoration();
+    const button = screen.getByRole('button', { name: /Rue jardin/ });
+    const card = button.closest('.restoration-card');
+    expect(card).toHaveAttribute('data-futures', 'true');
+    expect(card?.querySelector('[role="radiogroup"]')).not.toBeNull();
   });
 });
