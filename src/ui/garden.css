@@ -363,24 +363,51 @@
 }
 
 .garden-varieties {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   gap: 0.35rem;
   margin: 0.35rem 0 0;
   padding: 0;
   list-style: none;
 }
 
+/* Each variety shows the two crops that make it: greyed seeds until it is found, then in
+   colour on a gold card. */
 .garden-variety {
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.65rem 0.3rem 0.35rem;
+  border-radius: 0.8rem;
   font-size: 0.78rem;
+  line-height: 1.25;
   border: 1px dashed rgb(31 42 36 / 0.25);
   color: var(--ink-soft);
+}
+
+.variety-pair {
+  display: flex;
+  flex: none;
+}
+
+.variety-pair .crop-art {
+  width: 1.6rem;
+  height: 1.6rem;
+  filter: grayscale(0.55);
+  opacity: 0.75;
+}
+
+.variety-pair .crop-art + .crop-art {
+  margin-left: -0.55rem;
 }
 
 .garden-variety[data-found='true'] {
   border: 1px solid var(--gold);
   background: rgb(255 244 214 / 0.9);
   color: var(--ink);
+}
+
+.garden-variety[data-found='true'] .crop-art {
+  filter: none;
+  opacity: 1;
 }

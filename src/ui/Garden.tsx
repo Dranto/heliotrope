@@ -186,9 +186,15 @@ export function Garden({
             const [a, b] = VARIETIES[id].parents;
             return (
               <li key={id} className="garden-variety" data-found={found}>
-                {found
-                  ? t.garden.varieties[id]
-                  : t.garden.unknownVariety(t.garden.crops[a].name, t.garden.crops[b].name)}
+                <span className="variety-pair" aria-hidden="true">
+                  <CropArt crop={a} />
+                  <CropArt crop={b} />
+                </span>
+                <span>
+                  {found
+                    ? t.garden.varieties[id]
+                    : t.garden.unknownVariety(t.garden.crops[a].name, t.garden.crops[b].name)}
+                </span>
               </li>
             );
           })}
