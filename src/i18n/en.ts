@@ -90,6 +90,9 @@ export const en: Texts = {
     'Shortcuts: keys 1 to 8 buy a building, M switches to Max and back, U buys the affordable upgrades',
   nextGoal: (name: string) => `Next: ${name}`,
   nextGoalLabel: (name: string, duration: string) => `Next goal: ${name}, in ${duration}`,
+  goalMissing: (amount: string) => `${amount} Light to go`,
+  nextGoalMissingLabel: (name: string, amount: string) =>
+    `Next goal: ${name}, ${amount} Light to go`,
   biodiversity: (percent: string) => `Biodiversity +${percent}%`,
   biodiversityHint:
     'Each building type owned 10, 50, 100, 150 then 250 times adds 2% to all production.',

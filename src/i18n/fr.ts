@@ -135,6 +135,9 @@ export const fr = {
   nextGoal: (name: string) => `Prochain\u00a0: ${name}`,
   nextGoalLabel: (name: string, duration: string) =>
     `Prochain objectif\u00a0: ${name}, dans ${duration}`,
+  goalMissing: (amount: string) => `encore ${amount}\u00a0Lumière`,
+  nextGoalMissingLabel: (name: string, amount: string) =>
+    `Prochain objectif\u00a0: ${name}, encore ${amount}\u00a0Lumière`,
   biodiversity: (percent: string) => `Biodiversité +${percent}\u00a0%`,
   biodiversityHint:
     'Chaque type de bâtiment possédé à 10, 50, 100, 150 puis 250 exemplaires ajoute 2\u00a0% à toute la production.',

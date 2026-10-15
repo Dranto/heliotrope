@@ -1,3 +1,4 @@
+import { formatNumber } from '../game/format';
 import { nextGoal, secondsToAfford, type Goal } from '../game/goals';
 import { UPGRADES } from '../game/upgrades';
 import { t } from '../i18n';
@@ -43,19 +44,20 @@ export function NextGoal() {
   const name = goalName(goal);
   const seconds = secondsToAfford(state, goal.cost);
   const finite = Number.isFinite(seconds);
+  // With nothing produced yet there is no time to give: the Light still missing stands in for it.
+  const missing = formatNumber(Math.ceil(goal.cost - state.resources.light));
+  const detail = finite ? t.eta(etaText(seconds)) : t.goalMissing(missing);
   return (
     <span className="counter-goal" data-testid="next-goal" data-kind={goal.kind}>
       {/* A plain span has no role, so an aria-label on it is never read: the full sentence goes
           to screen readers as hidden text instead. */}
       <span className="visually-hidden">
-        {finite ? t.nextGoalLabel(name, etaText(seconds)) : t.nextGoal(name)}
+        {finite ? t.nextGoalLabel(name, etaText(seconds)) : t.nextGoalMissingLabel(name, missing)}
       </span>
       <span aria-hidden="true">{t.nextGoal(name)}</span>
-      {finite && (
-        <span className="counter-goal-eta" aria-hidden="true">
-          {t.eta(etaText(seconds))}
-        </span>
-      )}
+      <span className="counter-goal-eta" aria-hidden="true">
+        {detail}
+      </span>
     </span>
   );
 }
