@@ -89,13 +89,3 @@ export function offlineReport(before: GameState, after: GameState): OfflineRepor
     weathers: weathersBetween(before.weather, after.weather),
   };
 }
-
-/** Nothing to show: the return then keeps to the Light gathered. */
-export function isReportEmpty(report: OfflineReport): boolean {
-  return (
-    report.built.length === 0 &&
-    report.ripened.length === 0 &&
-    !report.seedsRipened &&
-    report.seasons === 0
-  );
-}
