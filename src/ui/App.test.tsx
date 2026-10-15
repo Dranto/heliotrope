@@ -715,4 +715,26 @@ describe('the phone tab bar', () => {
     fireEvent.click(tabs.getByRole('button', { name: /Améliorer/ }));
     expect(scrollTo).not.toHaveBeenCalled();
   });
+
+  it('puts the screen tiles of the "Plus" tab in the main landmark', () => {
+    // Every media query matches, so the screen reads as a phone.
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    try {
+      renderApp();
+      const menu = screen.getByRole('navigation', { name: 'Menu' });
+      expect(menu.closest('header')).not.toBeNull();
+      const tabs = within(screen.getByRole('navigation', { name: 'Sections du jeu' }));
+      fireEvent.click(tabs.getByRole('button', { name: 'Plus' }));
+      const moved = screen.getByRole('navigation', { name: 'Menu' });
+      expect(moved.closest('main')).not.toBeNull();
+      expect(within(moved).getByRole('button', { name: /Options/ })).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

@@ -3664,7 +3664,7 @@ button {
   .app:not([data-tab='living'])
     :is(.garden-panel, .orchard-panel, .alliances-panel, .requests-panel),
   .app:not([data-tab='region']) :is(.bioregion, .works-panel),
-  .app[data-tab='more'] .layout {
+  .app[data-tab='more'] .layout > :not(.menu) {
     display: none;
   }
 
@@ -3675,6 +3675,7 @@ button {
   .app[data-tab='more'] .menu {
     order: 4;
     display: grid;
+    align-self: start;
     width: 100%;
     gap: 0.6rem;
   }
