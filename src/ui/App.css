@@ -1205,6 +1205,31 @@ button {
   stroke-width: 0.6;
 }
 
+.roof-bed {
+  fill: #c9a274;
+}
+
+.roof-soil {
+  fill: #8d6a4b;
+}
+
+.roof-furrow {
+  fill: none;
+  stroke: #6e4f36;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.row-light {
+  fill: none;
+  stroke: #c9dfa6;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-dasharray: 0 4;
+  opacity: 0.85;
+}
+
 .row {
   fill: none;
   stroke-width: 3;

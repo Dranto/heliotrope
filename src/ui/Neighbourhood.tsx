@@ -296,17 +296,32 @@ function Garden({ box: [x, y, w, h], level }: { box: Box; level: number }) {
   // Each row of plants is a dotted line; ripe tomatoes then flowers join them with upgrades.
   const kinds = (i: number) =>
     level >= 3 && i % 3 === 2 ? 'blossom' : level >= 1 && i % 2 ? 'tomato' : 'leafy';
+  // A timber frame around dark soil; each row sits on its own earthed-up furrow, its leaves
+  // catching the sun on one side.
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx="2" className="bed" />
+      <rect x={x} y={y} width={w} height={h} rx="2" className="bed roof-bed" />
+      <rect
+        x={x + 1.2}
+        y={y + 1.2}
+        width={w - 2.4}
+        height={h - 2.4}
+        rx="1.2"
+        className="roof-soil"
+      />
       {Array.from({ length: rows }, (_, i) => {
         const offset = 2 + gap * i + gap / 2;
         const d = horizontal
           ? `M${x + 3} ${y + offset} H${x + w - 3}`
           : `M${x + offset} ${y + 3} V${y + h - 3}`;
+        const light = horizontal
+          ? `M${x + 3.5} ${y + offset - 0.7} H${x + w - 3}`
+          : `M${x + offset - 0.7} ${y + 3.5} V${y + h - 3}`;
         return (
           <g key={i}>
+            <path d={d} className="roof-furrow" />
             <path d={d} className="row foliage-stroke" />
+            <path d={light} className="row-light" />
             {kinds(i) !== 'leafy' && <path d={d} className={`row-fruit ${kinds(i)}-stroke`} />}
           </g>
         );
