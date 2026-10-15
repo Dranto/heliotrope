@@ -376,6 +376,9 @@ describe('App', () => {
     expect(dialog).toHaveTextContent('Première lueur');
     expect(dialog).toHaveTextContent('Jalon caché');
     expect(dialog).not.toHaveTextContent('Photosynthèse lente');
+    // Families are reached by their headings, not as landmarks named like the main panels.
+    expect(within(dialog).queryAllByRole('region')).toHaveLength(0);
+    expect(within(dialog).getByRole('heading', { level: 3, name: /^Lumière/ })).toBeInTheDocument();
   });
 
   it('announces a Milestone when it is reached', () => {

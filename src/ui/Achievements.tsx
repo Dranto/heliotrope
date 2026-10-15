@@ -94,12 +94,9 @@ export function Achievements({ onClose }: { onClose: () => void }) {
         const colourName = t.decor.colours[colour].toLowerCase();
         const next = complete ? null : nextMilestone(state, family);
         return (
-          <section
-            key={family}
-            className="achievement-family"
-            aria-label={t.achievements.families[family]}
-            data-complete={complete}
-          >
+          // A plain section, found by its heading: named, it would be a landmark sharing the
+          // main panels' names ("Lumière", "Le quartier") in the screen reader's landmark list.
+          <section key={family} className="achievement-family" data-complete={complete}>
             <h3 className="achievement-family-title">
               {t.achievements.families[family]}
               <span className="achievement-family-count">
