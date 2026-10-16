@@ -4479,7 +4479,7 @@ button {
 
 .curve-legend i {
   width: 0.9rem;
-  height: 2px;
+  height: 3px;
   border-radius: 1px;
   background: var(--sage);
 }

@@ -8,6 +8,9 @@ const HEIGHT = 150;
 const PAD = { left: 40, right: 8, top: 8, bottom: 20 };
 const PLOT_W = WIDTH - PAD.left - PAD.right;
 const PLOT_H = HEIGHT - PAD.top - PAD.bottom;
+/** Opacity of each line by rank, newest first: far enough apart to tell five Seasons apart. */
+const FADE = [1, 0.72, 0.5, 0.34, 0.22];
+const FADE_OLDEST = 0.16;
 
 /** Duration of a curve: the time of its last point. */
 function span(curve: SeasonCurve): number {
@@ -22,8 +25,9 @@ function valueAt(curve: SeasonCurve, seconds: number): number | undefined {
 
 /**
  * Light per second through the last Seasons (design doc §10.5), on a log scale so a late Season
- * and the first one share the chart. The current Season is the darkest line, earlier ones fade
- * with age. Pointing at the chart reads each Season's production at that time.
+ * and the first one share the chart. The newest line is the dark one: the current Season's, or
+ * the last finished Season's while the current one has no line yet. Earlier ones fade step by
+ * step, so each stays told apart. Pointing at the chart reads each Season's production then.
  */
 export function ProductionCurve({ curves }: { curves: SeasonCurve[] }) {
   const [hover, setHover] = useState<number | null>(null);
@@ -43,7 +47,11 @@ export function ProductionCurve({ curves }: { curves: SeasonCurve[] }) {
   const every = Math.ceil((high - low) / 4);
   const ticks: number[] = [];
   for (let e = low; e <= high; e += every) ticks.push(e);
-  const current = curves[curves.length - 1]!.season;
+  // Right after a new Season starts it has a single point and no line: the last finished
+  // Season then leads, rather than every line being drawn faded.
+  const current = drawn[drawn.length - 1]!.season;
+  const fade = (season: number) =>
+    FADE[drawn.length - 1 - drawn.findIndex((c) => c.season === season)] ?? FADE_OLDEST;
 
   function onPointer(event: PointerEvent<SVGSVGElement>) {
     const box = event.currentTarget.getBoundingClientRect();
@@ -82,9 +90,7 @@ export function ProductionCurve({ curves }: { curves: SeasonCurve[] }) {
             key={curve.season}
             className="curve-line"
             data-current={curve.season === current}
-            style={{
-              opacity: curve.season === current ? 1 : 0.25 + 0.6 / (current - curve.season),
-            }}
+            style={{ opacity: fade(curve.season) }}
             points={curve.points.map((p, i) => `${x(i * curve.step)},${y(p)}`).join(' ')}
           />
         ))}
@@ -112,11 +118,7 @@ export function ProductionCurve({ curves }: { curves: SeasonCurve[] }) {
           const name = t.seeds.seasonName(curve.season);
           return (
             <span key={curve.season} data-current={curve.season === current}>
-              <i
-                style={{
-                  opacity: curve.season === current ? 1 : 0.25 + 0.6 / (current - curve.season),
-                }}
-              />
+              <i style={{ opacity: fade(curve.season) }} />
               {value === undefined || hover === null
                 ? name
                 : t.stats.curveAt(name, t.duration(hover), formatNumber(value))}
