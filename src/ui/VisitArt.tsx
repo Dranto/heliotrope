@@ -73,7 +73,19 @@ function Shower() {
       </g>
       <g className="visit-cloud">
         <ellipse className="visit-cloud-shadow" cx="3" cy="16" rx="16" ry="4" />
-        <path d="M-15 4c-4 0-6-3-5-6 1-3 4-4 7-3 1-5 6-8 11-6 3-4 9-4 12 0 4-1 8 2 8 6 3 1 4 4 3 6-1 2-3 3-5 3Z" />
+        <path
+          className="visit-cloud-belly"
+          d="M-15 4c-4 0-6-3-5-6 1-3 4-4 7-3 1-5 6-8 11-6 3-4 9-4 12 0 4-1 8 2 8 6 3 1 4 4 3 6-1 2-3 3-5 3Z"
+        />
+        {/* The sunlit top, lifted off the lilac belly so the cloud reads as a volume. */}
+        <path
+          className="visit-cloud-top"
+          d="M-14 1c-3 0-5-2-4-4 1-3 4-3 6-2 1-5 6-7 10-5 3-4 9-4 12 0 4-1 7 2 7 5 3 1 3 3 2 5-1 1-2 1-4 1Z"
+        />
+        <path
+          className="visit-cloud-light"
+          d="M-12-3c1-2 3-2 4-1M-3-8c2-2 5-2 7 0M8-8c2-1 4 0 5 1"
+        />
       </g>
     </g>
   );
