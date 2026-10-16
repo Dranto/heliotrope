@@ -66,22 +66,55 @@
 }
 
 .bioregion-land .agri-shade {
-  fill: rgb(47 70 60 / 0.18);
+  fill: rgb(70 60 110 / 0.16);
 }
 
 .bioregion-land .agri-panel {
-  fill: #48607a;
+  fill: url(#agri-glass);
+  stroke: #2b3a5a;
+  stroke-width: 0.5;
+}
+
+.bioregion-land .agri-cell {
+  stroke: #cfe2f0;
+  stroke-width: 0.4;
+  stroke-dasharray: 2 1.4;
+  opacity: 0.45;
 }
 
 .bioregion-land .agri-edge {
-  stroke: #cfe2f0;
-  stroke-width: 1.2;
+  stroke: #eaf4fb;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.bioregion-land .agri-glint {
+  stroke: #ffffff;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.bioregion-land .agri-flower.flower-0 {
+  fill: #e48fb6;
+}
+
+.bioregion-land .agri-flower.flower-1 {
+  fill: #f2b740;
+}
+
+.bioregion-land .agri-flower.flower-2 {
+  fill: #fff6e6;
 }
 
 .bioregion-land .sheep {
   fill: #fffaf0;
   stroke: #9b917f;
   stroke-width: 0.6;
+}
+
+.bioregion-land .sheep-head {
+  fill: #5b5048;
 }
 
 /* Food forests and the old-growth forest. */

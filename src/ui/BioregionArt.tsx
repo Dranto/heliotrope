@@ -122,19 +122,60 @@ export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
 /** Agrivoltaic meadow: a flowering meadow under rows of raised solar panels. */
 export function Meadow({ box: [x, y, w, h] }: { box: Box }) {
   const rows = [0.22, 0.5, 0.78].map((f) => y + h * f);
+  const span = w - 24;
+  // Each row is a string of glass modules with a thin gap between them, like real panels.
+  const modules = Math.max(3, Math.round(span / 16));
+  const size = span / modules;
+  const glint = landHash(x, y) % modules;
   return (
     <g className="agri-meadow">
       <rect x={x} y={y} width={w} height={h} rx="14" className="meadow-ground" />
       <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} rx="8" fill="url(#land-flowers)" />
-      {rows.map((ry) => (
+      {rows.map((ry, r) => (
         <g key={ry}>
-          <rect x={x + 12} y={ry - 2} width={w - 24} height="7" rx="1.5" className="agri-shade" />
-          <rect x={x + 12} y={ry - 5} width={w - 24} height="7" rx="1.5" className="agri-panel" />
-          <path d={`M${x + 12} ${ry - 5}H${x + w - 12}`} className="agri-edge" />
+          <rect x={x + 14} y={ry} width={span} height="9" rx="2" className="agri-shade" />
+          {Array.from({ length: modules }, (_, i) => (
+            <rect
+              key={i}
+              x={x + 12 + i * size + 0.5}
+              y={ry - 6}
+              width={size - 1}
+              height="10"
+              rx="1.2"
+              className="agri-panel"
+            />
+          ))}
+          <path d={`M${x + 12} ${ry - 1}H${x + 12 + span}`} className="agri-cell" />
+          <path d={`M${x + 12.5} ${ry - 5.5}H${x + 11.5 + span}`} className="agri-edge" />
+          {/* The sky caught in one module of each row. */}
+          <path
+            d={`M${x + 12 + ((glint + r * 2) % modules) * size + 2.5} ${ry + 2.5}l3.6 -7`}
+            className="agri-glint"
+          />
+          {/* Wildflowers thrive in the panels' half-shade, in a band along each row. */}
+          {Array.from({ length: modules }, (_, i) => (
+            <circle
+              key={`f${i}`}
+              cx={x + 12 + i * size + size * (0.3 + ((i * 7 + r * 3) % 5) * 0.1)}
+              cy={ry + 7 + ((i + r) % 2) * 1.5}
+              r="1.5"
+              className={`agri-flower flower-${(i + r) % 3}`}
+            />
+          ))}
         </g>
       ))}
-      <circle cx={x + w * 0.3} cy={y + h * 0.36} r="2.6" className="sheep" />
-      <circle cx={x + w * 0.66} cy={y + h * 0.64} r="2.6" className="sheep" />
+      <Sheep x={x + w * 0.3} y={y + h * 0.36} />
+      <Sheep x={x + w * 0.66} y={y + h * 0.64} />
+    </g>
+  );
+}
+
+/** A sheep grazing under the panels: a woolly back and a dark head. */
+function Sheep({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <ellipse cx={x} cy={y} rx="3.2" ry="2.4" className="sheep" />
+      <circle cx={x + 3.1} cy={y - 0.4} r="1.2" className="sheep-head" />
     </g>
   );
 }
@@ -289,6 +330,12 @@ export function LandPatterns() {
       <pattern id="land-furrows" width="8" height="8" patternUnits="userSpaceOnUse">
         <path d="M0 4H8" className="furrow" />
       </pattern>
+      {/* Solar glass: the pale sky at the top of a module, deep blue below. */}
+      <linearGradient id="agri-glass" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#a7c4e6" />
+        <stop offset="0.4" stopColor="#4c6fa3" />
+        <stop offset="1" stopColor="#33467a" />
+      </linearGradient>
       <pattern id="land-flowers" width="18" height="16" patternUnits="userSpaceOnUse">
         <circle cx="4" cy="5" r="1.1" className="flower-a" />
         <circle cx="13" cy="11" r="1" className="flower-b" />
