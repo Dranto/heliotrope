@@ -1206,13 +1206,29 @@ button {
   stroke-width: 0.6;
 }
 
-.farm-glass {
-  fill: #eef3ea;
+.farm-deck {
+  fill: #e4cfa6;
 }
 
-.farm rect:not(.shadow, .row) {
-  stroke: rgb(255 255 255 / 0.8);
-  stroke-width: 0.6;
+.farm-stone {
+  fill: #f1ece2;
+}
+
+.farm :is(.farm-deck, .farm-stone) {
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 0.5;
+}
+
+.farm-shade {
+  fill: #3b3328;
+  opacity: 0.24;
+}
+
+.farm .skylight-frame {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.5;
+  opacity: 0.8;
 }
 
 .bed {
