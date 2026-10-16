@@ -22,20 +22,34 @@
 }
 
 .bioregion-land .crop-0 {
-  fill: #efe1bb;
+  fill: #f0da9c;
 }
 
 .bioregion-land .crop-1 {
-  fill: #e0e5c0;
+  fill: #dde7b6;
 }
 
 .bioregion-land .crop-2 {
-  fill: #ead7aa;
+  fill: #e8cd9a;
+}
+
+.bioregion-land .wheat-row {
+  stroke: rgb(184 140 58 / 0.32);
+  stroke-width: 2;
+}
+
+.bioregion-land .sprout {
+  fill: rgb(122 166 92 / 0.55);
 }
 
 .bioregion-land .furrow {
-  stroke: rgb(140 115 70 / 0.1);
-  stroke-width: 1.4;
+  stroke: rgb(150 104 56 / 0.26);
+  stroke-width: 2.6;
+}
+
+.bioregion-land .crop-light {
+  stroke: rgb(255 248 222 / 0.5);
+  stroke-width: 0.8;
 }
 
 .bioregion-land .hedge {
