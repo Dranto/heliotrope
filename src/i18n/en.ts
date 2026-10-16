@@ -838,6 +838,7 @@ export const en: Texts = {
     side: (name: string, have: string, need: string) => `${name}: ${have} of ${need}`,
     awake: 'Awake',
     asleep: 'Asleep',
+    asleepList: (count: string) => `Asleep alliances (${count})`,
     choose: 'Choose',
     chooseLabel: (name: string) => `Choose the alliance: ${name}`,
     takeOut: 'Take out',

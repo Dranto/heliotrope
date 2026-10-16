@@ -30,9 +30,66 @@ export function Alliances() {
   if (!areAlliancesOpen(state)) return null;
   const { chosen } = state.alliances;
   const slots = allianceSlots(state);
-  // Twelve alliances (M34): the chosen ones first, then those awake, then those still asleep.
-  const rank = (id: AllianceId) => (chosen.includes(id) ? 0 : isAwake(state, id) ? 1 : 2);
-  const order = [...ALLIANCE_IDS].sort((a, b) => rank(a) - rank(b));
+  // Twelve alliances (M34): the chosen ones first, then those awake; those still asleep wait
+  // folded below, so the panel stays short on a phone.
+  const rank = (id: AllianceId) => (chosen.includes(id) ? 0 : 1);
+  const shown = ALLIANCE_IDS.filter((id) => chosen.includes(id) || isAwake(state, id)).sort(
+    (a, b) => rank(a) - rank(b),
+  );
+  const asleep = ALLIANCE_IDS.filter((id) => !shown.includes(id));
+
+  function card(id: AllianceId) {
+    const def = ALLIANCES[id];
+    const name = t.alliances.names[id];
+    const awake = isAwake(state, id);
+    const isChosen = chosen.includes(id);
+    const sides = def.sides
+      .map((side) =>
+        t.alliances.side(
+          t.alliances.sides[side.key] ?? side.key,
+          formatNumber(Math.min(side.have(state), side.need)),
+          formatNumber(side.need),
+        ),
+      )
+      .join(' · ');
+    return (
+      <li key={id} className="alliance-card" data-chosen={isChosen} data-alliance={id}>
+        <strong>
+          {name}{' '}
+          <span className="alliance-state" data-awake={awake}>
+            · {awake ? t.alliances.awake : t.alliances.asleep}
+          </span>
+        </strong>
+        <p className="alliance-sides">{sides}</p>
+        <p className="alliance-effect">
+          {def.bonuses.length > 0 ? bonusesText(def.bonuses) : t.alliances.effects[id]}
+        </p>
+        {isChosen ? (
+          <button
+            type="button"
+            className="buy"
+            disabled={!canTakeOut(state, id)}
+            title={canTakeOut(state, id) ? undefined : t.alliances.takenOut}
+            aria-label={t.alliances.takeOutLabel(name)}
+            onClick={() => store.dispatch((s) => takeOutAlliance(s, id))}
+          >
+            <span className="buy-verb">{t.alliances.takeOut}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="buy"
+            disabled={!canChoose(state, id)}
+            title={canChoose(state, id) ? undefined : t.alliances.full}
+            aria-label={t.alliances.chooseLabel(name)}
+            onClick={() => store.dispatch((s) => chooseAlliance(s, id))}
+          >
+            <span className="buy-verb">{t.alliances.choose}</span>
+          </button>
+        )}
+      </li>
+    );
+  }
 
   return (
     <section className="panel alliances-panel" aria-labelledby="alliances-title" data-open={open}>
@@ -45,60 +102,13 @@ export function Alliances() {
         </span>
       </header>
       <p className="hint">{t.alliances.hint}</p>
-      <ul className="alliances-list">
-        {order.map((id) => {
-          const def = ALLIANCES[id];
-          const name = t.alliances.names[id];
-          const awake = isAwake(state, id);
-          const isChosen = chosen.includes(id);
-          const sides = def.sides
-            .map((side) =>
-              t.alliances.side(
-                t.alliances.sides[side.key] ?? side.key,
-                formatNumber(Math.min(side.have(state), side.need)),
-                formatNumber(side.need),
-              ),
-            )
-            .join(' · ');
-          return (
-            <li key={id} className="alliance-card" data-chosen={isChosen} data-alliance={id}>
-              <strong>
-                {name}{' '}
-                <span className="alliance-state" data-awake={awake}>
-                  · {awake ? t.alliances.awake : t.alliances.asleep}
-                </span>
-              </strong>
-              <p className="alliance-sides">{sides}</p>
-              <p className="alliance-effect">
-                {def.bonuses.length > 0 ? bonusesText(def.bonuses) : t.alliances.effects[id]}
-              </p>
-              {isChosen ? (
-                <button
-                  type="button"
-                  className="buy"
-                  disabled={!canTakeOut(state, id)}
-                  title={canTakeOut(state, id) ? undefined : t.alliances.takenOut}
-                  aria-label={t.alliances.takeOutLabel(name)}
-                  onClick={() => store.dispatch((s) => takeOutAlliance(s, id))}
-                >
-                  <span className="buy-verb">{t.alliances.takeOut}</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="buy"
-                  disabled={!canChoose(state, id)}
-                  title={canChoose(state, id) ? undefined : t.alliances.full}
-                  aria-label={t.alliances.chooseLabel(name)}
-                  onClick={() => store.dispatch((s) => chooseAlliance(s, id))}
-                >
-                  <span className="buy-verb">{t.alliances.choose}</span>
-                </button>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {shown.length > 0 && <ul className="alliances-list">{shown.map(card)}</ul>}
+      {asleep.length > 0 && (
+        <details className="alliances-asleep" open={shown.length === 0}>
+          <summary>{t.alliances.asleepList(formatNumber(asleep.length))}</summary>
+          <ul className="alliances-list">{asleep.map(card)}</ul>
+        </details>
+      )}
     </section>
   );
 }

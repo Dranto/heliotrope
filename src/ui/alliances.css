@@ -25,6 +25,29 @@
   list-style: none;
 }
 
+.alliances-asleep {
+  margin-top: 0.6rem;
+}
+
+.alliances-asleep summary {
+  cursor: pointer;
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+.alliances-asleep > .alliances-list {
+  margin-top: 0.5rem;
+}
+
+/* Easier to tap on a touch screen (§10.3). */
+@media (pointer: coarse) {
+  .alliances-asleep summary {
+    min-height: 2.75rem;
+    padding-block: 0.6rem;
+    box-sizing: border-box;
+  }
+}
+
 .alliance-card {
   display: grid;
   grid-template-columns: 1fr auto;
