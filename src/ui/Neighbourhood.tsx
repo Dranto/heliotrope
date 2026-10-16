@@ -565,6 +565,18 @@ function petal(length: number, width: number): string {
   return `M0 0 C${-width} ${-length * 0.35} ${-width * 0.6} ${-length * 0.9} 0 ${-length} C${width * 0.6} ${-length * 0.9} ${width} ${-length * 0.35} 0 0Z`;
 }
 
+/** The shaded half of a petal, away from the sun, so each terrace reads as a sloped wing. */
+function petalShade(length: number, width: number): string {
+  return `M0 0 C${-width} ${-length * 0.35} ${-width * 0.6} ${-length * 0.9} 0 ${-length}Z`;
+}
+
+/** A planted row along each half of a petal, and the walkway down its middle. */
+function petalRows(length: number, width: number): string {
+  const row = (side: number) =>
+    `M0 ${-length * 0.14} C${side * width * 0.55} ${-length * 0.36} ${side * width * 0.36} ${-length * 0.78} 0 ${-length * 0.9}`;
+  return `${row(-1)} ${row(1)}`;
+}
+
 /** The living arcology: a rosette of planted and glazed terraces that opens ring by ring. */
 function Arcology({ rings, level }: { rings: number; level: number }) {
   const [cx, cy] = centre(ARCOLOGY_SITE);
@@ -577,12 +589,18 @@ function Arcology({ rings, level }: { rings: number; level: number }) {
         return (
           <Appear key={i} at={[0, 0]} size={length}>
             {Array.from({ length: count }, (_, k) => (
-              <path
-                key={k}
-                d={petal(length, length * 0.42)}
-                transform={`rotate(${(k * 360) / count + (i % 2) * 22.5})`}
-                className={i % 2 ? 'terrace glass-terrace' : 'terrace foliage-light'}
-              />
+              <g key={k} transform={`rotate(${(k * 360) / count + (i % 2) * 22.5})`}>
+                <path
+                  d={petal(length, length * 0.42)}
+                  className={i % 2 ? 'terrace glass-terrace' : 'terrace foliage-light'}
+                />
+                <path d={petalShade(length, length * 0.42)} className="terrace-shade" />
+                {i % 2 ? (
+                  <path d={`M0 ${-length * 0.12}V${-length * 0.92}`} className="terrace-rib" />
+                ) : (
+                  <path d={petalRows(length, length * 0.42)} className="row foliage-stroke" />
+                )}
+              </g>
             ))}
           </Appear>
         );
