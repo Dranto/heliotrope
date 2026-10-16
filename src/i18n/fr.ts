@@ -912,6 +912,7 @@ export const fr = {
     side: (name: string, have: string, need: string) => `${name}\u00a0: ${have} sur ${need}`,
     awake: 'Éveillée',
     asleep: 'Endormie',
+    asleepList: (count: string) => `Alliances endormies (${count})`,
     choose: 'Choisir',
     chooseLabel: (name: string) => `Choisir l’alliance\u00a0: ${name}`,
     takeOut: 'Retirer',
