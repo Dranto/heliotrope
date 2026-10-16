@@ -4,7 +4,7 @@
 // old-growth forest; the collectors dig ponds, open streams and fit the city with tanks and swales.
 import type { LandscapeId } from '../game/cityData';
 import { LandscapeArt } from './LandscapeArt';
-import { memo } from 'react';
+import { Fragment, memo } from 'react';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import { t } from '../i18n';
 import {
@@ -99,8 +99,7 @@ export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
         width={w - 12}
         height={h - 12}
         rx="10"
-        fill="url(#land-furrows)"
-        transform={angle ? `rotate(90 ${x + w / 2} ${y + h / 2})` : undefined}
+        fill={`url(#land-crop-${crop}${angle ? '-turned' : ''})`}
       />
       {/* A hedgerow of round shrubs along the south edge of some fields. */}
       {hedge &&
@@ -327,9 +326,45 @@ export function Swale({ box: [x, y, w, h] }: { box: Box }) {
 export function LandPatterns() {
   return (
     <>
-      <pattern id="land-furrows" width="8" height="8" patternUnits="userSpaceOnUse">
-        <path d="M0 4H8" className="furrow" />
-      </pattern>
+      {/* Each crop has its own texture, so the patchwork reads from afar; a turned copy runs
+          the rows the other way across half the fields. */}
+      {['', '-turned'].map((turn) => (
+        <Fragment key={turn}>
+          {/* Wheat: close golden rows, each lit along its top. */}
+          <pattern
+            id={`land-crop-0${turn}`}
+            width="6"
+            height="6"
+            patternUnits="userSpaceOnUse"
+            patternTransform={turn ? 'rotate(90)' : undefined}
+          >
+            <path d="M0 3.5H6" className="wheat-row" />
+            <path d="M0 1.6H6" className="crop-light" />
+          </pattern>
+          {/* Young green: rows of seedlings, dots of leaf on the soil. */}
+          <pattern
+            id={`land-crop-1${turn}`}
+            width="8"
+            height="7"
+            patternUnits="userSpaceOnUse"
+            patternTransform={turn ? 'rotate(90)' : undefined}
+          >
+            <circle cx="2" cy="3.5" r="1.4" className="sprout" />
+            <circle cx="6" cy="3.5" r="1.1" className="sprout" />
+          </pattern>
+          {/* Ploughed earth: wide ochre furrows. */}
+          <pattern
+            id={`land-crop-2${turn}`}
+            width="8"
+            height="8"
+            patternUnits="userSpaceOnUse"
+            patternTransform={turn ? 'rotate(90)' : undefined}
+          >
+            <path d="M0 4.5H8" className="furrow" />
+            <path d="M0 1.8H8" className="crop-light" />
+          </pattern>
+        </Fragment>
+      ))}
       {/* Solar glass: the pale sky at the top of a module, deep blue below. */}
       <linearGradient id="agri-glass" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stopColor="#a7c4e6" />
