@@ -243,6 +243,11 @@ describe('App', () => {
     expect(await screen.findByRole('dialog', { name: 'Les Saisons' })).toBeInTheDocument();
     expect(screen.getByTestId('seeds-gain')).toHaveTextContent('+2');
     expect(screen.getByText('mûres dans 5 min')).toBeInTheDocument();
+    // No arrow to the same number while they ripen: the tile says when the bonus moves.
+    expect(screen.getByTestId('seeds-bonus')).not.toHaveTextContent('→');
+    expect(
+      screen.getByText('grandit quand les Graines seront mûres, dans 5 min'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Les Graines mûrissent : encore 5 min de Saison.')).toBeInTheDocument();
     expect(
       screen.getByRole('progressbar', { name: 'Graines mûres à 66,7\u00a0%' }),

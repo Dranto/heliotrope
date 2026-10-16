@@ -93,6 +93,10 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
   const ripening = t.duration(Math.ceil(secondsToRipeness(state)));
   const available = canStartNewSeason(state);
   const premature = isSeasonPremature(state);
+  // An arrow to the same number says nothing: while the Seeds ripen, say when the bonus moves.
+  const bonusNow = t.stats.percent(formatPercent(seedBonus(state.seeds, state.sources)));
+  const bonusNext =
+    gain > 0 ? t.stats.percent(formatPercent(seedBonus(state.seeds + gain, state.sources))) : null;
 
   function start() {
     store.dispatch((s) => startNewSeason(s, challenge));
@@ -140,10 +144,16 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
           </dt>
           <dd>
             <strong data-testid="seeds-bonus">
-              {t.stats.percent(formatPercent(seedBonus(state.seeds, state.sources)))} →{' '}
-              {t.stats.percent(formatPercent(seedBonus(state.seeds + gain, state.sources)))}
+              {bonusNow}
+              {bonusNext && ` → ${bonusNext}`}
             </strong>
-            <span>{t.seeds.bonusAfter}</span>
+            <span>
+              {bonusNext
+                ? t.seeds.bonusAfter
+                : ripe
+                  ? t.seeds.bonusSame
+                  : t.seeds.bonusRipening(ripening)}
+            </span>
           </dd>
         </div>
       </dl>
