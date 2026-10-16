@@ -121,10 +121,23 @@
 }
 
 /* The summer cloud drifts a little while it rains on the rooftop gardens. */
-.visit-cloud path {
-  fill: #fff;
-  stroke: rgb(79 159 179 / 0.45);
-  stroke-width: 0.8;
+/* A summer cumulus: lilac belly in shadow, warm white top, gold rim light on the sun side. */
+.visit-cloud-belly {
+  fill: #d8d6ea;
+  stroke: rgb(108 98 150 / 0.4);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.visit-cloud-top {
+  fill: #fffcf4;
+}
+
+.visit-cloud-light {
+  fill: none;
+  stroke: rgb(255 222 150 / 0.55);
+  stroke-width: 0.7;
+  stroke-linecap: round;
 }
 
 .visit-shower {
