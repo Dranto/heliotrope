@@ -692,12 +692,17 @@ describe('App', () => {
     // One Source is already in reach.
     fireEvent.click(screen.getByRole('button', { name: /Cycle de l’eau, 1 Sources à gagner/ }));
     expect(await screen.findByTestId('sources-gain')).toHaveTextContent('+1');
+    expect(screen.getByTestId('sources-bonus')).toHaveTextContent('→');
     expect(screen.getByText('La rivière n’est pas encore prête')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Commencer un nouveau Cycle' }));
     fireEvent.click(screen.getByRole('button', { name: 'Oui, recommencer le Cycle' }));
     expect(store.getState().sources).toBe(1);
     expect(store.getState().collectors.roofTanks).toBe(0);
     expect(screen.getByTestId('sources-chip')).toHaveTextContent('1');
+    // With no Source left to gain, the bonus tile shows one number, not an arrow to itself.
+    expect(screen.getByTestId('sources-gain')).toHaveTextContent('+0');
+    expect(screen.getByTestId('sources-bonus')).not.toHaveTextContent('→');
+    expect(screen.getByText('sans Source à gagner, inchangé')).toBeInTheDocument();
   });
 });
 

@@ -1257,6 +1257,7 @@ export const en: Texts = {
     toGainHint: 'by starting a new Cycle',
     bonus: 'Production bonus',
     bonusAfter: 'after the new Cycle',
+    bonusSame: 'no Source to gain, unchanged',
     nextSource: (water: string) => `Next Spring in ${water} Water.`,
     formula:
       'Each Spring adds 10% to all production and to the Water gathered, and makes every Seed worth 1% more. Springs come from the Water gathered over every Cycle.',

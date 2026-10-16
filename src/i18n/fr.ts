@@ -1347,6 +1347,7 @@ export const fr = {
     toGainHint: 'en lançant un nouveau Cycle',
     bonus: 'Bonus de production',
     bonusAfter: 'après le nouveau Cycle',
+    bonusSame: 'sans Source à gagner, inchangé',
     nextSource: (water: string) => `Prochaine Source dans ${water} Eau.`,
     formula:
       'Chaque Source ajoute 10\u00a0% à toute la production et à l’Eau récoltée, et chaque Graine rapporte 1\u00a0% de plus. Les Sources viennent de l’Eau recueillie au fil de tous les Cycles.',

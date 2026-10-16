@@ -295,11 +295,13 @@ export function Cycles({ onClose }: { onClose: () => void }) {
         <div className="seed-tile">
           <dt>{t.cycles.bonus}</dt>
           <dd>
-            <strong>
-              {t.stats.percent(formatPercent(sourceBonus(state.sources)))} →{' '}
-              {t.stats.percent(formatPercent(sourceBonus(state.sources + gain)))}
+            {/* No arrow to the same number while no Source is in reach (as in the Seasons). */}
+            <strong data-testid="sources-bonus">
+              {t.stats.percent(formatPercent(sourceBonus(state.sources)))}
+              {gain > 0 &&
+                ` → ${t.stats.percent(formatPercent(sourceBonus(state.sources + gain)))}`}
             </strong>
-            <span>{t.cycles.bonusAfter}</span>
+            <span>{gain > 0 ? t.cycles.bonusAfter : t.cycles.bonusSame}</span>
           </dd>
         </div>
       </dl>
