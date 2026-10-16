@@ -1096,6 +1096,8 @@ export const en: Texts = {
     toGainRipening: (time: string) => `ripe in ${time}`,
     bonus: 'Production bonus',
     bonusAfter: 'after the new Season',
+    bonusSame: 'no Seed to harvest, unchanged',
+    bonusRipening: (time: string) => `grows once the Seeds are ripe, in ${time}`,
     nextSeed: (light: string, time: string | null) =>
       `Next Seed in ${light} Light${time ? `, about ${time} of production` : ''}.`,
     formula: (minutes: string, deepSoil: string) =>
