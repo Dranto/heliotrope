@@ -420,44 +420,65 @@ function Greenhouse({ box: [x, y, w, h], level }: { box: Box; level: number }) {
 function Farm({ site: { box, storeys }, level }: { site: Building; level: number }) {
   const [x, y, w, h] = box;
   const terraces = Math.min(3 + Math.min(level, 3), Math.floor(Math.min(w, h) / 11));
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  // Stepped terraces seen from above: warm decking and pale stone in turn, each shading the one
+  // below, their rims planted with shrubs and a small tree at two corners.
   return (
     <g className="farm">
       <Shadow box={box} storeys={storeys * 1.6} />
       {Array.from({ length: terraces }, (_, i) => {
         const inset = i * 5;
+        const tx = x + inset;
+        const ty = y + inset;
+        const tw = w - inset * 2;
+        const th = h - inset * 2;
         return (
-          <rect
-            key={i}
-            x={x + inset}
-            y={y + inset}
-            width={w - inset * 2}
-            height={h - inset * 2}
-            rx={Math.max(1.5, 5 - i)}
-            className={i % 2 ? 'farm-glass' : 'foliage-light'}
-          />
+          <g key={i}>
+            <rect
+              x={tx}
+              y={ty}
+              width={tw}
+              height={th}
+              rx={Math.max(1.5, 5 - i)}
+              className={i % 2 ? 'farm-stone' : 'farm-deck'}
+            />
+            {i + 1 < terraces && (
+              <rect
+                x={tx + 5.6}
+                y={ty + 6.4}
+                width={tw - 10}
+                height={th - 10}
+                rx={Math.max(1.5, 4 - i)}
+                className="farm-shade"
+              />
+            )}
+            <rect
+              x={tx + 1.6}
+              y={ty + 1.6}
+              width={tw - 3.2}
+              height={th - 3.2}
+              rx="1.5"
+              className="row foliage-stroke"
+            />
+            {(
+              [
+                [tx + 3.2, ty + 3.2],
+                [tx + tw - 3.2, ty + th - 3.2],
+              ] as const
+            ).map(([px, py]) => (
+              <g key={`${px},${py}`} className="farm-tree">
+                <circle cx={px} cy={py} r="2.2" className="foliage" />
+                <circle cx={px - 0.5} cy={py - 0.5} r="1.2" className="foliage-light" />
+              </g>
+            ))}
+          </g>
         );
       })}
-      {Array.from({ length: Math.ceil(terraces / 2) }, (_, k) => {
-        const inset = k * 10 + 2.5;
-        return (
-          <rect
-            key={k}
-            x={x + inset}
-            y={y + inset}
-            width={w - inset * 2}
-            height={h - inset * 2}
-            rx="1.5"
-            className="row foliage-stroke"
-          />
-        );
-      })}
-      <rect
-        x={x + w / 2 - 5}
-        y={y + h / 2 - 5}
-        width="10"
-        height="10"
-        rx="2"
-        className="skylight"
+      <rect x={cx - 5.5} y={cy - 5.5} width="11" height="11" rx="2" className="skylight" />
+      <path
+        className="skylight-frame"
+        d={`M${cx} ${cy - 5.5}v11M${cx - 5.5} ${cy}h11M${cx - 4.5} ${cy + 3}l7.5 -7.5`}
       />
     </g>
   );
