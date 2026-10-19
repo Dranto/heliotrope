@@ -1155,7 +1155,9 @@ button {
 }
 
 .panel-art rect {
-  fill: #2e4a5c;
+  fill: url(#panel-glass);
+  stroke: #2b3a5a;
+  stroke-width: 0.5;
 }
 
 .panel-art rect.framed {
@@ -1163,9 +1165,22 @@ button {
   stroke-width: 0.7;
 }
 
-.panel-art path {
-  stroke: #8fb3c9;
-  stroke-width: 0.5;
+.panel-art .panel-shadow {
+  fill: rgb(70 60 110 / 0.22);
+  stroke: none;
+}
+
+.panel-art .panel-cells {
+  stroke: #cfe2f0;
+  stroke-width: 0.35;
+  opacity: 0.55;
+}
+
+.panel-art .panel-edge {
+  stroke: #eaf4fb;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+  opacity: 0.85;
 }
 
 .panel-art .glint {
