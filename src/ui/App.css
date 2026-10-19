@@ -1072,9 +1072,13 @@ button {
 }
 
 .greenhouse .sheen {
-  stroke: rgb(255 255 255 / 0.7);
-  stroke-width: 3;
+  fill: none;
+  stroke-width: 2.4;
   stroke-linecap: round;
+}
+
+.greenhouse .sheen-thin {
+  stroke-width: 1;
 }
 
 .canopy-glint {

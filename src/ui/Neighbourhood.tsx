@@ -404,10 +404,24 @@ function Greenhouse({ box: [x, y, w, h], level }: { box: Box; level: number }) {
           className="warmth"
         />
       )}
-      <path
-        className="sheen"
-        d={`M${inner[0] + inner[2] * 0.15} ${inner[1] + inner[3] - 4} L${inner[0] + inner[2] * 0.45} ${inner[1] + 4}`}
+      {/* The sun on the glass: a soft glare in the sunny corner and two thin glints that fade at
+          both ends, rather than one hard slash across the whole roof. */}
+      <rect
+        x={inner[0]}
+        y={inner[1]}
+        width={inner[2]}
+        height={inner[3]}
+        rx="8"
+        fill="url(#glass-glare)"
       />
+      {[0, 7].map((offset) => (
+        <path
+          key={offset}
+          className={offset ? 'sheen sheen-thin' : 'sheen'}
+          stroke="url(#glass-glint)"
+          d={`M${inner[0] + inner[2] * 0.12 + offset} ${inner[1] + inner[3] * 0.62} L${inner[0] + inner[2] * 0.34 + offset} ${inner[1] + 5}`}
+        />
+      ))}
       {Array.from({ length: ribs }, (_, i) => {
         const rx = inner[0] + (inner[2] / (ribs + 1)) * (i + 1);
         return <path key={i} className="rib" d={`M${rx} ${inner[1]} V${inner[1] + inner[3]}`} />;
@@ -763,6 +777,15 @@ export const Neighbourhood = memo(function Neighbourhood({
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.32" />
             <stop offset="55%" stopColor="#ffffff" stopOpacity="0" />
             <stop offset="100%" stopColor="#3b3328" stopOpacity="0.08" />
+          </linearGradient>
+          <linearGradient id="glass-glare" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
+            <stop offset="35%" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="glass-glint" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="50%" stopColor="#ffffff" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </linearGradient>
           <pattern id="grass" width="14" height="12" patternUnits="userSpaceOnUse">
             <path
