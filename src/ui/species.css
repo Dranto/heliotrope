@@ -27,6 +27,14 @@
   stroke-width: 1.6;
 }
 
+/* The keyboard focus rings the thumb-sized hit disc, so it shows at every zoom and on the flying
+   species, which have no halo. */
+.species [data-greet]:focus-visible .species-hit {
+  stroke: var(--leaf, #2f6b4f);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
 @keyframes greet-glow {
   50% {
     stroke-opacity: 0.4;
