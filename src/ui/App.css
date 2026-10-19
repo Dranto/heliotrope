@@ -551,6 +551,9 @@ button {
   border: none;
   background: none;
   font: inherit;
+  /* A long title wraps on a phone: it starts on the left like the text under it, not centred
+     as a button's text is by default. */
+  text-align: start;
   cursor: pointer;
 }
 
