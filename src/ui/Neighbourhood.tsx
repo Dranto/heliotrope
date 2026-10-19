@@ -332,9 +332,13 @@ function Garden({ box: [x, y, w, h], level }: { box: Box; level: number }) {
 
 function Panel({ x, y, level }: { x: number; y: number; level: number }) {
   return (
+    // A balcony module: a soft shadow on the facade, blue glass catching the sky at its top,
+    // a fine cell grid and a lit upper edge.
     <g transform={`translate(${x} ${y})`} className="panel-art">
+      <rect x="0.8" y="1.1" width="11" height="8" rx="0.8" className="panel-shadow" />
       <rect width="11" height="8" rx="0.8" className={level >= 1 ? 'framed' : undefined} />
-      <path d="M0 4h11M3.7 0v8M7.3 0v8" />
+      <path className="panel-cells" d="M0.6 2.7h9.8M0.6 5.3h9.8M2.75 0.5v7M5.5 0.5v7M8.25 0.5v7" />
+      <path className="panel-edge" d="M1 0.55h9" />
       {level >= 3 && <path className="glint" d="M1 7 L5 1" />}
     </g>
   );
@@ -777,6 +781,11 @@ export const Neighbourhood = memo(function Neighbourhood({
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.32" />
             <stop offset="55%" stopColor="#ffffff" stopOpacity="0" />
             <stop offset="100%" stopColor="#3b3328" stopOpacity="0.08" />
+          </linearGradient>
+          <linearGradient id="panel-glass" x1="0" y1="0" x2="0.4" y2="1">
+            <stop offset="0" stopColor="#a7c4e6" />
+            <stop offset="0.45" stopColor="#4c6fa3" />
+            <stop offset="1" stopColor="#33467a" />
           </linearGradient>
           <linearGradient id="glass-glare" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />

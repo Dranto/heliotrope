@@ -123,7 +123,9 @@ describe('App', () => {
       </GameStoreContext.Provider>,
     );
     expect(container.querySelectorAll('[data-generator="pot"] .pot')).toHaveLength(3);
-    expect(container.querySelectorAll('[data-generator="balconyPanel"] rect')).toHaveLength(2);
+    expect(container.querySelectorAll('[data-generator="balconyPanel"] .panel-art')).toHaveLength(
+      2,
+    );
     expect(container.querySelector('.appear-ring')).toBeNull();
   });
 
