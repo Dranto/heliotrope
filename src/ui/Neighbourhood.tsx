@@ -316,38 +316,80 @@ function CarPark({ box: [x, y, w, h] }: { box: Box }) {
 function Garden({ box: [x, y, w, h], level }: { box: Box; level: number }) {
   const horizontal = w >= h;
   const span = horizontal ? h : w;
+  const length = horizontal ? w : h;
   const rows = Math.min(Math.floor((span - 4) / 4.5), 3 + level);
   const gap = (span - 4) / rows;
   // Each row of plants is a dotted line; ripe tomatoes then flowers join them with upgrades.
   const kinds = (i: number) =>
     level >= 3 && i % 3 === 2 ? 'blossom' : level >= 1 && i % 2 ? 'tomato' : 'leafy';
+  // A long roof is split into planters with a paved walk between them, so it reads as a tended
+  // garden rather than one field of soil.
+  const planters = Math.max(1, Math.floor(length / 34));
+  const walk = 3.4;
+  const each = (length - 2.4 - walk * (planters - 1)) / planters;
   // A timber frame around dark soil; each row sits on its own earthed-up furrow, its leaves
   // catching the sun on one side.
   return (
     <g>
       <rect x={x} y={y} width={w} height={h} rx="2" className="bed roof-bed" />
-      <rect
-        x={x + 1.2}
-        y={y + 1.2}
-        width={w - 2.4}
-        height={h - 2.4}
-        rx="1.2"
-        className="roof-soil"
-      />
-      {Array.from({ length: rows }, (_, i) => {
-        const offset = 2 + gap * i + gap / 2;
-        const d = horizontal
-          ? `M${x + 3} ${y + offset} H${x + w - 3}`
-          : `M${x + offset} ${y + 3} V${y + h - 3}`;
-        const light = horizontal
-          ? `M${x + 3.5} ${y + offset - 0.7} H${x + w - 3}`
-          : `M${x + offset - 0.7} ${y + 3.5} V${y + h - 3}`;
+      {Array.from({ length: planters }, (_, p) => {
+        const start = 1.2 + p * (each + walk);
+        const [px, py, pw, ph] = horizontal
+          ? [x + start, y + 1.2, each, h - 2.4]
+          : [x + 1.2, y + start, w - 2.4, each];
         return (
-          <g key={i}>
-            <path d={d} className="roof-furrow" />
-            <path d={d} className="row foliage-stroke" />
-            <path d={light} className="row-light" />
-            {kinds(i) !== 'leafy' && <path d={d} className={`row-fruit ${kinds(i)}-stroke`} />}
+          <g key={p} className="roof-planter">
+            <rect x={px} y={py} width={pw} height={ph} rx="1.2" className="roof-soil" />
+            <path d={`M${px + 0.8} ${py + ph - 0.5}H${px + pw - 0.8}`} className="planter-shade" />
+            {Array.from({ length: rows }, (_, i) => {
+              const offset = 2 + gap * i + gap / 2;
+              const d = horizontal
+                ? `M${px + 1.8} ${y + offset} H${px + pw - 1.8}`
+                : `M${x + offset} ${py + 1.8} V${py + ph - 1.8}`;
+              const light = horizontal
+                ? `M${px + 2.3} ${y + offset - 0.7} H${px + pw - 1.8}`
+                : `M${x + offset - 0.7} ${py + 2.3} V${py + ph - 1.8}`;
+              return (
+                <g key={i}>
+                  <path d={d} className="roof-furrow" />
+                  <path d={d} className="row foliage-stroke" />
+                  <path d={light} className="row-light" />
+                  {kinds(i) !== 'leafy' && (
+                    <path d={d} className={`row-fruit ${kinds(i)}-stroke`} />
+                  )}
+                </g>
+              );
+            })}
+            <path d={`M${px + 0.8} ${py + 0.5}H${px + pw - 0.8}`} className="planter-lip" />
+          </g>
+        );
+      })}
+      {Array.from({ length: planters - 1 }, (_, p) => {
+        const mid = 1.2 + (p + 1) * (each + walk) - walk / 2;
+        const d = horizontal
+          ? `M${x + mid} ${y + 2.4}V${y + h - 2.4}`
+          : `M${x + 2.4} ${y + mid}H${x + w - 2.4}`;
+        // Two potted shrubs mark the ends of each walk.
+        const ends: [number, number][] = horizontal
+          ? [
+              [x + mid, y + 2.6],
+              [x + mid, y + h - 2.6],
+            ]
+          : [
+              [x + 2.6, y + mid],
+              [x + w - 2.6, y + mid],
+            ];
+        return (
+          <g key={p}>
+            <path d={d} className="roof-walk-edge" />
+            <path d={d} className="roof-walk" />
+            {ends.map(([cx, cy], e) => (
+              <g key={e} className="roof-shrub">
+                <circle cx={cx + 0.4} cy={cy + 0.5} r="2.1" className="roof-shrub-shadow" />
+                <circle cx={cx} cy={cy} r="2" className="foliage" />
+                <circle cx={cx - 0.6} cy={cy - 0.6} r="0.9" className="roof-shrub-light" />
+              </g>
+            ))}
           </g>
         );
       })}

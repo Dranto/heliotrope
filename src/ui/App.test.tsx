@@ -163,6 +163,27 @@ describe('App', () => {
     expect(container.querySelector('.seams')?.getAttribute('d')).toMatch(/^M[\d.]+ [\d.]+V/);
   });
 
+  it('splits the long rooftop gardens into planters along a paved walk', () => {
+    const base = openGame(0);
+    saveGame({
+      ...base,
+      generators: { ...base.generators, rooftopGarden: 300 },
+      totalLight: 1e8,
+      allTimeLight: 1e8,
+    });
+    const { container } = render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const gardens = container.querySelectorAll('.roof-bed').length;
+    const planters = container.querySelectorAll('.roof-planter').length;
+    expect(gardens).toBeGreaterThan(0);
+    expect(planters).toBeGreaterThan(gardens);
+    expect(container.querySelectorAll('.roof-walk')).toHaveLength(planters - gardens);
+    expect(container.querySelectorAll('.roof-shrub')).toHaveLength(2 * (planters - gardens));
+  });
+
   it('welcomes the player back with the Light produced offline', () => {
     const base = openGame(0);
     saveGame({ ...base, generators: { ...base.generators, balconyPanel: 1 } });
