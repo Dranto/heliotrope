@@ -46,9 +46,12 @@
   background: var(--branch);
 }
 
+/* The drawing shrinks on short screens so the chosen talent's card and its Sow button stay in
+   view under it, instead of below the fold of the dialog. */
 .tree-stage {
   position: relative;
-  margin: 0 0 0.9rem;
+  width: min(100%, max(18rem, calc((100dvh - 25rem) * 360 / 330)));
+  margin: 0 auto 0.9rem;
   border: 1px solid var(--glass-border);
   border-radius: 1.2rem;
   overflow: hidden;
