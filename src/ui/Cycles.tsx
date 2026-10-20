@@ -419,31 +419,34 @@ export function Cycles({ onClose }: { onClose: () => void }) {
       )}
 
       {!available && <p className="hint">{t.cycles.noSourceYet}</p>}
-      {confirming && available ? (
-        <div className="confirm-row">
-          <span>{t.cycles.confirm(formatNumber(gain))}</span>
-          <button type="button" className="season-button cycle-button" onClick={start}>
-            {challenge
-              ? t.cycleChallenges.startWith(t.cycleChallenges.names[challenge])
-              : t.cycles.confirmYes}
+      {/* The start button stays in view at the foot of the dialog while the player reads. */}
+      <div className="prestige-actions">
+        {confirming && available ? (
+          <div className="confirm-row">
+            <span>{t.cycles.confirm(formatNumber(gain))}</span>
+            <button type="button" className="season-button cycle-button" onClick={start}>
+              {challenge
+                ? t.cycleChallenges.startWith(t.cycleChallenges.names[challenge])
+                : t.cycles.confirmYes}
+            </button>
+            <button type="button" className="ghost" onClick={() => setConfirming(false)}>
+              {t.cycles.cancel}
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="season-button cycle-button"
+            disabled={!available}
+            onClick={() => {
+              setMessage('');
+              setConfirming(true);
+            }}
+          >
+            {t.cycles.start}
           </button>
-          <button type="button" className="ghost" onClick={() => setConfirming(false)}>
-            {t.cycles.cancel}
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="season-button cycle-button"
-          disabled={!available}
-          onClick={() => {
-            setMessage('');
-            setConfirming(true);
-          }}
-        >
-          {t.cycles.start}
-        </button>
-      )}
+        )}
+      </div>
     </Dialog>
   );
 }
