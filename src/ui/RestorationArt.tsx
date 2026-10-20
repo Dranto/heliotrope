@@ -1065,14 +1065,28 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       </g>
     );
   },
+  // Solar shelters over the avenue: each casts its shadow on the road, stands on two slim posts
+  // and carries blue glass cells under a gold rim that catches the sun.
   solarCanopy: () => {
     const [x, y, w] = OUTER_AVENUES.southWest;
     return (
       <g>
+        <defs>
+          <linearGradient id="canopy-glass" x1="0" y1="0" x2="0.4" y2="1">
+            <stop offset="0" stopColor="#a7c4e6" />
+            <stop offset="0.45" stopColor="#4c6fa3" />
+            <stop offset="1" stopColor="#33467a" />
+          </linearGradient>
+        </defs>
         {Array.from({ length: 7 }, (_, i) => (
           <g key={i} transform={`translate(${x + 8 + i * ((w - 26) / 6)} ${y + 6})`}>
+            <rect x="1.4" y="2" width="18" height="10" rx="1" className="canopy-shadow" />
+            <circle cx="3" cy="9.6" r="0.9" className="canopy-post" />
+            <circle cx="15" cy="9.6" r="0.9" className="canopy-post" />
             <rect width="18" height="10" rx="1" className="canopy-panel" />
-            <path d="M0 5 h18 M6 0 v10 M12 0 v10" className="canopy-grid" />
+            <path d="M0.8 5h16.4M4.6 0.6v8.8M9 0.6v8.8M13.4 0.6v8.8" className="canopy-grid" />
+            <path d="M1.2 0.7h15.6" className="canopy-edge" />
+            <path d="M3.4 8.6l3.6 -7.2h1.4l-3.6 7.2z" className="canopy-glint" />
           </g>
         ))}
       </g>

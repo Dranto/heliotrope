@@ -567,15 +567,36 @@
   opacity: 0.85;
 }
 
+.projects .canopy-shadow {
+  fill: rgb(59 51 40 / 0.22);
+}
+
+.projects .canopy-post {
+  fill: #d8d2c6;
+  stroke: #9e9584;
+  stroke-width: 0.3;
+}
+
 .projects .canopy-panel {
-  fill: #2e4a5c;
+  fill: url(#canopy-glass);
   stroke: var(--gold);
   stroke-width: 0.6;
 }
 
 .projects .canopy-grid {
-  stroke: #8fb3c9;
+  fill: none;
+  stroke: rgb(214 230 245 / 0.55);
+  stroke-width: 0.35;
+}
+
+.projects .canopy-edge {
+  stroke: rgb(255 255 255 / 0.7);
   stroke-width: 0.4;
+  stroke-linecap: round;
+}
+
+.projects .canopy-glint {
+  fill: rgb(255 255 255 / 0.28);
 }
 
 .projects .track-grass {
