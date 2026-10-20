@@ -160,3 +160,11 @@
 .requests-panel .buy {
   align-content: center;
 }
+
+/* A request met while the reserve is full says why its button waits, on phones too (no hover). */
+.request-blocked {
+  grid-column: 2;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+}

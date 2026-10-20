@@ -60,6 +60,7 @@ export function Requests() {
           {requests.open.map((request, i) => {
             const need = needText(request.need);
             const met = isRequestMet(state, request);
+            const blocked = met && full;
             return (
               <li key={i} className="request-card" data-met={met || undefined}>
                 <RequestIcon kind={request.need.kind} />
@@ -73,6 +74,11 @@ export function Requests() {
                     <span>{t.requests.from(t.restoration.districtNames[request.from])}</span>
                   )}
                 </span>
+                {blocked && (
+                  <p className="request-blocked" id={`request-blocked-${i}`}>
+                    {t.requests.reserveFull}
+                  </p>
+                )}
                 <span className="request-actions">
                   <button
                     type="button"
@@ -86,7 +92,7 @@ export function Requests() {
                     type="button"
                     className="buy"
                     disabled={!canServe(state, i)}
-                    title={met && full ? t.requests.reserveFull : undefined}
+                    aria-describedby={blocked ? `request-blocked-${i}` : undefined}
                     aria-label={t.requests.serveLabel(need)}
                     onClick={() => store.dispatch((s) => serveRequest(s, i))}
                   >

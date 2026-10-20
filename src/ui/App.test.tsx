@@ -611,6 +611,30 @@ describe('App', () => {
     expect(store.getState().effects.some((e) => e.kind === 'bloom')).toBe(true);
   });
 
+  it('says on the card why a met request waits while the reserve is full', () => {
+    const fresh = openGame(0);
+    saveGame({
+      ...fresh,
+      seasons: 1,
+      garden: { ...fresh.garden, harvests: 3 },
+      requests: {
+        ...fresh.requests,
+        open: [{ need: { kind: 'harvests', count: 3 }, base: 0, hand: 'bloom', from: null }],
+        hands: ['bloom', 'sky', 'flight'],
+      },
+    });
+    renderApp();
+    const panel = document.querySelector('.requests-panel') as HTMLElement;
+    const serve = within(panel).getByRole('button', {
+      name: 'Rendre service : 3 récoltes du potager',
+    });
+    expect(serve).toBeDisabled();
+    expect(serve).toHaveAccessibleDescription(
+      'Réserve pleine : lancez un coup de main pour faire de la place.',
+    );
+    expect(within(panel).getByText(/Réserve pleine/)).toBeVisible();
+  });
+
   it('offers a tab bar for small screens (§10.3)', () => {
     renderApp();
     const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });
