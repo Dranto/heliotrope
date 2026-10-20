@@ -3866,6 +3866,12 @@ button {
     padding-bottom: 6rem;
   }
 
+  /* The tab bar floats over the bottom of the page: a control reached with Tab or a screen
+     reader is scrolled into view above it, not under it. */
+  html {
+    scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+
   /* The map stays in sight on every tab, smaller while building or improving, so each purchase
      is seen growing on it. */
   .scene-map {
