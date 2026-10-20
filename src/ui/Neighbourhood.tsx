@@ -37,6 +37,7 @@ import {
   type Box,
   type Building,
   type Camera,
+  type Mirror,
 } from './neighbourhood';
 
 const CONCRETE = [0xa7, 0xa3, 0x9c];
@@ -526,37 +527,105 @@ function Farm({ site: { box, storeys }, level }: { site: Building; level: number
   );
 }
 
+/** The radii of the gravel paths between the rings of heliostats, as on the enriched map. */
+const MIRROR_PATHS = [26, 38, 50];
+
+/**
+ * The tower's lattice and the rays its receiver sends back, from above: spokes from one radius
+ * to another around the tower.
+ */
+function spokes(count: number, inner: (i: number) => number, outer: (i: number) => number) {
+  return Array.from({ length: count }, (_, i) => {
+    const a = (i / count) * Math.PI * 2;
+    const { x, y } = MIRROR_TOWER;
+    const [r1, r2] = [inner(i), outer(i)];
+    return `M${x + Math.cos(a) * r1} ${y + Math.sin(a) * r1}L${x + Math.cos(a) * r2} ${y + Math.sin(a) * r2}`;
+  }).join('');
+}
+
+const TOWER_LATTICE = spokes(
+  12,
+  () => 3.8,
+  () => 6.4,
+);
+const TOWER_RAYS = spokes(
+  16,
+  () => 4.2,
+  (i) => (i % 2 ? 7 : 8.6),
+);
+
+/**
+ * One heliostat from above: four mirror facets on a frame, reflecting the sky with a glint of
+ * sun across them, silver at first and gilded once upgraded.
+ */
+function Heliostat({ x, y, angle, gilded }: Mirror & { gilded: boolean }) {
+  return (
+    <g
+      className={gilded ? 'mirror gilded' : 'mirror'}
+      transform={`translate(${x} ${y}) rotate(${angle})`}
+    >
+      <rect className="mirror-shadow" x="-4.1" y="-1.3" width="9.2" height="3.8" rx="0.6" />
+      <rect className="mirror-frame" x="-4.6" y="-1.9" width="9.2" height="3.8" rx="0.6" />
+      {[-4.2, -2.1, 0, 2.1].map((fx) => (
+        <rect
+          key={fx}
+          className="mirror-facet"
+          x={fx + 0.1}
+          y="-1.55"
+          width="1.9"
+          height="3.1"
+          rx="0.2"
+        />
+      ))}
+      <path className="mirror-glint" d="M-1.4 -1.55l-1.6 3.1h1.1l1.6 -3.1z" />
+    </g>
+  );
+}
+
 function MirrorField({ count, level }: { count: number; level: number }) {
   const shown = MIRRORS.slice(0, count);
+  const { x: tx, y: ty } = MIRROR_TOWER;
+  const [fx, fy, fw, fh] = CAR_PARKS[1]!;
   return (
     <g>
+      {count > 0 && (
+        <g className="mirror-paths">
+          <clipPath id="mirror-field">
+            <rect x={fx} y={fy} width={fw} height={fh} rx="3" />
+          </clipPath>
+          <g clipPath="url(#mirror-field)">
+            {MIRROR_PATHS.map((radius) => (
+              <ellipse key={radius} cx={tx} cy={ty} rx={radius * 1.35} ry={radius} />
+            ))}
+            <path d={`M${tx} ${ty}V${fy + fh}`} />
+          </g>
+        </g>
+      )}
       {level >= 2 &&
         shown
           .filter((_, i) => i % 3 === 0)
           .map(({ x, y }) => (
-            <path
-              key={`${x},${y}`}
-              className="beam"
-              d={`M${x} ${y} L${MIRROR_TOWER.x} ${MIRROR_TOWER.y}`}
-            />
+            <path key={`${x},${y}`} className="beam" d={`M${x} ${y} L${tx} ${ty}`} />
           ))}
-      {shown.map(({ x, y, angle }) => (
-        <Appear key={`${x},${y}`} at={[x, y]} size={5}>
-          <rect
-            x="-4.4"
-            y="-1.8"
-            width="8.8"
-            height="3.6"
-            rx="0.6"
-            className={level >= 1 ? 'mirror gilded' : 'mirror'}
-            transform={`translate(${x} ${y}) rotate(${angle})`}
-          />
+      {shown.map((mirror) => (
+        <Appear key={`${mirror.x},${mirror.y}`} at={[mirror.x, mirror.y]} size={5}>
+          <Heliostat {...mirror} gilded={level >= 1} />
         </Appear>
       ))}
-      <Appear at={[MIRROR_TOWER.x, MIRROR_TOWER.y]} size={12}>
-        <circle cx={MIRROR_TOWER.x} cy={MIRROR_TOWER.y} r="11" fill="url(#hearth)" />
-        <circle cx={MIRROR_TOWER.x} cy={MIRROR_TOWER.y} r="5.5" className="tower" />
-        <circle cx={MIRROR_TOWER.x} cy={MIRROR_TOWER.y} r="2.2" className="heart" />
+      <Appear at={[tx, ty]} size={12}>
+        <circle cx={tx} cy={ty} r="11" fill="url(#hearth)" />
+        {/* The tower from above: a stone plinth, the lattice of its shaft, and the receiver
+            glowing gold at the top, rayed with the light the mirrors send it. */}
+        <g className="tower">
+          <circle cx={tx} cy={ty} r="7.4" className="tower-plinth" />
+          <circle cx={tx} cy={ty} r="6.4" className="tower-shaft" />
+          <path d={TOWER_LATTICE} className="tower-lattice" />
+          <circle cx={tx} cy={ty} r="5.2" className="tower-ring" />
+          <circle cx={tx} cy={ty} r="6.4" className="tower-rim" />
+          <path d={TOWER_RAYS} className="tower-rays" />
+          <circle cx={tx} cy={ty} r="3.9" className="heart" />
+          <circle cx={tx - 1} cy={ty - 1.1} r="1.1" className="tower-glint" />
+        </g>
       </Appear>
     </g>
   );
@@ -788,6 +857,24 @@ export const Neighbourhood = memo(function Neighbourhood({
         aria-label={t.sceneLabel}
       >
         <defs>
+          {/* Heliostat glass: the sky reflected, bright at the corner facing the sun. */}
+          <linearGradient id="mirror-glass" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#ffffff" />
+            <stop offset="0.3" stopColor="#cfe3ee" />
+            <stop offset="0.75" stopColor="#6f93a6" />
+            <stop offset="1" stopColor="#3f6276" />
+          </linearGradient>
+          <linearGradient id="mirror-glint" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.85" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+          <radialGradient id="tower-receiver" cx="0.4" cy="0.4">
+            <stop offset="0" stopColor="#fffaf0" />
+            <stop offset="0.35" stopColor="#fff0c2" />
+            <stop offset="0.7" stopColor="#e9a93b" />
+            <stop offset="1" stopColor="#b27422" />
+          </radialGradient>
           <radialGradient id="hearth">
             <stop offset="0%" stopColor="#FFF4D6" />
             <stop offset="50%" stopColor="#F4C063" stopOpacity="0.7" />
