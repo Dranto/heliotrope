@@ -276,29 +276,34 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
       )}
 
       {!available && growing === 0 && <p className="hint">{t.seeds.noSeedYet}</p>}
-      {confirming && available ? (
-        <div className="confirm-row">
-          <span>{t.seeds.confirm(formatNumber(gain))}</span>
-          <button type="button" className="season-button" onClick={start}>
-            {challenge ? t.challenges.startWith(t.challenges.names[challenge]) : t.seeds.confirmYes}
+      {/* The start button stays in view at the foot of the dialog while the player reads. */}
+      <div className="prestige-actions">
+        {confirming && available ? (
+          <div className="confirm-row">
+            <span>{t.seeds.confirm(formatNumber(gain))}</span>
+            <button type="button" className="season-button" onClick={start}>
+              {challenge
+                ? t.challenges.startWith(t.challenges.names[challenge])
+                : t.seeds.confirmYes}
+            </button>
+            <button type="button" className="ghost" onClick={() => setConfirming(false)}>
+              {t.seeds.cancel}
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="season-button"
+            disabled={!available}
+            onClick={() => {
+              setMessage('');
+              setConfirming(true);
+            }}
+          >
+            {t.seeds.start}
           </button>
-          <button type="button" className="ghost" onClick={() => setConfirming(false)}>
-            {t.seeds.cancel}
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="season-button"
-          disabled={!available}
-          onClick={() => {
-            setMessage('');
-            setConfirming(true);
-          }}
-        >
-          {t.seeds.start}
-        </button>
-      )}
+        )}
+      </div>
     </Dialog>
   );
 }

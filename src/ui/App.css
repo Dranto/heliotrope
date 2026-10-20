@@ -2352,6 +2352,17 @@ button {
   gap: 0.5rem;
 }
 
+/* The Season and Cycle dialogs scroll; their start button stays pinned at the foot, over a
+   fade of the dialog's paper, so the main action never sits a screen below the fold. */
+.prestige-actions {
+  position: sticky;
+  bottom: -1.5rem;
+  z-index: 1;
+  margin: 0.5rem -1.5rem -1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+  background: linear-gradient(to top, rgb(251 246 236) 65%, rgb(251 246 236 / 0));
+}
+
 /* Menu ------------------------------------------------------------------- */
 
 .menu {
