@@ -129,6 +129,25 @@ describe('App', () => {
     expect(container.querySelector('.appear-ring')).toBeNull();
   });
 
+  it('draws each heliostat as four glass facets on a frame, around a lattice tower', () => {
+    const base = openGame(0);
+    saveGame({ ...base, generators: { ...base.generators, mirrorPlant: 3 } });
+    const { container } = render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const mirrors = container.querySelectorAll('[data-generator="mirrorPlant"] .mirror');
+    expect(mirrors.length).toBeGreaterThan(0);
+    for (const mirror of mirrors) {
+      expect(mirror.querySelector('.mirror-frame')).not.toBeNull();
+      expect(mirror.querySelectorAll('.mirror-facet')).toHaveLength(4);
+    }
+    const tower = container.querySelector('[data-generator="mirrorPlant"] .tower')!;
+    expect(tower.querySelector('.tower-lattice')?.getAttribute('d')).toMatch(/^M/);
+    expect(container.querySelectorAll('.mirror-paths ellipse')).toHaveLength(3);
+  });
+
   it('gives the grey roofs gravel, membrane seams and a shaded parapet', () => {
     saveGame(openGame(0));
     const { container } = render(

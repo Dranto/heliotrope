@@ -1329,21 +1329,83 @@ button {
   stroke-width: 0.6;
 }
 
+/* Heliostats: four glass facets on a frame, silver at first, gilded once upgraded. */
 .mirror {
-  fill: #9dbdd1;
-  stroke: #4f7690;
-  stroke-width: 0.5;
+  --frame: #b9c4c8;
+  --frame-edge: #8b9599;
 }
 
 .mirror.gilded {
-  fill: #fdf0cf;
-  stroke: var(--gold);
+  --frame: var(--gold);
+  --frame-edge: #b27f2c;
 }
 
-.tower {
-  fill: var(--cream);
+.mirror-shadow {
+  fill: rgb(59 51 40 / 0.18);
+}
+
+.mirror-frame {
+  fill: var(--frame);
+  stroke: var(--frame-edge);
+  stroke-width: 0.3;
+}
+
+.mirror-facet {
+  fill: url(#mirror-glass);
+}
+
+.mirror-glint {
+  fill: url(#mirror-glint);
+  opacity: 0.8;
+}
+
+/* Gravel paths between the rings of heliostats. */
+.mirror-paths ellipse,
+.mirror-paths path {
+  fill: none;
+  stroke: #e6dcc6;
+  stroke-width: 2.4;
+}
+
+.tower-plinth {
+  fill: #e3dccd;
+  stroke: #bdb39f;
+  stroke-width: 0.5;
+}
+
+.tower-shaft {
+  fill: #d1c8b6;
+}
+
+.tower-lattice,
+.tower-ring {
+  fill: none;
+  stroke: #9e9584;
+  stroke-width: 0.35;
+}
+
+.tower-rim {
+  fill: none;
   stroke: var(--gold);
-  stroke-width: 1;
+  stroke-width: 0.5;
+}
+
+.tower-rays {
+  stroke: #f6d58f;
+  stroke-width: 0.35;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.tower .heart {
+  fill: url(#tower-receiver);
+  stroke: #fff4d6;
+  stroke-width: 0.3;
+}
+
+.tower-glint {
+  fill: #ffffff;
+  opacity: 0.75;
 }
 
 .beam {
