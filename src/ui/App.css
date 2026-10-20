@@ -1116,6 +1116,18 @@ button {
   fill: rgb(255 255 255 / 0.35);
 }
 
+.seams {
+  fill: none;
+  stroke: rgb(59 51 40 / 0.18);
+  stroke-width: 0.3;
+}
+
+.parapet-shade {
+  fill: none;
+  stroke: rgb(59 51 40 / 0.2);
+  stroke-width: 1.2;
+}
+
 .wasteland rect {
   fill: #cdc6b8;
   stroke: rgb(31 42 36 / 0.18);

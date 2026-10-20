@@ -175,6 +175,8 @@ function Roof({
   const top = h - facade;
   const seed = hash(x, y);
   const wide = w >= h;
+  // Seams of the roof membrane, one every 9 units or so, as on the enriched map.
+  const seams = Math.floor(w / 9);
   return (
     <g>
       <rect x={x} y={y} width={w} height={h} rx="2" className="facade" />
@@ -187,6 +189,28 @@ function Roof({
       <rect x={x} y={y} width={w} height={top} rx="2" fill="url(#roof-sheen)" />
       {!bare && (
         <>
+          <rect
+            x={x + 1.5}
+            y={y + 1.5}
+            width={w - 3}
+            height={top - 3}
+            rx="1"
+            fill="url(#roof-gravel)"
+          />
+          {seams > 1 && (
+            <path
+              className="seams"
+              d={Array.from(
+                { length: seams - 1 },
+                (_, i) => `M${x + (w / seams) * (i + 1)} ${y + 2.5}V${y + top - 2.5}`,
+              ).join('')}
+            />
+          )}
+          {/* The parapet shades a strip of roof inside its sunny edge, then catches the light. */}
+          <path
+            className="parapet-shade"
+            d={`M${x + 2.4} ${y + top - 2}V${y + 2.4}H${x + w - 2}`}
+          />
           <rect className="parapet" x={x + 2} y={y + 2} width={w - 4} height={top - 4} rx="1" />
           {seed % 3 === 0 && w > 30 && (
             <path
@@ -782,6 +806,21 @@ export const Neighbourhood = memo(function Neighbourhood({
             <stop offset="55%" stopColor="#ffffff" stopOpacity="0" />
             <stop offset="100%" stopColor="#3b3328" stopOpacity="0.08" />
           </linearGradient>
+          {/* Gravel on the flat roofs: specks darker and lighter than any roof colour. */}
+          <pattern id="roof-gravel" width="6.2" height="5.4" patternUnits="userSpaceOnUse">
+            <g fill="#3b3328" fillOpacity="0.15">
+              <circle cx="0.6" cy="0.8" r="0.24" />
+              <circle cx="3.9" cy="1.9" r="0.18" />
+              <circle cx="2.2" cy="4.1" r="0.21" />
+              <circle cx="5.4" cy="4.6" r="0.16" />
+            </g>
+            <g fill="#ffffff" fillOpacity="0.32">
+              <circle cx="2.4" cy="0.5" r="0.19" />
+              <circle cx="5.3" cy="2.8" r="0.22" />
+              <circle cx="0.9" cy="3" r="0.17" />
+              <circle cx="3.6" cy="4.9" r="0.2" />
+            </g>
+          </pattern>
           <linearGradient id="panel-glass" x1="0" y1="0" x2="0.4" y2="1">
             <stop offset="0" stopColor="#a7c4e6" />
             <stop offset="0.45" stopColor="#4c6fa3" />

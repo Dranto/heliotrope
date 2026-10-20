@@ -129,6 +129,21 @@ describe('App', () => {
     expect(container.querySelector('.appear-ring')).toBeNull();
   });
 
+  it('gives the grey roofs gravel, membrane seams and a shaded parapet', () => {
+    saveGame(openGame(0));
+    const { container } = render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const parapets = container.querySelectorAll('.parapet').length;
+    expect(parapets).toBeGreaterThan(0);
+    expect(container.querySelectorAll('.parapet-shade')).toHaveLength(parapets);
+    expect(container.querySelectorAll('[fill="url(#roof-gravel)"]')).toHaveLength(parapets);
+    expect(container.querySelector('#roof-gravel')).not.toBeNull();
+    expect(container.querySelector('.seams')?.getAttribute('d')).toMatch(/^M[\d.]+ [\d.]+V/);
+  });
+
   it('welcomes the player back with the Light produced offline', () => {
     const base = openGame(0);
     saveGame({ ...base, generators: { ...base.generators, balconyPanel: 1 } });
