@@ -387,7 +387,47 @@ function LivingRoofs() {
             rx="2"
             fill="url(#sedum-texture)"
           />
+          {/* A gravel path of stepping stones along the roof, so it reads as a garden walked in. */}
+          <path
+            d={
+              w >= h
+                ? `M${x + 5} ${y + h * 0.55}H${x + w - 5}`
+                : `M${x + w * 0.55} ${y + 5}V${y + h - 5}`
+            }
+            className="roof-steps"
+          />
           <Flowers box={[x + 3, y + 3, w - 6, h - 6]} count={Math.round((w * h) / 160)} salt={i} />
+          {/* Rounded shrubs, each with its shadow and a sunlit top. */}
+          {Array.from({ length: Math.max(2, Math.round((w * h) / 700)) }, (_, k) => {
+            const cx = x + 6 + noise(k, i + 60) * (w - 12);
+            const cy = y + 6 + noise(k, i + 61) * (h - 12);
+            const r = 2.2 + noise(k, i + 62) * 1.4;
+            return (
+              <g key={`s${k}`} className="roof-clump">
+                <circle cx={cx + 0.7} cy={cy + 0.9} r={r} className="roof-clump-shadow" />
+                <circle cx={cx} cy={cy} r={r} className="roof-clump-leaf" />
+                <circle
+                  cx={cx - r * 0.3}
+                  cy={cy - r * 0.3}
+                  r={r * 0.45}
+                  className="roof-clump-light"
+                />
+              </g>
+            );
+          })}
+          {/* The parapet: a lit edge on the sun side and its shadow on the far side. */}
+          <rect
+            x={x + 1.4}
+            y={y + 1.4}
+            width={w - 2.8}
+            height={h - 2.8}
+            rx="2.4"
+            className="roof-lip"
+          />
+          <path
+            d={`M${x + 2.6} ${y + h - 2.2}H${x + w - 2.2}V${y + 2.6}`}
+            className="roof-lip-shade"
+          />
         </g>
       ))}
     </g>
