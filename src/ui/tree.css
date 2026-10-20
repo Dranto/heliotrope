@@ -3,16 +3,20 @@
 [data-branch='roots'] {
   --branch: #c8734f;
   --branch-soft: #efc9a4;
+  /* Text in the branch colour: dark enough to read on the soft tint and on cream (WCAG AA). */
+  --branch-ink: #7f3f22;
 }
 
 [data-branch='pollinators'] {
   --branch: #9b78c4;
   --branch-soft: #dccbef;
+  --branch-ink: #5f4290;
 }
 
 [data-branch='memory'] {
   --branch: #2f6b4f;
   --branch-soft: #bcd3b5;
+  --branch-ink: #24563f;
 }
 
 /* ---------- Tree screen ---------- */
@@ -252,7 +256,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--branch);
+  color: var(--branch-ink);
 }
 
 .tree-effect {
@@ -272,7 +276,7 @@
 
 .tree-learnt-tag {
   background: var(--branch-soft);
-  color: var(--branch);
+  color: var(--branch-ink);
 }
 
 .tree-locked-tag {
