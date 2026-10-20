@@ -168,3 +168,10 @@
   font-size: 0.85rem;
   color: var(--ink);
 }
+
+.hand-wait {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}

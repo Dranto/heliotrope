@@ -656,6 +656,25 @@ describe('App', () => {
     expect(within(panel).getByText(/Réserve pleine/)).toBeVisible();
   });
 
+  it('says what a helping hand waits for when it cannot be played yet', () => {
+    const fresh = openGame(0);
+    saveGame({
+      ...fresh,
+      seasons: 1,
+      requests: { ...fresh.requests, hands: ['ripen', 'bloom'] },
+    });
+    renderApp();
+    const panel = document.querySelector('.requests-panel') as HTMLElement;
+    const ripen = within(panel).getByRole('button', {
+      name: 'Lancer : Une culture mûre d’un coup',
+    });
+    expect(ripen).toBeDisabled();
+    expect(ripen).toHaveAccessibleDescription('Semez d’abord une culture au potager.');
+    const bloom = within(panel).getByRole('button', { name: 'Lancer : Une Floraison' });
+    expect(bloom).toBeEnabled();
+    expect(bloom).not.toHaveAttribute('aria-describedby');
+  });
+
   it('offers a tab bar for small screens (§10.3)', () => {
     renderApp();
     const tabs = screen.getByRole('navigation', { name: 'Sections du jeu' });

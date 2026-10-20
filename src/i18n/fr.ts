@@ -24,6 +24,7 @@ import type { FamilyId } from '../game/families';
 import type { CanopyId, TalentBranch, TalentId } from '../game/talents';
 import type { CropId, VarietyId } from '../game/seedBank';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
+import type { HandId } from '../game/requests';
 
 export interface GeneratorText {
   name: string;
@@ -92,6 +93,11 @@ export const fr = {
     waiting: 'Une demande arrive bientôt.',
     reserve: 'Coups de main',
     reserveEmpty: 'Aucun coup de main en réserve.',
+    handWaits: {
+      ripen: 'Semez d’abord une culture au potager.',
+      works: 'Attend un grand chantier en cours.',
+      sky: 'Servira une fois l’échange de prévision de la Saison utilisé.',
+    } as Partial<Record<HandId, string>>,
     reserveFull: 'Réserve pleine\u00a0: lancez un coup de main pour faire de la place.',
     play: 'Lancer',
     playLabel: (hand: string) => `Lancer\u00a0: ${hand}`,

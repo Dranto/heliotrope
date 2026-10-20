@@ -111,21 +111,33 @@ export function Requests() {
         <p className="hint">{t.requests.reserveEmpty}</p>
       ) : (
         <ul className="hand-list">
-          {requests.hands.map((hand, i) => (
-            <li key={i} className="hand-card" data-hand={hand}>
-              <RequestIcon kind={hand} />
-              <span>{t.requests.hands[hand]}</span>
-              <button
-                type="button"
-                className="buy"
-                disabled={!canPlayHand(state, i)}
-                aria-label={t.requests.playLabel(t.requests.hands[hand])}
-                onClick={() => store.dispatch((s) => playHand(s, i))}
-              >
-                {t.requests.play}
-              </button>
-            </li>
-          ))}
+          {requests.hands.map((hand, i) => {
+            // A hand that cannot be played yet says what it waits for, on phones too.
+            const wait = canPlayHand(state, i) ? undefined : t.requests.handWaits[hand];
+            return (
+              <li key={i} className="hand-card" data-hand={hand}>
+                <RequestIcon kind={hand} />
+                <span className="hand-text">
+                  {t.requests.hands[hand]}
+                  {wait && (
+                    <span className="hand-wait" id={`hand-wait-${i}`}>
+                      {wait}
+                    </span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  className="buy"
+                  disabled={!canPlayHand(state, i)}
+                  aria-label={t.requests.playLabel(t.requests.hands[hand])}
+                  aria-describedby={wait ? `hand-wait-${i}` : undefined}
+                  onClick={() => store.dispatch((s) => playHand(s, i))}
+                >
+                  {t.requests.play}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
       {bonds.length > 0 && (
