@@ -1279,6 +1279,41 @@ button {
   fill: #8d6a4b;
 }
 
+.roof-walk-edge {
+  fill: none;
+  stroke: #b38c5f;
+  stroke-width: 2.6;
+}
+
+.roof-walk {
+  fill: none;
+  stroke: #f1e6cf;
+  stroke-width: 2;
+  stroke-dasharray: 1.8 0.6;
+}
+
+.roof-shrub-shadow {
+  fill: rgb(60 40 25 / 0.3);
+}
+
+.roof-shrub-light {
+  fill: rgb(230 245 200 / 0.55);
+}
+
+.planter-lip {
+  fill: none;
+  stroke: rgb(255 240 210 / 0.75);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.planter-shade {
+  fill: none;
+  stroke: rgb(60 40 25 / 0.35);
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
 .roof-furrow {
   fill: none;
   stroke: #6e4f36;
