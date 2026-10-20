@@ -184,6 +184,26 @@ describe('App', () => {
     expect(container.querySelectorAll('.roof-shrub')).toHaveLength(2 * (planters - gardens));
   });
 
+  it('gives each vertical farm terrace a glass rail and shrubs with shadow and sunlit tops', () => {
+    const base = openGame(0);
+    saveGame({
+      ...base,
+      generators: { ...base.generators, verticalFarm: 10 },
+      totalLight: 1e8,
+      allTimeLight: 1e8,
+    });
+    const { container } = render(
+      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
+        <App />
+      </GameStoreContext.Provider>,
+    );
+    const rows = container.querySelectorAll('.farm .row.foliage-stroke').length;
+    expect(rows).toBeGreaterThan(0);
+    expect(container.querySelectorAll('.farm .farm-rail')).toHaveLength(rows);
+    expect(container.querySelectorAll('.farm .farm-row-shade')).toHaveLength(rows);
+    expect(container.querySelectorAll('.farm .farm-row-light')).toHaveLength(rows);
+  });
+
   it('welcomes the player back with the Light produced offline', () => {
     const base = openGame(0);
     saveGame({ ...base, generators: { ...base.generators, balconyPanel: 1 } });

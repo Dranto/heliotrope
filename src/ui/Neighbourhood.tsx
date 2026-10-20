@@ -508,7 +508,8 @@ function Farm({ site: { box, storeys }, level }: { site: Building; level: number
   const cx = x + w / 2;
   const cy = y + h / 2;
   // Stepped terraces seen from above: warm decking and pale stone in turn, each shading the one
-  // below, their rims planted with shrubs and a small tree at two corners.
+  // below behind a glass rail, their rims planted with shrubs (each with its shadow and a sunlit
+  // top) and a small tree at two corners.
   return (
     <g className="farm">
       <Shadow box={box} storeys={storeys * 1.6} />
@@ -539,12 +540,36 @@ function Farm({ site: { box, storeys }, level }: { site: Building; level: number
               />
             )}
             <rect
+              x={tx + 0.4}
+              y={ty + 0.4}
+              width={tw - 0.8}
+              height={th - 0.8}
+              rx={Math.max(1.2, 4.6 - i)}
+              className="farm-rail"
+            />
+            <rect
+              x={tx + 2}
+              y={ty + 2.1}
+              width={tw - 3.2}
+              height={th - 3.2}
+              rx="1.5"
+              className="row farm-row-shade"
+            />
+            <rect
               x={tx + 1.6}
               y={ty + 1.6}
               width={tw - 3.2}
               height={th - 3.2}
               rx="1.5"
               className="row foliage-stroke"
+            />
+            <rect
+              x={tx + 1.1}
+              y={ty + 1.1}
+              width={tw - 3.2}
+              height={th - 3.2}
+              rx="1.5"
+              className="row-light farm-row-light"
             />
             {(
               [
