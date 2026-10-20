@@ -51,6 +51,11 @@ export const en: Texts = {
     waiting: 'A request is on its way.',
     reserve: 'Helping hands',
     reserveEmpty: 'No helping hand in reserve.',
+    handWaits: {
+      ripen: 'Sow a crop in the garden first.',
+      works: 'Waits for a great work under way.',
+      sky: 'Usable once this Season’s forecast swap is spent.',
+    },
     reserveFull: 'Reserve full: play a helping hand to make room.',
     play: 'Play',
     playLabel: (hand: string) => `Play: ${hand}`,
