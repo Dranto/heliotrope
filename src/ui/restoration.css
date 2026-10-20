@@ -120,6 +120,41 @@
   stroke-dasharray: 1.2 0.6;
 }
 
+.parcels .roof-steps {
+  fill: none;
+  stroke: #efe4cc;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 2.4 1.6;
+  opacity: 0.9;
+}
+
+.parcels .roof-clump-shadow {
+  fill: rgb(40 60 40 / 0.25);
+}
+
+.parcels .roof-clump-leaf {
+  fill: #6f9a5a;
+}
+
+.parcels .roof-clump-light {
+  fill: #b7d58f;
+  opacity: 0.8;
+}
+
+.parcels .roof-lip {
+  fill: none;
+  stroke: rgb(255 248 230 / 0.85);
+  stroke-width: 0.9;
+}
+
+.parcels .roof-lip-shade {
+  fill: none;
+  stroke: rgb(70 60 45 / 0.3);
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
 .parcels .sedum-drift {
   opacity: 0.8;
 }
