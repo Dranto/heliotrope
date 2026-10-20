@@ -51,7 +51,7 @@ export const en: Texts = {
     waiting: 'A request is on its way.',
     reserve: 'Helping hands',
     reserveEmpty: 'No helping hand in reserve.',
-    reserveFull: 'Reserve full',
+    reserveFull: 'Reserve full: play a helping hand to make room.',
     play: 'Play',
     playLabel: (hand: string) => `Play: ${hand}`,
     bond: (district: string, percent: string) => `Bond with ${district}: +${percent}%`,

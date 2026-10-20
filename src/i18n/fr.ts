@@ -92,7 +92,7 @@ export const fr = {
     waiting: 'Une demande arrive bientôt.',
     reserve: 'Coups de main',
     reserveEmpty: 'Aucun coup de main en réserve.',
-    reserveFull: 'Réserve pleine',
+    reserveFull: 'Réserve pleine\u00a0: lancez un coup de main pour faire de la place.',
     play: 'Lancer',
     playLabel: (hand: string) => `Lancer\u00a0: ${hand}`,
     bond: (district: string, percent: string) => `Lien avec ${district}\u00a0: +${percent}\u00a0%`,
