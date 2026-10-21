@@ -972,12 +972,12 @@ function Lane({ box: [x, y, w, h] }: { box: Box }) {
 const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
   seedSwap: () => (
     <g>
-      <Box box={[278, 231.5, 12, 9]} className="table" />
+      <Box box={[314, 265, 12, 9]} className="table" />
       {[0, 1, 2, 3].map((i) => (
         <rect
           key={i}
-          x={279.5 + i * 2.6}
-          y={233 + (i % 2)}
+          x={315.5 + i * 2.6}
+          y={266.5 + (i % 2)}
           width="2"
           height="3"
           rx="0.4"
@@ -988,15 +988,15 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
   ),
   toolLibrary: () => (
     <g>
-      <Box box={[332, 231, 12, 10]} className="shed" />
-      <path d="M332 236 H344" className="shed-ridge" />
-      <path d="M336 233.5 l4 5" className="tool" />
+      <Box box={[348, 265, 12, 10]} className="shed" />
+      <path d="M348 270 H360" className="shed-ridge" />
+      <path d="M352 267.5 l4 5" className="tool" />
     </g>
   ),
   compost: () => (
     <g>
       {[0, 1, 2].map((i) => (
-        <rect key={i} x={263} y={229 + i * 5} width="8" height="4" rx="1" className="compost" />
+        <rect key={i} x={300 + i * 7.5} y={250} width="6.5" height="5" rx="1" className="compost" />
       ))}
     </g>
   ),
@@ -1035,16 +1035,16 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
     <g>
       {[0, 1].map((i) => (
         <g key={i}>
-          <Box box={[351 + i * 6, 232.5 + i * 1.5, 4.6, 5]} className="hive" />
-          <path d={`M${351 + i * 6} ${234.5 + i * 1.5} h4.6`} className="hive-line" />
+          <Box box={[381 + i * 6, 197.5 + i * 1.5, 4.6, 5]} className="hive" />
+          <path d={`M${381 + i * 6} ${199.5 + i * 1.5} h4.6`} className="hive-line" />
         </g>
       ))}
       {[0, 1, 2, 3, 4].map((i) => (
         <circle
           key={i}
           className="bee"
-          cx={348 + noise(i, 9) * 16}
-          cy={226 + noise(i, 10) * 18}
+          cx={378 + noise(i, 9) * 16}
+          cy={191 + noise(i, 10) * 18}
           r="0.7"
           style={{ animationDelay: `${-noise(i, 4) * 4}s` }}
         />
