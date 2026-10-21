@@ -492,9 +492,47 @@
 }
 
 .projects .compost {
-  fill: #8a6a4a;
+  fill: #b98a5a;
   stroke: rgb(255 255 255 / 0.5);
   stroke-width: 0.5;
+}
+
+.projects .compost-shadow {
+  fill: rgb(60 50 70 / 0.18);
+}
+
+.projects .compost-heap {
+  fill: #7a5636;
+}
+
+.projects .compost-heap-1 {
+  fill: #5e4128;
+}
+
+.projects .compost-heap-2 {
+  fill: #3f2c1c;
+}
+
+.projects .compost-lid {
+  stroke: rgb(255 240 210 / 0.85);
+  stroke-width: 0.5;
+  stroke-linecap: round;
+}
+
+.projects .compost-slat {
+  stroke: rgb(185 138 90 / 0.9);
+  stroke-width: 0.35;
+}
+
+.projects .compost-greens {
+  fill: #8fbf6a;
+}
+
+.projects .compost-sprout {
+  fill: none;
+  stroke: #9fd27a;
+  stroke-width: 0.45;
+  stroke-linecap: round;
 }
 
 .projects .battery {

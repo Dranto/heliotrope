@@ -993,11 +993,39 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       <path d="M352 267.5 l4 5" className="tool" />
     </g>
   ),
+  // Three slatted bins, from fresh greens to ripe dark soil where a seedling already sprouts.
   compost: () => (
     <g>
-      {[0, 1, 2].map((i) => (
-        <rect key={i} x={300 + i * 7.5} y={250} width="6.5" height="5" rx="1" className="compost" />
+      {[0, 1, 2].map((i) => {
+        const x = 300 + i * 7.5;
+        return (
+          <g key={i}>
+            <rect x={x + 0.5} y={250.6} width="6.5" height="5" rx="1" className="compost-shadow" />
+            <rect x={x} y={250} width="6.5" height="5" rx="1" className="compost" />
+            <rect
+              x={x + 0.9}
+              y={250.9}
+              width="4.7"
+              height="3.2"
+              rx="0.6"
+              className={`compost-heap compost-heap-${i}`}
+            />
+            <path d={`M${x + 0.8} 250.45 h4.9`} className="compost-lid" />
+            <path d={`M${x + 2.4} 251 v3 M${x + 4.1} 251 v3`} className="compost-slat" />
+          </g>
+        );
+      })}
+      {[
+        [301.6, 251.8],
+        [303.4, 252.9],
+        [305, 251.7],
+      ].map(([cx, cy], i) => (
+        <circle key={i} cx={cx} cy={cy} r="0.55" className="compost-greens" />
       ))}
+      <path
+        d="M318.3 253.6 v-1.6 M318.3 252.4 q-0.9 -0.7 -1.5 -0.2 M318.3 252.2 q0.8 -0.8 1.4 -0.3"
+        className="compost-sprout"
+      />
     </g>
   ),
   // Cabinets on a shared cable, each with a sunlit lid, a shaded side and a charge gauge that
