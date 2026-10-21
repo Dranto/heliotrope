@@ -3216,7 +3216,10 @@ button {
   padding: 0 0.25rem;
   border-radius: 1rem;
   background: var(--gold);
-  color: #fffaf0;
+  /* Dark ink on gold, as on the buy buttons: white read at under 2:1. A cream ring keeps the
+     badge apart from the gold parcel it sits on. */
+  color: var(--ink);
+  box-shadow: 0 0 0 1.5px #fffaf0;
   font-size: 0.7rem;
   font-weight: 700;
   line-height: 1.1rem;
