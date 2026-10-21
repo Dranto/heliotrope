@@ -970,20 +970,32 @@ function Lane({ box: [x, y, w, h] }: { box: Box }) {
 }
 
 const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
+  // A swap table in relief under a linen runner, its paper seed packets each printed with their
+  // flower, and a jar of loose seeds.
   seedSwap: () => (
     <g>
+      <rect x={314.7} y={265.8} width="12" height="9" rx="3" className="table-shadow" />
       <Box box={[314, 265, 12, 9]} className="table" />
-      {[0, 1, 2, 3].map((i) => (
-        <rect
-          key={i}
-          x={315.5 + i * 2.6}
-          y={266.5 + (i % 2)}
-          width="2"
-          height="3"
-          rx="0.4"
-          className={FLOWER_CLASSES[i]}
-        />
-      ))}
+      <rect x={314.6} y={269.3} width="10.8" height="2.6" rx="0.5" className="swap-cloth" />
+      <path d="M314.9 270.2 H325.1 M314.9 271 H325.1" className="swap-stripe" />
+      {[0, 1, 2, 3].map((i) => {
+        const x = 315.4 + i * 2.5;
+        const y = 266 + (i % 2) * 0.7;
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width="2" height="2.8" rx="0.3" className="swap-packet" />
+            <path d={`M${x + 0.2} ${y + 0.6} h1.6`} className="swap-fold" />
+            <circle
+              cx={x + 1}
+              cy={y + 1.7}
+              r="0.55"
+              className={`${FLOWER_CLASSES[i]} swap-bloom`}
+            />
+          </g>
+        );
+      })}
+      <circle cx={322.9} cy={272.7} r="0.95" className="swap-jar" />
+      <circle cx={322.7} cy={272.5} r="0.45" className="swap-seeds" />
     </g>
   ),
   // A tiled shed, its roof sunlit on one slope, with a rake laid in front, a spade against the

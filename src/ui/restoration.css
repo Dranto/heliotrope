@@ -484,6 +484,47 @@
   fill: var(--terracotta);
 }
 
+.projects .table-shadow {
+  fill: rgb(60 50 70 / 0.18);
+}
+
+.projects .swap-cloth {
+  fill: #eef0e2;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.2;
+}
+
+.projects .swap-stripe {
+  stroke: #9db58e;
+  stroke-width: 0.25;
+}
+
+.projects .swap-packet {
+  fill: #fffaf0;
+  stroke: rgb(120 90 60 / 0.35);
+  stroke-width: 0.2;
+}
+
+.projects .swap-fold {
+  stroke: rgb(120 90 60 / 0.3);
+  stroke-width: 0.2;
+}
+
+.projects .swap-bloom {
+  stroke: rgb(120 90 60 / 0.4);
+  stroke-width: 0.15;
+}
+
+.projects .swap-jar {
+  fill: rgb(220 236 240 / 0.85);
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 0.25;
+}
+
+.projects .swap-seeds {
+  fill: #8a6a45;
+}
+
 .projects .shed-ridge {
   stroke: rgb(255 255 255 / 0.8);
   stroke-width: 0.6;
