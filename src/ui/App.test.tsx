@@ -475,6 +475,11 @@ describe('App', () => {
     // Families are reached by their headings, not as landmarks named like the main panels.
     expect(within(dialog).queryAllByRole('region')).toHaveLength(0);
     expect(within(dialog).getByRole('heading', { level: 3, name: /^Lumière/ })).toBeInTheDocument();
+    // The progress bar and its percent sit in one group, so they wrap together on a phone.
+    const meter = screen.getByTestId('next-light').querySelector('.achievement-next-meter');
+    expect(meter).not.toBeNull();
+    expect(meter?.querySelector('.achievement-next-bar')).not.toBeNull();
+    expect(meter?.querySelector('.achievement-next-percent')).toHaveTextContent(/^\d+\s%$/);
   });
 
   it('announces a Milestone when it is reached', () => {

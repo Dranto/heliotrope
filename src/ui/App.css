@@ -3681,10 +3681,17 @@ button {
   color: var(--leaf);
 }
 
+.achievement-next-meter {
+  display: flex;
+  flex: 1 1 9rem;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 15rem;
+}
+
 .achievement-next-bar {
   position: relative;
-  flex: 1 1 6rem;
-  max-width: 12rem;
+  flex: 1 1 auto;
   height: 0.4rem;
   overflow: hidden;
   border-radius: 1rem;
@@ -3699,6 +3706,7 @@ button {
 }
 
 .achievement-next-percent {
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: var(--ink-soft);
 }
