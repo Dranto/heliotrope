@@ -1,13 +1,14 @@
 import { readFileSync } from 'node:fs';
 
-// The action buttons of the Season-2 panels, pressed many times a game, answer over a full 44 px
-// on a touch screen (§10.3).
+// Buttons pressed many times a game answer over a full 44 px on a touch screen (§10.3): the
+// action buttons of the Season-2 panels by their height, the Milestone gift on the map by its size.
 const RULES: [file: string, selector: string][] = [
   ['./alliances.css', '.alliance-card .buy'],
   ['./greatWorks.css', '.works-card .works-give'],
   ['./orchard.css', '.orchard-card .buy'],
   ['./garden.css', '.ghost.garden-sow'],
 ];
+const SQUARE_RULES: [file: string, selector: string][] = [['./App.css', '.milestone-gift']];
 
 function coarseBlocks(css: string): string[] {
   const blocks: string[] = [];
@@ -24,11 +25,23 @@ function coarseBlocks(css: string): string[] {
   return blocks;
 }
 
-describe('touch targets in the Season-2 panels', () => {
+function escapeSelector(selector: string): string {
+  return selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+describe('touch targets', () => {
   it.each(RULES)('%s gives %s a 44 px height on a touch screen', (file, selector) => {
     const css = readFileSync(new URL(file, import.meta.url), 'utf8');
-    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const rule = new RegExp(`${escaped}\\s*\\{[^}]*min-height:\\s*2\\.75rem`);
+    const rule = new RegExp(`${escapeSelector(selector)}\\s*\\{[^}]*min-height:\\s*2\\.75rem`);
     expect(coarseBlocks(css).some((block) => rule.test(block))).toBe(true);
+  });
+
+  it.each(SQUARE_RULES)('%s gives %s a 44 px square on a touch screen', (file, selector) => {
+    const css = readFileSync(new URL(file, import.meta.url), 'utf8');
+    const block = new RegExp(`${escapeSelector(selector)}\\s*\\{([^}]*)\\}`);
+    const rules = coarseBlocks(css).flatMap((b) => b.match(block)?.[1] ?? []);
+    expect(rules.some((r) => /width:\s*2\.75rem/.test(r) && /height:\s*2\.75rem/.test(r))).toBe(
+      true,
+    );
   });
 });

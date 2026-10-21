@@ -3228,6 +3228,14 @@ button {
   border-radius: 50%;
 }
 
+/* A full 44 px target on a touch screen (§10.3); the parcel stays centred on its spot. */
+@media (pointer: coarse) {
+  .milestone-gift {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
 @keyframes gift-bob {
   50% {
     transform: translate(-50%, calc(-50% - 3px));
