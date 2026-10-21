@@ -119,14 +119,16 @@ export function Achievements({ onClose }: { onClose: () => void }) {
               <div className="achievement-next" data-testid={`next-${family}`}>
                 <span>{t.achievements.next(achievementName(next.achievement))}</span>
                 {next.progress !== null && (
-                  <>
+                  // Bar and percent wrap together, so a narrow screen never leaves the percent
+                  // alone on a line under its bar.
+                  <span className="achievement-next-meter">
                     <span className="achievement-next-bar" aria-hidden="true">
                       <span style={{ width: `${Math.round(next.progress * 100)}%` }} />
                     </span>
                     <span className="achievement-next-percent">
                       {t.achievements.progress(formatNumber(Math.floor(next.progress * 100)))}
                     </span>
-                  </>
+                  </span>
                 )}
               </div>
             )}
