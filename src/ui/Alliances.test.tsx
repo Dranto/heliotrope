@@ -52,4 +52,23 @@ describe('the alliances panel', () => {
     const list = document.querySelector('.alliances-panel > .alliances-list') as HTMLElement;
     expect(within(list).getAllByRole('button', { name: /^Choisir/ })).toHaveLength(awake.length);
   });
+
+  it('labels each state as a pill and keeps every count whole', () => {
+    saveGame(grown());
+    const store = new GameStore(localStorage, () => 0);
+    render(
+      <GameStoreContext.Provider value={store}>
+        <Alliances />
+      </GameStoreContext.Provider>,
+    );
+    const states = [...document.querySelectorAll('.alliance-state')];
+    expect(states.length).toBe(ALLIANCE_IDS.length);
+    // No leading "·", which stood alone at the start of a line when the name wrapped.
+    for (const state of states) expect(state.textContent).toMatch(/^(Éveillée|Endormie)$/);
+    // "4 sur 4" never splits across two lines.
+    for (const sides of document.querySelectorAll('.alliance-sides')) {
+      expect(sides.textContent).toMatch(/\d\u00a0sur\u00a0\d/);
+      expect(sides.textContent).not.toMatch(/\d sur|sur \d/);
+    }
+  });
 });
