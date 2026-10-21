@@ -4,6 +4,8 @@
   --cream: #fbf6ec;
   --gold: #e9a93b;
   --gold-soft: #f6d58f;
+  /* Gold for text: 5:1 on cream, where --gold itself reads at under 2:1. */
+  --gold-deep: #8f6110;
   --sage: #8fae8b;
   --leaf: #2f6b4f;
   --lilac: #b79ad6;
@@ -3618,7 +3620,7 @@ button {
 .bloom-gift {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--gold-deep, #b7801f);
+  color: var(--gold-deep);
 }
 
 .dialog.achievements {
@@ -3653,11 +3655,11 @@ button {
 }
 
 .achievement-family[data-complete='true'] .achievement-family-title {
-  color: var(--gold-deep, #b7801f);
+  color: var(--gold-deep);
 }
 
 .achievement-family[data-complete='true'] .achievement-family-count {
-  color: var(--gold-deep, #b7801f);
+  color: var(--gold-deep);
 }
 
 .achievement-family-reward {
