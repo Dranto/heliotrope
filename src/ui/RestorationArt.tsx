@@ -986,11 +986,30 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       ))}
     </g>
   ),
+  // A tiled shed, its roof sunlit on one slope, with a rake laid in front, a spade against the
+  // wall and a watering can waiting to be borrowed.
   toolLibrary: () => (
     <g>
+      <rect x={348.7} y={265.8} width="12" height="10" rx="3.3" className="shed-shadow" />
       <Box box={[348, 265, 12, 10]} className="shed" />
+      <path
+        d="M348.3 270 H359.7 V272 a2.9 2.9 0 0 1 -2.9 2.7 H351.2 a2.9 2.9 0 0 1 -2.9 -2.7 Z"
+        className="shed-shade"
+      />
+      <path
+        d="M350 267.4 H358 M349.6 268.8 H358.4 M349.6 271.6 H358.4 M350 273 H358"
+        className="shed-tiles"
+      />
       <path d="M348 270 H360" className="shed-ridge" />
-      <path d="M352 267.5 l4 5" className="tool" />
+      <path d="M349.6 276.7 H355.4" className="tool-handle" />
+      <path
+        d="M355.4 275.8 v1.8 M355.4 275.9 h0.9 M355.4 276.7 h0.9 M355.4 277.5 h0.9"
+        className="tool-metal"
+      />
+      <path d="M361.3 266.6 v5.4 M360.6 266.6 h1.4" className="tool-handle" />
+      <rect x={360.6} y={271.8} width="1.4" height="2.1" rx="0.5" className="tool-blade" />
+      <rect x={363} y={271.4} width="2.3" height="2.3" rx="0.8" className="watering-can" />
+      <path d="M365.2 272.2 l1.3 -0.9 M363.4 271.4 q0.75 -1.1 1.5 0" className="watering-spout" />
     </g>
   ),
   // Three slatted bins, from fresh greens to ripe dark soil where a seedling already sprouts.
