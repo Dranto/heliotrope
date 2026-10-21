@@ -484,11 +484,56 @@
   fill: var(--terracotta);
 }
 
-.projects .shed-ridge,
-.projects .tool {
+.projects .shed-ridge {
   stroke: rgb(255 255 255 / 0.8);
   stroke-width: 0.6;
   stroke-linecap: round;
+}
+
+.projects .shed-shadow {
+  fill: rgb(60 50 70 / 0.18);
+}
+
+/* The slope away from the sun. */
+.projects .shed-shade {
+  fill: rgb(90 40 30 / 0.22);
+}
+
+.projects .shed-tiles {
+  stroke: rgb(255 255 255 / 0.3);
+  stroke-width: 0.3;
+  stroke-linecap: round;
+}
+
+.projects .tool-handle {
+  stroke: #a8794a;
+  stroke-width: 0.5;
+  stroke-linecap: round;
+}
+
+.projects .tool-metal,
+.projects .watering-spout {
+  fill: none;
+  stroke: #7d8a91;
+  stroke-width: 0.35;
+  stroke-linecap: round;
+}
+
+.projects .tool-blade {
+  fill: #9aa7ad;
+  stroke: rgb(255 255 255 / 0.6);
+  stroke-width: 0.2;
+}
+
+.projects .watering-can {
+  fill: #6f9a86;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.3;
+}
+
+.projects .watering-spout {
+  stroke: #6f9a86;
+  stroke-width: 0.45;
 }
 
 .projects .compost {
