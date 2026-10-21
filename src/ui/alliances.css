@@ -70,16 +70,23 @@
 }
 
 .alliance-state {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
+  vertical-align: 0.1em;
 }
 
 .alliance-state[data-awake='true'] {
   color: #2f6b4f;
+  background: rgb(47 107 79 / 0.1);
 }
 
 .alliance-state[data-awake='false'] {
   color: var(--ink-soft);
+  background: rgb(60 50 40 / 0.06);
 }
 
 .alliance-sides {

@@ -56,8 +56,9 @@ export function Alliances() {
       <li key={id} className="alliance-card" data-chosen={isChosen} data-alliance={id}>
         <strong>
           {name}{' '}
+          {/* A pill rather than a "· state" suffix, which led its own line when the name wrapped. */}
           <span className="alliance-state" data-awake={awake}>
-            · {awake ? t.alliances.awake : t.alliances.asleep}
+            {awake ? t.alliances.awake : t.alliances.asleep}
           </span>
         </strong>
         <p className="alliance-sides">{sides}</p>

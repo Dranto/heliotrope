@@ -840,7 +840,7 @@ export const en: Texts = {
     effects: {
       windBikes: 'In the wind, the Cooperatives also buy the synergies',
     } as Partial<Record<AllianceId, string>>,
-    side: (name: string, have: string, need: string) => `${name}: ${have} of ${need}`,
+    side: (name: string, have: string, need: string) => `${name}: ${have}\u00a0of\u00a0${need}`,
     awake: 'Awake',
     asleep: 'Asleep',
     asleepList: (count: string) => `Asleep alliances (${count})`,
