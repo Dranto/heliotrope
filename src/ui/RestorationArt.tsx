@@ -1090,26 +1090,52 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       })}
     </g>
   ),
+  // Two hives on their stands, lids catching the sun above the stacked boxes, a landing board at
+  // each entrance, a lavender clump beside them and golden bees going to and fro.
   beehives: () => (
     <g>
-      {[0, 1].map((i) => (
-        <g key={i}>
-          <Box box={[381 + i * 6, 197.5 + i * 1.5, 4.6, 5]} className="hive" />
-          <path d={`M${381 + i * 6} ${199.5 + i * 1.5} h4.6`} className="hive-line" />
-        </g>
-      ))}
+      {[0, 1].map((i) => {
+        const x = 381 + i * 6;
+        const y = 197.5 + i * 1.5;
+        return (
+          <g key={i}>
+            <rect x={x + 0.6} y={y + 0.7} width="4.6" height="5" rx="1.4" className="hive-shadow" />
+            <Box box={[x, y, 4.6, 5]} className="hive" />
+            <path
+              d={`M${x + 0.4} ${y + 2.6} h3.8 M${x + 0.4} ${y + 3.8} h3.8`}
+              className="hive-line"
+            />
+            <rect x={x - 0.2} y={y - 0.3} width="5" height="2" rx="0.6" className="hive-lid" />
+            <path d={`M${x + 0.3} ${y - 0.15} h4`} className="hive-lid-light" />
+            <rect x={x + 1.1} y={y + 5} width="2.4" height="0.9" rx="0.3" className="hive-board" />
+            <path d={`M${x + 1.5} ${y + 4.7} h1.6`} className="hive-entrance" />
+          </g>
+        );
+      })}
       {[0, 1, 2, 3, 4].map((i) => (
         <circle
           key={i}
-          className="bee"
-          cx={378 + noise(i, 9) * 16}
-          cy={191 + noise(i, 10) * 18}
-          r="0.7"
-          style={{ animationDelay: `${-noise(i, 4) * 4}s` }}
+          cx={379.4 + (i % 3) * 0.8}
+          cy={202.6 + Math.floor(i / 3) * 0.9 + (i % 2) * 0.3}
+          r="0.55"
+          className="hive-lavender"
         />
       ))}
+      {[0, 1, 2, 3, 4].map((i) => {
+        const cx = 378 + noise(i, 9) * 16;
+        const cy = 191 + noise(i, 10) * 18;
+        return (
+          <g key={i} className="bee" style={{ animationDelay: `${-noise(i, 4) * 4}s` }}>
+            <ellipse cx={cx - 0.3} cy={cy - 0.55} rx="0.55" ry="0.35" className="bee-wing" />
+            <ellipse cx={cx + 0.3} cy={cy - 0.55} rx="0.55" ry="0.35" className="bee-wing" />
+            <ellipse cx={cx} cy={cy} rx="0.85" ry="0.6" className="bee-body" />
+            <path d={`M${cx - 0.1} ${cy - 0.5} v1`} className="bee-stripe" />
+          </g>
+        );
+      })}
     </g>
   ),
+
   festival: () => (
     <g className="festival">
       <Garland from={[262, 216]} to={[360, 216]} count={13} className="flag" />
