@@ -680,18 +680,71 @@
 
 .projects .hive {
   fill: #f2c25c;
-  stroke: #9c7a52;
+  stroke: rgb(255 255 255 / 0.8);
   stroke-width: 0.4;
 }
 
+.projects .hive-shadow {
+  fill: rgb(60 50 70 / 0.18);
+}
+
+/* The joints between the stacked boxes. */
 .projects .hive-line {
-  stroke: #9c7a52;
-  stroke-width: 0.4;
+  stroke: rgb(156 122 82 / 0.55);
+  stroke-width: 0.3;
+  stroke-linecap: round;
 }
 
-.projects .bee {
-  fill: #3b3328;
-  animation: buzz 4s ease-in-out infinite alternate;
+.projects .hive-lid {
+  fill: #e8dcc4;
+  stroke: #9c7a52;
+  stroke-width: 0.3;
+}
+
+/* The lid's edge facing the sun. */
+.projects .hive-lid-light {
+  stroke: #fffaf0;
+  stroke-width: 0.35;
+  stroke-linecap: round;
+}
+
+.projects .hive-board {
+  fill: #a8794a;
+}
+
+.projects .hive-entrance {
+  stroke: #4a3a2a;
+  stroke-width: 0.4;
+  stroke-linecap: round;
+}
+
+.projects .hive-lavender {
+  fill: #9b7fc7;
+  stroke: rgb(255 255 255 / 0.5);
+  stroke-width: 0.15;
+}
+
+.projects .bee-wing {
+  fill: rgb(255 255 255 / 0.75);
+  stroke: rgb(80 70 60 / 0.35);
+  stroke-width: 0.1;
+}
+
+.projects .bee-body {
+  fill: #f2b632;
+  stroke: #3b3328;
+  stroke-width: 0.2;
+}
+
+.projects .bee-stripe {
+  stroke: #3b3328;
+  stroke-width: 0.3;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .projects .bee {
+    animation: buzz 4s ease-in-out infinite alternate;
+  }
 }
 
 @keyframes buzz {
