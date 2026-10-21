@@ -263,6 +263,13 @@
   color: var(--leaf);
 }
 
+/* A full 44 px target on a touch screen (§10.3). */
+@media (pointer: coarse) {
+  .ghost.garden-sow {
+    min-height: 2.75rem;
+  }
+}
+
 .garden-sow svg {
   width: 1.35rem;
   height: 1.35rem;
