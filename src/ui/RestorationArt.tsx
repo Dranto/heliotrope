@@ -1000,14 +1000,35 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       ))}
     </g>
   ),
+  // Cabinets on a shared cable, each with a sunlit lid, a shaded side and a charge gauge that
+  // fills one cell after the other.
   sharedBatteries: () => (
     <g>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <g key={i}>
-          <Box box={[316 + i * 13, 198, 9, 6]} className="battery" />
-          <path d={`M${319.5 + i * 13} 199.5 l1.8 1.6 -1.4 0 1.8 1.6`} className="bolt" />
-        </g>
-      ))}
+      <path d="M320.5 205.2 H372.5" className="battery-cable" />
+      {[0, 1, 2, 3, 4].map((i) => {
+        const x = 316 + i * 13;
+        return (
+          <g key={i}>
+            <rect x={x + 0.6} y={198.8} width="9" height="6" rx="2" className="battery-shadow" />
+            <Box box={[x, 198, 9, 6]} className="battery" />
+            <path d={`M${x + 7.6} 199 v4`} className="battery-shade" />
+            <path d={`M${x + 1.4} 198.6 h6.2`} className="battery-lid" />
+            <path d={`M${x + 3.5} 199.5 l1.8 1.6 -1.4 0 1.8 1.6`} className="bolt" />
+            {[0, 1, 2].map((c) => (
+              <rect
+                key={c}
+                x={x + 1.4 + c * 1.5}
+                y={202.6}
+                width="1.1"
+                height="0.8"
+                rx="0.3"
+                className="battery-cell"
+                style={{ animationDelay: `${(c + i * 0.4) * 0.6}s` }}
+              />
+            ))}
+          </g>
+        );
+      })}
     </g>
   ),
   beehives: () => (

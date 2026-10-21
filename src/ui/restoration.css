@@ -509,6 +509,51 @@
   stroke-width: 0.6;
 }
 
+.projects .battery-shadow {
+  fill: rgb(60 50 70 / 0.18);
+}
+
+.projects .battery-cable {
+  fill: none;
+  stroke: #2f4f4e;
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  stroke-dasharray: 2.2 0.8;
+}
+
+.projects .battery-shade {
+  stroke: rgb(20 40 40 / 0.35);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.projects .battery-lid {
+  stroke: rgb(255 246 220 / 0.85);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.projects .battery-cell {
+  fill: #9fd8a0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .projects .battery-cell {
+    animation: battery-charge 3.6s ease-in-out infinite;
+  }
+}
+
+@keyframes battery-charge {
+  0%,
+  100% {
+    fill: #9fd8a0;
+  }
+
+  50% {
+    fill: #f4c063;
+  }
+}
+
 .projects .hive {
   fill: #f2c25c;
   stroke: #9c7a52;
