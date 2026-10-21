@@ -65,11 +65,11 @@ export const OUTER_AVENUES: Record<'northWest' | 'northEast' | 'southWest' | 'so
 
 /** Centre of each project's mark, used for its entrance ring. */
 export const PROJECT_SPOTS: Record<ProjectId, [number, number]> = {
-  seedSwap: [284, 236],
-  toolLibrary: [338, 236],
-  compost: [267, 236],
+  seedSwap: [320, 269.5],
+  toolLibrary: [354, 270],
+  compost: [311, 252.5],
   sharedBatteries: [347, 201],
-  beehives: [355, 236],
+  beehives: [386, 200],
   festival: [311, 216],
   bikeLanes: [98, NORTH + W / 2],
   market: [513, NORTH + W / 2],
