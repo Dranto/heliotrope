@@ -141,6 +141,14 @@
   box-shadow: 0 0 0 3px rgb(143 174 139 / 0.35);
 }
 
+/* The switch is flipped many times a game: on a touch screen it answers over a full 44 px
+   (§10.3), the card around it being taller anyway. */
+@media (pointer: coarse) {
+  .coop-switch {
+    min-height: 2.75rem;
+  }
+}
+
 .coop-thrifty {
   display: flex;
   gap: 0.6rem;
