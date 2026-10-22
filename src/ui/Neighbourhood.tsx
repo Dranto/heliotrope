@@ -917,10 +917,12 @@ export const Neighbourhood = memo(function Neighbourhood({
 
   return (
     <LiveContext.Provider value={live}>
+      {/* A labelled group, not an image: the map holds things to greet, tend and pick, and an
+          image would hide them from screen readers. */}
       <svg
         viewBox={`0 0 ${width} ${height}`}
         preserveAspectRatio="xMidYMid slice"
-        role="img"
+        role="group"
         aria-label={t.sceneLabel}
       >
         <defs>
