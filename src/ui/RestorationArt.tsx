@@ -1168,22 +1168,55 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       </g>
     );
   },
+  // Café parasols in alternating cream and sage panels, each with its shadow on the avenue and a
+  // sunlit edge, and a bicycle waiting for its repair beside them.
   repairCafe: () => {
     const [x, y] = OUTER_AVENUES.southEast;
+    const panels = 8;
+    const wedge = (cx: number, cy: number, k: number) => {
+      const a0 = (k / panels) * Math.PI * 2;
+      const a1 = ((k + 1) / panels) * Math.PI * 2;
+      const r = 5;
+      return `M${cx} ${cy} L${cx + r * Math.cos(a0)} ${cy + r * Math.sin(a0)} A${r} ${r} 0 0 1 ${cx + r * Math.cos(a1)} ${cy + r * Math.sin(a1)} Z`;
+    };
+    const bx = x + 64;
+    const by = y + 11;
     return (
       <g>
-        {[0, 1, 2, 3].map((i) => (
-          <g key={i}>
-            <circle cx={x + 14 + i * 13} cy={y + 11} r="5" className="parasol" />
-            <path
-              d={`M${x + 14 + i * 13 - 5} ${y + 11} h10 M${x + 14 + i * 13} ${y + 6} v10`}
-              className="parasol-rib"
-            />
-          </g>
-        ))}
+        {[0, 1, 2, 3].map((i) => {
+          const cx = x + 14 + i * 13;
+          const cy = y + 11;
+          return (
+            <g key={i}>
+              <circle cx={cx + 0.9} cy={cy + 1.1} r="5.1" className="parasol-shadow" />
+              {Array.from({ length: panels }, (_, k) => (
+                <path
+                  key={k}
+                  d={wedge(cx, cy, k)}
+                  className={k % 2 ? 'parasol-panel sage' : 'parasol-panel'}
+                />
+              ))}
+              <circle cx={cx} cy={cy} r="5" className="parasol" />
+              <path
+                d={`M${cx - 4.3} ${cy - 1.6} a4.6 4.6 0 0 1 3 -3.2`}
+                className="parasol-light"
+              />
+              <circle cx={cx} cy={cy} r="0.7" className="parasol-cap" />
+            </g>
+          );
+        })}
+        <g className="repair-bike">
+          <circle cx={bx - 2.6} cy={by} r="1.7" className="bike-wheel" />
+          <circle cx={bx + 2.6} cy={by} r="1.7" className="bike-wheel" />
+          <path
+            d={`M${bx - 2.6} ${by} L${bx - 0.6} ${by - 1.6} H${bx + 1.6} L${bx + 2.6} ${by} M${bx - 0.6} ${by - 1.6} L${bx} ${by} L${bx + 1.6} ${by - 1.6} M${bx + 1.4} ${by - 2.4} h0.9`}
+            className="bike-frame"
+          />
+        </g>
       </g>
     );
   },
+
   // Four rain tanks linked by a pipe, each with its shadow, a hooped rim catching the sun and
   // clear water where a ripple spreads.
   rainwater: () => (
