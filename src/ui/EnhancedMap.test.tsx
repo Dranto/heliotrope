@@ -40,6 +40,6 @@ describe('Enhanced map (§10.4)', () => {
     await waitFor(() => expect(document.querySelector('.pixi-map')).not.toBeInTheDocument(), {
       timeout: 4000,
     });
-    expect(screen.getByRole('img', { name: sceneLabel }).tagName.toLowerCase()).toBe('svg');
+    expect(screen.getByRole('group', { name: sceneLabel }).tagName.toLowerCase()).toBe('svg');
   });
 });
