@@ -2265,8 +2265,9 @@ button {
   cursor: not-allowed;
 }
 
+/* The verb on every buy button: small capitals, but at 12 px so a phone still reads it. */
 .buy-verb {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
