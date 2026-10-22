@@ -799,14 +799,49 @@
 }
 
 .projects .parasol {
-  fill: #fffaf0;
-  stroke: var(--sage);
-  stroke-width: 0.8;
+  fill: none;
+  stroke: rgb(255 255 255 / 0.85);
+  stroke-width: 0.5;
 }
 
-.projects .parasol-rib {
-  stroke: rgb(143 174 139 / 0.7);
+.projects .parasol-shadow {
+  fill: rgb(59 51 40 / 0.2);
+}
+
+.projects .parasol-panel {
+  fill: #fffaf0;
+  stroke: rgb(120 140 110 / 0.35);
+  stroke-width: 0.15;
+}
+
+.projects .parasol-panel.sage {
+  fill: var(--sage);
+}
+
+/* The edge facing the sun. */
+.projects .parasol-light {
+  fill: none;
+  stroke: #fffaf0;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+}
+
+.projects .parasol-cap {
+  fill: #c9a25c;
+}
+
+.projects .bike-wheel {
+  fill: none;
+  stroke: #3f4a52;
+  stroke-width: 0.35;
+}
+
+.projects .bike-frame {
+  fill: none;
+  stroke: var(--terracotta);
   stroke-width: 0.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .projects .cistern {
