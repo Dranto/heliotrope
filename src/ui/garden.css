@@ -356,6 +356,10 @@
 
 .garden-crop small {
   display: block;
+  /* The growing time and effect decide which crop to sow: kept at 12 px, not the browser's
+     smaller <small> (10.4 px on a phone). */
+  font-size: 0.75rem;
+  line-height: 1.35;
   color: var(--ink-soft);
 }
 
