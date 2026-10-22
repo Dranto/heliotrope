@@ -159,6 +159,7 @@ export function Generators() {
                 data-guide={(guide?.kind === 'building' && guide.generator === id) || undefined}
                 disabled={!affordable}
                 aria-label={t.buyLabel(text.name, cost, units)}
+                aria-describedby={`buy-eta-${id}`}
                 aria-keyshortcuts={String(rank)}
                 title={t.shortcutsHint}
                 onClick={() => store.dispatch((s) => buyGenerator(s, id, unitsFor(s, id, amount)))}
@@ -168,7 +169,9 @@ export function Generators() {
                   {units > 1 && ` ×${units}`}
                 </span>
                 <span className="buy-cost">☀ {cost}</span>
-                {owned < limit && <Eta cost={generatorCost(state, id, units)} />}
+                {owned < limit && (
+                  <Eta cost={generatorCost(state, id, units)} id={`buy-eta-${id}`} />
+                )}
               </button>
               <GrowthPaths id={id} state={state} />
             </li>

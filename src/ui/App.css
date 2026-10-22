@@ -4590,7 +4590,7 @@ button {
 /* Time before purchase and next goal (§10.5) ----------------------------- */
 
 .buy-eta {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--ink-soft);
   font-variant-numeric: tabular-nums;

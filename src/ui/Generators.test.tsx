@@ -31,3 +31,18 @@ describe('Generators growth pips', () => {
     expect(pip).toHaveAttribute('aria-expanded', 'false');
   });
 });
+
+describe('the time before a building is affordable', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('describes the buy button without being re-read as it ticks', () => {
+    const base = createInitialState(0);
+    saveGame({ ...base, generators: { ...base.generators, pot: 1 } });
+    renderGenerators();
+    const buy = screen.getByRole('button', { name: /^Acheter Héliotrope en pot pour/ });
+    expect(buy).toHaveAccessibleDescription(/^dans \d/);
+    const eta = document.getElementById(buy.getAttribute('aria-describedby')!)!;
+    expect(eta).toHaveClass('buy-eta');
+    expect(eta).toHaveAttribute('aria-hidden', 'true');
+  });
+});

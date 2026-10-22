@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { guideStep } from '../game/guide';
 import { upgradesAllowed } from '../game/challenges';
 import { formatCost, formatNumber } from '../game/format';
@@ -164,6 +164,7 @@ function UpgradeDetail({
   onBuy,
 }: DetailProps) {
   const family = upgradeFamily(upgrade);
+  const etaId = useId();
   return (
     <div className="upgrade-detail" data-family={family} aria-live="polite">
       <span className="detail-emblem" data-family={family} aria-hidden="true">
@@ -179,11 +180,12 @@ function UpgradeDetail({
         className="buy"
         disabled={!affordable}
         aria-label={t.buyUpgradeLabel(name, cost)}
+        aria-describedby={etaId}
         onClick={onBuy}
       >
         <span className="buy-verb">{t.buy}</span>
         <span className="buy-cost">☀ {cost}</span>
-        <Eta cost={price} />
+        <Eta cost={price} id={etaId} />
       </button>
     </div>
   );

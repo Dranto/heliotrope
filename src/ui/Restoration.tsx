@@ -8,7 +8,7 @@ import {
   type DistrictDef,
 } from '../game/districts';
 import { formatCost } from '../game/format';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useId, useState } from 'react';
 import {
   PARCEL_IDS,
   parcelBonuses,
@@ -177,6 +177,7 @@ interface CardProps {
 function Card({ kind, name, effect, future, cost, affordable, onBuy, onFocus, onBlur }: CardProps) {
   const price = formatCost(cost);
   const Icon = ICONS[kind];
+  const etaId = useId();
   return (
     <li
       className="restoration-card"
@@ -204,6 +205,7 @@ function Card({ kind, name, effect, future, cost, affordable, onBuy, onFocus, on
             ? t.restoration.carryOutLabel(name, price)
             : t.restoration.restoreLabel(name, price)
         }
+        aria-describedby={etaId}
         onClick={onBuy}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -212,7 +214,7 @@ function Card({ kind, name, effect, future, cost, affordable, onBuy, onFocus, on
           {kind === 'project' ? t.restoration.carryOut : t.restoration.restore}
         </span>
         <span className="buy-cost">☀ {price}</span>
-        <Eta cost={cost} />
+        <Eta cost={cost} id={etaId} />
       </button>
     </li>
   );
