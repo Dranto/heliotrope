@@ -1149,25 +1149,57 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       ))}
     </g>
   ),
+  // Five market stalls under striped awnings: each casts its shadow on the avenue, its roof
+  // folds along a sunlit ridge and its front hangs in scallops.
   market: () => {
     const [x, y] = OUTER_AVENUES.northEast;
     return (
       <g>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <g key={i}>
-            <Box box={[x + 16 + i * 32, y + 5, 22, 12]} className="awning" />
-            {[0, 1, 2, 3].map((k) => (
-              <path
-                key={k}
-                d={`M${x + 20 + i * 32 + k * 4.6} ${y + 5.5} v11`}
-                className={i % 2 ? 'awning-stripe gold' : 'awning-stripe'}
+        {[0, 1, 2, 3, 4].map((i) => {
+          const x0 = x + 16 + i * 32;
+          const y0 = y + 5;
+          const stripe = i % 2 ? 'awning-stripe gold' : 'awning-stripe';
+          const clip = `market-awning-${i}`;
+          return (
+            <g key={i}>
+              <rect
+                x={x0 + 0.9}
+                y={y0 + 1.2}
+                width="22"
+                height="13.4"
+                rx="4"
+                className="awning-shadow"
               />
-            ))}
-          </g>
-        ))}
+              <path
+                d={`M${x0} ${y0 + 12} ${Array.from({ length: 5 }, () => 'a2.2 2.2 0 0 0 4.4 0').join(' ')} Z`}
+                className={`awning-scallop ${stripe}`}
+              />
+              <clipPath id={clip}>
+                <Box box={[x0, y0, 22, 12]} className="" />
+              </clipPath>
+              <Box box={[x0, y0, 22, 12]} className="awning" />
+              <g clipPath={`url(#${clip})`}>
+                {[0, 1, 2, 3, 4].map((k) => (
+                  <rect
+                    key={k}
+                    x={x0 + k * 4.4 + 1.1}
+                    y={y0}
+                    width="2.2"
+                    height="12"
+                    className={stripe}
+                  />
+                ))}
+                <rect x={x0} y={y0 + 6} width="22" height="6" className="awning-shade" />
+              </g>
+              <path d={`M${x0 + 1.5} ${y0 + 6} H${x0 + 20.5}`} className="awning-ridge" />
+              <Box box={[x0, y0, 22, 12]} className="awning-edge" />
+            </g>
+          );
+        })}
       </g>
     );
   },
+
   // Café parasols in alternating cream and sage panels, each with its shadow on the avenue and a
   // sunlit edge, and a bicycle waiting for its repair beside them.
   repairCafe: () => {

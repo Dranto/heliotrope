@@ -785,17 +785,41 @@
 
 .projects .awning {
   fill: #fffaf0;
-  stroke: rgb(156 122 82 / 0.4);
+}
+
+.projects .awning-edge {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.85);
   stroke-width: 0.5;
 }
 
+.projects .awning-shadow {
+  fill: rgb(59 51 40 / 0.2);
+}
+
 .projects .awning-stripe {
-  stroke: var(--terracotta);
-  stroke-width: 1.6;
+  fill: var(--terracotta);
 }
 
 .projects .awning-stripe.gold {
-  stroke: var(--gold);
+  fill: var(--gold);
+}
+
+/* The front flap hangs below the roof in scallops of the stall's colour. */
+.projects .awning-scallop {
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-width: 0.3;
+}
+
+/* The slope away from the sun. */
+.projects .awning-shade {
+  fill: rgb(90 50 30 / 0.16);
+}
+
+.projects .awning-ridge {
+  stroke: #fffaf0;
+  stroke-width: 0.5;
+  stroke-linecap: round;
 }
 
 .projects .parasol {
