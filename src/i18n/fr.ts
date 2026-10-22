@@ -807,10 +807,10 @@ export const fr = {
     title: 'Le potager de la cour',
     hint: 'Semez, revenez quand c’est mûr\u00a0: rien ne fane, tout vous attend.',
     crops: {
-      radish: { name: 'Radis', effect: 'Une bouffée de Lumière\u00a0: 2 min de production' },
+      radish: { name: 'Radis', effect: 'Une bouffée de Lumière\u00a0: 2\u00a0min de production' },
       sunflower: { name: 'Tournesols', effect: 'Le Papillon doré vient aussitôt' },
-      beans: { name: 'Haricots grimpants', effect: 'Potagers et Serres ×2 pendant 20 min' },
-      squash: { name: 'Courges', effect: '30 min de production de Lumière et d’Eau' },
+      beans: { name: 'Haricots grimpants', effect: 'Potagers et Serres ×2 pendant 20\u00a0min' },
+      squash: { name: 'Courges', effect: '30\u00a0min de production de Lumière et d’Eau' },
       strawberry: { name: 'Fraises', effect: 'Un quart de la jauge de pollen' },
     } satisfies Record<CropId, { name: string; effect: string }>,
     plot: (index: number) => `Carré ${index}`,

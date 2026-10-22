@@ -732,10 +732,13 @@ export const en: Texts = {
     title: 'The courtyard garden',
     hint: 'Sow, come back when it is ripe: nothing wilts, everything waits for you.',
     crops: {
-      radish: { name: 'Radishes', effect: 'A puff of Light: 2 min of production' },
+      radish: { name: 'Radishes', effect: 'A puff of Light: 2\u00a0min of production' },
       sunflower: { name: 'Sunflowers', effect: 'The Golden Butterfly comes at once' },
-      beans: { name: 'Climbing beans', effect: 'Rooftop gardens and greenhouses ×2 for 20 min' },
-      squash: { name: 'Squashes', effect: '30 min of Light and Water production' },
+      beans: {
+        name: 'Climbing beans',
+        effect: 'Rooftop gardens and greenhouses ×2 for 20\u00a0min',
+      },
+      squash: { name: 'Squashes', effect: '30\u00a0min of Light and Water production' },
       strawberry: { name: 'Strawberries', effect: 'A quarter of the pollen gauge' },
     } satisfies Record<CropId, { name: string; effect: string }>,
     plot: (index: number) => `Bed ${index}`,
