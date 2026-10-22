@@ -12,13 +12,19 @@ function etaText(seconds: number): string {
 
 /**
  * Time before a purchase, under its price (design doc §10.5). Nothing when it is affordable or
- * when nothing is produced yet.
+ * when nothing is produced yet. Its buy button points at it with `aria-describedby={id}`, since the
+ * button's own label replaces the text inside it; hidden from the reading order, the ticking
+ * count is not re-announced every second inside a live region.
  */
-export function Eta({ cost }: { cost: number }) {
+export function Eta({ cost, id }: { cost: number; id: string }) {
   const state = useGameState();
   const seconds = secondsToAfford(state, cost);
   if (seconds <= 0 || !Number.isFinite(seconds)) return null;
-  return <span className="buy-eta">{t.eta(etaText(seconds))}</span>;
+  return (
+    <span className="buy-eta" id={id} aria-hidden="true">
+      {t.eta(etaText(seconds))}
+    </span>
+  );
 }
 
 function goalName(goal: Goal): string {
