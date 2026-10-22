@@ -1338,13 +1338,40 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       </g>
     );
   },
-  assembly: () => (
-    <g>
-      {[13.5, 16.5].map((r) => (
-        <circle key={r} cx="311" cy="236" r={r} className="assembly-seats" />
-      ))}
-    </g>
-  ),
+  // Ten curved wooden benches around the tree, each with its plank lit on the sun side and a
+  // cushion in front, so the neighbours' circle reads as seats rather than a dashed line.
+  assembly: () => {
+    const cx = 311;
+    const cy = 236;
+    const at = (r: number, deg: number) => {
+      const a = (deg * Math.PI) / 180;
+      return `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+    };
+    const arc = (r: number, from: number, to: number) =>
+      `M${at(r, from)} A${r} ${r} 0 0 1 ${at(r, to)}`;
+    const benches = Array.from({ length: 10 }, (_, i) => i * 36 - 90);
+    return (
+      <g>
+        <circle cx={cx} cy={cy + 0.8} r="15.4" className="assembly-shadow" />
+        {benches.map((a) => (
+          <g key={a}>
+            <path d={arc(16.6, a - 13, a + 13)} className="assembly-back" />
+            <path d={arc(15.2, a - 13, a + 13)} className="assembly-seat" />
+            <path d={arc(15.6, a - 11, a + 11)} className="assembly-plank" />
+          </g>
+        ))}
+        {benches.map((a, i) => (
+          <circle
+            key={a}
+            cx={cx + 13 * Math.cos(((a + 18) * Math.PI) / 180)}
+            cy={cy + 13 * Math.sin(((a + 18) * Math.PI) / 180)}
+            r="1.15"
+            className={`assembly-cushion c${i % 3}`}
+          />
+        ))}
+      </g>
+    );
+  },
   lightFestival: () => (
     <g>
       {[...STREETS.horizontal.map((y) => ({ y })), ...STREETS.vertical.map((x) => ({ x }))].flatMap(
