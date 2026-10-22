@@ -763,17 +763,45 @@
 
 .projects .garland-string {
   fill: none;
-  stroke: rgb(156 122 82 / 0.6);
-  stroke-width: 0.35;
+  stroke: rgb(156 122 82 / 0.7);
+  stroke-width: 0.4;
 }
 
-.projects .flag {
-  animation: sway 3s ease-in-out infinite alternate;
+/* The festival's bunting: pennants in the four bloom colours, outlined in cream so they read
+   on the pale courtyard, swinging gently from the string. */
+.projects .flag-cloth {
+  stroke: #fffaf0;
+  stroke-width: 0.3;
+  stroke-linejoin: round;
+}
+
+.projects .flag-shadow {
+  fill: rgb(31 42 36 / 0.14);
+}
+
+.projects .flag-light {
+  fill: rgb(255 255 255 / 0.32);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .projects .flag {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: sway 3s ease-in-out infinite alternate;
+  }
+
+  .projects .flag:nth-child(odd) {
+    animation-delay: -1.5s;
+  }
 }
 
 @keyframes sway {
+  from {
+    transform: rotate(-7deg);
+  }
+
   to {
-    transform: translateY(0.6px);
+    transform: rotate(7deg);
   }
 }
 

@@ -927,7 +927,7 @@ function Box({ box: [x, y, w, h], className }: { box: Box; className: string }) 
   return <rect x={x} y={y} width={w} height={h} rx={Math.min(w, h) / 3} className={className} />;
 }
 
-/** Strings of little flags or lanterns between two points, sagging gently. */
+/** A string of little pennants between two points, sagging gently. */
 function Garland({ from, to, count, className }: GarlandProps) {
   const [x1, y1] = from;
   const [x2, y2] = to;
@@ -942,14 +942,16 @@ function Garland({ from, to, count, className }: GarlandProps) {
       <path d={`M${x1} ${y1} Q${mx} ${my + sag} ${x2} ${y2}`} className="garland-string" />
       {Array.from({ length: count }, (_, i) => {
         const [x, y] = point((i + 1) / (count + 1));
+        // A pennant hangs from the string, its sunlit left half lighter, with a soft shadow.
         return (
-          <circle
-            key={i}
-            cx={x}
-            cy={y}
-            r="1"
-            className={`${className} ${FLOWER_CLASSES[i % FLOWER_CLASSES.length]}`}
-          />
+          <g key={i} className={className}>
+            <path d={`M${x - 1.5} ${y + 0.6} h3 l-1.5 3.4 z`} className="flag-shadow" />
+            <path
+              d={`M${x - 1.5} ${y} h3 l-1.5 3.4 z`}
+              className={`flag-cloth ${FLOWER_CLASSES[i % FLOWER_CLASSES.length]}`}
+            />
+            <path d={`M${x - 1.5} ${y} h1.5 v3.4 z`} className="flag-light" />
+          </g>
         );
       })}
     </g>
