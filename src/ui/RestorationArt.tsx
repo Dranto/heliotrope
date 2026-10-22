@@ -965,9 +965,31 @@ interface GarlandProps {
   className: string;
 }
 
+/**
+ * Two painted cycle lanes along an avenue: a green band at each kerb, a dashed white line on its
+ * road side and a small bicycle painted every few blocks.
+ */
 function Lane({ box: [x, y, w, h] }: { box: Box }) {
+  const bands = [y + 0.4, y + h - 4.4];
+  const bikes = Array.from({ length: Math.max(1, Math.floor(w / 60)) }, (_, i) => x + 30 + i * 60);
   return (
-    <path d={`M${x} ${y + 2.5} H${x + w} M${x} ${y + h - 2.5} H${x + w}`} className="bike-lane" />
+    <g>
+      {bands.map((top, side) => (
+        <g key={top}>
+          <rect x={x} y={top} width={w} height="4" className="bike-lane" />
+          <path d={`M${x} ${side ? top - 0.3 : top + 4.3} H${x + w}`} className="bike-lane-edge" />
+          {bikes.map((bx) => (
+            <g key={bx} className="bike-glyph">
+              <circle cx={bx - 1.3} cy={top + 2.3} r="0.95" />
+              <circle cx={bx + 1.3} cy={top + 2.3} r="0.95" />
+              <path
+                d={`M${bx - 1.3} ${top + 2.3} L${bx - 0.2} ${top + 1} H${bx + 0.8} L${bx + 1.3} ${top + 2.3} M${bx - 0.2} ${top + 1} L${bx} ${top + 2.3}`}
+              />
+            </g>
+          ))}
+        </g>
+      ))}
+    </g>
   );
 }
 
@@ -1398,6 +1420,16 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
   ),
 };
 
+/** Marks painted on the ground (the cycle lanes) lie under the stalls and objects set on it. */
+const GROUND_MARKS: readonly ProjectId[] = ['bikeLanes'];
+
+function groundFirst(projects: readonly ProjectId[]): readonly ProjectId[] {
+  return [
+    ...projects.filter((id) => GROUND_MARKS.includes(id)),
+    ...projects.filter((id) => !GROUND_MARKS.includes(id)),
+  ];
+}
+
 /** Projects carried out this Season: small marks over the city, each with a soft entrance. */
 export const ProjectMarks = memo(function ProjectMarks({
   projects,
@@ -1406,7 +1438,7 @@ export const ProjectMarks = memo(function ProjectMarks({
 }) {
   return (
     <g className="projects">
-      {projects.map((id) => {
+      {groundFirst(projects).map((id) => {
         const Art = PROJECT_ART[id];
         return (
           <g key={id} data-project={id}>

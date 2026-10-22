@@ -805,10 +805,24 @@
   }
 }
 
+/* Cycle lanes: a band of green paint at each kerb, a dashed white edge on the road side and a
+   white bicycle painted every few blocks. */
 .projects .bike-lane {
-  stroke: #7fb069;
-  stroke-width: 1.6;
-  opacity: 0.85;
+  fill: rgb(127 176 105 / 0.62);
+}
+
+.projects .bike-lane-edge {
+  fill: none;
+  stroke: rgb(255 250 240 / 0.9);
+  stroke-width: 0.45;
+  stroke-dasharray: 2.4 1.6;
+}
+
+.projects .bike-glyph {
+  fill: none;
+  stroke: rgb(255 250 240 / 0.95);
+  stroke-width: 0.4;
+  stroke-linejoin: round;
 }
 
 .projects .awning {
