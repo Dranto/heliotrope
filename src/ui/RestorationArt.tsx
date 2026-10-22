@@ -1184,16 +1184,34 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       </g>
     );
   },
+  // Four rain tanks linked by a pipe, each with its shadow, a hooped rim catching the sun and
+  // clear water where a ripple spreads.
   rainwater: () => (
     <g>
-      {[0, 1, 2, 3].map((i) => (
-        <g key={i}>
-          <circle cx={440 + i * 12} cy={236} r="3.4" className="cistern" />
-          <circle cx={440 + i * 12} cy={236} r="1.6" className="cistern-water" />
-        </g>
-      ))}
+      <path d="M440 236 H476" className="cistern-pipe" />
+      {[0, 1, 2, 3].map((i) => {
+        const cx = 440 + i * 12;
+        return (
+          <g key={i}>
+            <circle cx={cx + 0.7} cy={236.8} r="3.6" className="cistern-shadow" />
+            <circle cx={cx} cy={236} r="3.4" className="cistern" />
+            <circle cx={cx} cy={236} r="2.85" className="cistern-hoop" />
+            <path d={`M${cx - 2.9} ${235.2} a3 3 0 0 1 2.1 -2.2`} className="cistern-light" />
+            <circle cx={cx} cy={236} r="2.2" className="cistern-water" />
+            <circle
+              cx={cx}
+              cy={236}
+              r="1.2"
+              className="cistern-ripple"
+              style={{ animationDelay: `${-i * 1.1}s` }}
+            />
+            <path d={`M${cx - 1.3} ${235.1} q0.6 -0.7 1.4 -0.8`} className="cistern-glint" />
+          </g>
+        );
+      })}
     </g>
   ),
+
   butterflyGarden: () => {
     const [x, , w] = PARCEL_PLACES.pollinatorStrip;
     return (

@@ -811,12 +811,71 @@
 
 .projects .cistern {
   fill: #e9e3d6;
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 0.5;
+}
+
+.projects .cistern-shadow {
+  fill: rgb(60 50 70 / 0.18);
+}
+
+.projects .cistern-pipe {
   stroke: #6fa8b2;
-  stroke-width: 0.8;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.projects .cistern-hoop {
+  fill: none;
+  stroke: #6fa8b2;
+  stroke-width: 0.45;
+}
+
+/* The rim's edge facing the sun. */
+.projects .cistern-light {
+  fill: none;
+  stroke: #fffaf0;
+  stroke-width: 0.45;
+  stroke-linecap: round;
 }
 
 .projects .cistern-water {
   fill: #8ec7d0;
+  stroke: rgb(60 110 120 / 0.35);
+  stroke-width: 0.2;
+}
+
+.projects .cistern-ripple {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.6);
+  stroke-width: 0.2;
+}
+
+.projects .cistern-glint {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 0.3;
+  stroke-linecap: round;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .projects .cistern-ripple {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cistern-ripple 4.4s ease-out infinite;
+  }
+}
+
+@keyframes cistern-ripple {
+  from {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
 }
 
 .projects .buddleia {
