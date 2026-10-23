@@ -4840,3 +4840,30 @@ button {
 .app[data-map-paused] *:not(.overlay, .overlay *, .butterfly, .butterfly *)::after {
   animation-play-state: paused !important;
 }
+
+/* Windows high contrast (forced colours) drops the tints that mark the chosen view, quantity,
+   tab or upgrade and the gold of a buy button; system colours mark them again. */
+@media (forced-colors: active) {
+  :root :is(.segmented, .future-pills) button[aria-checked='true'],
+  :root :is(.layerbar, .tabbar) button[aria-current='page'],
+  :root button.upgrade-tile[aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  :root :is(.segmented, .future-pills) button[aria-checked='true'] *,
+  :root :is(.layerbar, .tabbar) button[aria-current='page'] *,
+  :root button.upgrade-tile[aria-pressed='true'] * {
+    color: HighlightText;
+    stroke: HighlightText;
+  }
+
+  :is(.buy, .buy-all) {
+    border: 1px solid ButtonText;
+  }
+
+  :is(.buy, .buy-all):disabled {
+    border-color: GrayText;
+  }
+}
