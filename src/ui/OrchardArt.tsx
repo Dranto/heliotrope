@@ -35,6 +35,55 @@ const CROWN_SPOTS: [number, number][] = [
   [-9, 3],
 ];
 
+/** Leaf clusters of a grown crown, [x, y, radius]: a lobed outline about 14 across. */
+const TREE_LOBES: [number, number, number][] = [
+  [0, -6, 8],
+  [-7, -3, 7],
+  [7, -3, 7],
+  [-6, 4, 7],
+  [6, 4, 7],
+  [0, 3, 8],
+];
+
+/** The few leaf clusters of a young tree, on top of its trunk. */
+const SAPLING_LOBES: [number, number, number][] = [
+  [-2.2, -6.5, 3],
+  [2.2, -7, 3],
+  [0, -10, 2.8],
+];
+
+/**
+ * A crown lit from the upper left like the rest of the map: the clusters in shade, offset down
+ * and right, then in leaf, then a smaller sunlit cap on each.
+ */
+function Crown({ lobes }: { lobes: [number, number, number][] }) {
+  return (
+    <g className="orchard-crown">
+      {lobes.map(([x, y, r]) => (
+        <circle key={`s${x},${y}`} className="shade" cx={x + r * 0.12} cy={y + r * 0.16} r={r} />
+      ))}
+      {lobes.map(([x, y, r]) => (
+        <circle
+          key={`l${x},${y}`}
+          className="leaf"
+          cx={x - r * 0.06}
+          cy={y - r * 0.08}
+          r={r * 0.9}
+        />
+      ))}
+      {lobes.map(([x, y, r]) => (
+        <circle
+          key={`h${x},${y}`}
+          className="lit"
+          cx={x - r * 0.3}
+          cy={y - r * 0.35}
+          r={r * 0.45}
+        />
+      ))}
+    </g>
+  );
+}
+
 function Tree({ id, stage }: { id: FruitId; stage: TreeStage }) {
   if (stage === 'none') {
     return (
@@ -56,10 +105,12 @@ function Tree({ id, stage }: { id: FruitId; stage: TreeStage }) {
   if (stage === 'sapling') {
     return (
       <g className="orchard-sapling">
-        <ellipse className="orchard-shadow" rx="7" ry="3" cy="5" />
-        <path className="orchard-stake" d="M2 5V-9" />
-        <path className="orchard-trunk" d="M0 5V-4" />
-        <circle className="orchard-crown" r="5" cy="-6" />
+        <ellipse className="orchard-mulch" rx="6.5" ry="2.8" cy="5" />
+        <ellipse className="orchard-shadow" rx="5" ry="2" cx="2" cy="5.4" />
+        <path className="orchard-stake" d="M3 5V-9" />
+        <path className="orchard-tie" d="M1.9 -4.4h2.2" />
+        <path className="orchard-trunk" d="M0 5V-6" />
+        <Crown lobes={SAPLING_LOBES} />
       </g>
     );
   }
@@ -67,27 +118,29 @@ function Tree({ id, stage }: { id: FruitId; stage: TreeStage }) {
   const spots = stage === 'fruiting' ? CROWN_SPOTS.slice(0, 4) : CROWN_SPOTS;
   return (
     <g className="orchard-tree">
-      <ellipse className="orchard-shadow" rx="15" ry="5" cy="13" />
-      <path className="orchard-trunk" d="M0 13V2" strokeWidth={3} />
-      <circle className="orchard-crown" r="14" />
-      <circle className="orchard-crown-light" r="9" cx="-3" cy="-4" />
-      {spots.map(([x, y]) =>
-        fruit ? (
-          <circle
-            key={`${x},${y}`}
-            cx={x}
-            cy={y}
-            r={id === 'cherry' ? 1.6 : 2.2}
-            fill={FRUIT_COLOURS[id]}
-            className="orchard-fruit"
-          />
-        ) : (
-          <g key={`${x},${y}`} transform={`translate(${x} ${y})`} className="orchard-blossom">
-            <circle r="2" />
-            <circle r="0.7" className="orchard-blossom-heart" />
-          </g>
-        ),
-      )}
+      <ellipse className="orchard-shadow" rx="15" ry="5" cx="3" cy="13" />
+      <path className="orchard-trunk-flare" d="M-3.2 13.5q2.2 -1 2 -5h2.4q-.2 4 2 5z" />
+      <path className="orchard-trunk" d="M0 13V4" strokeWidth={3} />
+      <g transform="translate(0 -3)">
+        <Crown lobes={TREE_LOBES} />
+        {spots.map(([x, y]) =>
+          fruit ? (
+            <circle
+              key={`${x},${y}`}
+              cx={x}
+              cy={y}
+              r={id === 'cherry' ? 1.6 : 2.2}
+              fill={FRUIT_COLOURS[id]}
+              className="orchard-fruit"
+            />
+          ) : (
+            <g key={`${x},${y}`} transform={`translate(${x} ${y})`} className="orchard-blossom">
+              <circle r="2" />
+              <circle r="0.7" className="orchard-blossom-heart" />
+            </g>
+          ),
+        )}
+      </g>
     </g>
   );
 }
