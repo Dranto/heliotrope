@@ -1160,6 +1160,46 @@ button {
   stroke-width: 0.6;
 }
 
+.pot-shadow {
+  fill: #3b3328;
+  opacity: 0.22;
+}
+
+.pot-rim {
+  fill: none;
+  stroke: #ffe3cf;
+  stroke-width: 0.45;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.pot-soil {
+  fill: #4a3324;
+  stroke: #7a4a30;
+  stroke-width: 0.3;
+}
+
+.pot-leaf {
+  fill: var(--foliage);
+}
+
+.pot-leaf.shade {
+  opacity: 0.8;
+}
+
+.pot-art .floret {
+  fill: #d8c8ee;
+}
+
+.pot-art .floret.deep {
+  fill: #7d5aa6;
+}
+
+.pot-gleam {
+  fill: #fff;
+  opacity: 0.45;
+}
+
 .petal {
   fill: var(--lilac);
 }
