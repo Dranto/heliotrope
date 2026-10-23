@@ -83,3 +83,19 @@ describe('the orchard trees', () => {
     expect(sapling.querySelectorAll('.orchard-crown .leaf').length).toBeGreaterThan(1);
   });
 });
+
+describe('the orchard hives', () => {
+  it('stand two boxes under a gabled lid, with winged bees around them', () => {
+    const svg = draw('none,none,none,none;2');
+    const hives = svg.querySelectorAll('.orchard-hive');
+    expect(hives).toHaveLength(2);
+    for (const hive of hives) {
+      expect(hive.querySelectorAll('.orchard-hive-box')).toHaveLength(2);
+      expect(hive.querySelector('.orchard-hive-stand')).not.toBeNull();
+      expect(hive.querySelector('.orchard-hive-board')).not.toBeNull();
+      const bees = hive.querySelectorAll('.orchard-bee');
+      expect(bees.length).toBeGreaterThan(1);
+      for (const bee of bees) expect(bee.querySelectorAll('.orchard-bee-wing')).toHaveLength(2);
+    }
+  });
+});

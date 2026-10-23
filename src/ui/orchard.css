@@ -149,25 +149,78 @@
 }
 
 .orchard-hive-box {
-  fill: #e8c46a;
+  fill: #e2b95c;
   stroke: #a77b2a;
-  stroke-width: 0.6;
+  stroke-width: 0.5;
+}
+
+.orchard-hive-box.upper {
+  fill: #edcb78;
+}
+
+.orchard-hive-lit {
+  fill: none;
+  stroke: rgb(255 246 214 / 0.75);
+  stroke-width: 0.9;
+  stroke-linecap: round;
 }
 
 .orchard-hive-line {
   fill: none;
-  stroke: #a77b2a;
-  stroke-width: 0.5;
+  stroke: #b88a35;
+  stroke-width: 0.6;
+}
+
+.orchard-hive-stand {
+  fill: none;
+  stroke: #7a5638;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+.orchard-hive-plank {
+  fill: #9a7350;
+}
+
+.orchard-hive-board {
+  fill: #b98c4a;
+}
+
+.orchard-hive-entrance {
+  fill: none;
+  stroke: #4a3220;
+  stroke-width: 0.7;
+  stroke-linecap: round;
 }
 
 .orchard-hive-roof {
-  fill: #b85f3a;
-  stroke: #8a4428;
-  stroke-width: 0.5;
+  fill: #c86c44;
 }
 
-.orchard-bee {
-  fill: #2c2622;
+.orchard-hive-roof.shade {
+  fill: #9c4d2f;
+}
+
+.orchard-hive-ridge {
+  fill: none;
+  stroke: #f2c9a8;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.orchard-bee-body {
+  fill: #f2bf3c;
+}
+
+.orchard-bee-stripe {
+  fill: none;
+  stroke: #3a2c20;
+  stroke-width: 0.35;
+}
+
+.orchard-bee-wing {
+  fill: rgb(255 255 255 / 0.85);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -177,8 +230,12 @@
 }
 
 @keyframes orchard-bee {
+  50% {
+    transform: translate(2px, -1.5px);
+  }
+
   to {
-    transform: translate(2px, -2px);
+    transform: translate(-0.5px, -2.5px);
   }
 }
 
