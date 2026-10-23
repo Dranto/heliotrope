@@ -587,6 +587,25 @@ function Farm({ site: { box, storeys }, level }: { site: Building; level: number
               rx="1.5"
               className="row-light farm-row-light"
             />
+            {/* Paler lettuces between the shrubs and a few flowers, a different colour on
+                each terrace, so the rims read as planted beds rather than one hedge. */}
+            <rect
+              x={tx + 1.6}
+              y={ty + 1.6}
+              width={tw - 3.2}
+              height={th - 3.2}
+              rx="1.5"
+              className="farm-greens"
+            />
+            <rect
+              x={tx + 1.6}
+              y={ty + 1.6}
+              width={tw - 3.2}
+              height={th - 3.2}
+              rx="1.5"
+              className={`farm-blooms b${i % 3}`}
+              strokeDashoffset={i * 5}
+            />
             {(
               [
                 [tx + 3.2, ty + 3.2],
