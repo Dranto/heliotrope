@@ -35,4 +35,16 @@ describe('Restoration', () => {
     expect(card).toHaveAttribute('data-futures', 'true');
     expect(card?.querySelector('[role="radiogroup"]')).not.toBeNull();
   });
+
+  it('reads each progress dot as a restored plot by name or a plot still to restore', () => {
+    saveGame({ ...createInitialState(0), parcels: ['park', 'pollinatorStrip'] });
+    renderRestoration();
+    const dots = screen.getByRole('list', { name: 'Parcelles à restaurer' });
+    const items = [...dots.querySelectorAll('li')].map((li) => li.textContent);
+    // "Parc du parking restaurée" did not agree with masculine and plural names.
+    expect(items).toContain('Parcelle restaurée\u00a0: Parc du parking');
+    expect(items).toContain('Parcelle restaurée\u00a0: Corridor des pollinisateurs');
+    expect(items.filter((text) => text === 'Parcelle à restaurer')).toHaveLength(items.length - 2);
+    expect(items).not.toContain('…');
+  });
 });

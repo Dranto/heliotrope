@@ -272,7 +272,9 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
                 return (
                   <li key={id} data-done={done} title={done ? name : undefined}>
                     <span className="visually-hidden">
-                      {done ? t.restoration.districtRestored(name) : '…'}
+                      {done
+                        ? t.restoration.districtRestored(name)
+                        : t.restoration.districtToRestore}
                     </span>
                   </li>
                 );
@@ -289,7 +291,9 @@ export function Restoration({ onHighlight }: { onHighlight: (id: ParcelId | null
                     title={done ? t.restoration.parcelNames[id] : undefined}
                   >
                     <span className="visually-hidden">
-                      {done ? t.restoration.restored(t.restoration.parcelNames[id]) : '…'}
+                      {done
+                        ? t.restoration.restored(t.restoration.parcelNames[id])
+                        : t.restoration.parcelToRestore}
                     </span>
                   </li>
                 );
