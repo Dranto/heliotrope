@@ -61,3 +61,25 @@ describe('the orchard ground', () => {
     }
   });
 });
+
+describe('the orchard trees', () => {
+  it('give a grown tree a lobed crown in shade, leaf and sun above a flared trunk', () => {
+    const svg = draw('flowering,fruiting,ripe,sapling;0');
+    for (const id of ['apple', 'pear', 'cherry']) {
+      const tree = svg.querySelector(`[data-tree="${id}"] .orchard-tree`)!;
+      const crown = tree.querySelector('.orchard-crown')!;
+      const lobes = crown.querySelectorAll('.leaf').length;
+      expect(lobes).toBeGreaterThan(4);
+      expect(crown.querySelectorAll('.shade')).toHaveLength(lobes);
+      expect(crown.querySelectorAll('.lit')).toHaveLength(lobes);
+      expect(tree.querySelector('.orchard-trunk-flare')).not.toBeNull();
+    }
+  });
+
+  it('plant a sapling in mulch, tied to its stake, with a few leaf clusters', () => {
+    const sapling = draw('sapling,none,none,none;0').querySelector('.orchard-sapling')!;
+    expect(sapling.querySelector('.orchard-mulch')).not.toBeNull();
+    expect(sapling.querySelector('.orchard-tie')).not.toBeNull();
+    expect(sapling.querySelectorAll('.orchard-crown .leaf').length).toBeGreaterThan(1);
+  });
+});
