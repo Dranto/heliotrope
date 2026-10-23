@@ -3221,7 +3221,7 @@ button {
   position: absolute;
   top: -0.2rem;
   right: -0.3rem;
-  min-width: 1.1rem;
+  min-width: 1.2rem;
   padding: 0 0.25rem;
   border-radius: 1rem;
   background: var(--gold);
@@ -3229,9 +3229,10 @@ button {
      badge apart from the gold parcel it sits on. */
   color: var(--ink);
   box-shadow: 0 0 0 1.5px #fffaf0;
-  font-size: 0.7rem;
+  /* 12 px, the smallest text the game shows: the count is read at a glance on a phone. */
+  font-size: 0.75rem;
   font-weight: 700;
-  line-height: 1.1rem;
+  line-height: 1.2rem;
 }
 
 .milestone-gift:focus-visible {
