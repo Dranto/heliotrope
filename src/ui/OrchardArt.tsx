@@ -145,15 +145,40 @@ function Tree({ id, stage }: { id: FruitId; stage: TreeStage }) {
   );
 }
 
+/** Where the bees fly around a hive, and how far into their loop each one starts. */
+const HIVE_BEES: [number, number, number][] = [
+  [9.5, -7, 0],
+  [-10, -3, 0.7],
+  [6, -12, 1.4],
+];
+
 function Hive() {
   return (
+    // A painted hive on its stand: two stacked boxes lit on their left, a gabled lid with a
+    // sunlit slope, a landing board under the entrance, and bees looping around it.
     <g className="orchard-hive">
-      <ellipse className="orchard-shadow" rx="8" ry="2.4" cy="6" />
-      <rect x="-6" y="-4" width="12" height="10" rx="1" className="orchard-hive-box" />
-      <path d="M-6 0h12M-6 3h12" className="orchard-hive-line" />
-      <path d="M-7.5 -4 0 -9 7.5 -4Z" className="orchard-hive-roof" />
-      <circle className="orchard-bee" cx="9" cy="-6" r="1" />
-      <circle className="orchard-bee" cx="-10" cy="-2" r="1" />
+      <ellipse className="orchard-shadow" rx="8.5" ry="2.4" cx="1.5" cy="8.6" />
+      <path className="orchard-hive-stand" d="M-4.5 7v2.4M4.5 7v2.4" />
+      <rect x="-7" y="6" width="14" height="1.3" rx="0.4" className="orchard-hive-plank" />
+      <rect x="-6" y="1.2" width="12" height="4.8" rx="0.6" className="orchard-hive-box" />
+      <rect x="-6" y="-3.6" width="12" height="4.8" rx="0.6" className="orchard-hive-box upper" />
+      <path className="orchard-hive-lit" d="M-5.3 -3v8.4" />
+      <path className="orchard-hive-line" d="M-6 1.2h12" />
+      <rect x="-2.6" y="4.6" width="5.2" height="1.4" rx="0.4" className="orchard-hive-board" />
+      <path className="orchard-hive-entrance" d="M-1.8 4.6h3.6" />
+      <path className="orchard-hive-roof shade" d="M0 -9.2 8 -3.4H0Z" />
+      <path className="orchard-hive-roof" d="M0 -9.2 -8 -3.4H0Z" />
+      <path className="orchard-hive-ridge" d="M-7.6 -3.4h15.2" />
+      {HIVE_BEES.map(([x, y, delay]) => (
+        <g key={`${x},${y}`} transform={`translate(${x} ${y})`}>
+          <g className="orchard-bee" style={{ animationDelay: `-${delay}s` }}>
+            <ellipse className="orchard-bee-wing" rx="0.9" ry="0.55" cx="-0.3" cy="-0.9" />
+            <ellipse className="orchard-bee-wing" rx="0.9" ry="0.55" cx="0.6" cy="-0.8" />
+            <ellipse className="orchard-bee-body" rx="1.2" ry="0.75" />
+            <path className="orchard-bee-stripe" d="M-0.2 -0.65v1.3M0.45 -0.6v1.2" />
+          </g>
+        </g>
+      ))}
     </g>
   );
 }
