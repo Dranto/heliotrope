@@ -6,8 +6,8 @@ import {
   setNumberLanguage,
 } from './format';
 
-// Expected strings use "_" for the narrow no-break space to keep them readable.
-const s = (text: string) => text.replaceAll('_', ' ');
+// Expected strings use "_" for the no-break space to keep them readable.
+const s = (text: string) => text.replaceAll('_', '\u00a0');
 
 describe('formatNumber', () => {
   it.each([
@@ -37,6 +37,14 @@ describe('formatNumber', () => {
 
   it('passes non-finite values through', () => {
     expect(formatNumber(Infinity)).toBe('Infinity');
+  });
+
+  it('separates thousands and suffixes with a full no-break space, not the narrow one', () => {
+    // Manrope's narrow no-break space is a tenth of an em: "479 339" read as "479339".
+    for (const text of [formatNumber(479_339), formatNumber(12e6)]) {
+      expect(text).toMatch(/\u00a0/);
+      expect(text).not.toMatch(/[\u202f ]/);
+    }
   });
 });
 

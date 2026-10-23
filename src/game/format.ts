@@ -1,10 +1,14 @@
 // Number display rules from docs/game-design.md §8. In French notation: full digits with a
-// thin-space separator up to 999 999, then short long-scale suffixes with 3 significant digits
+// no-break space separator up to 999 999, then short long-scale suffixes with 3 significant digits
 // ("1,23 M", "45,6 Md"), then scientific notation. The English version (§14 Q1) follows the
 // same rules with a decimal point, comma separators and short-scale suffixes ("1.23 M", "45.6 B").
 
-/** Narrow no-break space: the space before a suffix, and the French thousands separator. */
-const SPACE = '\u202f';
+/**
+ * No-break space: the space before a suffix, and the French thousands separator. Not the narrow
+ * one (U+202F): Manrope draws it a tenth of an em wide, so "479 339" and "12,0 M" read as one
+ * block in the bold counter and buy buttons.
+ */
+const SPACE = '\u00a0';
 
 /** Languages of the interface (§14 Q1): French first, English second. */
 export type Language = 'fr' | 'en';

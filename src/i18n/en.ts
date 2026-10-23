@@ -1426,7 +1426,7 @@ export const en: Texts = {
     close: 'Close the options',
     displayTitle: 'Display',
     notation: 'Large number notation',
-    notationShort: 'Short suffixes (1.23\u202fM)',
+    notationShort: 'Short suffixes (1.23\u00a0M)',
     notationScientific: 'Scientific (1.23e6)',
     reducedMotion: 'Reduce animations',
     language: 'Language',

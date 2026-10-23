@@ -870,7 +870,7 @@ Roadmap P29 : le simulateur joue enfin tout (`src/game/wholeGame.ts`, `simulateW
 
 ### Affichage des nombres
 
-- Jusqu'à 999 999 : chiffres complets avec séparateur de milliers (« 12 345 »).
+- Jusqu'à 999 999 : chiffres complets avec séparateur de milliers (« 12 345 »). Le séparateur et l'espace avant un suffixe sont des espaces insécables pleines : l'espace fine de la police (un dixième d'em) disparaissait dans les chiffres gras du compteur et des boutons.
 - Au-delà : suffixes courts de l'échelle longue avec 3 chiffres significatifs (« 1,23 M », « 45,6 Md », « 7,89 Bn »…) : M (million, 1e6), Md (milliard), Bn (billion), Bd (billiard), Tn (trillion), Td (trilliard), Qn (quadrillion), Qd (quadrilliard, 1e27), puis notation scientifique (« 1,23e30 ») au-delà du dernier suffixe.
 - Option pour forcer la notation scientifique partout.
 - En anglais (M8, §14 Q1) : mêmes règles avec le point décimal, la virgule comme séparateur de milliers et les suffixes de l'échelle courte (« 12,345 », « 1.23 M », « 45.6 B », « 7.89 T » ; puis Qa, Qi, Sx, Sp, Oc).
