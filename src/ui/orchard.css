@@ -6,15 +6,74 @@
   stroke-width: 0.8;
 }
 
-.orchard-mow {
+/* A low hedge of hawthorn just inside the edge: round shrubs, lit on their upper side. */
+.orchard-hedge {
   fill: none;
-  stroke: rgb(255 255 255 / 0.35);
-  stroke-width: 6;
+  stroke: #7ea262;
+  stroke-width: 4;
+  stroke-dasharray: 0.1 2.9;
+  stroke-linecap: round;
 }
 
-.orchard-pit ellipse {
-  fill: #9c7a55;
-  opacity: 0.6;
+.orchard-hedge.lit {
+  stroke: #a8c886;
+  stroke-width: 2;
+  transform: translate(-0.5px, -0.6px);
+}
+
+/* Paths mown short along the trees and the hives, the meadow left tall between them. */
+.orchard-mow {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.2);
+  stroke-width: 22;
+  stroke-linecap: round;
+}
+
+.orchard-tufts {
+  fill: none;
+  stroke: #8fb46a;
+  stroke-width: 0.7;
+  stroke-linecap: round;
+}
+
+.orchard-flower {
+  fill: #fbf6ea;
+}
+
+.orchard-flower.f1 {
+  fill: #f2cd52;
+}
+
+.orchard-flower.f2 {
+  fill: #b9a2dc;
+}
+
+.orchard-mulch {
+  fill: #dcc58e;
+  stroke: #c4a96b;
+  stroke-width: 0.4;
+}
+
+.orchard-straw {
+  fill: none;
+  stroke: #f0deaa;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.orchard-soil {
+  fill: #8a6544;
+}
+
+.orchard-soil-light {
+  fill: #a7835c;
+}
+
+.orchard-tie {
+  fill: none;
+  stroke: #e9d7a8;
+  stroke-width: 0.9;
+  stroke-linecap: round;
 }
 
 .orchard-stake {

@@ -5,7 +5,14 @@
 import { memo, type KeyboardEvent } from 'react';
 import type { FruitId, TreeStage } from '../game/orchard';
 import { t } from '../i18n';
-import { HIVE_SPOTS, ORCHARD_PLACE, parseOrchard, TREE_SPOTS } from './orchardMap';
+import {
+  HIVE_SPOTS,
+  MEADOW,
+  MOWN_PATHS,
+  ORCHARD_PLACE,
+  parseOrchard,
+  TREE_SPOTS,
+} from './orchardMap';
 import './orchard.css';
 
 const FRUIT_COLOURS: Record<FruitId, string> = {
@@ -31,9 +38,18 @@ const CROWN_SPOTS: [number, number][] = [
 function Tree({ id, stage }: { id: FruitId; stage: TreeStage }) {
   if (stage === 'none') {
     return (
+      // A planting hole waiting for its tree: a straw mulch ring around dug soil, a stake tied
+      // with twine.
       <g className="orchard-pit">
-        <ellipse rx="7" ry="4" cy="4" />
+        <ellipse className="orchard-mulch" rx="8.5" ry="4.6" cy="4" />
+        <path
+          className="orchard-straw"
+          d="M-7 3.2l2 .5M-4.5 6.6l2 -.3M3 7.1l2.2 -.6M5.6 1.6l1.8 .9M-1 0.2l2 .2"
+        />
+        <ellipse className="orchard-soil" rx="4.6" ry="2.4" cy="4" />
+        <ellipse className="orchard-soil-light" rx="2.4" ry="1" cx="-1" cy="3.2" />
         <path className="orchard-stake" d="M0 4V-6" />
+        <path className="orchard-tie" d="M-1.1 -3.4h2.2" />
       </g>
     );
   }
@@ -104,10 +120,22 @@ function OrchardPaths({
   return (
     <g className="orchard-layer">
       <rect className="orchard-ground" x={x} y={y} width={w} height={h} rx="6" />
-      <path
-        className="orchard-mow"
-        d={`M${x + 8} ${y + 82}H${x + w - 8}M${x + 8} ${y + 20}H${x + w - 8}`}
-      />
+      {['orchard-hedge', 'orchard-hedge lit'].map((name) => (
+        <rect
+          key={name}
+          className={name}
+          x={x + 2.5}
+          y={y + 2.5}
+          width={w - 5}
+          height={h - 5}
+          rx="5"
+        />
+      ))}
+      <path className="orchard-mow" d={MOWN_PATHS} />
+      <path className="orchard-tufts" d={MEADOW.tufts} />
+      {MEADOW.flowers.map(([fx, fy, tint]) => (
+        <circle key={`${fx},${fy}`} className={`orchard-flower f${tint}`} cx={fx} cy={fy} r="0.9" />
+      ))}
       {(Object.keys(TREE_SPOTS) as FruitId[]).map((id) => {
         const [tx, ty] = TREE_SPOTS[id];
         const stage = trees[id];
