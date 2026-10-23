@@ -412,24 +412,40 @@ function Panel({ x, y, level }: { x: number; y: number; level: number }) {
 }
 
 function Pot({ x, y, level }: { x: number; y: number; level: number }) {
-  const petals = 3 + Math.min(level, 4);
+  // A terracotta pot seen from above, as in the enriched map: its shadow, a lit rim, dark soil,
+  // a rosette of leaves and the heliotrope's dome of florets, fuller with each upgrade.
+  const florets = 7 + Math.min(level, 4) * 2;
   return (
-    <g>
+    <g className="pot-art">
+      <circle cx={x + 0.7} cy={y + 0.9} r="3.6" className="pot-shadow" />
       <circle cx={x} cy={y} r="3.4" className="pot" />
-      <circle cx={x} cy={y} r="2.5" className="foliage" />
-      {Array.from({ length: petals }, (_, i) => {
-        const a = (i / petals) * Math.PI * 2;
+      <path d={`M${x - 2.9} ${y - 1.3}A3.2 3.2 0 0 1 ${x + 1} ${y - 3.1}`} className="pot-rim" />
+      <circle cx={x} cy={y} r="2.6" className="pot-soil" />
+      {Array.from({ length: 6 }, (_, i) => (
+        <path
+          key={i}
+          transform={`translate(${x} ${y}) rotate(${i * 60 + 15})`}
+          d="M0 0C.9 -.8 1.1 -2.1 0 -3C-1.1 -2.1 -.9 -.8 0 0Z"
+          className={i % 2 ? 'pot-leaf shade' : 'pot-leaf'}
+        />
+      ))}
+      <circle cx={x} cy={y} r={1.3 + Math.min(level, 4) * 0.1} className="petal" />
+      {Array.from({ length: florets }, (_, i) => {
+        // Florets on the golden angle, darker at the heart of the dome.
+        const a = i * 2.39996;
+        const d = 1.8 * Math.sqrt((i + 0.5) / florets);
         return (
           <circle
             key={i}
-            cx={x + Math.cos(a) * 1.6}
-            cy={y + Math.sin(a) * 1.6}
-            r="1.4"
-            className="petal"
+            cx={x + Math.cos(a) * d}
+            cy={y + Math.sin(a) * d}
+            r=".45"
+            className={d < 1 ? 'floret deep' : 'floret'}
           />
         );
       })}
-      <circle cx={x} cy={y} r="0.8" className="heart" />
+      <circle cx={x - 0.5} cy={y - 0.6} r="0.55" className="pot-gleam" />
+      <circle cx={x} cy={y} r="0.35" className="heart" />
     </g>
   );
 }
