@@ -532,34 +532,37 @@ export function Scene({
         <Butterfly onCatch={onCatch} />
       </div>
       <figcaption className="scene-caption">
-        {furthest > 1 && (
-          <div className="segmented views" role="radiogroup" aria-label={t.layout.views}>
-            {VIEWS.filter((v) => v <= furthest).map((v) => (
-              <button
-                key={v}
-                type="button"
-                role="radio"
-                aria-checked={view === v}
-                aria-label={t.phases[v]}
-                onClick={() => choose(v)}
-              >
-                {/* Narrow screens drop the article so the four views fit on one line. */}
-                <span className="view-long">{t.phases[v]}</span>
-                <span className="view-short">{t.layout.viewNames[v]}</span>
-              </button>
-            ))}
-          </div>
-        )}
-        {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
-        {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
-        {weather && (
-          <WeatherForecast
-            now={weather}
-            next={forecast.split(',') as WeatherId[]}
-            canSwap={(i) => canSwapForecast(state, i)}
-            onSwap={(i) => store.dispatch((s) => swapForecast(s, i))}
-          />
-        )}
+        {/* On a phone this row scrolls sideways while the tools after it stay in reach. */}
+        <div className="caption-row">
+          {furthest > 1 && (
+            <div className="segmented views" role="radiogroup" aria-label={t.layout.views}>
+              {VIEWS.filter((v) => v <= furthest).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  role="radio"
+                  aria-checked={view === v}
+                  aria-label={t.phases[v]}
+                  onClick={() => choose(v)}
+                >
+                  {/* Narrow screens drop the article so the four views fit on one line. */}
+                  <span className="view-long">{t.phases[v]}</span>
+                  <span className="view-short">{t.layout.viewNames[v]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
+          {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
+          {weather && (
+            <WeatherForecast
+              now={weather}
+              next={forecast.split(',') as WeatherId[]}
+              canSwap={(i) => canSwapForecast(state, i)}
+              onSwap={(i) => store.dispatch((s) => swapForecast(s, i))}
+            />
+          )}
+        </div>
         {mode === 'play' && isDecorOpen(state) && (
           <button type="button" className="scene-tool decor-tool" onClick={() => setMode('decor')}>
             <ToolIcon path={DECOR_ICON} />
