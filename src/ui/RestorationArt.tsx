@@ -1396,28 +1396,60 @@ const PROJECT_ART: Record<ProjectId, () => ReactNode> = {
       </g>
     );
   },
-  lightFestival: () => (
-    <g>
-      {[...STREETS.horizontal.map((y) => ({ y })), ...STREETS.vertical.map((x) => ({ x }))].flatMap(
-        (street, s) =>
-          Array.from({ length: 10 }, (_, i) => {
-            const along = (i + 0.5) / 10;
-            const cx = 'x' in street ? street.x! + STREETS.width / 2 : along * WORLD.width;
-            const cy = 'y' in street ? street.y! + STREETS.width / 2 : along * WORLD.height;
-            return (
-              <circle
-                key={`${s}-${i}`}
-                cx={cx}
-                cy={cy}
-                r="1.6"
-                className="lantern"
-                style={{ animationDelay: `${-noise(i, s) * 3}s` }}
-              />
-            );
-          }),
-      )}
-    </g>
-  ),
+  lightFestival: () => {
+    // A string of paper lanterns down the middle of every street: a cord sagging between them,
+    // each lantern with a cap, a sunlit side and a warm pool of light on the paving below.
+    const streets = [
+      ...STREETS.horizontal.map((y) => ({ horizontal: true, at: y + STREETS.width / 2 })),
+      ...STREETS.vertical.map((x) => ({ horizontal: false, at: x + STREETS.width / 2 })),
+    ];
+    const point = (street: (typeof streets)[number], along: number, side = 0) =>
+      street.horizontal
+        ? { x: along * WORLD.width, y: street.at + side }
+        : { x: street.at + side, y: along * WORLD.height };
+    return (
+      <g>
+        {streets.map((street, s) => {
+          const lanterns = Array.from({ length: 10 }, (_, i) => point(street, (i + 0.5) / 10));
+          const cord = lanterns
+            .slice(1)
+            .map((to, i) => {
+              const sag = point(street, (i + 1) / 10, 2.2);
+              return `Q${sag.x} ${sag.y} ${to.x} ${to.y}`;
+            })
+            .join(' ');
+          return (
+            <g key={s}>
+              <path d={`M${lanterns[0]!.x} ${lanterns[0]!.y} ${cord}`} className="lantern-cord" />
+              {lanterns.map((c, i) => (
+                <g
+                  key={i}
+                  className={`lantern c${(i + s) % 3}`}
+                  style={{ animationDelay: `${-noise(i, s) * 3}s` }}
+                >
+                  <circle cx={c.x} cy={c.y + 1.5} r="5" className="lantern-pool" />
+                  <circle cx={c.x} cy={c.y} r="2" className="lantern-paper" />
+                  <path
+                    d={`M${c.x} ${c.y - 1.9} Q${c.x - 0.9} ${c.y} ${c.x} ${c.y + 1.9} M${c.x} ${c.y - 1.9} Q${c.x + 0.9} ${c.y} ${c.x} ${c.y + 1.9}`}
+                    className="lantern-rib"
+                  />
+                  <circle cx={c.x - 0.6} cy={c.y - 0.6} r="0.7" className="lantern-light" />
+                  <rect
+                    x={c.x - 0.7}
+                    y={c.y - 2.4}
+                    width="1.4"
+                    height="0.7"
+                    rx="0.2"
+                    className="lantern-cap"
+                  />
+                </g>
+              ))}
+            </g>
+          );
+        })}
+      </g>
+    );
+  },
 };
 
 /** Marks painted on the ground (the cycle lanes) lie under the stalls and objects set on it. */
