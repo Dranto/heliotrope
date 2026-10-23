@@ -579,7 +579,8 @@ export const en: Texts = {
     carryOutAllLabel: (count: number) => `Launch the ${count} affordable projects, cheapest first`,
     restoreLabel: (name: string, cost: string) => `Restore ${name} for ${cost} Light`,
     carryOutLabel: (name: string, cost: string) => `Launch the ${name} project for ${cost} Light`,
-    restored: (name: string) => `${name} restored`,
+    restored: (name: string) => `Plot restored: ${name}`,
+    parcelToRestore: 'Plot to restore',
     started: (name: string) => `Project launched: ${name}`,
     parcelNames: {
       gardenStreet: 'Garden street',
@@ -619,6 +620,7 @@ export const en: Texts = {
       chimneys: 'Living towers',
     },
     districtRestored: (name: string) => `Neighbouring district restored: ${name}`,
+    districtToRestore: 'Neighbouring district to restore',
     projectNames: {
       seedSwap: 'Seed swap',
       toolLibrary: 'Tool library',

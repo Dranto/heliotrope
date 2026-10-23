@@ -648,7 +648,8 @@ export const fr = {
       `Lancer les ${count} projets à portée, le moins cher d’abord`,
     restoreLabel: (name: string, cost: string) => `Restaurer ${name} pour ${cost} Lumière`,
     carryOutLabel: (name: string, cost: string) => `Lancer le projet ${name} pour ${cost} Lumière`,
-    restored: (name: string) => `${name} restaurée`,
+    restored: (name: string) => `Parcelle restaurée\u00a0: ${name}`,
+    parcelToRestore: 'Parcelle à restaurer',
     started: (name: string) => `Projet lancé\u00a0: ${name}`,
     parcelNames: {
       gardenStreet: 'Rue jardin',
@@ -688,6 +689,7 @@ export const fr = {
       chimneys: 'Tours vivantes',
     } satisfies Record<DistrictId, string>,
     districtRestored: (name: string) => `Quartier voisin restauré\u00a0: ${name}`,
+    districtToRestore: 'Quartier voisin à restaurer',
     projectNames: {
       seedSwap: 'Troc de graines',
       toolLibrary: 'Outilthèque',
