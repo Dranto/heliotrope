@@ -162,7 +162,7 @@ export const fr = {
     clickFromProduction: (percent: string) =>
       `Chaque clic rapporte aussi ${percent}\u00a0% de la production par seconde`,
     synergy: (generator: string, percent: string, source: string) =>
-      `${generator}\u00a0: +${percent}\u00a0% par ${source} possédé`,
+      `${generator}\u00a0: +${percent}\u00a0% par ${source}`,
     clickPerBuilding: (light: string) =>
       `Chaque clic rapporte +${light} Lumière par bâtiment possédé`,
     clickSynergy: (generator: string, percent: string) =>
