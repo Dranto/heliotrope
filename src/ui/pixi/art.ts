@@ -270,6 +270,84 @@ function wastelandArt([x, y, w, h]: Box): string {
       `<path d="M${r(tx)} ${r(ty)}l-2 -3M${r(tx)} ${r(ty)}l0 -3.6M${r(tx)} ${r(ty)}l2 -3M${r(tx)} ${r(ty)}l-1 -2.2" stroke="#7d8a5e" stroke-width=".45" stroke-linecap="round" fill="none"/>`,
     );
   });
+  // The slab of the building that stood here, cracked, rebar sticking out of its edge.
+  const [sx, sy, sw, sh] = [x + w * 0.55, y + h * 0.12, w * 0.26, h * 0.22];
+  parts.push(
+    `<rect x="${r(sx + 0.8)}" y="${r(sy + 1)}" width="${r(sw)}" height="${r(sh)}" rx=".6" fill="#3b3328" opacity=".16"/>`,
+    `<rect x="${r(sx)}" y="${r(sy)}" width="${r(sw)}" height="${r(sh)}" rx=".6" fill="#bdb7ab" stroke="#9c9383" stroke-width=".3"/>`,
+    `<path d="M${r(sx)} ${r(sy)}H${r(sx + sw)}" stroke="#e4dfd4" stroke-width=".5"/>`,
+    `<path d="M${r(sx + sw * 0.3)} ${r(sy)}l${r(sw * 0.12)} ${r(sh * 0.45)}l${r(-sw * 0.06)} ${r(sh * 0.55)}M${r(sx + sw * 0.42)} ${r(sy + sh * 0.45)}l${r(sw * 0.35)} ${r(sh * 0.15)}" stroke="#8d8578" stroke-width=".3" fill="none"/>`,
+    `<path d="M${r(sx + sw)} ${r(sy + sh * 0.3)}h1.6M${r(sx + sw)} ${r(sy + sh * 0.65)}h1.2" stroke="#8a6a52" stroke-width=".35" stroke-linecap="round"/>`,
+  );
+  // A puddle holding the sky.
+  const [px, py] = [x + w * 0.3, y + h * 0.8];
+  parts.push(
+    `<ellipse cx="${r(px)}" cy="${r(py)}" rx="${r(w * 0.07)}" ry="${r(h * 0.045)}" fill="#a9c3c8" stroke="#b5ad9e" stroke-width=".5"/>`,
+    `<ellipse cx="${r(px - w * 0.02)}" cy="${r(py - h * 0.012)}" rx="${r(w * 0.025)}" ry="${r(h * 0.01)}" fill="#fff" opacity=".6"/>`,
+  );
+  // Heaps, plants and the shrub scale with the plot, so a large waste ground is not bare.
+  const k = Math.max(1, Math.min(w, h) / 60);
+  // Heaps of broken concrete, each lump lit on its sunny side.
+  for (const [hx, hy, salt] of [
+    [x + w * 0.82, y + h * 0.6, 40],
+    [x + w * 0.4, y + h * 0.55, 140],
+  ] as const) {
+    if (salt === 140 && k < 2) continue;
+    parts.push(
+      `<ellipse cx="${r(hx + k)}" cy="${r(hy + 1.6 * k)}" rx="${r(5.6 * k)}" ry="${r(3.2 * k)}" fill="#3b3328" opacity=".15"/>`,
+    );
+    for (let i = 0; i < 7; i++) {
+      const lx = hx + (rnd(seed, i + salt) - 0.5) * 8 * k;
+      const ly = hy + (rnd(seed, i + salt + 10) - 0.5) * 4.4 * k;
+      const size = (1.2 + rnd(seed, i + salt + 20) * 1.2) * k;
+      const tone = ['#a9a091', '#b8b0a2', '#968d7e'][i % 3]!;
+      parts.push(
+        `<path d="M${r(lx - size)} ${r(ly + size * 0.5)}l${r(size * 0.5)} ${r(-size)}l${r(size * 1.2)} ${r(size * 0.1)}l${r(size * 0.4)} ${r(size * 0.9)}z" fill="${tone}" stroke="#857c6e" stroke-width=".2"/>`,
+        `<path d="M${r(lx - size * 0.5)} ${r(ly - size * 0.5)}l${r(size * 1.2)} ${r(size * 0.1)}" stroke="#ece6da" stroke-width=".3" opacity=".8"/>`,
+      );
+    }
+  }
+  // Pioneer plants taking the ground back first, along the fence where nothing treads:
+  // tufts with dandelions, poppies and daisies.
+  const blooms = ['#e9c44a', '#d2553f', '#f6f1e4'];
+  const clumps = Math.round((w + h) / 9);
+  const kc = Math.sqrt(k);
+  const inset = 4 * k;
+  for (let i = 0; i < clumps; i++) {
+    const edge = i % 4;
+    const t = rnd(seed, i + 70);
+    // Each clump drifts a little inward, so they do not stand in a row.
+    const drift = rnd(seed, i + 90) * 3 * k;
+    const cx =
+      edge === 1
+        ? x + w - inset - drift
+        : edge === 3
+          ? x + inset + drift
+          : x + inset + t * (w - 2 * inset);
+    const cy =
+      edge === 0
+        ? y + inset + drift
+        : edge === 2
+          ? y + h - inset - drift
+          : y + inset + t * (h - 2 * inset);
+    const size = (1.2 + rnd(seed, i + 80) * 1) * kc;
+    parts.push(
+      `<ellipse cx="${r(cx)}" cy="${r(cy)}" rx="${r(size * 1.3)}" ry="${r(size)}" fill="#8a9a5e"/>`,
+      `<ellipse cx="${r(cx - size * 0.3)}" cy="${r(cy - size * 0.3)}" rx="${r(size * 0.6)}" ry="${r(size * 0.45)}" fill="#a5b474"/>`,
+      `<circle cx="${r(cx + size * 0.5)}" cy="${r(cy - size * 0.2)}" r="${r(0.5 * kc)}" fill="${blooms[i % 3]}"/>`,
+      `<circle cx="${r(cx - size * 0.6)}" cy="${r(cy + size * 0.3)}" r="${r(0.42 * kc)}" fill="${blooms[(i + 1) % 3]}"/>`,
+    );
+  }
+  // A buddleia in the corner, the first shrub to grow on rubble, its lilac spikes full of bees.
+  const [bx, by] = [x + w * 0.1, y + h * 0.16];
+  parts.push(
+    `<g transform="translate(${r(bx)} ${r(by)}) scale(${r(k)})">`,
+    `<circle cx="1" cy="1.2" r="4" fill="#3b3328" opacity=".18"/>`,
+    `<circle r="3.8" fill="#6f8a55"/>`,
+    `<circle cx="-1" cy="-1" r="2" fill="#8ea56c"/>`,
+    `<path d="M1 -1l2.4 -2.2M-1.6 .6l-2.6 1.4M1.6 1.4l2.2 1.8M-.4 -2l-.6 -2.8" stroke="${LILAC}" stroke-width=".85" stroke-linecap="round"/>`,
+    `</g>`,
+  );
   return parts.join('');
 }
 
