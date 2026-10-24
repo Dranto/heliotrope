@@ -86,6 +86,28 @@ function LobedCrown({
   );
 }
 
+/**
+ * A strip of wild flowers left along one edge of every field, for the pollinators: poppies,
+ * cornflowers and chamomile in the grass, placed by a stable hash so each field differs.
+ */
+function FieldMargin({ box: [x, y, w, h], south }: { box: Box; south: boolean }) {
+  const top = south ? y + h - 16 : y + 6;
+  const seed = landHash(x, y);
+  const count = Math.floor((w - 16) / 7);
+  return (
+    <g>
+      <rect x={x + 6} y={top} width={w - 12} height="10" rx="5" className="field-margin" />
+      {Array.from({ length: count }, (_, i) => {
+        const k = (seed + i * 37) % 11;
+        const cx = x + 10 + i * 7 + (k % 3);
+        const cy = top + 3 + ((k * 5) % 5);
+        const kind = k < 4 ? 'poppy' : k < 7 ? 'cornflower' : k < 9 ? 'chamomile' : null;
+        return kind && <circle key={i} cx={cx} cy={cy} r={k % 2 ? 1.9 : 1.5} className={kind} />;
+      })}
+    </g>
+  );
+}
+
 export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
   const [x, y, w, h] = box;
   const hedge = landHash(x, y) % 2 === 0;
@@ -101,6 +123,22 @@ export function FieldArt({ field: { box, crop, angle } }: { field: Field }) {
         rx="10"
         fill={`url(#land-crop-${crop}${angle ? '-turned' : ''})`}
       />
+      {/* Wheat: the tractor's tramlines, pairs of pale wheel tracks along the rows. */}
+      {crop === 0 &&
+        [0.36, 0.66].flatMap((f) =>
+          [-1.6, 1.6].map((d) => (
+            <path
+              key={`${f}${d}`}
+              d={
+                angle
+                  ? `M${x + w * f + d} ${y + 8}V${y + h - 8}`
+                  : `M${x + 8} ${y + h * f + d}H${x + w - 8}`
+              }
+              className="tramline"
+            />
+          )),
+        )}
+      <FieldMargin box={box} south={!hedge} />
       {/* A hedgerow of round shrubs along the south edge of some fields. */}
       {hedge &&
         Array.from({ length: Math.floor(w / 16) }, (_, i) => (
