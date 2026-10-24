@@ -198,6 +198,7 @@ export function Generators() {
 function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
   const store = useGameStore();
   const [picked, setPicked] = useState<number | null>(null);
+  const [skyNote, setSkyNote] = useState(false);
   const reached = reachedTiers(state, id);
   const pending = pendingTier(state, id);
   const shown = picked ?? pending;
@@ -227,17 +228,21 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
           );
         })}
         {sky && (
-          <span
+          // A tap writes out what the weather does, since a phone shows no tooltip.
+          <button
+            type="button"
             className="growth-sky"
             data-active={favoured}
-            role="img"
+            aria-expanded={skyNote}
             aria-label={t.weather.paths(t.weather.day[sky])}
             title={t.weather.paths(t.weather.day[sky])}
+            onClick={() => setSkyNote((open) => !open)}
           >
             <WeatherIcon id={sky} />
-          </span>
+          </button>
         )}
       </span>
+      {sky && skyNote && <p className="growth-sky-note">{t.weather.paths(t.weather.day[sky])}</p>}
       {shown !== null && (
         <div className="growth-fork" role="group" aria-label={t.growth.choose(forms[shown]!)}>
           {([0, 1] as const).map((path) => {
