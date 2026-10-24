@@ -63,6 +63,16 @@ describe('drawings of the enriched map (§10.4)', () => {
     expect(drawings(ctx, 3).map((a) => a.svg)).toEqual(drawings(ctx, 3).map((a) => a.svg));
   });
 
+  it('gives a large bare roof a stair head, a paver path and exhaust stacks, not a garden roof', () => {
+    const ctx: ArtContext = { palette: palette(2, null), lit: 1, greenness: 0.2 };
+    const big = buildingArt(ctx, [0, 0, 120, 80], 4).svg;
+    expect(big).toContain('fill="#8a7259"');
+    expect(big).toContain('stroke-dasharray="1.6 .5"');
+    expect(big.match(/fill="#6d6860"\/>/g)).toHaveLength(3);
+    expect(buildingArt(ctx, [0, 0, 120, 80], 4, { bare: true }).svg).not.toContain('#8a7259');
+    expect(buildingArt(ctx, [0, 0, 40, 30], 4).svg).not.toContain('#8a7259');
+  });
+
   it('keeps spring leaves green, its blossom pink', () => {
     const spring = palette(2, 'spring');
     expect(spring.foliageLight).toBe('#b5d68e');
