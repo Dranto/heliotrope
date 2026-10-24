@@ -206,6 +206,7 @@ export const en: Texts = {
     tier: (form: string, count: string) => `${form}, from ${count}`,
     choose: (form: string) => `${form}: pick a path`,
     locked: 'A path already changed this Season',
+    lockedNote: 'This building already changed path this Season: it can change again next Season.',
     forms: {
       pot: ['Flowering planter', 'Wall of pots', 'Cascade of pots'],
       balconyPanel: ['Solar pergola', 'Photovoltaic trellis', 'Solar facade'],

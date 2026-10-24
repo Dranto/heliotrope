@@ -2293,9 +2293,21 @@ button {
   background: rgb(183 154 214 / 0.35);
 }
 
-.growth-path:disabled {
+.growth-path[aria-disabled='true'] {
   opacity: 0.55;
   cursor: default;
+}
+
+.growth-locked-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+/* Empty, the note keeps its place for screen readers without adding a row gap. */
+.growth-locked-note:empty {
+  margin-top: -0.4rem;
 }
 
 .app[data-motion='reduced'] .growth-pip {
