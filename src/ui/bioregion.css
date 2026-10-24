@@ -404,4 +404,30 @@
 
 .bioregion-land .lily {
   fill: #6f9a62;
+  stroke: #557d4c;
+  stroke-width: 0.5;
+}
+
+.bioregion-land .pond-deep {
+  fill: #5fa4b4;
+  opacity: 0.7;
+}
+
+.bioregion-land .pond-ripple {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.45);
+  stroke-width: 0.8;
+  stroke-dasharray: 5 4;
+}
+
+.bioregion-land .lily-flower {
+  fill: #fbf7ef;
+}
+
+.bioregion-land .lily-flower.pink {
+  fill: #f4b6c8;
+}
+
+.bioregion-land .lily-heart {
+  fill: #f2c94c;
 }
