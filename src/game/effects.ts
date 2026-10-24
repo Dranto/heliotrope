@@ -1,19 +1,7 @@
 // Temporary effects of the Golden Butterfly, the visits and the garden's beans (docs/game-design.md §9.2, §9.6). Data only, so the
 // production formulas can read them without depending on the butterfly logic.
 
-export type EffectKind =
-  | 'bloom'
-  | 'pollination'
-  | 'shower'
-  | 'birds'
-  | 'beans'
-  | 'grazing'
-  | 'festival'
-  | 'fireflies'
-  | 'fleaMarket'
-  | 'flight';
-
-export const EFFECT_KINDS: readonly EffectKind[] = [
+export const EFFECT_KINDS = [
   'bloom',
   'pollination',
   'shower',
@@ -24,7 +12,9 @@ export const EFFECT_KINDS: readonly EffectKind[] = [
   'fireflies',
   'fleaMarket',
   'flight',
-];
+] as const;
+/** The save keeps only effects whose kind is listed above, so the type is read from the list. */
+export type EffectKind = (typeof EFFECT_KINDS)[number];
 
 export interface ActiveEffect {
   kind: EffectKind;
