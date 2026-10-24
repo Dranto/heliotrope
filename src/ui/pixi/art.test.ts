@@ -7,6 +7,7 @@ import {
   gardenArt,
   greenhouseArt,
   groundArt,
+  LILAC,
   mirrorArt,
   panelArt,
   planterArt,
@@ -23,7 +24,7 @@ function drawings(ctx: ArtContext, level: number): Art[] {
   return [
     groundArt(ctx, {
       courtyardGreen: 0.5,
-      wastelands: [],
+      wastelands: [GREENHOUSE_SITES[1]!],
       carParks: [CAR_PARKS[0]!],
       mirrorField: CAR_PARKS[1]!,
     }),
@@ -71,6 +72,17 @@ describe('drawings of the enriched map (§10.4)', () => {
     expect(big.match(/fill="#6d6860"\/>/g)).toHaveLength(3);
     expect(buildingArt(ctx, [0, 0, 120, 80], 4, { bare: true }).svg).not.toContain('#8a7259');
     expect(buildingArt(ctx, [0, 0, 40, 30], 4).svg).not.toContain('#8a7259');
+  });
+
+  it('lets pioneer plants, a buddleia and a puddle take back a waste ground, more on a large one', () => {
+    const ctx: ArtContext = { palette: palette(1, null), lit: 1, greenness: 0 };
+    const ground = (box: [number, number, number, number]) =>
+      groundArt(ctx, { courtyardGreen: 0, wastelands: [box], carParks: [] }).svg;
+    const small = ground([0, 0, 90, 70]);
+    expect(small).toContain(`stroke="${LILAC}"`);
+    expect(small).toContain('fill="#a9c3c8"');
+    const tufts = (svg: string) => svg.match(/fill="#a5b474"/g)?.length ?? 0;
+    expect(tufts(ground([0, 0, 300, 200]))).toBeGreaterThan(tufts(small));
   });
 
   it('keeps spring leaves green, its blossom pink', () => {
