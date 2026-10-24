@@ -433,14 +433,48 @@ export function buildingArt(
     `<path d="M${lit === 1 ? x + 0.6 : x + w - 0.6} ${y + top - 1}V${y + 0.6}${lit === 1 ? `H${x + w - 1}` : `H${x + 1}`}" stroke="#fff" stroke-width=".7" opacity=".55" fill="none"/>`,
   );
   if (!bare && !sedum) {
-    // Seams of the roof membrane.
+    // Strips of the roof membrane, every other one a shade lighter, between their seams.
     const seams = Math.floor(w / 9);
-    for (let i = 1; i < seams; i++) {
-      parts.push(
-        `<path d="M${r(x + (w / seams) * i)} ${y + 2.5}V${r(y + top - 2.5)}" stroke="${shade(roof, -0.1)}" stroke-width=".25" opacity=".6"/>`,
-      );
+    for (let i = 0; i < seams; i++) {
+      const sx = x + (w / seams) * i;
+      if (i % 2 === 1) {
+        parts.push(
+          `<rect x="${r(sx)}" y="${y + 2.4}" width="${r(w / seams)}" height="${r(top - 4.8)}" fill="${shade(roof, 0.05)}" opacity=".6"/>`,
+        );
+      }
+      if (i > 0) {
+        parts.push(
+          `<path d="M${r(sx)} ${y + 2.5}V${r(y + top - 2.5)}" stroke="${shade(roof, -0.12)}" stroke-width=".35" opacity=".7"/>`,
+        );
+      }
     }
     const wide = w >= h;
+    // Large roofs get what a real one carries: the stair head the caretaker comes up through,
+    // a paver path from it to the vent, and a cluster of exhaust stacks.
+    if (w > 50 && top > 34) {
+      const hx = x + 5;
+      const hy = y + 5;
+      const vx = x + w - 8;
+      const vy = y + top - 5;
+      parts.push(
+        `<path d="M${hx + 5} ${hy + 8}V${r(vy)}H${r(vx - 4)}" stroke="#e3dccd" stroke-width="2.2" stroke-dasharray="1.6 .5" fill="none" opacity=".85"/>`,
+        `<rect x="${hx + 1.2 * -lit + 1}" y="${hy + 1.3}" width="10" height="7.5" rx=".8" fill="#3b3328" opacity=".22"/>`,
+        `<rect x="${hx}" y="${hy}" width="10" height="7.5" rx=".8" fill="#bcb6ab" stroke="#8f897f" stroke-width=".3"/>`,
+        `<rect x="${hx + 0.6}" y="${hy + 0.6}" width="8.8" height="4.6" rx=".5" fill="#d9d4ca"/>`,
+        `<rect x="${hx + 3.4}" y="${hy + 5.4}" width="3.2" height="2.1" rx=".2" fill="#8a7259"/>`,
+      );
+      const sx = x + w * 0.82;
+      const sy = y + top * 0.3;
+      for (const [dx, dy, rr] of [
+        [0, 0, 2.2],
+        [5.2, 1.1, 1.8],
+        [1.8, 5, 1.5],
+      ] as const) {
+        parts.push(
+          `<circle cx="${r(sx + dx + 0.6)}" cy="${r(sy + dy + 0.7)}" r="${rr + 0.3}" fill="#3b3328" opacity=".2"/><circle cx="${r(sx + dx)}" cy="${r(sy + dy)}" r="${rr}" fill="#cfc9be" stroke="#8f897f" stroke-width=".3"/><circle cx="${r(sx + dx)}" cy="${r(sy + dy)}" r="${r(rr * 0.5)}" fill="#6d6860"/>`,
+        );
+      }
+    }
     if (seed % 3 === 0 && w > 30) {
       // Glass skylights.
       const n = wide ? 3 : 2;
