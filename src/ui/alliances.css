@@ -97,6 +97,16 @@
   color: #2f6b4f;
 }
 
+.alliance-blocked {
+  grid-column: 1 / -1;
+  color: var(--ink-soft);
+}
+
+/* Empty, the note keeps its place for screen readers without adding a row gap. */
+.alliance-blocked:empty {
+  margin-top: -0.25rem;
+}
+
 .alliance-card .buy {
   grid-row: 1 / span 3;
   grid-column: 2;

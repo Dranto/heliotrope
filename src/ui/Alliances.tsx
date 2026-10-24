@@ -13,6 +13,7 @@ import {
 import { formatNumber } from '../game/format';
 import { t } from '../i18n';
 import { bonusesText } from '../i18n/restoration';
+import { useState } from 'react';
 import { usePanelOpen } from './layoutPrefs';
 import { PanelTitle } from './PanelTitle';
 import { useGameState, useGameStore } from './useGame';
@@ -27,6 +28,9 @@ export function Alliances() {
   const store = useGameStore();
   const state = useGameState();
   const [open, toggle] = usePanelOpen('alliances');
+  // The alliance whose button was tapped while it could not act: it says why, since a phone
+  // shows no tooltip.
+  const [blocked, setBlocked] = useState<AllianceId | null>(null);
   if (!areAlliancesOpen(state)) return null;
   const { chosen } = state.alliances;
   const slots = allianceSlots(state);
@@ -43,6 +47,8 @@ export function Alliances() {
     const name = t.alliances.names[id];
     const awake = isAwake(state, id);
     const isChosen = chosen.includes(id);
+    const allowed = isChosen ? canTakeOut(state, id) : canChoose(state, id);
+    const why = isChosen ? t.alliances.takenOut : t.alliances.full;
     const sides = def.sides
       .map((side) =>
         t.alliances.side(
@@ -65,29 +71,26 @@ export function Alliances() {
         <p className="alliance-effect">
           {def.bonuses.length > 0 ? bonusesText(def.bonuses) : t.alliances.effects[id]}
         </p>
-        {isChosen ? (
-          <button
-            type="button"
-            className="buy"
-            disabled={!canTakeOut(state, id)}
-            title={canTakeOut(state, id) ? undefined : t.alliances.takenOut}
-            aria-label={t.alliances.takeOutLabel(name)}
-            onClick={() => store.dispatch((s) => takeOutAlliance(s, id))}
-          >
-            <span className="buy-verb">{t.alliances.takeOut}</span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="buy"
-            disabled={!canChoose(state, id)}
-            title={canChoose(state, id) ? undefined : t.alliances.full}
-            aria-label={t.alliances.chooseLabel(name)}
-            onClick={() => store.dispatch((s) => chooseAlliance(s, id))}
-          >
-            <span className="buy-verb">{t.alliances.choose}</span>
-          </button>
-        )}
+        <button
+          type="button"
+          className="buy"
+          aria-disabled={!allowed}
+          title={allowed ? undefined : why}
+          aria-label={isChosen ? t.alliances.takeOutLabel(name) : t.alliances.chooseLabel(name)}
+          onClick={() => {
+            if (!allowed) {
+              setBlocked(id);
+              return;
+            }
+            setBlocked(null);
+            store.dispatch((s) => (isChosen ? takeOutAlliance(s, id) : chooseAlliance(s, id)));
+          }}
+        >
+          <span className="buy-verb">{isChosen ? t.alliances.takeOut : t.alliances.choose}</span>
+        </button>
+        <p className="alliance-blocked" aria-live="polite">
+          {blocked === id && !allowed ? why : ''}
+        </p>
       </li>
     );
   }
