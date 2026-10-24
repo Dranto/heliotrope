@@ -2104,9 +2104,26 @@ button {
 
 /* The weather the building's paths play stronger under (M33), lit while it reigns. */
 .growth-sky {
+  position: relative;
   display: inline-flex;
   margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
   opacity: 0.45;
+  cursor: pointer;
+}
+
+.growth-sky[aria-expanded='true'] {
+  opacity: 1;
+}
+
+.growth-sky-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
 }
 
 .growth-sky .weather-icon {
@@ -2206,6 +2223,13 @@ button {
   .growth-pips {
     --pip-gap: 1.1rem;
     padding-inline-start: 0.3rem;
+  }
+
+  .growth-sky::after {
+    content: '';
+    position: absolute;
+    inset: -0.7rem;
+    border-radius: 50%;
   }
 
   .growth-pip::after {

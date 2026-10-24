@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { withAllIntroduced } from '../game/introductions';
 import { saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
 import { GameStore } from '../game/store';
@@ -29,6 +30,26 @@ describe('Generators growth pips', () => {
     ).toBeInTheDocument();
     fireEvent.click(pip);
     expect(pip).toHaveAttribute('aria-expanded', 'false');
+  });
+});
+
+describe('the weather mark on a building', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('writes out what the weather does when tapped, since a phone shows no tooltip', () => {
+    const base = withAllIntroduced(createInitialState(0));
+    saveGame({ ...base, seasons: 1, generators: { ...base.generators, pot: 60 } });
+    renderGenerators();
+    const sky = screen.getByRole('button', { name: /les voies de ce bâtiment jouent/ });
+    expect(sky).toHaveAttribute('aria-expanded', 'false');
+    expect(document.querySelector('.growth-sky-note')).toBeNull();
+    fireEvent.click(sky);
+    expect(sky).toHaveAttribute('aria-expanded', 'true');
+    expect(document.querySelector('.growth-sky-note')?.textContent).toBe(
+      sky.getAttribute('aria-label'),
+    );
+    fireEvent.click(sky);
+    expect(document.querySelector('.growth-sky-note')).toBeNull();
   });
 });
 
