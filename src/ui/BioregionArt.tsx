@@ -322,10 +322,40 @@ export function Pond({ x, y, r }: Crown) {
   );
 }
 
+/**
+ * A tree of the old-growth forest. The forest mixes its species, picked by a stable hash: mostly
+ * oaks, with beeches a lighter green, pale small birches and dark Scots pines, whose needles
+ * radiate from the top like a star.
+ */
 export function OldCrown({ x, y, r }: Crown) {
+  const kind = landHash(x, y) % 7;
+  if (kind === 5) {
+    const star = (radius: number, turn: number) =>
+      Array.from({ length: 18 }, (_, i) => {
+        const a = ((i + turn) / 18) * Math.PI * 2;
+        const d = i % 2 === 0 ? radius : radius * 0.62;
+        return `${i === 0 ? 'M' : 'L'}${x + Math.cos(a) * d} ${y + Math.sin(a) * d}`;
+      }).join('') + 'Z';
+    return (
+      <g data-tree="pine">
+        <circle cx={x + r * 0.3} cy={y + r * 0.4} r={r * 0.95} className="crown-shadow" />
+        <path d={star(r, 0)} className="pine" />
+        <path d={star(r * 0.66, 0.5)} className="pine-light" />
+        <circle cx={x} cy={y} r={r * 0.14} className="pine-top" />
+      </g>
+    );
+  }
+  if (kind === 6) {
+    return (
+      <g data-tree="birch">
+        <LobedCrown x={x} y={y} r={r * 0.78} className="birch-crown" />
+      </g>
+    );
+  }
+  const beech = kind === 3 || kind === 4;
   return (
-    <g>
-      <LobedCrown x={x} y={y} r={r} className="old-crown" />
+    <g data-tree={beech ? 'beech' : 'oak'}>
+      <LobedCrown x={x} y={y} r={r} className={beech ? 'old-crown beech' : 'old-crown'} />
     </g>
   );
 }

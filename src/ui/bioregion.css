@@ -195,6 +195,31 @@
   stroke-width: 1.2;
 }
 
+.bioregion-land .old-crown.beech {
+  fill: #5f9a5c;
+  stroke: #4c8550;
+}
+
+.bioregion-land .birch-crown {
+  fill: #9cbf73;
+  stroke: #86ab62;
+  stroke-width: 1;
+}
+
+.bioregion-land .pine {
+  fill: #2e5f4f;
+  stroke: #244f42;
+  stroke-width: 0.8;
+}
+
+.bioregion-land .pine-light {
+  fill: #4a7e62;
+}
+
+.bioregion-land .pine-top {
+  fill: #8a6a48;
+}
+
 /* The hillsides (§7.5): terraces of vines on the hills' sunny flank. */
 .bioregion-land .terrace-wall {
   fill: none;
