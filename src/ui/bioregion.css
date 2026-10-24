@@ -56,6 +56,27 @@
   fill: #a9c28e;
 }
 
+.bioregion-land .tramline {
+  stroke: rgb(255 250 232 / 0.9);
+  stroke-width: 1.3;
+}
+
+.bioregion-land .field-margin {
+  fill: #c2d69a;
+}
+
+.bioregion-land .poppy {
+  fill: #d9574a;
+}
+
+.bioregion-land .cornflower {
+  fill: #5b80cf;
+}
+
+.bioregion-land .chamomile {
+  fill: #fffaf0;
+}
+
 .bioregion-land .haze {
   fill: url(#land-haze);
 }
