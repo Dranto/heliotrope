@@ -298,17 +298,57 @@ export function Hills() {
   );
 }
 
-export function Pond({ x, y, r }: Crown) {
+/** A lily pad: a disc with the notch of its stem, turned by `turn` (radians). */
+function lilyPad(x: number, y: number, r: number, turn: number): string {
+  const a = turn - 0.32;
+  const b = turn + 0.32;
   return (
-    <g>
+    `M${x} ${y}L${x + Math.cos(a) * r} ${y + Math.sin(a) * r}` +
+    `A${r} ${r} 0 1 0 ${x + Math.cos(b) * r} ${y + Math.sin(b) * r}Z`
+  );
+}
+
+/**
+ * A retention pond of the Bioregion: a sunlit shallow rim around darker deep water, a few
+ * notched lily pads (one in flower, white or pink) and a ripple, all turned by a stable hash so
+ * no two ponds look alike.
+ */
+export function Pond({ x, y, r }: Crown) {
+  const seed = landHash(x, y);
+  const turn = (seed % 12) * (Math.PI / 6);
+  const pad = (k: number) => {
+    const a = turn + k * 0.9;
+    const d = r * (0.42 + (k % 2) * 0.14);
+    return { px: x + Math.cos(a) * d, py: y + Math.sin(a) * d, pr: r * (0.18 - k * 0.025) };
+  };
+  const pads = [0, 1, 2].map(pad);
+  const bloom = pad(0);
+  return (
+    <g data-pond="">
       <circle cx={x} cy={y} r={r + 5} className="pond-bank" />
       <circle cx={x} cy={y} r={r} className="pond" />
+      <circle cx={x + r * 0.08} cy={y + r * 0.1} r={r * 0.64} className="pond-deep" />
       <path
         d={`M${x - r * 0.5} ${y - r * 0.2}q${r * 0.25} -3 ${r * 0.5} 0`}
         className="pond-glint"
       />
-      <circle cx={x + r * 0.4} cy={y + r * 0.35} r={r * 0.16} className="lily" />
-      <circle cx={x + r * 0.15} cy={y + r * 0.55} r={r * 0.12} className="lily" />
+      <circle
+        cx={x - r * 0.28}
+        cy={y + r * 0.3}
+        r={r * 0.2}
+        className="pond-ripple"
+        transform={`rotate(${seed * 7} ${x} ${y})`}
+      />
+      {pads.map(({ px, py, pr }, k) => (
+        <path key={k} d={lilyPad(px, py, pr, turn + k * 2.1)} className="lily" />
+      ))}
+      <circle
+        cx={bloom.px}
+        cy={bloom.py}
+        r={bloom.pr * 0.45}
+        className={seed % 2 === 0 ? 'lily-flower' : 'lily-flower pink'}
+      />
+      <circle cx={bloom.px} cy={bloom.py} r={bloom.pr * 0.16} className="lily-heart" />
       <path
         className="reeds"
         d={Array.from({ length: 6 }, (_, i) => {
