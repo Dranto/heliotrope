@@ -10,6 +10,7 @@ import {
 } from './save';
 import { createInitialState, DEFAULT_SETTINGS, STATE_VERSION, type GameState } from './state';
 import { INTRO_GAP_SECONDS, withAllIntroduced } from './introductions';
+import { EFFECT_KINDS } from './effects';
 
 /** A new game whose mechanics are all introduced (§10.8), to test them directly. */
 const openGame = (now: number) => withAllIntroduced(createInitialState(now));
@@ -351,6 +352,12 @@ describe('export and import', () => {
     expect(state.cycles).toBe(1);
     // The rooted Seeds still pay for the talents learnt before the Cycle.
     expect(state.talents).toEqual(['gardenersCoop', 'nightWatch', 'roofersCoop', 'mycorrhiza']);
+  });
+
+  it('keeps a running effect of every kind across a save', () => {
+    const effects = EFFECT_KINDS.map((kind) => ({ kind, remaining: 5 }));
+    const state = deserialize(serialize({ ...openGame(0), effects }), 0)!;
+    expect(state.effects).toEqual(effects);
   });
 
   it('drops invalid Milestones, effects and settings', () => {
