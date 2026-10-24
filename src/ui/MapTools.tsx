@@ -10,6 +10,7 @@ import {
   isFlowerColourUnlocked,
   setFlowerColour,
   type DecorCondition,
+  type FlowerColour,
 } from '../game/decor';
 import { VISUAL_SEASONS, type VisualSeason } from '../game/phases';
 import { t } from '../i18n';
@@ -34,6 +35,9 @@ function conditionText(condition: DecorCondition): string {
 export function DecorToolbar({ onDone }: { onDone: () => void }) {
   const store = useGameStore();
   const state = useGameState();
+  // A colour still to win is told on a tap, since a title never shows on a phone.
+  const [toWin, setToWin] = useState<FlowerColour | null>(null);
+  const toWinCondition = toWin && FLOWER_CONDITIONS[toWin];
   return (
     <section className="map-toolbar decor-toolbar" aria-labelledby="decor-title">
       <h3 id="decor-title">{t.decor.title}</h3>
@@ -66,9 +70,14 @@ export function DecorToolbar({ onDone }: { onDone: () => void }) {
               role="radio"
               className="toolbar-pill"
               aria-checked={state.decor.flower === colour}
-              disabled={!won}
+              aria-disabled={!won}
               title={!won && condition ? conditionText(condition) : undefined}
-              onClick={() => store.dispatch((s) => setFlowerColour(s, colour))}
+              onClick={() => {
+                if (won) {
+                  setToWin(null);
+                  store.dispatch((s) => setFlowerColour(s, colour));
+                } else setToWin(colour);
+              }}
             >
               <span className="colour-dot" style={{ background: COROLLAS[colour][0]![1] }} />
               {t.decor.colours[colour]}
@@ -76,6 +85,11 @@ export function DecorToolbar({ onDone }: { onDone: () => void }) {
           );
         })}
       </div>
+      <p className="hint colour-to-win" aria-live="polite">
+        {toWin &&
+          toWinCondition &&
+          t.decor.colourToWin(t.decor.colours[toWin], conditionText(toWinCondition))}
+      </p>
       <div className="toolbar-actions">
         <button type="button" className="season-button" onClick={onDone}>
           {t.decor.done}

@@ -221,6 +221,7 @@ export const fr = {
     achievements: (count: number) => `${count} jalons`,
     species: (count: number) => `${count} espèces de l’Herbier`,
     milestoneFamily: (family: string) => `Tous les jalons de la famille ${family}`,
+    colourToWin: (colour: string, condition: string) => `${colour} à gagner\u00a0: ${condition}`,
   },
   photo: {
     open: 'Photo',
