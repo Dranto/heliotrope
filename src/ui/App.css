@@ -2364,12 +2364,12 @@ button {
     filter 0.15s ease;
 }
 
-.buy:hover:not(:disabled) {
+.buy:hover:not(:disabled, [aria-disabled='true']) {
   filter: brightness(1.05);
   transform: translateY(-1px);
 }
 
-.buy:active:not(:disabled) {
+.buy:active:not(:disabled, [aria-disabled='true']) {
   transform: translateY(0);
 }
 
@@ -2378,7 +2378,8 @@ button {
   outline-offset: 2px;
 }
 
-.buy:disabled {
+.buy:disabled,
+.buy[aria-disabled='true'] {
   background: rgb(31 42 36 / 0.06);
   box-shadow: none;
   color: var(--ink-soft);
