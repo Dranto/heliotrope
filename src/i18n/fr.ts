@@ -84,6 +84,7 @@ export const fr = {
       works: 'Un quart d’étape de grand chantier',
       sky: 'Un échange de prévision de plus',
     },
+    progress: (done: string, count: string) => `Avancement\u00a0: ${done} sur ${count}`,
     offers: (hand: string) => `Offre\u00a0: ${hand}`,
     from: (district: string) => `De ${district}`,
     serve: 'Rendre service',

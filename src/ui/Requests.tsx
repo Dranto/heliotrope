@@ -2,7 +2,7 @@ import { ACHIEVEMENTS } from '../game/achievements';
 import { achievementName } from '../i18n/achievements';
 import { BOND_BONUS, BOND_MAX } from '../game/bonds';
 import { DISTRICT_IDS } from '../game/districts';
-import { formatPercent } from '../game/format';
+import { formatNumber, formatPercent } from '../game/format';
 import {
   areRequestsOpen,
   canPlayHand,
@@ -66,9 +66,10 @@ export function Requests() {
                 <RequestIcon kind={request.need.kind} />
                 <span className="request-need">{need}</span>
                 <span className="request-meta">
-                  <span className="request-progress">
-                    {requestProgress(state, request)}/{request.need.count}
-                  </span>
+                  <RequestProgress
+                    done={requestProgress(state, request)}
+                    count={request.need.count}
+                  />
                   <span>{t.requests.offers(t.requests.hands[request.hand])}</span>
                   {request.from && (
                     <span>{t.requests.from(t.restoration.districtNames[request.from])}</span>
@@ -153,5 +154,23 @@ export function Requests() {
         </ul>
       )}
     </section>
+  );
+}
+
+/** How far a request has come: a short bar beside "1/10", read out as a sentence. */
+function RequestProgress({ done, count }: { done: number; count: number }) {
+  const shown = Math.min(done, count);
+  return (
+    <span className="request-progress">
+      <span aria-hidden="true">
+        {formatNumber(shown)}/{formatNumber(count)}
+      </span>
+      <span className="request-bar" aria-hidden="true">
+        <span style={{ width: `${Math.round((shown / count) * 100)}%` }} />
+      </span>
+      <span className="visually-hidden">
+        {t.requests.progress(formatNumber(shown), formatNumber(count))}
+      </span>
+    </span>
   );
 }
