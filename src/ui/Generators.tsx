@@ -199,6 +199,8 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
   const store = useGameStore();
   const [picked, setPicked] = useState<number | null>(null);
   const [skyNote, setSkyNote] = useState(false);
+  // A path that cannot change yet says why on a tap, since a phone shows no tooltip.
+  const [lockedNote, setLockedNote] = useState(false);
   const reached = reachedTiers(state, id);
   const pending = pendingTier(state, id);
   const shown = picked ?? pending;
@@ -223,7 +225,10 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
               aria-expanded={shown === tier}
               title={t.growth.tier(forms[tier]!, formatNumber(count))}
               aria-label={t.growth.tier(forms[tier]!, formatNumber(count))}
-              onClick={() => setPicked(shown === tier ? null : tier)}
+              onClick={() => {
+                setPicked(shown === tier ? null : tier);
+                setLockedNote(false);
+              }}
             />
           );
         })}
@@ -255,9 +260,13 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
                 className="growth-path"
                 data-path={path}
                 aria-pressed={current}
-                disabled={!allowed}
+                aria-disabled={!allowed}
                 title={allowed ? undefined : t.growth.locked}
                 onClick={() => {
+                  if (!allowed) {
+                    setLockedNote(true);
+                    return;
+                  }
                   store.dispatch((s) => choosePath(s, id, shown, path));
                   setPicked(null);
                 }}
@@ -268,6 +277,9 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
               </button>
             );
           })}
+          <p className="growth-locked-note" aria-live="polite">
+            {lockedNote && t.growth.lockedNote}
+          </p>
         </div>
       )}
     </div>

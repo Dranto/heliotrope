@@ -259,6 +259,8 @@ export const fr = {
     tier: (form: string, count: string) => `${form}, dès ${count}`,
     choose: (form: string) => `${form}\u00a0: choisir une voie`,
     locked: 'Une voie déjà changée cette Saison',
+    lockedNote:
+      'Ce bâtiment a déjà changé de voie cette Saison\u00a0: il pourra en changer de nouveau à la prochaine.',
     forms: {
       pot: ['Jardinière fleurie', 'Mur de pots', 'Cascade de pots'],
       balconyPanel: ['Pergola solaire', 'Treille photovoltaïque', 'Façade solaire'],

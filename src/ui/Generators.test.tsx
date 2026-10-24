@@ -33,6 +33,36 @@ describe('Generators growth pips', () => {
   });
 });
 
+describe('a growth path that cannot change yet', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('says why on a tap instead of ignoring it, and keeps the path', () => {
+    const base = createInitialState(0);
+    saveGame({
+      ...base,
+      generators: { ...base.generators, pot: 60 },
+      growth: {
+        paths: { ...base.growth.paths, pot: [0, null, null] },
+        swapped: { ...base.growth.swapped, pot: 0 },
+      },
+    });
+    const store = new GameStore(localStorage, () => 0);
+    render(
+      <GameStoreContext.Provider value={store}>
+        <Generators />
+      </GameStoreContext.Provider>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Jardinière fleurie, dès 50' }));
+    const note = document.querySelector('.growth-locked-note')!;
+    expect(note.textContent).toBe('');
+    const other = document.querySelector<HTMLButtonElement>('.growth-path[data-path="1"]')!;
+    expect(other).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(other);
+    expect(note.textContent).toMatch(/déjà changé de voie cette Saison/);
+    expect(store.getState().growth.paths.pot[0]).toBe(0);
+  });
+});
+
 describe('the weather mark on a building', () => {
   beforeEach(() => localStorage.clear());
 
