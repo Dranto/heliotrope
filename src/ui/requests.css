@@ -127,7 +127,27 @@
 }
 
 .request-progress {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
   font-variant-numeric: tabular-nums;
+}
+
+/* A short gauge beside the count, so "1/10" reads as progress at a glance. */
+.request-bar {
+  position: relative;
+  width: 2.6rem;
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: rgb(31 42 36 / 0.1);
+}
+
+.request-bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold), var(--leaf));
 }
 
 .hand-card {

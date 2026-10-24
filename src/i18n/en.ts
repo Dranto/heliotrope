@@ -42,6 +42,7 @@ export const en: Texts = {
       works: 'A quarter of a great work stage',
       sky: 'One more forecast swap',
     },
+    progress: (done: string, count: string) => `Progress: ${done} of ${count}`,
     offers: (hand: string) => `Offers: ${hand}`,
     from: (district: string) => `From ${district}`,
     serve: 'Help out',
