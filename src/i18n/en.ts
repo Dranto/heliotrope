@@ -108,8 +108,9 @@ export const en: Texts = {
   upgradeTile: (name: string, cost: string, affordable: boolean) =>
     `${name}, ${cost} Light${affordable ? ', affordable' : ''}`,
   noUpgrades: 'New upgrades will appear as the neighbourhood grows.',
-  upgradeInSight: (name: string, generator: string, owned: string, required: string) =>
-    `Next: ${name} · ${generator} ${owned} / ${required}`,
+  upgradeInSight: (name: string) => `Next: ${name}`,
+  upgradeInSightCount: (generator: string, owned: string, required: string) =>
+    `${generator}: ${owned} / ${required}`,
   upgradeEffect: {
     generatorMultiplier: (generator: string) => `${generator}: production ×2`,
     clickMultiplier: 'Click value ×2',

@@ -1946,6 +1946,22 @@ button {
   color: var(--ink);
 }
 
+/* The upgrade on its own line, then the building count it waits for beside the bar. */
+.upgrade-sight-name {
+  flex: 1 1 100%;
+  font-weight: 600;
+}
+
+.upgrade-sight-count {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.upgrade-sight .achievement-next-bar {
+  flex: 1 1 4rem;
+}
+
 .empty {
   margin: 0;
   font-family: var(--serif);

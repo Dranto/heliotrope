@@ -127,9 +127,11 @@ function UpgradeInSightLine() {
   const progress = Math.min(1, sight.owned / sight.required);
   return (
     <div className="upgrade-sight" data-testid="upgrade-in-sight">
-      <span>
-        {t.upgradeInSight(
-          upgradeText(sight.upgrade).name,
+      <span className="upgrade-sight-name">
+        {t.upgradeInSight(upgradeText(sight.upgrade).name)}
+      </span>
+      <span className="upgrade-sight-count">
+        {t.upgradeInSightCount(
           t.generators[sight.generator].name,
           formatNumber(sight.owned),
           formatNumber(sight.required),
