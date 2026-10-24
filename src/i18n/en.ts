@@ -171,6 +171,7 @@ export const en: Texts = {
     achievements: (count: number) => `${count} Milestones`,
     species: (count: number) => `${count} Herbarium species`,
     milestoneFamily: (family: string) => `Every Milestone of the family ${family}`,
+    colourToWin: (colour: string, condition: string) => `${colour} to win: ${condition}`,
   },
   photo: {
     open: 'Photo',

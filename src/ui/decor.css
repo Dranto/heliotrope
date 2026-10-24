@@ -234,7 +234,8 @@
   font-weight: 600;
 }
 
-.toolbar-pill:disabled {
+.toolbar-pill:disabled,
+.toolbar-pill[aria-disabled='true'] {
   opacity: 0.45;
   cursor: default;
 }
