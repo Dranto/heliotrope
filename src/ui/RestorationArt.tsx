@@ -305,12 +305,30 @@ function Park() {
     [x + w - 16, y + h - 18, 10],
     [x + w - 30, y + h - 12, 7],
     [x + 14, y + h - 22, 8],
+    [x + w - 13, y + 13, 7],
+  ];
+  // Flowering shrubs along the top and bottom edges, clear of the trees and the path.
+  const shrubs: [number, number, number][] = [
+    ...Array.from({ length: 7 }, (_, i): [number, number, number] => [
+      x + 42 + i * 5.6 + (noise(i, 35) - 0.5) * 2.4,
+      y + 5 + (noise(i, 31) - 0.5) * 3.4,
+      2 + noise(i, 32) * 2,
+    ]),
+    ...Array.from({ length: 8 }, (_, i): [number, number, number] => [
+      x + 26 + i * 5.4 + (noise(i, 36) - 0.5) * 2.4,
+      y + h - 5.5 + (noise(i, 33) - 0.5) * 3.4,
+      2 + noise(i, 34) * 2,
+    ]),
   ];
   const path = `M${x} ${y + h * 0.7} C${x + w * 0.3} ${y + h * 0.75} ${x + w * 0.4} ${y + h * 0.2} ${x + w} ${y + h * 0.3}`;
   const [px, py] = [x + w * 0.62, y + h * 0.58];
   return (
     <g>
       <Surface box={[x, y, w, h]} rx={4} className="lawn" texture="lawn-stripes" />
+      <Tufts box={[x + 4, y + 4, w - 8, h - 8]} count={34} salt={21} />
+      {/* Daisies left in the lawn, more of them where the mower passes less. */}
+      <Flowers box={[x + w * 0.42, y + h * 0.74, w * 0.3, h * 0.16]} count={9} salt={23} />
+      <Flowers box={[x + w * 0.05, y + h * 0.12, w * 0.32, h * 0.18]} count={7} salt={27} />
       <path d={path} className="park-path-edge" />
       <path d={path} className="park-path" />
       <ellipse cx={px} cy={py} rx="18.4" ry="13.2" className="pond-bank" />
@@ -336,6 +354,16 @@ function Park() {
       <Flowers box={[x + w * 0.2, y + h * 0.42, w * 0.22, h * 0.14]} count={22} salt={5} />
       <Bench x={x + w * 0.5} y={y + h * 0.3} />
       <Bench x={x + w * 0.16} y={y + h * 0.62} />
+      {shrubs.map(([cx, cy, r], i) => (
+        <g key={i}>
+          <circle cx={cx + 1} cy={cy + 1} r={r} className="tree-shadow" />
+          <circle cx={cx} cy={cy} r={r} className="hedge" />
+          <circle cx={cx - r * 0.3} cy={cy - r * 0.3} r={r * 0.5} className="foliage-light" />
+          {i % 3 === 1 && (
+            <circle cx={cx + r * 0.3} cy={cy + r * 0.1} r={r * 0.3} className="blossom" />
+          )}
+        </g>
+      ))}
       {clumps.map(([cx, cy, r], i) => (
         <Tree key={i} x={cx} y={cy} r={r} bloom={i === 1} />
       ))}
