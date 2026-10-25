@@ -8,11 +8,14 @@ import {
   checkBloom,
   chooseAlliance,
   isAwake,
+  MAX_SLOTS,
+  slotSourcesLeft,
   takeOutAlliance,
   validAlliances,
   workingAlliances,
 } from './alliances';
 import { costFactor, globalBonus } from './bonuses';
+import { LANDSCAPE_IDS } from './cityData';
 import { SITE_IDS } from './bioregion';
 import { stageCount, WORK_IDS } from './greatWorks';
 import { deserialize, serialize } from './save';
@@ -88,6 +91,23 @@ describe('the alliances (§9.9)', () => {
       alliances: { ...state.alliances, bloomed: true },
     };
     expect(allianceSlots(more)).toBe(6);
+  });
+
+  it('name the ways still left to open a slot', () => {
+    const state = grown();
+    expect(slotSourcesLeft(state)).toEqual(['works', 'bloom', 'sister']);
+    const more = {
+      ...state,
+      greatWorks: allWorks(state),
+      alliances: { ...state.alliances, bloomed: true },
+    };
+    expect(slotSourcesLeft(more)).toEqual(['sister']);
+    const full = {
+      ...more,
+      city: { ...more.city, founded: [...LANDSCAPE_IDS] },
+    };
+    expect(allianceSlots(full)).toBe(MAX_SLOTS);
+    expect(slotSourcesLeft(full)).toEqual([]);
   });
 
   it('take one out once per Cycle of water', () => {

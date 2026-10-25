@@ -1,5 +1,5 @@
 // English texts (docs/game-design.md §14 Q1). Same shape as the French reference, `Texts`.
-import type { AllianceId } from '../game/alliances';
+import type { AllianceId, SlotSource } from '../game/alliances';
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FamilyId } from '../game/families';
@@ -802,8 +802,13 @@ export const en: Texts = {
     title: 'The alliances',
     hint: 'An alliance links two things you have grown. It wakes once both reach their threshold, and works only while it holds a slot. One can be taken out per Season before the first Cycle of water, then one per Cycle.',
     slots: (used: string, total: string) => `Slots: ${used} of ${total}`,
-    slotsHint:
-      'Two slots from the 2nd Season, three with the Bioregion, one more with two great works complete, with each sister city and with the grand bloom (eight at most).',
+    slotsToCome: (ways: string) => `More slots: ${ways}.`,
+    slotSources: {
+      bioregion: 'by opening the Bioregion',
+      works: 'with two great works complete',
+      bloom: 'with the grand bloom',
+      sister: 'with each sister city',
+    } satisfies Record<SlotSource, string>,
     names: {
       orchardBees: 'The orchard’s bees',
       tramMarket: 'The tram market',
