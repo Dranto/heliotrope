@@ -294,8 +294,13 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
           <button
             type="button"
             className="season-button"
-            disabled={!available}
+            // Still focusable and tappable while blocked, so a tap says why (no tooltip on phone).
+            aria-disabled={!available}
             onClick={() => {
+              if (!available) {
+                setMessage(growing > 0 ? t.seeds.ripening(ripening) : t.seeds.noSeedYet);
+                return;
+              }
               setMessage('');
               setConfirming(true);
             }}

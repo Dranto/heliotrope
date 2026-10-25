@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { saveGame } from '../game/save';
 import { createInitialState } from '../game/state';
@@ -58,5 +58,23 @@ describe('Seasons', () => {
     const rule = /^\.prestige-actions \{([^}]*)\}/m.exec(css)![1]!;
     expect(rule).toMatch(/position: sticky;/);
     expect(rule).toMatch(/bottom: -1\.5rem;/);
+  });
+
+  it('keeps a blocked start button tappable and says why on a tap', () => {
+    saveGame(createInitialState(0));
+    renderSeasons();
+    const button = screen.getByRole('button', { name: 'Commencer une nouvelle Saison' });
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(button);
+    expect(screen.getByRole('status')).toHaveTextContent(/au moins une Graine/);
+    expect(screen.queryByRole('button', { name: 'Oui, replanter' })).not.toBeInTheDocument();
+  });
+
+  it('says how long the Seeds still ripen when the start button is tapped too early', () => {
+    saveGame({ ...createInitialState(0), allTimeLight: 1e15, seasonSeconds: 60 });
+    renderSeasons();
+    fireEvent.click(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' }));
+    expect(screen.getByRole('status')).toHaveTextContent(/Les Graines mûrissent/);
   });
 });

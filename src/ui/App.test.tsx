@@ -329,7 +329,10 @@ describe('App', () => {
     expect(
       screen.getByRole('progressbar', { name: 'Graines mûres à 66,7\u00a0%' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
     fireEvent.click(screen.getByRole('button', { name: /Fermer les Saisons/ }));
     act(() => store.dispatch((s) => ({ ...s, playSeconds: 900, seasonSeconds: 900 })));
     fireEvent.click(screen.getByRole('button', { name: 'Saisons, 2 Graines à gagner' }));
@@ -355,7 +358,10 @@ describe('App', () => {
     });
     expect(store.getState().generators.arcology).toBe(0);
     expect(screen.getByText('La 2ᵉ Saison commence. La terre se souvient.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
     expect(screen.getByTestId('seeds-chip')).toHaveTextContent('2');
     // The new Season is saved right away.
     expect(new GameStore(localStorage, () => 0).getState().seeds).toBe(2);
