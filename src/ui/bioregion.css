@@ -392,6 +392,38 @@
   fill: rgb(255 250 230 / 0.4);
 }
 
+/* The open hillside: grass tufts, heather, broom in flower and grey boulders. */
+.bioregion-land .hill-tuft {
+  fill: none;
+  stroke: #7f9d5c;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.bioregion-land .heather {
+  fill: #b48cc0;
+  stroke: #8f6aa0;
+  stroke-width: 0.6;
+}
+
+.bioregion-land .broom {
+  fill: #f2c94c;
+  stroke: #c9a03a;
+  stroke-width: 0.6;
+}
+
+.bioregion-land .boulder {
+  fill: #c9c2b2;
+}
+
+.bioregion-land .boulder-shadow {
+  fill: rgb(110 90 60 / 0.22);
+}
+
+.bioregion-land .boulder-light {
+  fill: rgb(255 255 255 / 0.45);
+}
+
 .bioregion-land .field-edge {
   fill: none;
   stroke: rgb(255 250 235 / 0.55);

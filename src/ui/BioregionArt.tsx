@@ -10,6 +10,7 @@ import { t } from '../i18n';
 import {
   CANALS,
   HILLS,
+  type Hill,
   LAND,
   RAIN,
   RIVER,
@@ -262,6 +263,65 @@ export function MarshArt({ x, y, rx, ry, angle }: Marsh) {
   );
 }
 
+/** How many clumps grow on each hill, and the golden angle that spreads them evenly. */
+const HILL_CLUMPS = 40;
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
+/**
+ * The open hillside between the contour lines: tufts of grass, heather, flowering broom and a few
+ * grey boulders, spread by the golden angle and picked by a stable hash so each hill differs.
+ */
+function HillGrowth({ hill }: { hill: Hill }) {
+  return (
+    <g className="hill-growth">
+      {Array.from({ length: HILL_CLUMPS }, (_, i) => {
+        const f = 0.3 + 0.62 * Math.sqrt((i + 0.5) / HILL_CLUMPS);
+        const a = i * GOLDEN_ANGLE + hill.x * 0.01;
+        const x = Math.round(hill.x + Math.cos(a) * hill.rx * f);
+        const y = Math.round(hill.y + Math.sin(a) * hill.ry * f);
+        const kind = landHash(x, y) % 6;
+        if (kind === 0) {
+          return (
+            <g key={i} data-clump="boulder">
+              <ellipse cx={x + 2.5} cy={y + 3} rx="11" ry="7" className="boulder-shadow" />
+              <ellipse cx={x} cy={y} rx="11" ry="7.5" className="boulder" />
+              <ellipse cx={x - 3} cy={y - 2.5} rx="5" ry="2.8" className="boulder-light" />
+            </g>
+          );
+        }
+        if (kind === 1 || kind === 2) {
+          return (
+            <g key={i} data-clump={kind === 1 ? 'heather' : 'broom'}>
+              {[
+                [-6, 2, 6],
+                [5, 1, 6.5],
+                [0, -5, 5.5],
+                [8, -5, 4],
+              ].map(([dx, dy, r]) => (
+                <circle
+                  key={`${dx},${dy}`}
+                  cx={x + dx!}
+                  cy={y + dy!}
+                  r={r}
+                  className={kind === 1 ? 'heather' : 'broom'}
+                />
+              ))}
+            </g>
+          );
+        }
+        return (
+          <path
+            key={i}
+            data-clump="tuft"
+            d={`M${x - 6} ${y}l1.5 -9M${x} ${y}l0 -12M${x + 6} ${y}l-1.5 -9M${x - 3} ${y}l-5 -6M${x + 3} ${y}l5 -6`}
+            className="hill-tuft"
+          />
+        );
+      })}
+    </g>
+  );
+}
+
 export function Hills() {
   return (
     <g className="hills">
@@ -292,6 +352,7 @@ export function Hills() {
               className="contour"
             />
           ))}
+          <HillGrowth hill={hill} />
         </g>
       ))}
     </g>
