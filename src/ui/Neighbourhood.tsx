@@ -160,7 +160,7 @@ function hash(x: number, y: number): number {
  * A building seen from above with a hint of its south facade, so its height reads at a glance:
  * a strip of windows under the roof edge, then the roof with its parapet and equipment.
  */
-function Roof({
+export function Roof({
   box: [x, y, w, h],
   storeys,
   fill,
@@ -169,7 +169,7 @@ function Roof({
   box: Box;
   storeys: number;
   fill: string;
-  /** Roofs that carry a garden keep their edge and facade, without equipment. */
+  /** Roofs that carry a garden keep their membrane and parapet, without equipment. */
   bare?: boolean;
 }) {
   const facade = Math.min(storeys * 1.3 + 1.5, h * 0.24);
@@ -188,31 +188,29 @@ function Roof({
       />
       <rect x={x} y={y} width={w} height={top} rx="2" fill={fill} />
       <rect x={x} y={y} width={w} height={top} rx="2" fill="url(#roof-sheen)" />
+      {/* A garden covers only part of its roof: the rest keeps its gravel, seams and parapet. */}
+      <rect
+        x={x + 1.5}
+        y={y + 1.5}
+        width={w - 3}
+        height={top - 3}
+        rx="1"
+        fill="url(#roof-gravel)"
+      />
+      {seams > 1 && (
+        <path
+          className="seams"
+          d={Array.from(
+            { length: seams - 1 },
+            (_, i) => `M${x + (w / seams) * (i + 1)} ${y + 2.5}V${y + top - 2.5}`,
+          ).join('')}
+        />
+      )}
+      {/* The parapet shades a strip of roof inside its sunny edge, then catches the light. */}
+      <path className="parapet-shade" d={`M${x + 2.4} ${y + top - 2}V${y + 2.4}H${x + w - 2}`} />
+      <rect className="parapet" x={x + 2} y={y + 2} width={w - 4} height={top - 4} rx="1" />
       {!bare && (
         <>
-          <rect
-            x={x + 1.5}
-            y={y + 1.5}
-            width={w - 3}
-            height={top - 3}
-            rx="1"
-            fill="url(#roof-gravel)"
-          />
-          {seams > 1 && (
-            <path
-              className="seams"
-              d={Array.from(
-                { length: seams - 1 },
-                (_, i) => `M${x + (w / seams) * (i + 1)} ${y + 2.5}V${y + top - 2.5}`,
-              ).join('')}
-            />
-          )}
-          {/* The parapet shades a strip of roof inside its sunny edge, then catches the light. */}
-          <path
-            className="parapet-shade"
-            d={`M${x + 2.4} ${y + top - 2}V${y + 2.4}H${x + w - 2}`}
-          />
-          <rect className="parapet" x={x + 2} y={y + 2} width={w - 4} height={top - 4} rx="1" />
           {seed % 3 === 0 && w > 30 && (
             <path
               className="skylights"
