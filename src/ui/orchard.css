@@ -310,7 +310,8 @@
 
 .orchard-varieties li {
   padding: 0.15rem 0.6rem;
-  border-radius: 999px;
+  /* Round on one line, a soft card when the bonus wraps onto a second. */
+  border-radius: 0.8rem;
   background: rgb(31 42 36 / 0.06);
   color: var(--ink-soft);
 }

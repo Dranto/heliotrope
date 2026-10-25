@@ -160,11 +160,12 @@ export function Orchard({ onHarvestAll }: { onHarvestAll: () => void }) {
       <ul className="orchard-varieties">
         {FRUIT_IDS.map((id) => {
           const found = orchard.varieties.includes(id);
+          const name = found
+            ? t.orchard.varieties[id]
+            : t.orchard.unknownVariety(t.orchard.names[id]);
           return (
-            <li key={id} data-found={found} title={bonusesText(fruitVarietyBonuses([id]))}>
-              {found
-                ? `${t.orchard.varieties[id]} · ${bonusesText(fruitVarietyBonuses([id]))}`
-                : t.orchard.unknownVariety(t.orchard.names[id])}
+            <li key={id} data-found={found}>
+              {`${name} · ${bonusesText(fruitVarietyBonuses([id]))}`}
             </li>
           );
         })}
