@@ -101,4 +101,17 @@ describe('the alliances panel', () => {
     expect(taken.querySelector('.alliance-blocked')?.textContent).toBe('');
     expect(store.getState().alliances.chosen).toEqual(chosen);
   });
+  it('writes how more slots open instead of hiding it in a tooltip', () => {
+    saveGame(grown());
+    const store = new GameStore(localStorage, () => 0);
+    render(
+      <GameStoreContext.Provider value={store}>
+        <Alliances />
+      </GameStoreContext.Provider>,
+    );
+    expect(document.querySelector('.alliances-slots')).not.toHaveAttribute('title');
+    expect(document.querySelector('.alliances-to-come')?.textContent).toBe(
+      'Prochaines places\u00a0: avec deux grands chantiers achevés, avec la grande floraison, avec chaque ville sœur.',
+    );
+  });
 });

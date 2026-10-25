@@ -1,6 +1,6 @@
 // French texts, the reference language (docs/game-design.md §14 Q1). Every other language
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
-import type { AllianceId } from '../game/alliances';
+import type { AllianceId, SlotSource } from '../game/alliances';
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FruitId } from '../game/fruits';
@@ -875,8 +875,13 @@ export const fr = {
     title: 'Les alliances',
     hint: 'Une alliance relie deux choses que vous avez fait grandir. Elle s’éveille quand les deux atteignent leur seuil, et ne joue que si elle occupe une place. On peut en retirer une par Saison avant le premier Cycle de l’eau, puis une par Cycle.',
     slots: (used: string, total: string) => `Places\u00a0: ${used} sur ${total}`,
-    slotsHint:
-      'Deux places dès la 2ᵉ Saison, trois avec la Biorégion, une de plus avec deux grands chantiers achevés, avec chaque ville sœur et avec la grande floraison (huit au plus).',
+    slotsToCome: (ways: string) => `Prochaines places\u00a0: ${ways}.`,
+    slotSources: {
+      bioregion: 'en ouvrant la Biorégion',
+      works: 'avec deux grands chantiers achevés',
+      bloom: 'avec la grande floraison',
+      sister: 'avec chaque ville sœur',
+    } satisfies Record<SlotSource, string>,
     names: {
       orchardBees: 'Les abeilles du verger',
       tramMarket: 'Le marché du tram',

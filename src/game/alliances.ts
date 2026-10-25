@@ -269,6 +269,20 @@ export function allianceSlots(state: GameState): number {
   );
 }
 
+/** What can still open an alliance slot, in the order a player usually meets it. */
+export type SlotSource = 'bioregion' | 'works' | 'bloom' | 'sister';
+
+/** The ways left to gain a slot; empty once every slot is open. */
+export function slotSourcesLeft(state: GameState): SlotSource[] {
+  if (allianceSlots(state) >= MAX_SLOTS) return [];
+  const left: SlotSource[] = [];
+  if (!isBioregionOpen(state)) left.push('bioregion');
+  if (worksBuilt(state) < 2) left.push('works');
+  if (!state.alliances.bloomed) left.push('bloom');
+  left.push('sister');
+  return left;
+}
+
 export function canChoose(state: GameState, id: AllianceId): boolean {
   const { chosen } = state.alliances;
   return !chosen.includes(id) && chosen.length < allianceSlots(state);

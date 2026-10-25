@@ -2,6 +2,7 @@ import {
   ALLIANCE_IDS,
   ALLIANCES,
   allianceSlots,
+  slotSourcesLeft,
   areAlliancesOpen,
   canChoose,
   canTakeOut,
@@ -34,6 +35,7 @@ export function Alliances() {
   if (!areAlliancesOpen(state)) return null;
   const { chosen } = state.alliances;
   const slots = allianceSlots(state);
+  const toCome = slotSourcesLeft(state);
   // Twelve alliances (M34): the chosen ones first, then those awake; those still asleep wait
   // folded below, so the panel stays short on a phone.
   const rank = (id: AllianceId) => (chosen.includes(id) ? 0 : 1);
@@ -101,11 +103,16 @@ export function Alliances() {
         <PanelTitle id="alliances-title" open={open} onToggle={toggle}>
           {t.alliances.title}
         </PanelTitle>
-        <span className="alliances-slots" title={t.alliances.slotsHint}>
+        <span className="alliances-slots">
           {t.alliances.slots(formatNumber(chosen.length), formatNumber(slots))}
         </span>
       </header>
       <p className="hint">{t.alliances.hint}</p>
+      {toCome.length > 0 && (
+        <p className="hint alliances-to-come">
+          {t.alliances.slotsToCome(toCome.map((way) => t.alliances.slotSources[way]).join(', '))}
+        </p>
+      )}
       {shown.length > 0 && <ul className="alliances-list">{shown.map(card)}</ul>}
       {asleep.length > 0 && (
         <details className="alliances-asleep" open={shown.length === 0}>
