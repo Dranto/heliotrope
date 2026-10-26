@@ -502,6 +502,37 @@ export function buildingArt(
       `<rect x="${x + 1.5}" y="${y + 1.5}" width="${w - 3}" height="${top - 3}" rx="1.5" fill="url(#sedum)" opacity=".45"/>`,
       `<path d="${path}" stroke="#ddd3bf" stroke-width="1.6" stroke-linecap="round"/><path d="${path}" stroke="#f1eadb" stroke-width=".5" stroke-dasharray=".4 .8" stroke-linecap="round"/>`,
     );
+    // Cushions of shrubs off the walkway give the carpet some relief: a shadow away from the
+    // sun, a body, and a lit cap on the sun's side; two hives on a large roof.
+    const wide = w >= top;
+    const along = wide ? w - 10 : top - 10;
+    const cushions = Math.max(2, Math.floor(along / 22));
+    for (let i = 0; i < cushions; i++) {
+      const f = (i + 0.5 + (rnd(seed, i + 1200) - 0.5) * 0.5) / cushions;
+      const side = (i + seed) % 2 === 0 ? -1 : 1;
+      const offset = (wide ? top : w) * (0.24 + rnd(seed, i + 1500) * 0.06) * side;
+      const cx = wide ? x + 5 + along * f : x + w / 2 + offset;
+      const cy = wide ? y + top / 2 + offset : y + 5 + along * f;
+      const size = 2.4 + rnd(seed, i + 1800) * 1.2;
+      const leaf = i % 3 === 2 ? shade(ctx.palette.foliage, 0.12) : ctx.palette.foliage;
+      parts.push(
+        `<ellipse cx="${r(cx - lit * size * 0.45)}" cy="${r(cy + size * 0.4)}" rx="${r(size * 1.05)}" ry="${r(size * 0.8)}" fill="#3b3328" opacity=".2"/>`,
+        `<circle cx="${r(cx)}" cy="${r(cy)}" r="${r(size)}" fill="${leaf}"/>`,
+        `<circle cx="${r(cx + lit * size * 0.32)}" cy="${r(cy - size * 0.3)}" r="${r(size * 0.55)}" fill="${shade(leaf, 0.22)}"/>`,
+        `<circle cx="${r(cx - lit * size * 0.2)}" cy="${r(cy + size * 0.1)}" r=".3" fill="${i % 2 === 0 ? LILAC : GOLD_SOFT}"/>`,
+      );
+    }
+    if (w * top >= 1800) {
+      const hx = wide ? x + w - 12 : x + w / 2 + 3;
+      const hy = wide ? y + top / 2 + 3 : y + top - 10;
+      for (const dx of [0, 4.4]) {
+        parts.push(
+          `<rect x="${r(hx + dx + 0.5)}" y="${r(hy + 0.6)}" width="3.4" height="2.8" rx=".35" fill="#3b3328" opacity=".2"/>`,
+          `<rect x="${r(hx + dx)}" y="${r(hy)}" width="3.4" height="2.8" rx=".35" fill="#f3e6c4" stroke="#b08a52" stroke-width=".25"/>`,
+          `<path d="M${r(hx + dx)} ${r(hy + 0.95)}h3.4M${r(hx + dx)} ${r(hy + 1.85)}h3.4" stroke="#d6bf8a" stroke-width=".2"/>`,
+        );
+      }
+    }
   }
   // Parapet: a light rim on the sun's side, a dark one on the other, and the strip of roof it
   // shades just inside the sunny edge.
