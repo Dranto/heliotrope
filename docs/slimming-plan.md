@@ -3,7 +3,8 @@
 > Statut : proposé le 2026-10-26 à la demande d'Antoine : « étoffer le jeu et supprimer les mécaniques de
 > gameplay avec peu d'impact et peu compréhensibles pour alléger le jeu et se concentrer sur renforcer les
 > mécaniques intéressantes (bâtir / améliorer / quartier / étendre l'arbre des saisons / avoir de vrais choix
-> impactants pour la partie) ». Rien n'est retiré tant qu'Antoine n'a pas validé ce plan. Chaque lot est une PR,
+> impactants pour la partie) ». Validé et élargi par Antoine le même soir : retirer aussi les Saisons et Cycles
+> à défi (« ils ne rapportent rien »), le mode photo et la personnalisation du décor. Chaque lot est une PR,
 > dans l'ordre, avec le design doc mis à jour dans la même PR.
 
 ## 1. D'où l'on part
@@ -39,25 +40,32 @@ par design, et le joueur de référence ne perd rien à prendre toujours la prem
 | **Verger, ruches, miel**, apiculteurs | Aucun fruit dans la partie mesurée (2 jours réels par arbre) | Les fraises s'ouvrent avec la Biorégion au lieu de la 1ʳᵉ ruche |
 | **Cadeaux des Jalons** | Un geste de plus sans effet mesuré | Le +1 % par Jalon et les familles complètes restent |
 | **Bouquet** | Invisible (quelques secondes par heure), mal compris | Rien |
+| **Saisons à défi** (4) | Antoine : « ils ne rapportent rien » ; le joueur de référence ne les joue pas | Leurs 4 espèces reviennent autrement (ci-dessous) |
+| **Cycles à défi** (3) et le bras des crues | Idem | Leurs 3 espèces reviennent autrement ; le bras des crues rend les sites moins chers |
+| **Décor** (pièces, emplacements, couleurs de l'héliotrope) | Aucun effet sur la partie, par design | L'héliotrope garde ses fleurs lilas ; les familles de Jalons gardent leur bonus |
+| **Mode photo** | Aucun effet sur la partie | Rien |
 
-Soit 9 panneaux ou gestes de moins, environ 4 000 lignes de jeu et d'interface, et quatre entrées de moins dans
+Soit 13 panneaux, écrans ou gestes de moins, plus de 5 000 lignes de jeu et d'interface, et quatre entrées de moins dans
 la file « une nouveauté à la fois » (§10.8), qui ouvre ainsi plus tôt ce qui reste.
 
 **Ce qui reste mais se simplifie.**
 
 - **La météo** : un temps favorise ses bâtiments (×1,25), sans plus. On retire son effet sur les chances du
   Papillon, sur les voies (« sous leur ciel ») et sur chaque culture du potager. Les cinq espèces du temps restent.
-- **L'Herbier** : aucune espèce ne revient par une mécanique retirée, rien ne change pour elles. La famille « Espèces du temps » donne un bonus simple (biodiversité ×1,1).
-- **Les Jalons** : la quinzaine de Jalons liés aux mécaniques retirées (Première alliance, La toile du vivant,
+- **L'Herbier** : les sept espèces des défis reviennent par le jeu lui-même, par exemple le martin-pêcheur avec
+  les Ruisseaux rouverts, la chouette hulotte à 10 Saisons accomplies, l'orchis avec l'Arbre complet, la loutre,
+  le saumon et la cigogne noire avec les Cycles et les sites (liste exacte au lot 4). L'Herbier complet devient
+  atteignable sans défi. La famille « Espèces du temps » donne un bonus simple (biodiversité ×1,1).
+- **Les Jalons** : la vingtaine de Jalons liés aux mécaniques retirées (Première alliance, La toile du vivant,
   La grande floraison, Premier service, Bon voisin, Bonjour voisin, Première pierre, Grands travaux, Premier
-  fruit, Vieux vergers, Vieil arbre, Bouquet, Grand bouquet…) sont remplacés un pour un par des Jalons des
+  fruit, Vieux vergers, Vieil arbre, Bouquet, Grand bouquet, les Jalons des défis…) sont remplacés un pour un par des Jalons des
   mécaniques renforcées (§4), pour que le compte et le bonus d'un joueur ne baissent jamais.
 
 ## 3. Ce qui ne bouge pas
 
-Le clic et le pollen, le Papillon doré, les visites, le potager (sans paniers), les parcelles, les projets, les
-quartiers voisins, les Saisons et leurs défis, la Biorégion, les Cycles et leurs défis, le delta, les villes
-sœurs et l'atelier, les Coopératives, le hors ligne, le décor et le mode photo.
+Le clic et le pollen, le Papillon doré, les visites, le potager (sans paniers), les parcelles et leurs avenirs,
+les projets, les quartiers voisins, les Saisons, la Biorégion, les Cycles, le delta, les villes sœurs et
+l'atelier, les Coopératives, le hors ligne, le soir et la nuit, la musique.
 
 ## 4. Ce qui se renforce
 
@@ -65,21 +73,21 @@ Principe : chaque renfort donne **un vrai choix**, dont les options mènent à d
 **touche ce qui fixe le rythme** au milieu de partie (la maturité des Graines, l'Eau, les prix) plutôt qu'un
 multiplicateur de Lumière qui ne se voit pas.
 
-### 4.1 Bâtir : des voies qui engagent (lot 4)
+### 4.1 Bâtir : des voies qui engagent (lot 5)
 
 Les 24 voies (§5.5) deviennent des spécialisations : à chaque forme, **l'une renforce fort le bâtiment
 (×2 au lieu de ×1,25-1,5), l'autre le relie à un système** (Graines qui mûrissent plus vite, Eau, prix,
 clic), avec des effets nettement plus marqués. Une voie se change **une fois par Cycle** au lieu d'une fois par
 Saison. Le panneau Bâtir montre ce que chaque voie change à la partie (« la Saison mûrit 20 s plus vite »).
 
-### 4.2 Améliorer : des paliers qui changent une règle (lot 5)
+### 4.2 Améliorer : des paliers qui changent une règle (lot 6)
 
 Après les seuils ×2, une amélioration par bâtiment à 150 puis 300 exemplaires **change une règle** au lieu de
 doubler (les pots comptent double dans la biodiversité, les serres font pousser le potager, les centrales
 baissent le prix des collecteurs…). Les synergies gagnent un second rang (« Synergies renforcées ») qui double
 leur bonus, au milieu des Saisons tardives où le panneau se vide.
 
-### 4.3 Le quartier : des avenirs qui comptent et des quartiers qui pressent la Saison (lot 6)
+### 4.3 Le quartier : des avenirs qui comptent et des quartiers qui pressent la Saison (lot 7)
 
 - **Les avenirs** (§6.5) deviennent un choix entre deux styles : le premier avenir sert la Lumière, le second
   l'Eau ou les Graines (par exemple Rivière baignade : les Graines mûrissent 30 s plus vite). Les trames
@@ -89,7 +97,7 @@ leur bonus, au milieu des Saisons tardives où le panneau se vide.
   tram, pour que restaurer la périphérie se sente.
 - **Le simulateur** les restaure (il ne le faisait pas), pour que les cibles du §8 les comptent.
 
-### 4.4 L'Arbre des Saisons s'étend (lot 7)
+### 4.4 L'Arbre des Saisons s'étend (lot 8)
 
 - **Une quatrième branche, « Le Quartier »** (5 talents) : les remises des projets, la parcelle la plus chère à
   moitié prix chaque Saison, le clic ×2 de l'ancien Marché du tram, les bâtiments 10 % moins chers des Racines
@@ -99,10 +107,10 @@ leur bonus, au milieu des Saisons tardives où le panneau se vide.
   l'eau, pas avant : c'est l'orientation de toute une série de Saisons.
 - **La Canopée** reste, avec ses niveaux, au-dessus des quatre branches.
 
-### 4.5 Rééquilibrage et mesure (lot 8)
+### 4.5 Rééquilibrage et mesure (lot 9)
 
 Les retraits ôtent peu au rythme mesuré (aucune des mécaniques retirées ne le change), les renforts l'accélèrent.
-Le lot 8 remesure toutes les cibles du §8, ajoute au test du simulateur un **joueur attentif** (potager
+Le lot 9 remesure toutes les cibles du §8, ajoute au test du simulateur un **joueur attentif** (potager
 toutes les 3 min, visites accueillies, quartiers restaurés) avec ses propres cibles, et corrige la règle de
 relance à ×1,5 Sources qui rend l'essaimage instable (3 h ou 4 h selon les bonus).
 
@@ -110,7 +118,9 @@ relance à ×1,5 Sources qui rend l'essaimage instable (3 h ou 4 h selon les bon
 
 Chaque lot qui retire une mécanique monte `STATE_VERSION` et ajoute une migration dans `save.ts` qui efface ses
 champs. Ce qu'un joueur y avait mis ne lui donnait presque rien : il ne perd ni production ni Jalons (§2).
-Les paniers, le miel et les arbres disparaissent sans compensation ; les cultures en cours restent.
+Les paniers, le miel et les arbres disparaissent sans compensation ; les cultures en cours restent. Les
+espèces déjà ramenées par un défi restent dans l'Herbier ; les bonus gagnés aux défis (synergies ×1,25,
+production +10 %…) disparaissent avec eux, ce qui coûte quelques pour cent à un joueur qui les avait.
 
 ## 6. Les lots
 
@@ -119,11 +129,12 @@ Les paniers, le miel et les arbres disparaissent sans compensation ; les culture
 | 1 | Retirer alliances, grande floraison, bouquet, cadeaux des Jalons | +1 |
 | 2 | Retirer demandes, coups de main, liens, saluts, échange de prévision ; météo simplifiée | +1 |
 | 3 | Retirer grands chantiers, paniers, verger, ruches, miel ; fraises avec la Biorégion | +1 |
-| 4 | Bâtir : voies qui engagent | +1 |
-| 5 | Améliorer : paliers qui changent une règle, synergies renforcées | +1 |
-| 6 | Quartier : avenirs à deux styles, quartiers voisins sur le rythme, simulateur qui les restaure | — |
-| 7 | Arbre : branche du Quartier, fourches | +1 |
-| 8 | Rééquilibrage, joueur attentif, règle de relance | — |
+| 4 | Retirer Saisons et Cycles à défi, décor, couleurs, mode photo ; nouvelles conditions des espèces | +1 |
+| 5 | Bâtir : voies qui engagent | +1 |
+| 6 | Améliorer : paliers qui changent une règle, synergies renforcées | +1 |
+| 7 | Quartier : avenirs à deux styles, quartiers voisins sur le rythme, simulateur qui les restaure | — |
+| 8 | Arbre : branche du Quartier, fourches | +1 |
+| 9 | Rééquilibrage, joueur attentif, règle de relance | — |
 
-Les Jalons de remplacement (§2) arrivent avec les lots 4 à 7. Chaque lot garde les cibles du §8 dans les ±30 %
+Les Jalons de remplacement (§2) arrivent avec les lots 5 à 8. Chaque lot garde les cibles du §8 dans les ±30 %
 ou les remesure dans la même PR.
