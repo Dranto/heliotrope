@@ -74,6 +74,17 @@ describe('drawings of the enriched map (§10.4)', () => {
     expect(buildingArt(ctx, [0, 0, 40, 30], 4).svg).not.toContain('#8a7259');
   });
 
+  it('gives a sedum roof shrub cushions with a shadow, and hives only on a large roof', () => {
+    const ctx: ArtContext = { palette: palette(3, null), lit: 1, greenness: 0.8 };
+    const roof = (box: [number, number, number, number]) =>
+      buildingArt(ctx, box, 3, { sedum: true }).svg;
+    const big = roof([0, 0, 120, 60]);
+    expect(big.match(/opacity=".2"\/><circle/g)!.length).toBeGreaterThanOrEqual(4);
+    expect(big.match(/fill="#f3e6c4"/g)).toHaveLength(2);
+    expect(roof([0, 0, 40, 30])).not.toContain('#f3e6c4');
+    expect(buildingArt(ctx, [0, 0, 120, 60], 3).svg).not.toContain('#f3e6c4');
+  });
+
   it('lets pioneer plants, a buddleia and a puddle take back a waste ground, more on a large one', () => {
     const ctx: ArtContext = { palette: palette(1, null), lit: 1, greenness: 0 };
     const ground = (box: [number, number, number, number]) =>
