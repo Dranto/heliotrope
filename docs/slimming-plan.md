@@ -58,8 +58,9 @@ la file « une nouveauté à la fois » (§10.8), qui ouvre ainsi plus tôt ce q
   atteignable sans défi. La famille « Espèces du temps » donne un bonus simple (biodiversité ×1,1).
 - **Les Jalons** : la vingtaine de Jalons liés aux mécaniques retirées (Première alliance, La toile du vivant,
   La grande floraison, Premier service, Bon voisin, Bonjour voisin, Première pierre, Grands travaux, Premier
-  fruit, Vieux vergers, Vieil arbre, Bouquet, Grand bouquet, les Jalons des défis…) sont remplacés un pour un par des Jalons des
-  mécaniques renforcées (§4), pour que le compte et le bonus d'un joueur ne baissent jamais.
+  fruit, Vieux vergers, Vieil arbre, Bouquet, Grand bouquet, les Jalons des défis…) quittent la liste. Ceux
+  qu'un joueur a déjà atteints restent comptés dans son bonus (« Jalons d'autrefois ») : son bonus ne baisse
+  jamais. Les mécaniques renforcées (§4) apportent leurs propres Jalons.
 
 ## 3. Ce qui ne bouge pas
 
@@ -117,7 +118,7 @@ relance à ×1,5 Sources qui rend l'essaimage instable (3 h ou 4 h selon les bon
 ## 5. Les sauvegardes
 
 Chaque lot qui retire une mécanique monte `STATE_VERSION` et ajoute une migration dans `save.ts` qui efface ses
-champs. Ce qu'un joueur y avait mis ne lui donnait presque rien : il ne perd ni production ni Jalons (§2).
+champs. Ce qu'un joueur y avait mis ne lui donnait presque rien : il ne perd ni production ni bonus de Jalons (§2).
 Les paniers, le miel et les arbres disparaissent sans compensation ; les cultures en cours restent. Les
 espèces déjà ramenées par un défi restent dans l'Herbier ; les bonus gagnés aux défis (synergies ×1,25,
 production +10 %…) disparaissent avec eux, ce qui coûte quelques pour cent à un joueur qui les avait.
@@ -136,5 +137,5 @@ production +10 %…) disparaissent avec eux, ce qui coûte quelques pour cent à
 | 8 | Arbre : branche du Quartier, fourches | +1 |
 | 9 | Rééquilibrage, joueur attentif, règle de relance | — |
 
-Les Jalons de remplacement (§2) arrivent avec les lots 5 à 8. Chaque lot garde les cibles du §8 dans les ±30 %
+Les nouveaux Jalons arrivent avec les lots 5 à 8. Chaque lot garde les cibles du §8 dans les ±30 %
 ou les remesure dans la même PR.
