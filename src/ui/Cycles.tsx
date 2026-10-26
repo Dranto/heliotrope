@@ -253,6 +253,8 @@ export function Cycles({ onClose }: { onClose: () => void }) {
   const state = useGameState();
   const [confirming, setConfirming] = useState(false);
   const [message, setMessage] = useState('');
+  // A tap on the blocked start button stresses the line that says why, rather than repeat it.
+  const [stressed, setStressed] = useState(false);
   const challenges = offeredCycleChallenges(state);
   const [challenge, setChallenge] = useState<CycleChallengeId | null>(null);
   const gain = sourcesToGain(state);
@@ -418,7 +420,11 @@ export function Cycles({ onClose }: { onClose: () => void }) {
         </fieldset>
       )}
 
-      {!available && <p className="hint">{t.cycles.noSourceYet}</p>}
+      {!available && (
+        <p className="hint start-blocked" id="cycle-blocked" data-stressed={stressed || undefined}>
+          {t.cycles.noSourceYet}
+        </p>
+      )}
       {/* The start button stays in view at the foot of the dialog while the player reads. */}
       <div className="prestige-actions">
         {confirming && available ? (
@@ -437,8 +443,14 @@ export function Cycles({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             className="season-button cycle-button"
-            disabled={!available}
+            // Still focusable and tappable while blocked, so a tap points to why (as in the Seasons).
+            aria-disabled={!available}
+            aria-describedby={available ? undefined : 'cycle-blocked'}
             onClick={() => {
+              if (!available) {
+                setStressed(true);
+                return;
+              }
               setMessage('');
               setConfirming(true);
             }}

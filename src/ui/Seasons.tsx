@@ -87,6 +87,8 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
   const challenges = offeredChallenges(state);
   const [challenge, setChallenge] = useState<ChallengeId | null>(null);
   const [message, setMessage] = useState('');
+  // A tap on the blocked start button stresses the line that says why, rather than repeat it.
+  const [stressed, setStressed] = useState(false);
   const gain = seedsToGain(state);
   const growing = seedsGrowing(state);
   const ripe = areSeedsRipe(state);
@@ -275,7 +277,11 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
         </fieldset>
       )}
 
-      {!available && growing === 0 && <p className="hint">{t.seeds.noSeedYet}</p>}
+      {!available && growing === 0 && (
+        <p className="hint start-blocked" id="season-blocked" data-stressed={stressed || undefined}>
+          {t.seeds.noSeedYet}
+        </p>
+      )}
       {/* The start button stays in view at the foot of the dialog while the player reads. */}
       <div className="prestige-actions">
         {confirming && available ? (
@@ -296,9 +302,11 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
             className="season-button"
             // Still focusable and tappable while blocked, so a tap says why (no tooltip on phone).
             aria-disabled={!available}
+            aria-describedby={!available && growing === 0 ? 'season-blocked' : undefined}
             onClick={() => {
               if (!available) {
-                setMessage(growing > 0 ? t.seeds.ripening(ripening) : t.seeds.noSeedYet);
+                if (growing > 0) setMessage(t.seeds.ripening(ripening));
+                else setStressed(true);
                 return;
               }
               setMessage('');

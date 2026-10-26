@@ -66,8 +66,10 @@ describe('Seasons', () => {
     const button = screen.getByRole('button', { name: 'Commencer une nouvelle Saison' });
     expect(button).not.toBeDisabled();
     expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toHaveAccessibleDescription(/au moins une Graine/);
     fireEvent.click(button);
-    expect(screen.getByRole('status')).toHaveTextContent(/au moins une Graine/);
+    expect(screen.getByText(/au moins une Graine/)).toHaveAttribute('data-stressed');
+    expect(screen.getAllByText(/au moins une Graine/)).toHaveLength(1);
     expect(screen.queryByRole('button', { name: 'Oui, replanter' })).not.toBeInTheDocument();
   });
 

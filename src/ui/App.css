@@ -919,6 +919,12 @@ button {
   color: var(--ink-soft);
 }
 
+/* The reason a prestige cannot start yet, stressed when its blocked button is tapped. */
+.start-blocked[data-stressed] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 /* Scene: the neighbourhood seen from above (§6, §10.4) ------------------- */
 
 .scene {
