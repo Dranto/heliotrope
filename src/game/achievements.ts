@@ -4,7 +4,6 @@ import { WEATHER_IDS, type WeatherId } from './weather';
 import { WEATHER_SPECIES } from './species';
 import { totalGreetings } from './greetings';
 import { completeFamilies } from './families';
-import { MAX_WAITING_GIFTS, milestoneGift } from './milestoneFamilies';
 import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
 import { bonusesOf } from './bonuses';
@@ -12,8 +11,6 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
-import { workingAlliances } from './alliances';
-import { bouquetSize } from './effects';
 import { FRUIT_IDS } from './fruits';
 import { TREE_AGE_PICKS, treeAge } from './orchard';
 import { worksBuilt } from './greatWorks';
@@ -32,11 +29,20 @@ export const VISIT_MILESTONE_COUNT = 10;
 /** Harvests after a different crop for the Milestone of the rotation (M32). */
 export const ROTATION_MILESTONE = 25;
 
-/** Effects running at once for the Milestones of the bouquet (§5.7). */
-export const BOUQUET_MILESTONES = [3, 5] as const;
-
 /** §9.3: each Milestone unlocked adds +1% to global production (additive). */
 export const ACHIEVEMENT_BONUS = 0.01;
+
+/**
+ * Milestones whose mechanic left the game (docs/slimming-plan.md). A save that reached them keeps
+ * them as a count in `retiredAchievements`, so its bonus never drops.
+ */
+export const RETIRED_ACHIEVEMENTS: readonly unknown[] = [
+  'firstAlliance',
+  'livingWeb',
+  'grandBloom',
+  'bouquet',
+  'grandBouquet',
+];
 
 /** Upgrade groups a Milestone can ask to complete within one Season. */
 export const UPGRADE_SETS = {
@@ -114,15 +120,10 @@ export type AchievementCondition =
   | { kind: 'oldTree' }
   /** Sister cities founded (§7.6). */
   | { kind: 'sisterCities'; count: number }
-  /** Alliances chosen and awake (§9.9), and the grand bloom. */
-  | { kind: 'alliances'; count: number }
-  | { kind: 'grandBloom' }
   /** Paths working on the buildings that grow (§5.5). */
   | { kind: 'paths'; count: number }
   /** Pollen flights sent over all Seasons (§5.6). */
   | { kind: 'flights'; count: number }
-  /** Kinds of effect running at once, the bouquet (§5.7). */
-  | { kind: 'bouquet'; count: number }
   /** A weather lived at least once (§9.10). */
   | { kind: 'weather'; weather: WeatherId }
   /** Every species of the weather back (M33). */
@@ -227,15 +228,10 @@ export type AchievementId =
   | 'rotation'
   | 'oldTree'
   | `cities.${(typeof CITY_STEPS)[number]}`
-  | 'firstAlliance'
-  | 'livingWeb'
-  | 'grandBloom'
   | 'firstPath'
   | 'manyPaths'
   | 'firstFlight'
   | 'pollenStorm'
-  | 'bouquet'
-  | 'grandBouquet'
   | 'weather.sun'
   | 'weather.shower'
   | 'weather.wind'
@@ -400,27 +396,12 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'seasons' as const,
     condition: { kind: 'sisterCities', count } as const,
   })),
-  // The alliances and the grand bloom (§9.9).
-  { id: 'firstAlliance', family: 'neighbourhood', condition: { kind: 'alliances', count: 1 } },
-  { id: 'livingWeb', family: 'neighbourhood', condition: { kind: 'alliances', count: 5 } },
-  { id: 'grandBloom', family: 'neighbourhood', condition: { kind: 'grandBloom' } },
   // The buildings that grow (§5.5).
   { id: 'firstPath', family: 'buildings', condition: { kind: 'paths', count: 1 } },
   { id: 'manyPaths', family: 'buildings', condition: { kind: 'paths', count: 12 } },
   // The pollen (§5.6).
   { id: 'firstFlight', family: 'clicks', condition: { kind: 'flights', count: 1 } },
   { id: 'pollenStorm', family: 'clicks', condition: { kind: 'flights', count: 100 } },
-  // The bouquet of effects running together (§5.7, M31).
-  {
-    id: 'bouquet',
-    family: 'butterflies',
-    condition: { kind: 'bouquet', count: BOUQUET_MILESTONES[0] },
-  },
-  {
-    id: 'grandBouquet',
-    family: 'butterflies',
-    condition: { kind: 'bouquet', count: BOUQUET_MILESTONES[1] },
-  },
   // The neighbours' requests (§9.11).
   { id: 'firstFavour', family: 'neighbourhood', condition: { kind: 'requests', count: 1 } },
   { id: 'goodNeighbour', family: 'neighbourhood', condition: { kind: 'requests', count: 25 } },
@@ -591,9 +572,12 @@ export function bonusPerAchievement(state: GameState): number {
   return bonusesOf(state, 'perAchievement').reduce((sum, b) => sum + b.bonus, ACHIEVEMENT_BONUS);
 }
 
-/** Additive production bonus from the Milestones unlocked. */
+/**
+ * Additive production bonus from the Milestones unlocked, and from the retired ones a player had
+ * reached before their mechanic left the game (docs/slimming-plan.md): a bonus never drops.
+ */
 export function achievementBonus(state: GameState): number {
-  return state.achievements.length * bonusPerAchievement(state);
+  return (state.achievements.length + state.retiredAchievements) * bonusPerAchievement(state);
 }
 
 function buildingsOwned(state: GameState): number {
@@ -684,10 +668,6 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return worksBuilt(state) >= condition.count;
     case 'sisterCities':
       return state.city.founded.length >= condition.count;
-    case 'alliances':
-      return workingAlliances(state).length >= condition.count;
-    case 'grandBloom':
-      return state.alliances.bloomed;
     case 'paths':
       return pathsWorking(state) >= condition.count;
     case 'rotations':
@@ -696,8 +676,6 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return FRUIT_IDS.some((id) => treeAge(state.orchard.trees[id]) === TREE_AGE_PICKS.length);
     case 'flights':
       return state.pollen.flights >= condition.count;
-    case 'bouquet':
-      return bouquetSize(state.effects) >= condition.count;
     case 'weather':
       return state.weather.seen.includes(condition.weather);
     case 'weatherSpecies':
@@ -814,8 +792,6 @@ function measure(state: GameState, condition: AchievementCondition): [number, nu
       return [worksBuilt(state), condition.count];
     case 'sisterCities':
       return [state.city.founded.length, condition.count];
-    case 'alliances':
-      return [workingAlliances(state).length, condition.count];
     case 'paths':
       return [pathsWorking(state), condition.count];
     case 'rotations':
@@ -865,17 +841,11 @@ export function unlockAchievements(state: GameState): GameState {
     (a) => !state.achievements.includes(a.id) && isMet(state, a.condition),
   ).map((a) => a.id);
   if (fresh.length === 0) return state;
-  return leaveGifts({ ...state, achievements: [...state.achievements, ...fresh] }, fresh);
+  return { ...state, achievements: [...state.achievements, ...fresh] };
 }
 
 /** Unlock one Milestone directly, e.g. one earned by an action. */
 export function unlockAchievement(state: GameState, id: AchievementId): GameState {
   if (state.achievements.includes(id)) return state;
-  return leaveGifts({ ...state, achievements: [...state.achievements, id] }, [id]);
-}
-
-/** Each Milestone reached leaves its gift on the map (M37), to be gathered by the player. */
-function leaveGifts(state: GameState, fresh: readonly AchievementId[]): GameState {
-  const gifts = [...state.milestoneGifts, ...fresh.map(milestoneGift)];
-  return { ...state, milestoneGifts: gifts.slice(0, MAX_WAITING_GIFTS) };
+  return { ...state, achievements: [...state.achievements, id] };
 }

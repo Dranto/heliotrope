@@ -1,7 +1,6 @@
-import { isMilestoneGift, MAX_WAITING_GIFTS } from './milestoneFamilies';
 import { INTRO_GAP_SECONDS, validIntro } from './introductions';
 import { introduceAllDue } from './onboarding';
-import { isAchievementId, type AchievementId } from './achievements';
+import { isAchievementId, RETIRED_ACHIEVEMENTS, type AchievementId } from './achievements';
 import { EFFECT_KINDS, type ActiveEffect, type EffectKind } from './effects';
 import { LANGUAGES, type Language } from './format';
 import { GENERATOR_IDS } from './generators';
@@ -17,7 +16,6 @@ import { validPlots } from './garden';
 import { validGreatWorks } from './greatWorks';
 import { validOrchard } from './orchard';
 import { validCity } from './cities';
-import { validAlliances } from './alliances';
 import { validGreetings } from './greetings';
 import { validGrowth } from './growth';
 import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './pollen';
@@ -148,6 +146,10 @@ const migrations: Record<number, Migration> = {
       : { ...raw, version: 39 },
   // v40 adds the monkey cries easter egg to the Options (§6.3): off.
   39: (raw) => ({ ...raw, version: 40 }),
+  // v41 slims the game (docs/slimming-plan.md, lot 1): the alliances, the grand bloom, the bouquet
+  // and the Milestone gifts leave. Their fields are dropped below; the Milestones they gave are
+  // counted as retired once the state is read, so the bonus stays.
+  40: (raw) => ({ ...raw, version: 41 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -251,6 +253,11 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.achievements)) {
     state.achievements = [...new Set<AchievementId>(data.achievements.filter(isAchievementId))];
   }
+  const retired = Array.isArray(data.achievements)
+    ? new Set(data.achievements.filter((id) => RETIRED_ACHIEVEMENTS.includes(id))).size
+    : 0;
+  state.retiredAchievements =
+    (isCount(data.retiredAchievements) ? data.retiredAchievements : 0) + retired;
   if (Array.isArray(data.parcels)) {
     state.parcels = [...new Set<ParcelId>(data.parcels.filter(isParcelId))];
   }
@@ -370,11 +377,7 @@ export function deserialize(json: string, now: number): GameState | null {
   state.greatWorks = validGreatWorks(data.greatWorks);
   state.orchard = validOrchard(data.orchard);
   state.city = validCity(data.city);
-  state.alliances = validAlliances(data.alliances);
   state.greetings = validGreetings(data.greetings);
-  state.milestoneGifts = Array.isArray(data.milestoneGifts)
-    ? data.milestoneGifts.filter(isMilestoneGift).slice(0, MAX_WAITING_GIFTS)
-    : [];
   state.growth = validGrowth(data.growth);
   state.pollen = validPollen(data.pollen);
   state.weather = validWeather(data.weather, state.weather);

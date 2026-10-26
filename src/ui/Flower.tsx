@@ -14,7 +14,6 @@ import { visualSeason } from '../game/phases';
 import { clickValue } from '../game/production';
 import { clickHeliotrope } from '../game/tick';
 import { isFlying, isPollenOpen } from '../game/pollen';
-import { bouquetSize } from '../game/effects';
 import { arrivedFeature } from '../game/introductions';
 import './pollen.css';
 import { t } from '../i18n';
@@ -311,7 +310,6 @@ export function Flower() {
   const pollenOpen = isPollenOpen(state);
   const guided = guideStep(state)?.kind === 'flower';
   const flying = isFlying(state);
-  const bouquet = bouquetSize(state.effects);
 
   // The plant stretches and glows once when it reaches a new stage during play.
   const previous = useRef(stage);
@@ -484,24 +482,6 @@ export function Flower() {
               headsRef={heads}
             />
           </g>
-          {/* The bouquet (§5.7): a golden petal around the gauge for each effect running beside
-              the first, over the planter. */}
-          {bouquet > 1 && (
-            <g className="bouquet-petals" data-count={bouquet}>
-              {Array.from({ length: Math.min(bouquet - 1, 7) }, (_, i) => {
-                const a = Math.PI + ((i + 0.5) / 7) * Math.PI;
-                return (
-                  <ellipse
-                    key={i}
-                    cx={round(BASE.x + Math.cos(a) * (GAUGE.rx + 9))}
-                    cy={round(BASE.y - 2 + Math.sin(a) * (GAUGE.ry + 6))}
-                    rx="3"
-                    ry="5.5"
-                  />
-                );
-              })}
-            </g>
-          )}
         </svg>
         {floaters.map((f) => (
           <span

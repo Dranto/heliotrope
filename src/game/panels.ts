@@ -1,6 +1,5 @@
 // The side menu's panels, sorted by layer (docs/game-design.md §10.1, M25): when each one opens,
 // which ones the player has not seen yet, and whether a folded one hides something to do.
-import { allianceSlots, ALLIANCE_IDS, areAlliancesOpen, canChoose } from './alliances';
 import {
   canBuyCollector,
   canRaiseSite,
@@ -36,7 +35,6 @@ export const PANEL_IDS = [
   'garden',
   'orchard',
   'requests',
-  'alliances',
   'bioregion',
   'greatWorks',
 ] as const;
@@ -54,7 +52,6 @@ export const PANEL_LAYER: Record<PanelId, LayerId> = {
   garden: 'living',
   orchard: 'living',
   requests: 'living',
-  alliances: 'living',
   bioregion: 'region',
   greatWorks: 'region',
 };
@@ -87,8 +84,6 @@ export function isPanelShown(state: GameState, id: PanelId): boolean {
       return isOrchardOpen(state);
     case 'requests':
       return areRequestsOpen(state);
-    case 'alliances':
-      return areAlliancesOpen(state);
     case 'bioregion':
       return isBioregionOpen(state);
     case 'greatWorks':
@@ -148,11 +143,6 @@ export function panelHasAction(state: GameState, id: PanelId): boolean {
       return (
         state.requests.open.some((_, i) => canServe(state, i)) ||
         state.requests.hands.some((_, i) => canPlayHand(state, i))
-      );
-    case 'alliances':
-      return (
-        state.alliances.chosen.length < allianceSlots(state) &&
-        ALLIANCE_IDS.some((alliance) => canChoose(state, alliance))
       );
     case 'bioregion':
       return (

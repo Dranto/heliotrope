@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { unlockAchievements } from './achievements';
 import { butterflyOdds, BUTTERFLY_ODDS, butterflyOutcome, catchButterfly } from './butterfly';
-import { BOUQUET_MAX, BOUQUET_STEP, bouquetBonus, bouquetSize, type ActiveEffect } from './effects';
 import {
   addPollen,
   POLLEN_PER_CLICK,
@@ -11,7 +9,6 @@ import {
   SEASON_START_FILL,
   SEASON_START_SECONDS,
 } from './pollen';
-import { lightPerSecond } from './production';
 import { createInitialState, type GameState } from './state';
 import { welcomeVisit } from './visits';
 import { withAllIntroduced } from './introductions';
@@ -28,46 +25,7 @@ function fresh(extra: Partial<GameState> = {}): GameState {
   };
 }
 
-const running = (...kinds: ActiveEffect['kind'][]): ActiveEffect[] =>
-  kinds.map((kind) => ({ kind, remaining: 30 }));
-
 describe('the moments that chain together (§5.7, M31)', () => {
-  it('adds a bouquet bonus for each effect running beside the first, capped', () => {
-    expect(bouquetBonus([])).toBe(0);
-    expect(bouquetBonus(running('bloom'))).toBe(0);
-    expect(bouquetBonus(running('bloom', 'flight'))).toBeCloseTo(BOUQUET_STEP);
-    expect(bouquetBonus(running('bloom', 'flight', 'shower'))).toBeCloseTo(2 * BOUQUET_STEP);
-    const all = running(
-      'bloom',
-      'flight',
-      'shower',
-      'birds',
-      'beans',
-      'grazing',
-      'festival',
-      'fireflies',
-    );
-    expect(bouquetSize(all)).toBe(8);
-    expect(bouquetBonus(all)).toBe(BOUQUET_MAX);
-  });
-
-  it('raises the production while the bouquet blooms', () => {
-    const one = fresh({ effects: running('beans') });
-    const two = fresh({ effects: running('beans', 'fireflies') });
-    // The fireflies only light the click: the production gains only the bouquet.
-    expect(lightPerSecond(two) / lightPerSecond(one)).toBeCloseTo(1 + BOUQUET_STEP);
-  });
-
-  it('unlocks the bouquet Milestones at 3 and 5 effects at once', () => {
-    const three = unlockAchievements(fresh({ effects: running('bloom', 'flight', 'beans') }));
-    expect(three.achievements).toContain('bouquet');
-    expect(three.achievements).not.toContain('grandBouquet');
-    const five = unlockAchievements(
-      fresh({ effects: running('bloom', 'flight', 'beans', 'birds', 'shower') }),
-    );
-    expect(five.achievements).toContain('grandBouquet');
-  });
-
   it('gives the butterfly the colour of the weather once the sky is open', () => {
     const first = fresh({ seasons: 0 });
     expect(butterflyOdds(first)).toEqual(BUTTERFLY_ODDS);

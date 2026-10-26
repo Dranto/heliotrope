@@ -11,7 +11,6 @@ import {
   weatherBonuses,
   type WeatherState,
 } from './weather';
-import { allianceBonuses } from './alliances';
 import type { GameState } from './state';
 import { cityBonuses, type CitySource } from './cityData';
 import { corridorBonuses } from './corridors';
@@ -143,9 +142,9 @@ export interface BonusSource {
   generators: Readonly<Record<string, number>>;
 }
 
-/** The alliances (§9.9) read the whole game, so only a full state brings them. */
+/** The Herbier families and the Milestone families read the whole game: only a full state brings them. */
 function isGameState(source: BonusSource): source is GameState {
-  return 'alliances' in source && 'species' in source;
+  return 'cooperatives' in source && 'species' in source;
 }
 
 /**
@@ -227,7 +226,6 @@ function collectBonuses(source: BonusSource): Bonus[] {
         })
       : []),
     ...(requests ? bondBonuses(requests.bonds) : []),
-    ...(isGameState(source) ? allianceBonuses(source) : []),
     ...(isGameState(source) ? familyBonuses(source.species) : []),
     ...(isGameState(source) ? milestoneFamilyBonuses(source.achievements) : []),
   ];

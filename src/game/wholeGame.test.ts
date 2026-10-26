@@ -17,13 +17,12 @@ describe('the whole game (§8, M30)', () => {
     },
   );
 
-  it('plays every loop on the way: works, orchard, alliances, requests, workshop', () => {
+  it('plays every loop on the way: works, orchard, requests, workshop', () => {
     const { state } = run;
     expect(state.city.founded).toEqual(['home', 'plain']);
     expect(state.city.landscape).toBe('forest');
     expect(Object.values(state.greatWorks.works).every((w) => w.stage > 0)).toBe(true);
     expect(state.orchard.hives).toBeGreaterThan(0);
-    expect(state.alliances.chosen.length).toBeGreaterThanOrEqual(3);
     expect(state.requests.served).toBeGreaterThan(0);
     expect(Object.keys(state.city.workshop).length).toBeGreaterThan(0);
     // Real time runs four times as fast as play: an hour played for three away.

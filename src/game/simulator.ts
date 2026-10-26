@@ -363,8 +363,12 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   advisedSeason: 67 * 60,
 };
 
-/** §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. */
-export const CYCLE_TARGETS: readonly number[] = [35 * 60, 35 * 60, 45 * 60];
+/**
+ * §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. Cycle 2
+ * takes two or three Seasons of about 12 min depending on the Sources of the first (slimming
+ * plan, lot 1): its target sits between the two until lot 9 fixes the relaunch rule.
+ */
+export const CYCLE_TARGETS: readonly number[] = [30 * 60, 35 * 60, 45 * 60];
 
 /**
  * The reference player's later Seasons: each one is played until it would at least double the

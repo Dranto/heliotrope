@@ -1,32 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ACHIEVEMENT_LIST,
   ACHIEVEMENTS,
   achievementProgress,
-  unlockAchievement,
   unlockAchievements,
   type AchievementId,
 } from './achievements';
-import { canChoose, chooseAlliance, isAwake } from './alliances';
 import { factorOf, globalBonus } from './bonuses';
 import { familyColour, isFlowerColourUnlocked } from './decor';
-import { FAMILIES } from './families';
 import { withAllIntroduced } from './introductions';
 import {
   closeMilestone,
   completeMilestoneFamilies,
   familyMilestones,
-  gatherMilestoneGifts,
-  GIFT_GARDEN_SECONDS,
-  GIFT_LIGHT_CLICKS,
-  GIFT_POLLEN,
   isMilestoneFamilyComplete,
-  MAX_WAITING_GIFTS,
   nextMilestone,
 } from './milestoneFamilies';
-import { clickValue } from './production';
 import { isRequestMet, validRequests, type Request } from './requests';
-import { deserialize, serialize } from './save';
 import { createInitialState, type GameState } from './state';
 
 function second(extra: Partial<GameState> = {}): GameState {
@@ -35,44 +24,6 @@ function second(extra: Partial<GameState> = {}): GameState {
 
 const ids = (family: Parameters<typeof familyMilestones>[0]): AchievementId[] =>
   familyMilestones(family).map((a) => a.id);
-
-describe('the gift of each Milestone (M37)', () => {
-  it('waits on the map, then gives a puff of Light for the light, buildings and upgrades', () => {
-    const state = unlockAchievement(second(), 'mosaic');
-    expect(state.milestoneGifts).toEqual(['light']);
-    expect(state.resources.light).toBe(0);
-    const gathered = gatherMilestoneGifts(state);
-    expect(gathered.milestoneGifts).toEqual([]);
-    expect(gathered.resources.light).toBeCloseTo(clickValue(state) * GIFT_LIGHT_CLICKS);
-    expect(gatherMilestoneGifts(gathered)).toBe(gathered);
-  });
-
-  it('gives a step of the pollen gauge for the clicks and the butterflies', () => {
-    const state = unlockAchievement(second(), 'goldenPollen');
-    const gathered = gatherMilestoneGifts(state);
-    expect(gathered.pollen.gauge - state.pollen.gauge).toBeCloseTo(GIFT_POLLEN);
-  });
-
-  it('makes the garden grow for the neighbourhood and the Seasons', () => {
-    const fresh = second();
-    const plots = fresh.garden.plots.map((p, i) =>
-      i === 0 ? { ...p, crop: 'squash' as const, grown: 0 } : p,
-    );
-    const state = unlockAchievement({ ...fresh, garden: { ...fresh.garden, plots } }, 'hello');
-    const gathered = gatherMilestoneGifts(state);
-    expect(gathered.garden.plots[0]!.grown).toBeGreaterThanOrEqual(GIFT_GARDEN_SECONDS);
-  });
-
-  it('comes with every Milestone unlocked by the state, a few at most, kept in the save', () => {
-    const many = ACHIEVEMENT_LIST.slice(0, 20).map((a) => a.id);
-    const state = second();
-    const after = many.reduce(unlockAchievement, state);
-    expect(after.milestoneGifts).toHaveLength(MAX_WAITING_GIFTS);
-    expect(deserialize(serialize(after), 0)!.milestoneGifts).toEqual(after.milestoneGifts);
-    const clicked = unlockAchievements(second({ clicks: 10 }));
-    expect(clicked.milestoneGifts).toContain('pollen');
-  });
-});
 
 describe('the families of Milestones (M37)', () => {
   it('are complete once every Milestone but the hidden ones is reached', () => {
@@ -135,19 +86,5 @@ describe('what else reads the Milestones (M37)', () => {
     expect(validRequests({ ...state.requests, open: [request] }, state.requests).open).toEqual([
       request,
     ]);
-  });
-
-  it('the garlands wake with a family of Milestones and two of the Herbier', () => {
-    const state = second({
-      seasons: 3,
-      achievements: ids('upgrades'),
-      species: [...FAMILIES.pollinators],
-    });
-    expect(isAwake(state, 'garlands')).toBe(false);
-    const awake = { ...state, species: [...FAMILIES.pollinators, ...FAMILIES.night] };
-    expect(isAwake(awake, 'garlands')).toBe(true);
-    if (canChoose(awake, 'garlands')) {
-      expect(chooseAlliance(awake, 'garlands').alliances.chosen).toContain('garlands');
-    }
   });
 });

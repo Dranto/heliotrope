@@ -95,16 +95,10 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.worksBuilt(condition.count);
     case 'sisterCities':
       return describe.sisterCities(condition.count);
-    case 'alliances':
-      return describe.alliances(condition.count);
-    case 'grandBloom':
-      return describe.grandBloom;
     case 'paths':
       return describe.paths(condition.count);
     case 'flights':
       return describe.flights(condition.count);
-    case 'bouquet':
-      return describe.bouquet(condition.count);
     case 'rotations':
       return describe.rotations(condition.count);
     case 'oldTree':

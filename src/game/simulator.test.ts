@@ -68,15 +68,16 @@ describe('two Seasons in a row', () => {
 
 describe('challenge Seasons (§7.3)', () => {
   // Third Season of the reference player, as a challenge: each one should take a little longer
-  // than a free Season (about 30 min at this point), and stay winnable within the hour.
+  // than a free Season (about 20 min at this point), and stay winnable within the hour. The
+  // challenges leave with lot 4 of the slimming plan.
   const { second } = twoSeasons;
   const start = (id: ChallengeId) => learnReferenceTalents(startNewSeason(second.state, id));
 
   it.each(CHALLENGE_IDS)(
-    'wins %s between 20 minutes and an hour',
+    'wins %s between 15 minutes and an hour',
     (id) => {
       const { challengeWon } = simulate({ state: start(id), maxSeconds: 3600, stopWhenWon: true });
-      expect(challengeWon).toBeGreaterThan(20 * 60);
+      expect(challengeWon).toBeGreaterThan(15 * 60);
       expect(challengeWon).toBeLessThan(60 * 60);
     },
     30_000,

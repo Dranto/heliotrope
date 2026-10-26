@@ -1,79 +1,17 @@
-// Milestones that count (docs/game-design.md §9.16, M37): each Milestone reached leaves a small
-// gift tied to its family on the map, gathered with a click, a family whose Milestones are all reached gives a lasting bonus and a
-// colour of the heliotrope, and the next Milestone of each family shows its progress. Pure.
+// Milestones that count (docs/game-design.md §9.16, M37): a family whose Milestones are all
+// reached gives a lasting bonus and a colour of the heliotrope, and the next Milestone of each
+// family shows its progress. Pure.
 import {
   ACHIEVEMENT_FAMILIES,
   ACHIEVEMENT_LIST,
   achievementProgress,
-  ACHIEVEMENTS,
   isMeasuredInPowers,
   type AchievementDef,
   type AchievementFamily,
   type AchievementId,
 } from './achievements';
-import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
 import type { Bonus } from './bonuses';
-import { growGarden } from './garden';
-import { earnLight } from './light';
-import { addPollen } from './pollen';
-import { clickValue } from './production';
 import type { GameState } from './state';
-
-/** What a Milestone leaves when it is reached, by family. */
-export type MilestoneGift = 'light' | 'pollen' | 'garden' | 'water';
-
-export const MILESTONE_GIFTS: Record<AchievementFamily, MilestoneGift> = {
-  light: 'light',
-  buildings: 'light',
-  upgrades: 'light',
-  clicks: 'pollen',
-  butterflies: 'pollen',
-  neighbourhood: 'garden',
-  seasons: 'garden',
-  bioregion: 'water',
-};
-
-/** Gifts waiting on the map at most: the later ones are not kept. */
-export const MAX_WAITING_GIFTS = 8;
-
-/** The gift a Milestone leaves. */
-export function milestoneGift(id: AchievementId): MilestoneGift {
-  return MILESTONE_GIFTS[ACHIEVEMENTS[id].family];
-}
-
-/** A puff of Light: as much as this many clicks on the heliotrope (§5.2). */
-export const GIFT_LIGHT_CLICKS = 10;
-/** A step of the pollen gauge (§5.6). */
-export const GIFT_POLLEN = 0.05;
-/** The crops of the courtyard garden grow this many seconds at once (§9.7). */
-export const GIFT_GARDEN_SECONDS = 10 * 60;
-/** A drop of Water: this many seconds of the Bioregion's Water (§7.4). */
-export const GIFT_WATER_SECONDS = 30;
-
-function give(state: GameState, gift: MilestoneGift): GameState {
-  switch (gift) {
-    case 'light':
-      return earnLight(state, clickValue(state) * GIFT_LIGHT_CLICKS);
-    case 'pollen':
-      return addPollen(state, GIFT_POLLEN);
-    case 'garden':
-      return growGarden(state, GIFT_GARDEN_SECONDS);
-    case 'water':
-      return isBioregionOpen(state)
-        ? earnWater(state, waterPerSecond(state) * GIFT_WATER_SECONDS)
-        : state;
-  }
-}
-
-/** Player action: gather every gift the Milestones left on the map, in the order they came. */
-export function gatherMilestoneGifts(state: GameState): GameState {
-  if (state.milestoneGifts.length === 0) return state;
-  return state.milestoneGifts.reduce(give, { ...state, milestoneGifts: [] });
-}
-
-export function isMilestoneGift(value: unknown): value is MilestoneGift {
-  return value === 'light' || value === 'pollen' || value === 'garden' || value === 'water';
-}
 
 /** The Milestones of a family that count for completing it: the hidden ones are a bonus. */
 export function familyMilestones(family: AchievementFamily): AchievementDef[] {

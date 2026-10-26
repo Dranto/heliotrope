@@ -1,6 +1,5 @@
 // French texts, the reference language (docs/game-design.md §14 Q1). Every other language
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
-import type { AllianceId, SlotSource } from '../game/alliances';
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FruitId } from '../game/fruits';
@@ -297,7 +296,6 @@ export const fr = {
       fleaMarket: (seconds: string) => `Brocante, moitié prix · ${seconds}`,
       flight: (seconds: string) => `Envolée de pollen ×1,5 · ${seconds}`,
     },
-    bouquet: (count: number, bonus: string) => `Bouquet de ${count}\u00a0effets +${bonus}\u00a0%`,
   },
   visits: {
     welcome: {
@@ -327,7 +325,7 @@ export const fr = {
     close: 'Fermer les jalons',
     summary: (count: string, total: string, percent: string) =>
       `${count} sur ${total} jalons, production +${percent}\u00a0%`,
-    hint: 'Chaque jalon atteint ajoute 1\u00a0% à toute la production, pour toujours, et laisse un petit cadeau. Une famille complète donne un bonus et une couleur de fleur.',
+    hint: 'Chaque jalon atteint ajoute 1\u00a0% à toute la production, pour toujours. Une famille complète donne un bonus et une couleur de fleur.',
     unlocked: (name: string) => `Jalon atteint\u00a0: ${name}`,
     unlockedMany: (count: string) => `${count} jalons atteints\u00a0!`,
     bloomKicker: 'Jalon atteint',
@@ -335,18 +333,11 @@ export const fr = {
     bloomBonus: (percent: string) => `Production +${percent}\u00a0%`,
     familyCount: (count: string, total: string) => `${count} sur ${total}`,
     next: (name: string) => `Prochain\u00a0: ${name}`,
-    gather: (count: string) => `Ramasser les cadeaux des jalons (${count})`,
     progress: (percent: string) => `${percent}\u00a0%`,
     complete: 'Famille complète',
     reward: (bonus: string, colour: string) => `${bonus} · fleur ${colour}`,
     toComplete: (bonus: string, colour: string) =>
       `Complète, elle donnera\u00a0: ${bonus} · fleur ${colour}`,
-    gifts: {
-      light: 'Une bouffée de Lumière',
-      pollen: 'Un pas de la jauge de pollen',
-      garden: 'Le potager pousse de 10\u00a0min',
-      water: 'Une goutte d’Eau',
-    },
     locked: 'À atteindre',
     hiddenName: 'Jalon caché',
     names: {
@@ -490,15 +481,10 @@ export const fr = {
       skyCreatures: 'Les bêtes du ciel',
       'cities.1': 'Essaimage',
       'cities.3': 'Les villes sœurs',
-      firstAlliance: 'Main dans la main',
-      livingWeb: 'La toile du vivant',
-      grandBloom: 'La grande floraison',
       firstPath: 'Première voie',
       manyPaths: 'La ville aux mille formes',
       firstFlight: 'Première envolée',
       pollenStorm: 'Tempête de pollen',
-      bouquet: 'Bouquet',
-      grandBouquet: 'Grand bouquet',
       firstFavour: 'Coup de main',
       goodNeighbour: 'Bon voisin',
       'weather.sun': 'Plein soleil',
@@ -609,12 +595,6 @@ export const fr = {
         count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
       fruitHarvests: (count: number) =>
         count === 1 ? 'Cueillir un premier fruit au verger' : `Cueillir ${count} fois au verger`,
-      alliances: (count: number) =>
-        count === 1
-          ? 'Faire jouer une alliance'
-          : `Faire jouer ${count}\u00a0alliances en même temps`,
-      grandBloom:
-        'Restaurer toute la région\u00a0: les quatre chantiers, l’Herbier, chaque site au niveau 5',
       sisterCities: (count: number) =>
         count === 1 ? 'Fonder une ville sœur' : `Fonder ${count} villes sœurs`,
       paths: (count: number) =>
@@ -624,7 +604,6 @@ export const fr = {
       weather: (day: string) => `Vivre ${day}`,
       requests: (count: number) =>
         count === 1 ? 'Rendre service à un voisin' : `Rendre ${count} services aux voisins`,
-      bouquet: (count: number) => `Faire jouer ${count}\u00a0effets en même temps`,
       flights: (count: number) =>
         count === 1
           ? 'Remplir la jauge de pollen et lancer une envolée'
@@ -870,75 +849,6 @@ export const fr = {
     rotated: 'En rotation\u00a0: pousse ×1,2',
     weatherCrop: (crop: string) => `Le temps qu’il fait favorise\u00a0: ${crop} ×1,5`,
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
-  },
-  alliances: {
-    title: 'Les alliances',
-    hint: 'Une alliance relie deux choses que vous avez fait grandir. Elle s’éveille quand les deux atteignent leur seuil, et ne joue que si elle occupe une place. On peut en retirer une par Saison avant le premier Cycle de l’eau, puis une par Cycle.',
-    slots: (used: string, total: string) => `Places\u00a0: ${used} sur ${total}`,
-    slotsToCome: (ways: string) => `Prochaines places\u00a0: ${ways}.`,
-    slotSources: {
-      bioregion: 'en ouvrant la Biorégion',
-      works: 'avec deux grands chantiers achevés',
-      bloom: 'avec la grande floraison',
-      sister: 'avec chaque ville sœur',
-    } satisfies Record<SlotSource, string>,
-    names: {
-      orchardBees: 'Les abeilles du verger',
-      tramMarket: 'Le marché du tram',
-      nourishingRiver: 'La rivière nourricière',
-      travellingSeeds: 'Les graines voyageuses',
-      villageFeast: 'La fête au village',
-      deepRoots: 'Les racines profondes',
-      hivePollen: 'Le pollen des ruches',
-      showerGardens: 'Les jardins sous la pluie',
-      neighbourhoodForms: 'Les formes du quartier',
-      mutualAid: 'L’entraide',
-      windBikes: 'Les vélos dans le vent',
-      canopyFlocks: 'Les nuées de la canopée',
-      garlands: 'Les guirlandes',
-      almanac: 'L’almanach des voisins',
-    } satisfies Record<AllianceId, string>,
-    sides: {
-      hives: 'Ruches',
-      pollinators: 'Pollinisateurs de l’Herbier',
-      tram: 'Étapes du tram',
-      districts: 'Quartiers voisins',
-      blueCorridor: 'Trame bleue',
-      hillsArm: 'Bras des coteaux',
-      sisterCities: 'Villes sœurs',
-      varieties: 'Variétés du potager',
-      cityVisits: 'Visites de la ville',
-      hall: 'Étapes des halles',
-      canopy: 'Niveaux de la Canopée',
-      widths: 'Élargissements du delta',
-      flights: 'Envolées de pollen',
-      showers: 'Averses des voisins',
-      paths: 'Voies qui jouent',
-      parcels: 'Parcelles restaurées',
-      requests: 'Demandes servies',
-      bonds: 'Quartiers voisins liés',
-      cooperatives: 'Coopératives',
-      weathers: 'Temps vécus',
-      flocks: 'Nuées accueillies',
-      urbanCanopy: 'Canopées urbaines',
-      milestoneFamilies: 'Familles de Jalons complètes',
-      herbierFamilies: 'Familles de l’Herbier complètes',
-    } as Record<string, string>,
-    effects: {
-      windBikes: 'Par vent, les Coopératives achètent aussi les synergies',
-    } as Partial<Record<AllianceId, string>>,
-    side: (name: string, have: string, need: string) =>
-      `${name}\u00a0: ${have}\u00a0sur\u00a0${need}`,
-    awake: 'Éveillée',
-    asleep: 'Endormie',
-    asleepList: (count: string) => `Alliances endormies (${count})`,
-    choose: 'Choisir',
-    chooseLabel: (name: string) => `Choisir l’alliance\u00a0: ${name}`,
-    takeOut: 'Retirer',
-    takeOutLabel: (name: string) => `Retirer l’alliance\u00a0: ${name}`,
-    takenOut:
-      'Déjà une alliance retirée (une par Saison avant le premier Cycle, puis une par Cycle)',
-    full: 'Toutes les places sont prises',
   },
   cities: {
     open: 'Villes sœurs',
