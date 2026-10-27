@@ -95,7 +95,7 @@ describe('the pollen (§5.6, M27)', () => {
       (state, tier) => choosePath(state, 'pot', tier, tier === 2 ? 1 : 0),
       pots,
     );
-    expect(pollenFill(fed)).toBeCloseTo(1.25);
+    expect(pollenFill(fed)).toBeCloseTo(1.5);
   });
 
   it('moves the courtyard garden forward by a step', () => {

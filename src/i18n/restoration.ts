@@ -71,6 +71,12 @@ export function bonusText(bonus: Bonus): string {
       return b.perPath(formatPercent(bonus.bonus));
     case 'perMilestoneFamily':
       return b.perMilestoneFamily(formatPercent(bonus.bonus));
+    case 'ripening':
+      return b.ripening(t.duration(bonus.seconds));
+    case 'collectorDiscount':
+      return b.collectorDiscount(formatPercent(bonus.fraction));
+    case 'siteDiscount':
+      return b.siteDiscount(formatPercent(bonus.fraction));
   }
 }
 

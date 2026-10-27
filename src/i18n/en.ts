@@ -107,8 +107,9 @@ export const en: Texts = {
     label: (name: string) => `Forms of the ${name}`,
     tier: (form: string, count: string) => `${form}, from ${count}`,
     choose: (form: string) => `${form}: pick a path`,
-    locked: 'A path already changed this Season',
-    lockedNote: 'This building already changed path this Season: it can change again next Season.',
+    locked: 'A path already changed this Cycle',
+    lockedNote:
+      'This building already changed path this Cycle of water: it can change again next Cycle.',
     forms: {
       pot: ['Flowering planter', 'Wall of pots', 'Cascade of pots'],
       balconyPanel: ['Solar pergola', 'Photovoltaic trellis', 'Solar facade'],
@@ -537,6 +538,9 @@ export const en: Texts = {
       perPath: (percent: string) => `+${percent}% production per working path`,
       perMilestoneFamily: (percent: string) =>
         `+${percent}% production per complete family of Milestones`,
+      ripening: (duration: string) => `The Season's Seeds ripen ${duration} sooner`,
+      collectorDiscount: (percent: string) => `Water collectors cost ${percent}% less`,
+      siteDiscount: (percent: string) => `Bioregion sites cost ${percent}% less Water`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
       pollenFill: (factor: string) => `The pollen gauge fills ×${factor} faster`,
       cuttingsGift: (units: number) =>

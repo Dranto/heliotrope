@@ -15,8 +15,8 @@ import {
   seedsGrowing,
   seedsToGain,
   startNewSeason,
+  seasonRipeningSeconds,
 } from '../game/seasons';
-import { ripeningSeconds } from '../game/delta';
 import { canSowInTree, setSowerFactor, SOWER_FACTORS } from '../game/talents';
 import { t } from '../i18n';
 import { Dialog } from './Dialog';
@@ -165,7 +165,7 @@ export function Seasons({ onClose, onOpenTree }: { onClose: () => void; onOpenTr
 
       <p className="hint">
         {t.seeds.nextSeed(formatCost(lightToNextSeed(state)), timeToNextSeed(state))}{' '}
-        {t.seeds.formula(t.duration(ripeningSeconds(state)), formatNumber(DEEP_SOIL_SEEDS))}
+        {t.seeds.formula(t.duration(seasonRipeningSeconds(state)), formatNumber(DEEP_SOIL_SEEDS))}
       </p>
 
       {premature && available && (

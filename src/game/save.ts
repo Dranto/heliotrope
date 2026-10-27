@@ -155,6 +155,12 @@ const migrations: Record<number, Migration> = {
   // v45 (lot 4): the decor, the heliotrope's colours and the photo mode leave; the decor is
   // dropped below without compensation, the heliotrope blooms lilac again.
   44: (raw) => ({ ...raw, version: 45 }),
+  // v46 (lot 5): a working path changes once per Cycle instead of once per Season. The Seasons
+  // of the last changes mean nothing as Cycles, so every building may change once more.
+  45: (raw) => {
+    const growth = raw.growth as Record<string, unknown> | undefined;
+    return { ...raw, version: 46, growth: growth ? { ...growth, swapped: {} } : growth };
+  },
 };
 
 function isLanguage(value: string): value is Language {
