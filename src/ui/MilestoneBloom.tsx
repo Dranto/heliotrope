@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ACHIEVEMENTS, bonusPerAchievement, type AchievementId } from '../game/achievements';
 import { formatNumber, formatPercent } from '../game/format';
-import { MILESTONE_GIFTS } from '../game/milestoneFamilies';
 import { achievementDescription, achievementName } from '../i18n/achievements';
 import { t } from '../i18n';
 import { useGameState } from './useGame';
@@ -144,11 +143,6 @@ export function MilestoneBloom() {
                 formatPercent(bonusPerAchievement(state) * current.ids.length),
               )}
             </span>
-            {single && (
-              <span className="bloom-gift" data-gift={MILESTONE_GIFTS[single.family]}>
-                {t.achievements.gifts[MILESTONE_GIFTS[single.family]]}
-              </span>
-            )}
           </div>
         </div>
       )}

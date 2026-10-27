@@ -1,4 +1,3 @@
-import { MilestoneGifts } from './MilestoneGifts';
 import {
   lazy,
   Suspense,
@@ -71,8 +70,6 @@ import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
 import { CorridorLayer } from './CorridorArt';
 import { RootsLayer } from './RootsArt';
 import { treeAge } from './tree';
-import { AllianceThreads, BloomLayer } from './AllianceArt';
-import { workingAlliances } from '../game/alliances';
 import { OrchardLayer } from './OrchardArt';
 import { encodeOrchard } from './orchardMap';
 import { isOrchardOpen, pickFruit, type FruitId } from '../game/orchard';
@@ -285,9 +282,6 @@ export function Scene({
     >,
     state.growth.paths,
   );
-  // The alliances at work and the grand bloom (§9.9), joined so the map redraws only on a change.
-  const working = workingAlliances(state).join();
-  const bloomed = state.alliances.bloomed;
   // The orchard (§9.8), encoded so the layer only redraws when a tree or a hive changes.
   const orchardOpen = isOrchardOpen(state);
   // The landscape of the sister city lived in (§7.6).
@@ -369,8 +363,6 @@ export function Scene({
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
         <CorridorLayer corridors={corridors} />
-        <BloomLayer bloomed={bloomed} />
-        <AllianceThreads working={working} />
         <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <GrowthLayer growth={growth} flying={flying} reduced={reduced} />
@@ -416,8 +408,6 @@ export function Scene({
       weather,
       requests,
       corridors,
-      working,
-      bloomed,
       orchard,
       orchardOpen,
       onPick,
@@ -525,10 +515,6 @@ export function Scene({
         <div className="map-flower" style={{ left: flower.x, top: flower.y, width: flower.width }}>
           <Flower />
         </div>
-        <MilestoneGifts
-          left={flower.x + flower.width * 0.78}
-          top={flower.y + flower.width * 1.02}
-        />
         <Butterfly onCatch={onCatch} />
       </div>
       <figcaption className="scene-caption">

@@ -8,9 +8,7 @@ import { createDeltaState, type DeltaState } from './delta';
 import { createGreatWorksState, type GreatWorksState } from './greatWorks';
 import { createOrchardState, type OrchardState } from './orchard';
 import { createCityState, type CityState } from './cities';
-import { createAlliancesState, type AlliancesState } from './alliances';
 import { createGreetingsState, type GreetingsState } from './greetings';
-import type { MilestoneGift } from './milestoneFamilies';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -34,7 +32,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 40;
+export const STATE_VERSION = 41;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -99,6 +97,8 @@ export interface GameState {
   idleSeconds: number;
   /** Milestones unlocked over all Seasons, in unlock order (§9.3): each adds +1% production. */
   achievements: AchievementId[];
+  /** Milestones reached whose mechanic has left the game: they still count in the bonus. */
+  retiredAchievements: number;
   /** Parcels restored, in order (§6.1). Kept across Seasons. */
   parcels: ParcelId[];
   /** Neighbouring districts restored, in order (§6.4). Kept across Seasons and Cycles. */
@@ -147,10 +147,6 @@ export interface GameState {
   orchard: OrchardState;
   /** The sister cities (§7.6, M23): the city lived in, the network, the Savoirs. */
   city: CityState;
-  /** The alliances chosen and the grand bloom (§9.9, M24). */
-  alliances: AlliancesState;
-  /** Gifts the Milestones reached left on the map, not gathered yet (§9.16, M37). */
-  milestoneGifts: MilestoneGift[];
   /** The species greeted on the map (§9.15, M35). Kept forever. */
   greetings: GreetingsState;
   /** The paths picked as the buildings grow (§5.5, M26). Kept across Seasons and Cycles. */
@@ -223,6 +219,7 @@ export function createInitialState(now: number): GameState {
     seasonSeconds: 0,
     idleSeconds: 0,
     achievements: [],
+    retiredAchievements: 0,
     parcels: [],
     districts: [],
     futures: createFuturesState(),
@@ -247,8 +244,6 @@ export function createInitialState(now: number): GameState {
     greatWorks: createGreatWorksState(),
     orchard: createOrchardState(),
     city: createCityState(),
-    alliances: createAlliancesState(),
-    milestoneGifts: [],
     greetings: createGreetingsState(),
     growth: createGrowthState(),
     pollen: createPollenState(),

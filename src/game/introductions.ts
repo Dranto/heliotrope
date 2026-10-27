@@ -20,7 +20,6 @@ export const FEATURE_IDS = [
   'weather',
   'orchard',
   'greatWorks',
-  'alliances',
 ] as const;
 export type FeatureId = (typeof FEATURE_IDS)[number];
 

@@ -19,7 +19,7 @@ describe('isPanelHidden', () => {
     expect(isPanelHidden('restoration', 'medium', 'build')).toBe(false);
     expect(isPanelHidden('cooperatives', 'medium', 'improve')).toBe(false);
     expect(isPanelHidden('garden', 'medium', 'build')).toBe(true);
-    expect(isPanelHidden('alliances', 'medium', 'living')).toBe(false);
+    expect(isPanelHidden('garden', 'medium', 'living')).toBe(false);
     expect(isPanelHidden('bioregion', 'medium', 'living')).toBe(true);
     expect(isPanelHidden('bioregion', 'medium', 'region')).toBe(false);
   });

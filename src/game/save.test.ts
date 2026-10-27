@@ -1,3 +1,4 @@
+import { achievementBonus, bonusPerAchievement } from './achievements';
 import {
   clearSave,
   deserialize,
@@ -91,6 +92,25 @@ describe('save', () => {
     expect(loadGame(0)).toEqual(state);
     clearSave();
     expect(loadGame(0)).toBeNull();
+  });
+
+  it('keeps the bonus of Milestones whose mechanic left the game (slimming plan, lot 1)', () => {
+    const old = {
+      ...JSON.parse(serialize(playedState())),
+      version: 40,
+      achievements: ['light.3', 'firstAlliance', 'grandBouquet'],
+      alliances: { chosen: ['orchardBees'], bloomed: false },
+      milestoneGifts: ['light'],
+    };
+    delete old.retiredAchievements;
+    const state = deserialize(JSON.stringify(old), 0)!;
+    expect(state.achievements).toEqual(['light.3']);
+    expect(state.retiredAchievements).toBe(2);
+    expect(achievementBonus(state)).toBeCloseTo(3 * bonusPerAchievement(state));
+    expect('alliances' in state).toBe(false);
+    expect('milestoneGifts' in state).toBe(false);
+    // Saved again, the count is kept and not counted twice.
+    expect(deserialize(serialize(state), 0)!.retiredAchievements).toBe(2);
   });
 
   it('rejects corrupt or future saves', () => {

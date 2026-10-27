@@ -2,10 +2,9 @@
 // plays from the first click to the second sister city, in sessions: an hour
 // of play, then three hours away while the game goes on offline (§9.1), as a player who comes
 // back every few hours. At each coming and going it tends the small loops: the courtyard garden,
-// the orchard and its hives, the great works, the alliances and the neighbours' requests. Since
+// the orchard and its hives, the great works and the neighbours' requests. Since
 // v5 (M36) it also rotates its crops with the strawberries, greets the species on the map and
 // brings the sun forward in the forecast. Pure and headless, like the simulator it drives.
-import { ALLIANCE_IDS, canChoose, chooseAlliance, isAwake } from './alliances';
 import { buyWorkshop, canSwarm, swarm, type LandscapeId, type WorkshopId } from './cities';
 import { CROP_IDS, canSow, harvest, isRipe, sow, type CropId } from './garden';
 import { canContribute, isStageReady, missing, WORK_IDS, contribute } from './greatWorks';
@@ -15,7 +14,6 @@ import { applyOfflineProgress } from './offline';
 import { lightPerSecond } from './production';
 import { canPlayHand, canServe, playHand, serveRequest } from './requests';
 import { canGreet, greetSpecies } from './greetings';
-import { gatherMilestoneGifts } from './milestoneFamilies';
 import { canSwapForecast, swapForecast } from './weather';
 import {
   learnReferenceTalents,
@@ -108,14 +106,6 @@ function tendWorks(state: GameState): GameState {
   return next;
 }
 
-/** Choose every alliance awake while a place is free. */
-function tendAlliances(state: GameState): GameState {
-  return ALLIANCE_IDS.reduce(
-    (s, id) => (isAwake(s, id) && canChoose(s, id) ? chooseAlliance(s, id) : s),
-    state,
-  );
-}
-
 /** Serve every request met, then play the hands at once. */
 function tendRequests(state: GameState): GameState {
   let next = state;
@@ -130,8 +120,7 @@ function tendRequests(state: GameState): GameState {
 
 /** Everything the reference player does on a visit to the small loops. */
 export function tendLoops(state: GameState): GameState {
-  const gathered = gatherMilestoneGifts(state);
-  return tendRequests(tendAlliances(tendWorks(tendOrchard(tendSky(tendGarden(gathered))))));
+  return tendRequests(tendWorks(tendOrchard(tendSky(tendGarden(state)))));
 }
 
 /** Learn the reference rules of the workshop as far as the Savoirs go, cheapest level first. */

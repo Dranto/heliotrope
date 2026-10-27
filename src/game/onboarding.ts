@@ -1,6 +1,5 @@
 // Progressive introductions (docs/game-design.md §10.8): when a mechanic is due, and the pacing
 // that lets them join one at a time, at least INTRO_GAP_SECONDS of play apart.
-import { areAlliancesOpen } from './alliances';
 import { isBioregionOpen } from './bioregion';
 import { isButterflyUnlocked } from './butterfly';
 import { unlockedCooperatives } from './cooperatives';
@@ -77,8 +76,6 @@ function isOpen(state: GameState, id: FeatureId): boolean {
       return isOrchardOpen(state);
     case 'greatWorks':
       return areGreatWorksOpen(state);
-    case 'alliances':
-      return areAlliancesOpen(state);
   }
 }
 

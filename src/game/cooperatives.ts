@@ -24,7 +24,6 @@ import {
 } from './production';
 import type { GameState } from './state';
 import { CANOPY_LIST, TALENT_LIST } from './talents';
-import { windBikesRiding } from './alliances';
 import {
   canSow,
   CROP_IDS,
@@ -220,13 +219,7 @@ function nextPurchase(state: GameState): Purchase | null {
   const money = budget(state);
   const buildingCost = best ? generatorCost(state, best.id) : Infinity;
   const council = isCooperativeActive(state, 'council');
-  // "Les vélos dans le vent" (M34): under the wind, the building cooperatives buy the synergies.
-  const riders = !council && best !== null && windBikesRiding(state);
-  const upgrade = council
-    ? availableUpgrades(state)[0]
-    : riders
-      ? availableUpgrades(state).find((u) => u.effect.kind === 'synergy')
-      : undefined;
+  const upgrade = council ? availableUpgrades(state)[0] : undefined;
   // The council's projects (M36) wait in line with its upgrades, the cheaper first.
   const project = nextProject(state);
   if (project && (!upgrade || project.cost < upgrade.cost)) {
@@ -237,8 +230,7 @@ function nextPurchase(state: GameState): Purchase | null {
   }
   if (upgrade && (!best || upgrade.cost <= buildingCost * COUNCIL_PRIORITY)) {
     if (upgrade.cost > money) return null;
-    const buyer = council ? 'council' : best!.cooperative;
-    return { cooperative: buyer, kind: 'upgrade', id: upgrade.id, cost: upgrade.cost };
+    return { cooperative: 'council', kind: 'upgrade', id: upgrade.id, cost: upgrade.cost };
   }
   if (!best) return null;
   const goodDeal = best.score <= Math.min(...scores.values()) * COOPERATIVE_TOLERANCE;

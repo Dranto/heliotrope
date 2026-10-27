@@ -248,6 +248,8 @@ Roadmap P26. Le clic redevient un geste tout au long de la partie. Code dans `sr
 
 ### 5.7 Les moments qui s'enchaînent (M31)
 
+> Le bouquet et ses deux Jalons sont retirés par l'allègement (§9.17, lot 1).
+
 Roadmap P30, décision D23 : le bouquet est un bonus de production. Le clic, le Papillon doré, l'envolée et les visites deviennent une seule famille de moments qui se renforcent. Code dans `src/game/effects.ts` (bouquet), `src/game/butterfly.ts` (chances selon le temps) et `src/game/pollen.ts`, pétales dans `src/ui/Flower.tsx`, reflets des voies dans `src/ui/GrowthArt.tsx`.
 
 - **Le bouquet.** Chaque sorte d'effet en cours au-delà de la première (Floraison, Pollinisation, Averse d'été, Nuée, haricots, transhumance, fête des récoltes, lucioles, brocante, envolée) ajoute **+10 % à toute la production**, jusqu'à **+50 %** (six effets à la fois). Il ne retire jamais rien et s'arrête avec les effets. Autour de la jauge de pollen, au pied de l'arbre héliotrope, se pose un **pétale doré** par effet au-delà du premier (sept au plus), et le compteur montre « Bouquet de 3 effets +20 % » parmi les effets en cours. Les coups de main gardés en réserve (§9.11) servent à le composer : une Floraison ou une envolée lancée quand le Papillon passe.
@@ -841,9 +843,9 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 | Cycle | Cible | Simulé | Saisons | Sources à la fin |
 |---|---|---|---|---|
 | 1ᵉʳ (conseillé) | ~2 h 10 | 2 h 08 | une dizaine | 5 |
-| 2ᵉ | ~35 min | 36 min | 3 de 12 min | 13 |
-| 3ᵉ | ~35 min | 40 min | 4 de 10 min | 21 |
-| 4ᵉ | ~45 min | 55 min | 5, de 10 à 15 min | 35 |
+| 2ᵉ | ~30 min | 24 min | 2 de 12 min | 9 |
+| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 15 |
+| 4ᵉ | ~45 min | 40 min | 4 de 10 min | 24 |
 | 5ᵉ | (~1 h) | 1 h 10 | 6, de 10 à 16 min | 57 |
 | 6ᵉ | (~1 h 10) | 1 h 28 | 6, la dernière de 29 min | 90 |
 
@@ -1041,6 +1043,8 @@ Les variétés anciennes se lisent dans le panneau du verger, sous les ruches, p
 
 ### 9.9 Les alliances et la grande floraison (M24)
 
+> Retirées par l'allègement (§9.17, lot 1), avec leurs places, leurs fils et leurs Jalons.
+
 Des **synergies entre systèmes** à composer (roadmap P23, décision D16), à la place de l'album. Une alliance relie deux choses que le joueur a fait grandir, souvent de deux couches différentes ; elle **s'éveille** quand les deux atteignent leur seuil et ne joue que si elle occupe une **place**. Code dans `src/game/alliances.ts`, panneau `src/ui/Alliances.tsx` (après les grands chantiers), fils et floraison dans `src/ui/AllianceArt.tsx` et `src/ui/allianceMap.ts`.
 
 | Alliance | Ce qu'elle relie (seuils) | Effet |
@@ -1148,6 +1152,8 @@ Roadmap P32, décision D25 : échanger le prochain temps une fois par Saison. La
 
 ### 9.14 Les alliances du milieu (M34)
 
+> Retirées par l'allègement (§9.17, lot 1), avec « Les vélos dans le vent » et « La toile du vivant ».
+
 Roadmap P33, décision D26 : des places plus tôt plutôt que plus de places. Six alliances relient enfin les systèmes de la v4, et la composition devient une décision dès la 2ᵉ Saison. Code dans `src/game/alliances.ts` ; les effets nouveaux passent par `src/game/bonuses.ts` (`harvestBaskets`, `perPath`, `handSlots`) et `src/game/cooperatives.ts` (les vélos).
 
 | Alliance | Ce qu'elle relie (seuils) | Effet |
@@ -1193,6 +1199,8 @@ Roadmap P34. Le vivant revenu devient un acteur de la carte, et les demandes des
 
 ### 9.16 Des Jalons qui comptent (M37)
 
+> Les cadeaux sur la carte et les deux alliances qui lisent les Jalons sont retirés par l'allègement (§9.17, lot 1) ; les familles complètes, le prochain Jalon et les lauriers restent.
+
 Roadmap P36, ajout d'Antoine (« ajoute aussi des interactions avec les jalons et d'autres mécaniques du jeu pour rendre leur complétion satisfaisante »). Un Jalon ne faisait qu'ajouter +1 % ; désormais il laisse un cadeau, les familles complètes comptent, et d'autres mécaniques les lisent. Code dans `src/game/milestoneFamilies.ts`, la progression dans `src/game/achievements.ts` (`achievementProgress`).
 
 - **Un cadeau sur la carte.** Chaque Jalon atteint pose un petit médaillon de laurier au pied de l'héliotrope (son compte s'affiche quand il y en a plusieurs, huit au plus). Un clic les ramasse tous ; chacun donne le geste de sa famille, et le médaillon d'éclosion (§9.3) l'annonce sous « Production +1 % » :
@@ -1225,6 +1233,15 @@ Roadmap P36, ajout d'Antoine (« ajoute aussi des interactions avec les jalons e
 - **Écarts avec la roadmap.** Le cadeau attend un clic au lieu d'être donné d'un coup : donné seul, il raccourcissait la 1ʳᵉ Saison de plus de 30 % (le joueur de référence ne le ramasse que dans la partie complète, §8), et le ramasser est un geste de plus sur la carte. Le prochain objectif (M10) ne désigne pas de Jalon : il compare des prix, qu'un Jalon n'a pas. Pas de nouveau Jalon : 159 en tout.
 - **Équilibrage.** Les familles se complètent tard (la Lumière demande 1 Qn au total, le quartier la grande floraison) : leurs bonus et les lauriers servent la fin de partie. Le joueur de référence ramasse les cadeaux à chaque visite des petites boucles. 1ʳᵉ Saison 66 min (inchangée) ; 1ᵉʳ Cycle 2 h 39 ; Cycles 2 à 4 en 36, 36 et 44 min ; essaimages à 4 h et 5 h, sur leurs cibles.
 - **Sauvegarde.** Version 38 : les cadeaux en attente et le niveau des lauriers ; aucun pour une sauvegarde plus ancienne.
+
+### 9.17 Le jeu allégé (2026-10)
+
+Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et difficiles à comprendre, pour renforcer bâtir, améliorer, le quartier, l'Arbre des Saisons et les vrais choix. Le plan complet, ses neuf lots et leurs raisons sont dans `docs/slimming-plan.md` ; chaque lot met à jour ce document.
+
+- **Lot 1 : retirés.** Les alliances (§9.9, §9.14) et leurs places, la grande floraison, le bouquet (§5.7), les cadeaux des Jalons (§9.16) et les deux alliances qui lisaient les Jalons. Aucune ne changeait le rythme mesuré au §8. Les Coopératives des bâtiments n'achètent plus de synergies par vent : seul le Conseil achète les améliorations (§7.2).
+- **Les Jalons d'autrefois.** Les Jalons des mécaniques retirées (Première alliance, La toile du vivant, La grande floraison, Bouquet, Grand bouquet) quittent la liste : **154 Jalons**. Ceux qu'un joueur avait atteints restent comptés dans son bonus de +1 % par Jalon, qui ne baisse jamais. La famille du quartier se complète sans la grande floraison.
+- **Équilibrage.** 1ʳᵉ Saison 59 min, 2ᵉ Saison 21 min, 1ᵉʳ Cycle 50 min de jeu après elles ; Cycles 2 à 4 en 24, 36 et 40 min. Sans le bouquet ni les alliances, le 1ᵉʳ Cycle finit avec un peu moins de Sources, et le 2ᵉ, qui en vise ×1,5, tient en deux Saisons au lieu de trois : sa cible passe de 35 à **30 min**, entre les deux, jusqu'à la règle de relance du lot 9. Les Saisons à défi se gagnent dès 17 min (seuil du test abaissé à 15 min ; elles partent au lot 4).
+- **Sauvegarde.** Version 41 : les alliances, la floraison et les cadeaux en attente sont effacés ; les Jalons retirés déjà atteints deviennent un compte (`retiredAchievements`) ajouté au bonus.
 
 ## 10. Écrans et interface
 
@@ -1352,13 +1369,13 @@ Le confort en attente depuis M5 (roadmap, « Confort à glisser au fil de l'eau 
 
 Roadmap P24 : avec la v2 et la v3, le menu latéral avait neuf panneaux. Code dans `src/game/panels.ts` (pur) et `src/ui/App.tsx`.
 
-- **Trois couches.** Les panneaux se rangent sous trois onglets à icône, en haut du menu : **La ville** (Améliorer, Bâtir, Le quartier, Coopératives), **Le vivant** (Potager, Verger, Alliances) et **La région** (Biorégion, Grands chantiers). Une couche n'apparaît qu'avec son premier panneau ; la barre n'apparaît qu'avec la deuxième couche (le potager, dès le premier pot ; la région arrive avec la Biorégion). Un seul onglet à la fois, gardé dans le navigateur. Sur les très grands écrans (dès 1760 px), les deux colonnes montrent toujours tout et la barre disparaît.
+- **Trois couches.** Les panneaux se rangent sous trois onglets à icône, en haut du menu : **La ville** (Améliorer, Bâtir, Le quartier, Coopératives), **Le vivant** (Potager, Verger) et **La région** (Biorégion, Grands chantiers). Une couche n'apparaît qu'avec son premier panneau ; la barre n'apparaît qu'avec la deuxième couche (le potager, dès le premier pot ; la région arrive avec la Biorégion). Un seul onglet à la fois, gardé dans le navigateur. Sur les très grands écrans (dès 1760 px), les deux colonnes montrent toujours tout et la barre disparaît.
 - **Téléphone.** La barre d'onglets du bas devient Bâtir (bâtiments, Coopératives), Améliorer (améliorations, Le quartier), Le vivant, La région et Plus ; un onglet n'apparaît qu'avec sa couche.
 - **Ce qui vient de s'ouvrir.** Un panneau que le joueur n'a pas encore touché s'entoure d'un **anneau doré qui respire**, jusqu'au premier toucher (clic ou focus clavier). L'onglet qui le contient porte un **point doré** tant qu'il n'est pas choisi (et « nouveau » pour les lecteurs d'écran). Aucun texte. Une sauvegarde plus ancienne compte comme vus tous les panneaux qu'elle montre déjà.
-- **Ce qui attend.** Un panneau **replié** qui a quelque chose à faire maintenant (un achat possible, une récolte mûre, un arbre à planter, une place d'alliance libre, une étape de chantier prête) montre un point doré après son titre.
+- **Ce qui attend.** Un panneau **replié** qui a quelque chose à faire maintenant (un achat possible, une récolte mûre, un arbre à planter, une étape de chantier prête) montre un point doré après son titre.
 - **Les écrans** gardent leur barre d'icônes avec leurs pastilles (Graines mûres, Graines à semer, Sources) ; ils se chargent maintenant à leur première ouverture, ce qui allège le chargement de la carte (le fichier principal passe de 639 à 437 ko, 195 à 133 ko compressé, une partie se retrouvant dans des morceaux partagés).
 - **Les doigts.** Sur écran tactile, les carrés mûrs du potager, les arbres mûrs du verger et les visites se touchent dans un cercle plus large que leur dessin. Le Papillon fait déjà 56 px.
-- **Les sons** des systèmes récents (§6.3) : récolte et cueillette, étape de chantier et ruche, alliance.
+- **Les sons** des systèmes récents (§6.3) : récolte et cueillette, étape de chantier et ruche.
 - **Sauvegarde.** Version 26 : les panneaux déjà touchés.
 
 ### 10.8 Une nouveauté à la fois
@@ -1366,7 +1383,7 @@ Roadmap P24 : avec la v2 et la v3, le menu latéral avait neuf panneaux. Code da
 Mesuré sur une partie neuve avant ce changement (joueur de référence du §8) : le potager, les améliorations et le bouton des Jalons arrivaient ensemble à 8 s, l'Herbier, le Papillon, les visites et le décor entre 3 et 5 min, et la 2ᵉ Saison ouvrait d'un coup l'Arbre, les Coopératives, les demandes des voisins et la météo. Code dans `src/game/introductions.ts` (ce qui est introduit) et `src/game/onboarding.ts` (l'ordre et le rythme).
 
 - **Le principe.** Chaque mécanique garde sa condition d'ouverture ; une fois cette condition remplie, elle attend son tour. Une seule entre dans le jeu à la fois, **au moins 45 s de jeu après la précédente** (hors ligne compris : c'est du temps écoulé). La toute première attend 45 s après le début de la partie : la première minute reste à la fleur et au premier pot (§10.6). Tant qu'elle n'est pas introduite, une mécanique n'existe pas : ni panneau, ni effet, ni production (un Papillon ne vient pas, la météo ne joue pas).
-- **L'ordre**, quand plusieurs attendent ensemble : le pollen, le potager, Le quartier (parcelles et projets), les Jalons, l'Herbier, le Papillon doré, les visites, le décor, les Saisons, l'Arbre des Saisons, la Biorégion, les Coopératives, les demandes des voisins, la météo, le verger, les grands chantiers, les alliances. Les améliorations et les bâtiments ne passent pas par là.
+- **L'ordre**, quand plusieurs attendent ensemble : le pollen, le potager, Le quartier (parcelles et projets), les Jalons, l'Herbier, le Papillon doré, les visites, le décor, les Saisons, l'Arbre des Saisons, la Biorégion, les Coopératives, les demandes des voisins, la météo, le verger, les grands chantiers. Les améliorations et les bâtiments ne passent pas par là.
 - **La jauge de pollen** (§5.6) n'est plus là dès le début : elle rejoint la fleur avec la première amélioration de clic (Mains tièdes, 15 clics), et reste dès la 2ᵉ Saison. Avant, les clics ne la remplissent pas.
 - **Le signal, sans texte.** À l'arrivée de chaque mécanique, une lueur dorée s'allume sur la couronne de l'arbre héliotrope et trois anneaux dorés en partent, une fois. Puis la nouveauté se montre elle-même : un panneau s'entoure de son anneau doré et son onglet de son point (§10.7) ; un bouton (Jalons, Herbier, Saisons, Arbre), l'outil Décor ou la prévision du temps luisent quatre fois ; la jauge de pollen se dessine en or au pied de l'arbre ; le premier Papillon et la première visite arrivent 5 s après (au lieu d'attendre leur tirage). Avec les animations réduites (§10.4), rien ne bouge ni ne luit : il reste le point doré des onglets.
 - **Rythme mesuré** (joueur de référence, `src/game/onboarding.test.ts`) : 1ʳᵉ Saison, pollen 0:45, potager 1:30, Le quartier 2:15, Jalons 3:00, Herbier 3:45, Papillon 4:35, visites 5:20, décor 6:05, Saisons vers 19 min ; 2ᵉ Saison, l'Arbre tout de suite, puis Coopératives, demandes et météo de 45 s en 45 s ; 3ᵉ Saison, la Biorégion tout de suite, puis le verger et les grands chantiers. Les cibles du §8 tiennent (les retards se comptent en dizaines de secondes).

@@ -23,7 +23,6 @@ import { VISIT_EFFECTS, type WelcomeResult } from '../game/visits';
 import { ACHIEVEMENT_LIST } from '../game/achievements';
 import { formatNumber, formatPercent, setNotation } from '../game/format';
 import { SPECIES_LIST } from '../game/species';
-import { bouquetBonus, bouquetSize } from '../game/effects';
 import { arrivedFeature } from '../game/introductions';
 import { isAchievementsScreenOpen, isHerbierOpen, isTreeOpen } from '../game/onboarding';
 import { fleaMarketGenerator, lightPerSecond } from '../game/production';
@@ -67,7 +66,6 @@ import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
 import { Orchard } from './Orchard';
 import { Requests } from './Requests';
-import { Alliances } from './Alliances';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest, harvestAll } from '../game/garden';
 import { Scene } from './Scene';
@@ -101,7 +99,7 @@ const TABS: Tab[] = ['build', 'improve', 'living', 'region', 'more'];
 const TAB_PANELS: Record<Tab, PanelId[]> = {
   build: ['generators', 'cooperatives'],
   improve: ['upgrades', 'restoration'],
-  living: ['garden', 'orchard', 'requests', 'alliances'],
+  living: ['garden', 'orchard', 'requests'],
   region: ['bioregion', 'greatWorks'],
   more: [],
 };
@@ -121,7 +119,6 @@ const PANEL_CLASS: Record<PanelId, string> = {
   cooperatives: 'cooperatives',
   garden: 'garden-panel',
   orchard: 'orchard-panel',
-  alliances: 'alliances-panel',
   requests: 'requests-panel',
   bioregion: 'bioregion',
   greatWorks: 'works-panel',
@@ -676,14 +673,6 @@ export function App() {
                   {t.butterfly.effect[effect.kind](t.duration(Math.ceil(effect.remaining)))}
                 </span>
               ))}
-              {bouquetBonus(state.effects) > 0 && (
-                <span className="effect-chip" data-kind="bouquet">
-                  {t.butterfly.bouquet(
-                    bouquetSize(state.effects),
-                    formatPercent(bouquetBonus(state.effects)),
-                  )}
-                </span>
-              )}
             </span>
           )}
         </div>
@@ -767,7 +756,6 @@ export function App() {
               {awake('orchard') && <Orchard onHarvestAll={onHarvestAll} />}
               {awake('requests') && <Requests />}
               {awake('greatWorks') && <GreatWorks />}
-              {awake('alliances') && <Alliances />}
             </div>
             <div className="side-column">
               <Generators />

@@ -31,7 +31,6 @@ function counters(state: GameState): Record<Exclude<SoundName, 'bird'>, number> 
     harvest: state.garden.harvests + state.orchard.harvests,
     work:
       WORK_IDS.reduce((sum, id) => sum + state.greatWorks.works[id].stage, 0) + state.orchard.hives,
-    alliance: state.alliances.chosen.length,
     greet: totalGreetings(state),
   };
 }
@@ -40,7 +39,6 @@ function counters(state: GameState): Record<Exclude<SoundName, 'bird'>, number> 
 const PRIORITY = [
   'season',
   'work',
-  'alliance',
   'restore',
   'project',
   'milestone',
