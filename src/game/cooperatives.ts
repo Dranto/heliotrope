@@ -23,8 +23,8 @@ import {
 import type { GameState } from './state';
 import { CANOPY_LIST, TALENT_LIST } from './talents';
 import { canSow, CROP_IDS, isCropUnlocked, openPlots, sow, type CropId } from './garden';
-import { PROJECTS, type ProjectId } from './projects';
-import { carryOutProject, offeredProjects } from './restoration';
+import { type ProjectId } from './projects';
+import { carryOutProject, offeredProjects, projectCost } from './restoration';
 
 export const COOPERATIVE_IDS = [
   'gardeners',
@@ -143,7 +143,7 @@ function nextProject(state: GameState): { id: ProjectId; cost: number } | null {
   if (!councilLeadsProjects(state)) return null;
   let best: { id: ProjectId; cost: number } | null = null;
   for (const { id } of offeredProjects(state)) {
-    const { cost } = PROJECTS[id];
+    const cost = projectCost(state, id);
     if (!best || cost < best.cost) best = { id, cost };
   }
   return best;

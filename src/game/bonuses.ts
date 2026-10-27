@@ -84,7 +84,11 @@ export type Bonus =
   /** Water collectors cost this share less Light (§7.4). */
   | { kind: 'collectorDiscount'; fraction: number }
   /** Site levels cost this share less Water (§7.4). */
-  | { kind: 'siteDiscount'; fraction: number };
+  | { kind: 'siteDiscount'; fraction: number }
+  /** Neighbourhood projects cost this share less Light (§6.2, slimming plan lot 8). */
+  | { kind: 'projectDiscount'; fraction: number }
+  /** Parcels and neighbouring districts cost this share less Light (§6.1, §6.4, lot 8). */
+  | { kind: 'landDiscount'; fraction: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -237,7 +241,7 @@ export function ripeningBonus(source: BonusSource): number {
 /** Cost factor of a discount kind other than the buildings': each one stacks multiplicatively. */
 export function discountFactor(
   source: BonusSource,
-  kind: 'collectorDiscount' | 'siteDiscount',
+  kind: 'collectorDiscount' | 'siteDiscount' | 'projectDiscount' | 'landDiscount',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * (1 - b.fraction), 1);
 }

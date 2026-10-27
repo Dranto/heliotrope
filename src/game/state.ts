@@ -16,7 +16,7 @@ import { createFuturesState, type FuturesState } from './restoration';
 import { nextRandom, seedFrom } from './random';
 import { RESOURCE_IDS, type ResourceId } from './resources';
 import type { SpeciesId } from './species';
-import { createCanopyState, type CanopyState, type TalentId } from './talents';
+import { createCanopyState, type CanopyState, type ForkId, type TalentId } from './talents';
 import { createGrowthState, type GrowthState } from './growth';
 import { createPollenState, type PollenState } from './pollen';
 import { createWeatherState, type WeatherState } from './weather';
@@ -25,7 +25,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 46;
+export const STATE_VERSION = 47;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -102,6 +102,8 @@ export interface GameState {
   projects: ProjectId[];
   /** Talents of the Tree of Seasons learnt, in order (§7.1). Kept across Seasons. */
   talents: TalentId[];
+  /** Cycle of water in which each fork of the tree was last swapped (§7.1, lot 8). */
+  talentSwaps: Partial<Record<ForkId, number>>;
   /** Levels of the Canopy above the tree and the sower's settings (§7.1). Kept forever. */
   canopy: CanopyState;
   /** Cooperatives' settings and purchases (§7.2). Kept across Seasons. */
@@ -200,6 +202,7 @@ export function createInitialState(now: number): GameState {
     futures: createFuturesState(),
     projects: [],
     talents: [],
+    talentSwaps: {},
     canopy: createCanopyState(),
     cooperatives: createCooperativesState(),
     species: [],
