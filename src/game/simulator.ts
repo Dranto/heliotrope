@@ -47,8 +47,6 @@ export interface SimulationOptions {
   state?: GameState;
   /** Stop as soon as the Season total reaches ADVISED_SEASON_LIGHT. */
   stopWhenAdvised?: boolean;
-  /** Stop as soon as the running challenge Season is won (§7.3). */
-  stopWhenWon?: boolean;
   /** Clicks per second of the simulated active player. */
   clicksPerSecond?: number;
   /** Stop after this many seconds of play. */
@@ -71,8 +69,6 @@ export interface SimulationResult {
   firstGenerator: Partial<Record<GeneratorId, number>>;
   /** Seconds of play when the Season total reached ADVISED_SEASON_LIGHT (2e9 Light). */
   advisedSeason?: number;
-  /** Seconds of play when the running challenge Season was won (§7.3), to the nearest step. */
-  challengeWon?: number;
   /** State at the end of the simulation. */
   state: GameState;
   seconds: number;
@@ -170,7 +166,6 @@ export const REFERENCE_PATH = 0;
 export function simulate({
   state: start = createInitialState(0),
   stopWhenAdvised = false,
-  stopWhenWon = false,
   clicksPerSecond = REFERENCE_CLICKS_PER_SECOND,
   maxSeconds = 5 * 3600,
   maxStepSeconds = 10,
@@ -207,18 +202,12 @@ export function simulate({
   };
   let advisedSeason: number | undefined;
 
-  let challengeWon: number | undefined;
   while (
     seconds < maxSeconds &&
     !(stopWhenAdvised && advisedSeason !== undefined) &&
-    !(stopWhenWon && challengeWon !== undefined) &&
     seedsToGain(state) < stopAtSeeds
   ) {
     state = tendBioregion(state, income(state, clicksPerSecond));
-    if (challengeWon === undefined && state.challenges.length > start.challenges.length) {
-      challengeWon = seconds;
-      if (stopWhenWon) break;
-    }
     const option = bestOption(state, clicksPerSecond);
     const price = cost(state, option);
     const rate = income(state, clicksPerSecond);
@@ -243,7 +232,7 @@ export function simulate({
     }
     const bought = apply(state, option);
     if (bought === state) {
-      // Nothing left worth buying (a challenge Season's limits, §7.3): keep playing.
+      // Nothing left worth buying: keep playing.
       const dt = Math.min(maxStepSeconds, maxSeconds - seconds);
       state = earnLight(tick(state, dt), clicksPerSecond * dt * clickValue(state));
       state = pollinate(
@@ -264,7 +253,7 @@ export function simulate({
       advisedSeason = seconds;
     }
   }
-  return { firstGenerator, advisedSeason, challengeWon, state, seconds };
+  return { firstGenerator, advisedSeason, state, seconds };
 }
 
 /** The reference player sets aside at most this many seconds of income for a water collector. */

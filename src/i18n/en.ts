@@ -332,8 +332,6 @@ export const en: Texts = {
       'species.1': 'First return',
       'species.10': 'The neighbourhood hums',
       'species.18': 'Complete herbarium',
-      'challenges.1': 'Season braved',
-      'challenges.4': 'All the seasons of the world',
       'cooperatives.100': 'Cargo bike',
       'cooperatives.1000': 'Network of cooperatives',
       'seasons.1': 'First winter',
@@ -383,8 +381,6 @@ export const en: Texts = {
       'weather.mist': 'City of mist',
       'weather.heat': 'Indian summer',
       lockKeeper: 'The lock keeper watches',
-      'cycleChallenges.1': 'Come hell or high water',
-      'cycleChallenges.3': 'Keeper of the river',
     },
     families: {
       light: 'Light',
@@ -424,8 +420,6 @@ export const en: Texts = {
         count === 1
           ? 'See a species of the herbarium come back'
           : `See ${count} species of the herbarium come back`,
-      challenges: (count: number) =>
-        count === 1 ? 'Win a challenge Season' : `Win ${count} challenge Seasons`,
       talents: (count: number) =>
         count === 1
           ? 'Sow a first Seed in the Tree of Seasons'
@@ -485,8 +479,6 @@ export const en: Texts = {
       rotations: (count: number) => `Harvest ${count} crops sown after a different one`,
       families: (count: number) => `Bring ${count} whole families of the Herbier back`,
       weatherSpecies: 'See the five species of the weather come back',
-      cycleChallenges: (count: number) =>
-        count === 1 ? 'Win a challenge Cycle' : `Win all ${count} challenge Cycles`,
     },
   },
   restoration: {
@@ -798,38 +790,16 @@ export const en: Texts = {
       butterflies: (count: number) => `Catch ${count} Golden Butterflies`,
       project: (project: string) => `Launch the ${project} project`,
       talent: (talent: string) => `Learn ${talent} in the Tree`,
-      challenge: (challenge: string) => `Win ${challenge}`,
+      fullTree: 'Learn the whole Tree of Seasons',
+      seasons: (count: number) => `Live ${count} Seasons`,
+      cycles: (count: number) =>
+        count === 1 ? 'Finish a Cycle of water' : `Finish ${count} Cycles of water`,
+      collector: (collector: string, count: number) => `Own ${count} × ${collector}`,
+      site: (site: string, level: number) => `Raise ${site} to level ${level}`,
       visit: (visit: string, count: number) => `${visit}, ${count} times`,
       corridor: (family: string, length: number) => `A ${family} corridor of ${length} parcels`,
       weather: (day: string) => `Comes out on ${day}`,
     },
-  },
-  challenges: {
-    title: 'Challenge Season',
-    hint: 'A constraint for the whole Season. Reaching the goal lifts it, brings back a rare species and gives a bonus forever.',
-    free: 'Free Season',
-    freeHint: 'No constraint',
-    names: {
-      cloudy: 'the Season of clouds',
-      wild: 'the Wild Season',
-      frugal: 'the Frugal Season',
-      hands: 'the Season of hands',
-    },
-    rules: {
-      blocked: (buildings: string) => `Cannot build: ${buildings}`,
-      noUpgrades: 'No upgrades',
-      maxPerGenerator: (count: string) => `At most ${count} of each building`,
-      productionFactor: (factor: string) => `Building production divided by ${factor}`,
-    },
-    goal: (light: string) => `Goal: ${light} Light in the Season`,
-    reward: (species: string, bonus: string) => `Reward: ${species} · ${bonus}`,
-    won: (name: string) => `Challenge won: ${name}! The constraint is lifted.`,
-    wonTag: 'Won',
-    progress: (name: string, percent: string) => `${name}, goal ${percent}% reached`,
-    blockedTag: 'Not this Season',
-    limitTag: (count: string) => `At most ${count}`,
-    noUpgrades: 'The Wild Season grows without upgrades.',
-    startWith: (name: string) => `Start ${name}`,
   },
   welcomeTitle: 'While you were away…',
   welcomeBack: (light: string, duration: string) =>
@@ -908,7 +878,7 @@ export const en: Texts = {
       'The Heliotrope Seeds',
       'The restored plots',
       'The Tree of Seasons and its cooperatives',
-      'The Herbarium and the challenges won',
+      'The Herbarium',
       'The statistics',
       'The options',
     ],
@@ -1062,7 +1032,7 @@ export const en: Texts = {
       'The talents of the Tree of Seasons, without paying for them again',
       'The delta and its branches',
       'The restored parcels',
-      'The Herbarium, the challenges won and the Milestones',
+      'The Herbarium and the Milestones',
       'Statistics and options',
     ],
     start: 'Start a new Cycle',
@@ -1085,7 +1055,7 @@ export const en: Texts = {
       },
       effects: {
         hillsArm: 'Opens a fifth bioregion site, the Hillsides',
-        floodArm: 'Opens the challenge Cycles',
+        floodArm: 'Bioregion sites cost 25% less Water',
         seedArm: (minutes: string) => `Seeds ripen in ${minutes}`,
         memoryArm: 'Half the collectors and site levels stay after a Cycle',
         lockKeeper: 'Starts the Cycle on its own, at the level you choose',
@@ -1104,37 +1074,17 @@ export const en: Texts = {
           seedArm: (minutes: string) => `Seeds ripen in ${minutes}`,
           memoryArm: (share: string) => `${share}% of the collectors and sites stay after a Cycle`,
           hillsArm: (share: string) => `The Hillsides work +${share}% stronger`,
-          floodArm: (share: string) => `Challenge Cycle rewards work +${share}% stronger`,
+          floodArm: (share: string) => `Sites cost ${share}% less Water`,
         },
       },
     },
     lockKeeper: {
       title: 'The lock keeper',
-      hint: 'Starts a free Cycle as soon as its Springs multiply yours, never during a challenge.',
+      hint: 'Starts a Cycle as soon as its Springs multiply yours.',
       off: 'Off',
       factor: (factor: string) => `×${factor}`,
       started: (count: string) => `${count} Cycles started by the lock keeper`,
     },
-  },
-  cycleChallenges: {
-    title: 'Challenge Cycle',
-    hint: 'A constraint for the whole Cycle. Gathering the goal lifts it, brings back a river species and grants a bonus for ever.',
-    free: 'Free Cycle',
-    freeHint: 'No constraint',
-    names: {
-      drought: 'the dry year',
-      flood: 'the flood',
-      still: 'still water',
-    },
-    rules: {
-      water: (factor: string) => `Water gathered divided by ${factor}`,
-      collectorCost: (factor: string) => `Collectors ${factor} times dearer`,
-      siteCost: (factor: string) => `Sites ${factor} times dearer`,
-    },
-    goal: (water: string) => `Goal: ${water} Water in the Cycle`,
-    won: (name: string) => `Challenge won: ${name}! The constraint lifts.`,
-    progress: (name: string, percent: string) => `${name}, goal ${percent}% reached`,
-    startWith: (name: string) => `Start ${name}`,
   },
   cooperatives: {
     title: 'Cooperatives',

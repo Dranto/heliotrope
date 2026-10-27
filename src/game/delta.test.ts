@@ -1,16 +1,5 @@
-import {
-  canRaiseSite,
-  collectorCost,
-  isSiteRevealed,
-  siteCost,
-  waterMultiplier,
-} from './bioregion';
+import { canRaiseSite, collectorCost, isSiteRevealed, siteCost } from './bioregion';
 import { factorOf } from './bonuses';
-import {
-  completeCycleChallenge,
-  CYCLE_CHALLENGES,
-  offeredCycleChallenges,
-} from './cycleChallenges';
 import { runLockKeeper, sourceBonus, startNewCycle, waterForSources } from './cycles';
 import {
   availableSources,
@@ -119,7 +108,7 @@ describe('The delta of the Sources (§7.5, M15)', () => {
     expect(factorOf(open, 'visitInterval')).toBe(1);
   });
 
-  it('the lock keeper starts a free Cycle at the chosen level, never during a challenge', () => {
+  it('the lock keeper starts the next Cycle at the chosen level', () => {
     const ready = { ...delta({ allTimeWater: waterForSources(46) }) };
     const keeper = setLockFactor(withArms(ready, 'lockKeeper'), 1.5);
     expect(runLockKeeper(withArms(ready, 'lockKeeper'))).toEqual(withArms(ready, 'lockKeeper'));
@@ -130,9 +119,6 @@ describe('The delta of the Sources (§7.5, M15)', () => {
     // 30 → 44 Sources is short of ×1.5.
     const short = { ...keeper, allTimeWater: waterForSources(44) };
     expect(runLockKeeper(short)).toBe(short);
-    const challenged = { ...keeper, cycleChallenge: 'drought' as const };
-    expect(runLockKeeper(challenged)).toBe(challenged);
-    expect(runLockKeeper({ ...keeper, challenge: 'wild' as const }).cycles).toBe(2);
     expect(
       runLockKeeper({
         ...keeper,
@@ -146,10 +132,9 @@ describe('The delta of the Sources (§7.5, M15)', () => {
     const state = setLockFactor(withArms(delta(), 'seedArm', 'lockKeeper'), 2);
     const loaded = deserialize(serialize(state), 0)!;
     expect(loaded.delta).toEqual(state.delta);
-    const { delta: _delta, cycleChallenge: _c, cycleChallenges: _w, ...rest } = state;
+    const { delta: _delta, ...rest } = state;
     const old = deserialize(JSON.stringify({ ...rest, version: 16 }), 0)!;
     expect(old.delta.levels.seedArm).toBe(0);
-    expect(old.cycleChallenges).toEqual([]);
     expect(old.sites.hillsides).toBe(0);
   });
 
@@ -161,59 +146,32 @@ describe('The delta of the Sources (§7.5, M15)', () => {
   });
 });
 
-describe('Challenge Cycles (§7.5, M15)', () => {
-  const ready = () => withArms(delta({ allTimeWater: waterForSources(40) }), 'floodArm');
-
-  it('are offered once the flood arm is open, until won', () => {
-    expect(offeredCycleChallenges(delta())).toEqual([]);
-    expect(offeredCycleChallenges(ready()).map((c) => c.id)).toEqual(['drought', 'flood', 'still']);
-    expect(
-      offeredCycleChallenges({ ...ready(), cycleChallenges: ['flood'] }).map((c) => c.id),
-    ).toEqual(['drought', 'still']);
-    expect(startNewCycle(delta({ allTimeWater: waterForSources(40) }), 'drought').cycles).toBe(2);
+describe('The flood arm (§7.5, slimming plan lot 4)', () => {
+  it('makes every site level cheaper, more so once widened', () => {
+    const state = delta();
+    const open = withArms(state, 'floodArm');
+    expect(siteCost(open, 'wetlands') / siteCost(state, 'wetlands')).toBeCloseTo(0.75);
+    const wide = {
+      ...open,
+      delta: { ...open.delta, widths: { ...open.delta.widths, floodArm: 10 } },
+    };
+    expect(siteCost(wide, 'wetlands') / siteCost(state, 'wetlands')).toBeCloseTo(0.5);
+    expect(collectorCost(open, 'roofTanks')).toBe(collectorCost(state, 'roofTanks'));
   });
+});
 
-  it('the dry year divides the Water, the flood and still water raise the prices', () => {
-    const state = ready();
-    const dry = startNewCycle(state, 'drought');
-    expect(dry.cycleChallenge).toBe('drought');
-    const free = startNewCycle(state);
-    expect(waterMultiplier(dry) / waterMultiplier(free)).toBeCloseTo(0.25);
-    const flood = startNewCycle(state, 'flood');
-    expect(collectorCost(flood, 'roofTanks') / collectorCost(free, 'roofTanks')).toBe(10);
-    const still = startNewCycle(state, 'still');
-    expect(siteCost(still, 'wetlands') / siteCost(free, 'wetlands')).toBe(4);
-  });
-
-  it('gathering the goal wins the challenge, its species and its bonus', () => {
-    const dry = startNewCycle(ready(), 'drought');
-    expect(completeCycleChallenge(dry)).toBe(dry);
-    const goal = CYCLE_CHALLENGES.drought.goal;
-    const won = tick({ ...dry, allTimeWater: dry.allTimeWater + goal }, 0.1);
-    expect(won.cycleChallenge).toBeNull();
-    expect(won.cycleChallenges).toEqual(['drought']);
-    expect(won.species).toContain('otter');
-    expect(tick(won, 0.1).achievements).toContain('cycleChallenges.1');
-    const after = startNewCycle({ ...won, allTimeWater: waterForSources(60) });
-    expect(waterMultiplier(after)).toBeCloseTo(
-      (waterMultiplier(startNewCycle(ready())) * 1.25 * (1 + 0.1 * 60)) / (1 + 0.1 * 40),
-    );
-  });
-
-  it('the river species add to the Herbier without being needed to complete it', () => {
+describe('The river species (§7.5)', () => {
+  it('come back with the Cycles and the wetlands, on top of the Herbier', () => {
     const neighbourhood = SPECIES_IDS.filter(
       (id) => !['otter', 'salmon', 'blackStork'].includes(id),
     );
     expect(isHerbierComplete({ species: neighbourhood })).toBe(true);
     expect(isHerbierComplete({ species: neighbourhood.slice(1) })).toBe(false);
-    const state = unlockSpecies({ ...ready(), cycleChallenges: ['flood', 'still'] });
-    expect(state.species).toEqual(['salmon', 'blackStork']);
-  });
-
-  it('a save keeps the challenge running and the challenges won', () => {
-    const state = { ...startNewCycle(ready(), 'still'), cycleChallenges: ['drought' as const] };
-    const loaded = deserialize(serialize(state), 0)!;
-    expect(loaded.cycleChallenge).toBe('still');
-    expect(loaded.cycleChallenges).toEqual(['drought']);
+    const state = delta();
+    expect(unlockSpecies({ ...state, cycles: 1 }).species).toContain('otter');
+    expect(unlockSpecies({ ...state, cycles: 1 }).species).not.toContain('blackStork');
+    expect(unlockSpecies({ ...state, cycles: 5 }).species).toContain('blackStork');
+    const wet = { ...state, sites: { ...state.sites, wetlands: 10 } };
+    expect(unlockSpecies(wet).species).toContain('salmon');
   });
 });

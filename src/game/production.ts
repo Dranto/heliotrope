@@ -1,7 +1,6 @@
 // Production, click and cost formulas (docs/game-design.md §4, §5, §8). Pure functions shared
 // by the game, the UI and the balancing simulator.
 import { achievementBonus } from './achievements';
-import { challengeProductionFactor, generatorLimit, upgradesAllowed } from './challenges';
 import { bonusesOf, costFactor, factorOf, globalBonus } from './bonuses';
 import { effectFactor } from './effects';
 import { COST_GROWTH, GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
@@ -140,8 +139,7 @@ export function upgradeSynergyBonus(state: GameState): number {
 
 /**
  * §8: multiplier applied to every generator: Seeds × Sources × Milestones × biodiversity ×
- * upgrade synergies × parcels and projects × Floraison × the pollen's flight (§5.6), and the
- * constraint of a challenge Season (§7.3).
+ * upgrade synergies × parcels and projects × Floraison × the pollen's flight (§5.6).
  */
 export function globalMultiplier(state: GameState): number {
   let cached = globalCache.get(state);
@@ -163,8 +161,7 @@ function computeGlobalMultiplier(state: GameState): number {
     (1 + biodiversityBonus(state)) *
     (1 + upgradeSynergyBonus(state)) *
     effectFactor(state.effects, 'bloom') *
-    effectFactor(state.effects, 'flight') *
-    challengeProductionFactor(state)
+    effectFactor(state.effects, 'flight')
   );
 }
 
@@ -253,19 +250,17 @@ export function generatorCost(state: GameState, id: GeneratorId, count = 1): num
 }
 
 /**
- * Largest number of units of a generator affordable with the Light in reserve, within the limit
- * of a challenge Season (§7.3).
+ * Largest number of units of a generator affordable with the Light in reserve.
  */
 export function maxAffordable(state: GameState, id: GeneratorId): number {
   const first = generatorCost(state, id);
   const light = state.resources.light;
-  const room = generatorLimit(state, id) - state.generators[id];
-  if (light < first || room < 1) return 0;
+  if (light < first) return 0;
   let count = Math.floor(Math.log(1 + (light * (COST_GROWTH - 1)) / first) / Math.log(COST_GROWTH));
   // Guard against floating-point error at the boundary.
   while (count > 1 && generatorCost(state, id, count) > light) count -= 1;
   while (generatorCost(state, id, count + 1) <= light) count += 1;
-  return Math.min(room, Math.max(1, count));
+  return Math.max(1, count);
 }
 
 /**
@@ -283,11 +278,9 @@ export function isUpgradeBought(state: GameState, id: UpgradeId): boolean {
 }
 
 /**
- * An upgrade appears when its condition is met; conditions never become false in a Season. The
- * wild challenge Season (§7.3) offers none until it is won.
+ * An upgrade appears when its condition is met; conditions never become false in a Season.
  */
 export function isUpgradeUnlocked(state: GameState, id: UpgradeId): boolean {
-  if (!upgradesAllowed(state)) return false;
   const { owned, totalLight, upgrades, synergies, clicks, clickUpgrades } = UPGRADES[id].condition;
   if (totalLight !== undefined && state.totalLight < totalLight) return false;
   if (clicks !== undefined && state.clicks < clicks) return false;
@@ -318,7 +311,6 @@ export interface UpgradeInSight {
  * empty upgrade panel still shows a goal (§2, golden rule). Null when none is left this Season.
  */
 export function upgradeInSight(state: GameState): UpgradeInSight | null {
-  if (!upgradesAllowed(state)) return null;
   let best: UpgradeInSight | null = null;
   for (const upgrade of Object.values(UPGRADES)) {
     const { owned, ...others } = upgrade.condition;
@@ -327,7 +319,6 @@ export function upgradeInSight(state: GameState): UpgradeInSight | null {
     const entries = Object.entries(owned) as [GeneratorId, number][];
     if (entries.length !== 1) continue;
     const [generator, required] = entries[0]!;
-    if (required > generatorLimit(state, generator)) continue;
     const candidate = { upgrade, generator, owned: state.generators[generator], required };
     const ratio = candidate.owned / required;
     if (

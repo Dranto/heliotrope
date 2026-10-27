@@ -57,16 +57,4 @@ describe('next goal (§2, §10.5)', () => {
       discovered: false,
     });
   });
-
-  it('skips generators blocked by a challenge Season', () => {
-    const state = withState({
-      challenge: 'cloudy',
-      resources: { light: 50, water: 0 },
-      totalLight: 1e4,
-      generators: { ...createInitialState(0).generators, pot: 1 },
-    });
-    const goal = nextGoal(state)!;
-    expect(goal.kind === 'generator' && goal.id === 'balconyPanel').toBe(false);
-    expect(goal.cost).toBeGreaterThan(50);
-  });
 });

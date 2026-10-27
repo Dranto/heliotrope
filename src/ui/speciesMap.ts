@@ -109,7 +109,7 @@ export const SPECIES_PLACES: Record<SpeciesId, SpeciesPlace> = {
   orchid: { spots: [[518, 198]], motion: 'still', size: 16 },
   stagBeetle: { spots: [[150, 414]], motion: 'still', size: 14 },
   owl: { spots: [[566, 118]], motion: 'still', size: 18 },
-  // The river species of the challenge Cycles (§7.5), along the river found again.
+  // The river species of the Cycles (§7.5), along the river found again.
   otter: { spots: [[EAST + MID, 300]], motion: 'still', size: 17 },
   salmon: {
     spots: [

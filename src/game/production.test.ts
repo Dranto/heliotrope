@@ -290,13 +290,4 @@ describe('upgradeInSight (§2, §5.1)', () => {
       required: 50,
     });
   });
-
-  it('skips tiers a challenge Season keeps out of reach (§7.3)', () => {
-    const state = withState({
-      challenge: 'frugal',
-      generators: owned({ pot: 25, balconyPanel: 20 }),
-      upgrades: ['pot.1', 'pot.2', 'pot.3', 'balconyPanel.1', 'balconyPanel.2'],
-    });
-    expect(upgradeInSight(state)).toMatchObject({ upgrade: { id: 'balconyPanel.3' } });
-  });
 });

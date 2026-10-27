@@ -18,7 +18,7 @@ export interface DeltaDef {
 export const DELTA: Record<DeltaId, DeltaDef> = {
   // Opens the fifth site of the Bioregion, the hillsides (bioregion.ts).
   hillsArm: { id: 'hillsArm', costs: [2] },
-  // Opens the challenge Cycles (cycleChallenges.ts).
+  // Every site level of the Bioregion costs FLOOD_SITE_DISCOUNT less Water (slimming plan, lot 4).
   floodArm: { id: 'floodArm', costs: [2] },
   // The Seeds ripen sooner: 15 min, then 12, then 10 (§7).
   seedArm: { id: 'seedArm', costs: [3, 6] },
@@ -46,6 +46,8 @@ export const MIN_RIPENING_SECONDS = 5 * 60;
 export const MEMORY_WIDEN_SHARE = 0.04;
 /** Each widening of the hillsides or the flood arm: its effects grow by this share. */
 export const WIDEN_EFFECT_SHARE = 0.1;
+/** Share of the Water a site level costs that the flood arm saves, before widening. */
+export const FLOOD_SITE_DISCOUNT = 0.25;
 
 /** Seconds a Season lasts before its Seeds are ripe, by level of the seed arm. */
 export const RIPENING_SECONDS = [15 * 60, 12 * 60, 10 * 60] as const;
@@ -184,6 +186,12 @@ export function widenFactor(width: number): number {
   return 1 + WIDEN_EFFECT_SHARE * width;
 }
 
+/** Factor on the Water cost of every site level: lower once the flood arm is open, and widened. */
+export function floodSiteFactor(state: Pick<GameState, 'delta'>): number {
+  if (!isArmOpen(state, 'floodArm')) return 1;
+  return 1 - FLOOD_SITE_DISCOUNT * widenFactor(state.delta.widths.floodArm);
+}
+
 /** Levels opened over the whole delta. */
 export function deltaLevels(state: Pick<GameState, 'delta'>): number {
   return DELTA_IDS.reduce((sum, id) => sum + state.delta.levels[id], 0);
@@ -215,14 +223,6 @@ export function hillsidesBonuses(level: number, scale = 1): Bonus[] {
     { kind: 'clickMultiplier', factor: 1 + HILLSIDES_CLICK_BONUS * scale * level },
     { kind: 'visitInterval', factor: 1 / (1 + HILLSIDES_VISIT_BONUS * scale * level) },
   ];
-}
-
-/** A bonus `scale` times as strong: its gain over neutral grows, never its sign. */
-export function scaleBonus(bonus: Bonus, scale: number): Bonus {
-  if (scale === 1) return bonus;
-  if ('factor' in bonus) return { ...bonus, factor: 1 + (bonus.factor - 1) * scale };
-  if ('bonus' in bonus) return { ...bonus, bonus: bonus.bonus * scale };
-  return bonus;
 }
 
 /** Keep only widening levels a save can hold. */

@@ -12,7 +12,6 @@ import { WeatherIcon } from './WeatherArt';
 import { GeneratorIcon } from './UpgradeIcon';
 import { bonusText } from '../i18n/restoration';
 import { guideStep } from '../game/guide';
-import { generatorLimit } from '../game/challenges';
 import { formatCost, formatNumber, formatPercent } from '../game/format';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from '../game/generators';
 import {
@@ -121,7 +120,6 @@ export function Generators() {
           const units = unitsFor(state, id, amount);
           const cost = formatCost(generatorCost(state, id, units));
           const affordable = canBuyGenerator(state, id, units);
-          const limit = generatorLimit(state, id);
           const rank = GENERATOR_IDS.indexOf(id) + 1;
           return (
             <li key={id} className="generator">
@@ -129,13 +127,6 @@ export function Generators() {
                 <h3>
                   <GeneratorIcon id={id} />
                   {text.name}
-                  {limit !== Infinity && (
-                    <span className="generator-limit">
-                      {limit === 0
-                        ? t.challenges.blockedTag
-                        : t.challenges.limitTag(formatNumber(limit))}
-                    </span>
-                  )}
                 </h3>
                 <p className="flavour">{text.flavour}</p>
                 <p className="generator-stats">
@@ -163,9 +154,7 @@ export function Generators() {
                   {units > 1 && ` ×${units}`}
                 </span>
                 <span className="buy-cost">☀ {cost}</span>
-                {owned < limit && (
-                  <Eta cost={generatorCost(state, id, units)} id={`buy-eta-${id}`} />
-                )}
+                <Eta cost={generatorCost(state, id, units)} id={`buy-eta-${id}`} />
               </button>
               <GrowthPaths id={id} state={state} />
             </li>

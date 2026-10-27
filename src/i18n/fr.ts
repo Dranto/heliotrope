@@ -9,8 +9,6 @@ import type { ParcelId } from '../game/parcels';
 import type { DistrictId } from '../game/districts';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
-import type { ChallengeId } from '../game/challenges';
-import type { CycleChallengeId } from '../game/cycleChallenges';
 import type { DecorId, FlowerColour } from '../game/decor';
 import type { DeltaId } from '../game/delta';
 import type { CollectorId, SiteId } from '../game/bioregion';
@@ -385,8 +383,6 @@ export const fr = {
       'species.1': 'Premier retour',
       'species.10': 'Le quartier bourdonne',
       'species.18': 'Herbier complet',
-      'challenges.1': 'Saison bravée',
-      'challenges.4': 'Toutes les saisons du monde',
       'cooperatives.100': 'Vélo-cargo',
       'cooperatives.1000': 'Réseau de coopératives',
       'seasons.1': 'Premier hiver',
@@ -436,8 +432,6 @@ export const fr = {
       'weather.mist': 'Ville de brume',
       'weather.heat': 'Été indien',
       lockKeeper: 'L’éclusier veille',
-      'cycleChallenges.1': 'Contre vents et marées',
-      'cycleChallenges.3': 'Gardien de la rivière',
     } satisfies Record<AchievementId, string>,
     families: {
       light: 'Lumière',
@@ -481,8 +475,6 @@ export const fr = {
         count === 1
           ? 'Voir revenir une espèce de l’Herbier'
           : `Voir revenir ${count} espèces de l’Herbier`,
-      challenges: (count: number) =>
-        count === 1 ? 'Réussir une Saison à défi' : `Réussir ${count} Saisons à défi`,
       talents: (count: number) =>
         count === 1
           ? 'Semer une première Graine dans l’Arbre des Saisons'
@@ -549,8 +541,6 @@ export const fr = {
         `Récolter ${count}\u00a0cultures semées après une culture différente`,
       families: (count: number) => `Réunir ${count}\u00a0familles entières de l’Herbier`,
       weatherSpecies: 'Voir revenir les cinq espèces du temps',
-      cycleChallenges: (count: number) =>
-        count === 1 ? 'Réussir un Cycle à défi' : `Réussir les ${count} Cycles à défi`,
     },
   },
   restoration: {
@@ -868,38 +858,16 @@ export const fr = {
       butterflies: (count: number) => `Attraper ${count} Papillons dorés`,
       project: (project: string) => `Lancer le projet ${project}`,
       talent: (talent: string) => `Apprendre ${talent} dans l’Arbre`,
-      challenge: (challenge: string) => `Réussir ${challenge}`,
+      fullTree: 'Apprendre tout l’Arbre des Saisons',
+      seasons: (count: number) => `Vivre ${count}\u00a0Saisons`,
+      cycles: (count: number) =>
+        count === 1 ? 'Terminer un Cycle de l’eau' : `Terminer ${count}\u00a0Cycles de l’eau`,
+      collector: (collector: string, count: number) => `Posséder ${count} × ${collector}`,
+      site: (site: string, level: number) => `Élever ${site} au niveau ${level}`,
       visit: (visit: string, count: number) => `${visit}, ${count} fois`,
       corridor: (family: string, length: number) => `Une trame ${family} de ${length} parcelles`,
       weather: (day: string) => `Sort pendant ${day}`,
     },
-  },
-  challenges: {
-    title: 'Saison à défi',
-    hint: 'Une contrainte pour toute la Saison. Atteindre l’objectif la lève, ramène une espèce rare et donne un bonus pour toujours.',
-    free: 'Saison libre',
-    freeHint: 'Sans contrainte',
-    names: {
-      cloudy: 'la Saison des nuages',
-      wild: 'la Saison sauvage',
-      frugal: 'la Saison sobre',
-      hands: 'la Saison des mains',
-    } satisfies Record<ChallengeId, string>,
-    rules: {
-      blocked: (buildings: string) => `Impossible de bâtir\u00a0: ${buildings}`,
-      noUpgrades: 'Aucune amélioration',
-      maxPerGenerator: (count: string) => `Au plus ${count} de chaque bâtiment`,
-      productionFactor: (factor: string) => `Production des bâtiments divisée par ${factor}`,
-    },
-    goal: (light: string) => `Objectif\u00a0: ${light} Lumière dans la Saison`,
-    reward: (species: string, bonus: string) => `Récompense\u00a0: ${species} · ${bonus}`,
-    won: (name: string) => `Défi réussi\u00a0: ${name}\u00a0! La contrainte est levée.`,
-    wonTag: 'Réussi',
-    progress: (name: string, percent: string) => `${name}, objectif atteint à ${percent}\u00a0%`,
-    blockedTag: 'Pas cette Saison',
-    limitTag: (count: string) => `Au plus ${count}`,
-    noUpgrades: 'La Saison sauvage pousse sans amélioration.',
-    startWith: (name: string) => `Commencer ${name}`,
   },
   welcomeTitle: 'Pendant votre absence…',
   welcomeBack: (light: string, duration: string) =>
@@ -979,7 +947,7 @@ export const fr = {
       'Les Graines d’Héliotrope',
       'Les parcelles restaurées',
       'L’Arbre des Saisons et ses coopératives',
-      'L’Herbier et les défis réussis',
+      'L’Herbier',
       'Les statistiques',
       'Les options',
     ],
@@ -1145,7 +1113,7 @@ export const fr = {
       'Les talents de l’Arbre des Saisons, sans les repayer',
       'Le delta et ses bras',
       'Les parcelles restaurées',
-      'L’Herbier, les défis réussis et les jalons',
+      'L’Herbier et les jalons',
       'Les statistiques et les options',
     ],
     start: 'Commencer un nouveau Cycle',
@@ -1169,7 +1137,7 @@ export const fr = {
       } satisfies Record<DeltaId, string>,
       effects: {
         hillsArm: 'Ouvre un cinquième site de la biorégion, les Coteaux',
-        floodArm: 'Ouvre les Cycles à défi',
+        floodArm: 'Les sites de la biorégion coûtent 25\u00a0% d’Eau de moins',
         seedArm: (minutes: string) => `Les Graines mûrissent en ${minutes}`,
         memoryArm: 'La moitié des collecteurs et des niveaux de sites reste après un Cycle',
         lockKeeper: 'Relance le Cycle tout seul, au palier choisi',
@@ -1189,37 +1157,17 @@ export const fr = {
           memoryArm: (share: string) =>
             `${share} % des collecteurs et des sites reste après un Cycle`,
           hillsArm: (share: string) => `Les Coteaux font +${share} % d’effet`,
-          floodArm: (share: string) => `Les récompenses des Cycles à défi font +${share} % d’effet`,
+          floodArm: (share: string) => `Les sites coûtent ${share}\u00a0% d’Eau de moins`,
         },
       },
     },
     lockKeeper: {
       title: 'L’éclusier',
-      hint: 'Il commence un Cycle libre dès que ses Sources multiplient les vôtres, jamais pendant un défi.',
+      hint: 'Il commence un Cycle dès que ses Sources multiplient les vôtres.',
       off: 'Éteint',
       factor: (factor: string) => `×${factor}`,
       started: (count: string) => `${count} Cycles commencés par l’éclusier`,
     },
-  },
-  cycleChallenges: {
-    title: 'Cycle à défi',
-    hint: 'Une contrainte pour tout le Cycle. Recueillir l’objectif la lève, ramène une espèce de la rivière et donne un bonus pour toujours.',
-    free: 'Cycle libre',
-    freeHint: 'Sans contrainte',
-    names: {
-      drought: 'l’année sèche',
-      flood: 'la crue',
-      still: 'l’eau dormante',
-    } satisfies Record<CycleChallengeId, string>,
-    rules: {
-      water: (factor: string) => `Eau recueillie divisée par ${factor}`,
-      collectorCost: (factor: string) => `Collecteurs ${factor} fois plus chers`,
-      siteCost: (factor: string) => `Sites ${factor} fois plus chers`,
-    },
-    goal: (water: string) => `Objectif\u00a0: ${water} Eau dans le Cycle`,
-    won: (name: string) => `Défi réussi\u00a0: ${name}\u00a0! La contrainte est levée.`,
-    progress: (name: string, percent: string) => `${name}, objectif atteint à ${percent}\u00a0%`,
-    startWith: (name: string) => `Commencer ${name}`,
   },
   cooperatives: {
     title: 'Coopératives',

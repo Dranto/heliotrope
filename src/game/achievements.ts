@@ -46,6 +46,10 @@ export const RETIRED_ACHIEVEMENTS: readonly unknown[] = [
   'firstFruit',
   'oldOrchard',
   'oldTree',
+  'challenges.1',
+  'challenges.4',
+  'cycleChallenges.1',
+  'cycleChallenges.3',
 ];
 
 /** Upgrade groups a Milestone can ask to complete within one Season. */
@@ -95,8 +99,6 @@ export type AchievementCondition =
   | { kind: 'varieties'; count: number }
   /** Species of the Herbier back, kept across Seasons (§9.5). */
   | { kind: 'species'; count: number }
-  /** Challenge Seasons won (§7.3). */
-  | { kind: 'challenges'; count: number }
   /** Purchases of every Cooperative together, over all Seasons (§7.2). */
   | { kind: 'cooperativePurchases'; count: number }
   /** Water gathered over all Cycles (§7.4). */
@@ -127,8 +129,6 @@ export type AchievementCondition =
   | { kind: 'weatherSpecies' }
   /** Families of the Herbier complete (M35). */
   | { kind: 'families'; count: number }
-  /** Challenge Cycles won (§7.5). */
-  | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
   | { kind: 'visits'; visit: VisitKind; count: number }
   /** Every visitor of the city (§9.6, M18) welcomed once, or this many of them in all. */
@@ -175,7 +175,6 @@ const CANOPY_STEPS = [1, 18] as const;
 const HARVEST_STEPS = [1, 25, 250] as const;
 const COOPERATIVE_STEPS = [100, 1_000] as const;
 const SPECIES_STEPS = [1, 10, 18] as const;
-const CHALLENGE_STEPS = [1, 4] as const;
 const SEASON_STEPS = [1, 3, 5, 10, 25] as const;
 const PLAY_HOURS = [1, 24] as const;
 const WATER_EXPONENTS = [3, 6, 9] as const;
@@ -184,7 +183,6 @@ const SITE_STEPS = [1, 10, 25] as const;
 const CYCLE_STEPS = [1, 3] as const;
 const DELTA_STEPS = [1, 6] as const;
 const CITY_STEPS = [1, 3] as const;
-const CYCLE_CHALLENGE_STEPS = [1, 3] as const;
 
 export type AchievementId =
   | `light.${(typeof LIGHT_EXPONENTS)[number]}`
@@ -206,7 +204,6 @@ export type AchievementId =
   | 'seedBank'
   | `cooperatives.${(typeof COOPERATIVE_STEPS)[number]}`
   | `species.${(typeof SPECIES_STEPS)[number]}`
-  | `challenges.${(typeof CHALLENGE_STEPS)[number]}`
   | `seasons.${(typeof SEASON_STEPS)[number]}`
   | `playHours.${(typeof PLAY_HOURS)[number]}`
   | `water.${(typeof WATER_EXPONENTS)[number]}`
@@ -228,7 +225,6 @@ export type AchievementId =
   | 'skyCreatures'
   | 'wholeFamily'
   | 'lockKeeper'
-  | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
   | 'openDoors'
   | 'goodNeighbours'
@@ -446,11 +442,6 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   // Visits of the city (§9.6, M18).
   { id: 'cityFestival', family: 'neighbourhood', condition: { kind: 'everyCityVisit' } },
   { id: 'cityVisits.25', family: 'neighbourhood', condition: { kind: 'cityVisits', count: 25 } },
-  ...CHALLENGE_STEPS.map((count) => ({
-    id: `challenges.${count}` as const,
-    family: 'seasons' as const,
-    condition: { kind: 'challenges', count } as const,
-  })),
   // Seasons and time.
   ...SEASON_STEPS.map((count) => ({
     id: `seasons.${count}` as const,
@@ -500,7 +491,7 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     condition: { kind: 'cycles', count } as const,
   })),
   { id: 'floodTide', family: 'bioregion', condition: { kind: 'action' }, hidden: true },
-  // The delta of the Sources and the challenge Cycles (§7.5).
+  // The delta of the Sources (§7.5).
   ...DELTA_STEPS.map((count) => ({
     id: `delta.${count}` as const,
     family: 'bioregion' as const,
@@ -511,11 +502,6 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     family: 'bioregion',
     condition: { kind: 'lockCycles', count: LOCK_MILESTONE_CYCLES },
   },
-  ...CYCLE_CHALLENGE_STEPS.map((count) => ({
-    id: `cycleChallenges.${count}` as const,
-    family: 'bioregion' as const,
-    condition: { kind: 'cycleChallenges', count } as const,
-  })),
 ];
 
 export const ACHIEVEMENTS = Object.fromEntries(ACHIEVEMENT_LIST.map((a) => [a.id, a])) as Record<
@@ -610,8 +596,6 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.garden.varieties.length >= condition.count;
     case 'species':
       return state.species.length >= condition.count;
-    case 'challenges':
-      return state.challenges.length >= condition.count;
     case 'cooperativePurchases':
       return (
         Object.values(state.cooperatives.purchases).reduce((sum, n) => sum + n, 0) >=
@@ -645,8 +629,6 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return WEATHER_SPECIES.every((id) => state.species.includes(id));
     case 'families':
       return completeFamilies(state.species).length >= condition.count;
-    case 'cycleChallenges':
-      return state.cycleChallenges.length >= condition.count;
     case 'playSeconds':
       return state.playSeconds >= condition.seconds;
     case 'seasonSeconds':
@@ -726,8 +708,6 @@ function measure(state: GameState, condition: AchievementCondition): [number, nu
       return [state.garden.varieties.length, condition.count];
     case 'species':
       return [state.species.length, condition.count];
-    case 'challenges':
-      return [state.challenges.length, condition.count];
     case 'cooperativePurchases':
       return [
         Object.values(state.cooperatives.purchases).reduce((a, b) => a + b, 0),
@@ -753,8 +733,6 @@ function measure(state: GameState, condition: AchievementCondition): [number, nu
       return [state.pollen.flights, condition.count];
     case 'families':
       return [completeFamilies(state.species).length, condition.count];
-    case 'cycleChallenges':
-      return [state.cycleChallenges.length, condition.count];
     case 'playSeconds':
       return [state.playSeconds, condition.seconds];
     default:

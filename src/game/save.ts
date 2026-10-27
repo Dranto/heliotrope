@@ -19,12 +19,10 @@ import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './poll
 import { validWeather } from './weather';
 import { isPanelId, shownPanels, type PanelId } from './panels';
 import { isFlowerColour, validDecorSlots } from './decor';
-import { isCycleChallengeId, type CycleChallengeId } from './cycleChallenges';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
 import { isVarietyId, type VarietyId } from './seedBank';
 import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
-import { isChallengeId, type ChallengeId } from './challenges';
 import { isSpeciesId, type SpeciesId } from './species';
 import { emptyCurve, validHistory } from './history';
 import { VISIT_KINDS, VISIT_MAX_INTERVAL, VISIT_VISIBLE_SECONDS, type VisitKind } from './visits';
@@ -152,6 +150,9 @@ const migrations: Record<number, Migration> = {
   // v43 (lot 3): the great works and their baskets, the orchard, the hives and the honey leave.
   // Their fields are dropped below, their Milestones counted as retired.
   42: (raw) => ({ ...raw, version: 43 }),
+  // v44 (lot 4): the challenge Seasons and Cycles leave. Their fields are dropped below, their
+  // Milestones counted as retired; the species they brought back stay in the Herbier.
+  43: (raw) => ({ ...raw, version: 44 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -303,12 +304,6 @@ export function deserialize(json: string, now: number): GameState | null {
     const value = purchases?.[id];
     if (isCount(value)) state.cooperatives.purchases[id] = value;
   }
-  if (Array.isArray(data.challenges)) {
-    state.challenges = [...new Set<ChallengeId>(data.challenges.filter(isChallengeId))];
-  }
-  if (isChallengeId(data.challenge) && !state.challenges.includes(data.challenge)) {
-    state.challenge = data.challenge;
-  }
   if (Array.isArray(data.species)) {
     state.species = [...new Set<SpeciesId>(data.species.filter(isSpeciesId))];
   }
@@ -355,17 +350,6 @@ export function deserialize(json: string, now: number): GameState | null {
       : 0,
     lockCycles: isCount(delta?.lockCycles) ? delta.lockCycles : 0,
   };
-  if (Array.isArray(data.cycleChallenges)) {
-    state.cycleChallenges = [
-      ...new Set<CycleChallengeId>(data.cycleChallenges.filter(isCycleChallengeId)),
-    ];
-  }
-  if (
-    isCycleChallengeId(data.cycleChallenge) &&
-    !state.cycleChallenges.includes(data.cycleChallenge)
-  ) {
-    state.cycleChallenge = data.cycleChallenge;
-  }
   const garden = data.garden as Record<string, unknown> | undefined;
   state.garden = {
     plots: validPlots(garden?.plots),

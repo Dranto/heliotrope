@@ -43,8 +43,6 @@ function playedState(): GameState {
     parcels: ['gardenStreet', 'river'],
     projects: ['seedSwap'],
     talents: ['gardenersCoop', 'roofersCoop', 'nectarFlowers'],
-    challenge: 'frugal',
-    challenges: ['cloudy'],
     species: ['frog', 'kingfisher'],
     cooperatives: {
       paused: ['roofers'],
@@ -148,6 +146,26 @@ describe('save', () => {
     expect('greatWorks' in state).toBe(false);
     expect('orchard' in state).toBe(false);
     expect('baskets' in state.garden).toBe(false);
+  });
+
+  it('drops the challenge Seasons and Cycles (slimming plan, lot 4)', () => {
+    const played = JSON.parse(serialize(playedState()));
+    const old = {
+      ...played,
+      version: 43,
+      achievements: ['light.3', 'challenges.1', 'cycleChallenges.1'],
+      retiredAchievements: 0,
+      challenge: 'wild',
+      challenges: ['cloudy'],
+      cycleChallenge: null,
+      cycleChallenges: ['drought'],
+    };
+    const state = deserialize(JSON.stringify(old), 0)!;
+    expect(state.achievements).toEqual(['light.3']);
+    expect(state.retiredAchievements).toBe(2);
+    for (const key of ['challenge', 'challenges', 'cycleChallenge', 'cycleChallenges']) {
+      expect(key in state).toBe(false);
+    }
   });
 
   it('rejects corrupt or future saves', () => {
@@ -539,25 +557,13 @@ describe('export and import', () => {
     expect(deserialize(json('klingon'), 0)!.settings.language).toBe('fr');
   });
 
-  it('migrates a v9 save with no challenge and an empty Herbier, and drops unknown entries', () => {
+  it('migrates a v9 save with an empty Herbier, and drops unknown entries', () => {
     const v9 = deserialize(JSON.stringify({ version: 9, parcels: ['river'] }), 0)!;
-    expect(v9).toMatchObject({ challenge: null, challenges: [], species: [] });
+    expect(v9.species).toEqual([]);
     const state = deserialize(
-      JSON.stringify({
-        version: STATE_VERSION,
-        challenge: 'wild',
-        challenges: ['cloudy', 'storm', 'cloudy'],
-        species: ['frog', 'dragon', 'frog'],
-      }),
+      JSON.stringify({ version: STATE_VERSION, species: ['frog', 'dragon', 'frog'] }),
       0,
     )!;
-    expect(state).toMatchObject({ challenge: 'wild', challenges: ['cloudy'], species: ['frog'] });
-    // A challenge already won cannot be running.
-    const json = JSON.stringify({
-      version: STATE_VERSION,
-      challenge: 'cloudy',
-      challenges: ['cloudy'],
-    });
-    expect(deserialize(json, 0)!.challenge).toBeNull();
+    expect(state.species).toEqual(['frog']);
   });
 });

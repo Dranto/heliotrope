@@ -367,35 +367,6 @@ describe('App', () => {
     expect(new GameStore(localStorage, () => 0).getState().seeds).toBe(2);
   });
 
-  it('starts a challenge Season, shows its goal and lifts it once won (§7.3)', async () => {
-    const base = openGame(0);
-    saveGame({
-      ...base,
-      seeds: 10,
-      seasons: 1,
-      allTimeLight: 1e11,
-      totalLight: 1e9,
-      playSeconds: 3600,
-      seasonSeconds: 3600,
-    });
-    const store = renderApp(new GameStore(localStorage, () => 0));
-    fireEvent.click(screen.getByRole('button', { name: /^Saisons/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Les Saisons' });
-    expect(dialog).toHaveTextContent('Saison à défi');
-    fireEvent.click(screen.getByRole('radio', { name: /La Saison des nuages/ }));
-    fireEvent.click(screen.getByRole('button', { name: 'Commencer une nouvelle Saison' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Commencer la Saison des nuages' }));
-    expect(store.getState().challenge).toBe('cloudy');
-    expect(screen.getByTestId('challenge-chip')).toHaveTextContent('La Saison des nuages');
-    fireEvent.click(screen.getByRole('button', { name: /Fermer les Saisons/ }));
-    act(() => store.dispatch((s) => ({ ...s, totalLight: 2e9 })));
-    act(() => store.dispatch((s) => tick(s, 0.1)));
-    expect(store.getState()).toMatchObject({ challenge: null, challenges: ['cloudy'] });
-    expect(screen.queryByTestId('challenge-chip')).not.toBeInTheDocument();
-    expect(screen.getByText(/Défi réussi/)).toBeInTheDocument();
-    expect(screen.getByText(/De retour dans le quartier.*Martin-pêcheur/)).toBeInTheDocument();
-  });
-
   it('shows the Herbier, with the species back drawn on the map (§9.5)', async () => {
     const base = openGame(0);
     saveGame({ ...base, parcels: ['river'], species: ['frog'] });

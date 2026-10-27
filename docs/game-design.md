@@ -125,7 +125,7 @@ Pour chaque générateur, une amélioration qui **double** sa production se déb
 
 Soit 8 générateurs × 10 seuils = 80 améliorations, chacune avec un nom et une ligne d'ambiance (ex. « Terreau de compost » pour le Potager, « Miroirs auto-orientables » pour la Centrale).
 
-Quand aucune amélioration n'est proposée (par moments après le 1ᵉʳ Cycle, entre deux seuils), le panneau « Améliorer » montre la prochaine en vue : le seuil de bâtiment le plus proche d'être atteint, avec son compte et une barre (« Prochaine : Façades nourricières · Ferme verticale 149 / 150 »). Le panneau garde ainsi un objectif, selon la règle d'or du §2. Une Saison à défi qui plafonne les bâtiments écarte les seuils hors d'atteinte.
+Quand aucune amélioration n'est proposée (par moments après le 1ᵉʳ Cycle, entre deux seuils), le panneau « Améliorer » montre la prochaine en vue : le seuil de bâtiment le plus proche d'être atteint, avec son compte et une barre (« Prochaine : Façades nourricières · Ferme verticale 149 / 150 »). Le panneau garde ainsi un objectif, selon la règle d'or du §2.
 
 > Paliers de fin de partie (2026-10-13) : Antoine a demandé des paliers pour que les mécaniques ne s'estompent pas trop vite. Après le 1ᵉʳ Cycle, le joueur de référence possède 140 à 280 exemplaires de chaque bâtiment au fil d'une Saison : les seuils s'arrêtaient à 200, et le panneau « Améliorer » se vidait pour le reste de la partie. Les seuils de 225, 250 et 300 tombent là où le joueur se trouve. Leur coût suit la progression (×10 puis ×100 par seuil) ; c'est le nombre d'exemplaires qui les retient, pas le prix. Avec les deux paliers de biodiversité ajoutés au §5.4, les Cycles 2 à 4 durent 36, 40 et 55 min (cibles 35, 35 et 45, dans les ±30 %) : le 3ᵉ Cycle finit avec 21 Sources au lieu de 20, si bien que le 4ᵉ, qui en vise ×1,5, demande une Saison de plus. La boucle ne s'emballe pas : la 1ʳᵉ Saison, le 1ᵉʳ Cycle et les villes sœurs ne bougent pas.
 
@@ -569,7 +569,7 @@ Une fois les 17 talents appris, l'Arbre a encore une place pour les Graines des 
 
 La Canopée complète coûte environ 2 000 Graines : un puits de long terme, qui se remplit Cycle après Cycle. Ses effets restent liés à l'existant (synergies, Papillon, visites, Boutures) et modestes, pour allonger et alléger les Saisons tardives sans relancer leur emballement (§7, §8) ; le simulateur ne la joue pas, et les cibles du §8 ne bougent pas.
 
-- **Le semoir.** Une fois semé, un réglage de l'écran des Saisons choisit quand il relance : **éteint** (par défaut, décision D6 de la feuille de route), ou dès que les Graines mûres de la Saison multiplient celles déjà obtenues par **×1,5, ×2, ×3 ou ×5**. Il lance toujours une Saison libre et attend la fin d'une Saison à défi ; il travaille à chaque pas de simulation, donc hors ligne aussi. C'est l'automatisation de la couche du dessous, comme les Coopératives pour les bâtiments.
+- **Le semoir.** Une fois semé, un réglage de l'écran des Saisons choisit quand il relance : **éteint** (par défaut, décision D6 de la feuille de route), ou dès que les Graines mûres de la Saison multiplient celles déjà obtenues par **×1,5, ×2, ×3 ou ×5**. Il lance la Saison suivante ; il travaille à chaque pas de simulation, donc hors ligne aussi. C'est l'automatisation de la couche du dessous, comme les Coopératives pour les bâtiments.
 - **Écran.** Sous l'arbre, la section « La Canopée » liste ses neuf talents, leur niveau (des pastilles dorées), l'effet d'aujourd'hui et celui du niveau suivant, et le bouton Semer avec son prix. Avant les 17 talents, une ligne dit quand elle s'ouvre. Sur le dessin, une feuille dorée s'ajoute au-dessus du feuillage à chaque niveau semé et se balance doucement.
 - **Jalons (4).** Jeune canopée (1 niveau), Canopée touffue (18 niveaux), Cime (la Canopée complète), Semis spontané (le semoir lance 10 Saisons). 120 jalons en tout.
 - **Sauvegarde.** Version 15 : les niveaux de la Canopée et les réglages du semoir, rien de semé et le semoir éteint pour une sauvegarde plus ancienne.
@@ -593,6 +593,8 @@ Des voisins achètent à la place du joueur : ce sont les talents de la branche 
 - **Sur la carte.** Chaque coopérative est un vélo-cargo à sa couleur qui fait sa tournée dans les rues du quartier tant qu'elle travaille ; à chaque achat, un anneau doré part du vélo, et le bâtiment acheté apparaît sur la carte comme d'habitude. Une coopérative à l'arrêt gare son vélo. Avec les animations réduites (option ou réglage de l'appareil), les vélos restent garés.
 
 ### 7.3 Saisons à défi (M8)
+
+> Retiré par l'allègement (§9.17, lot 4) : les Saisons à défi ne rapportaient pas assez pour leur détour. Leurs espèces reviennent par le jeu lui-même (§9.5). Texte gardé pour l'historique.
 
 À partir de la 2ᵉ Saison, l'écran des Saisons propose, au moment de replanter, de faire de la Saison suivante une **Saison à défi** : une contrainte pour toute la Saison, montrée par la lumière de la scène plutôt que par du texte. Atteindre l'objectif de Lumière dans la Saison **lève la contrainte** pour le reste de la Saison, ramène une espèce rare de l'Herbier (§9.5) et donne un bonus gardé pour toujours. Chaque défi ne se gagne qu'une fois ; une Saison libre reste toujours possible.
 
@@ -646,8 +648,8 @@ bonusSources           = +10 % de production par Source (multiplicateur à part)
                          chaque Graine vaut +1 % de plus par Source (5 % → 6 % avec une Source)
 ```
 
-- **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites, un défi en cours.
-- **Conservé :** les Sources, **le delta et ses bras** (§7.5), les **talents et la Canopée de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les défis gagnés, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
+- **Remis à zéro :** tout ce qu'une nouvelle Saison remet à zéro, les **Graines** (les Graines ne comptent plus que la Lumière du nouveau Cycle), l'Eau, les collecteurs et les sites.
+- **Conservé :** les Sources, **le delta et ses bras** (§7.5), les **talents et la Canopée de l'Arbre des Saisons** (leurs Graines sont « enracinées » : on ne les repaie pas, `rootedSeeds`), les parcelles, l'Herbier, les jalons, le nombre de Saisons, les coopératives, les statistiques et les options. Le Cycle ouvre aussi la Saison suivante.
 - Disponible dès qu'une Source est à gagner ; l'écran conseille d'attendre **5 Sources** pour le premier (« La rivière n'est pas encore prête »), sans bloquer.
 - **Rythme.** Le joueur de référence (§8, chaque Saison jouée jusqu'à doubler ses Graines, une fois mûres) ouvre la Biorégion vers 2 h et peut lancer son premier Cycle conseillé vers **2 h 10** (2 h 45 avant le peaufinage des synergies du 2026-10-13, §8) ; le test du simulateur le garde dans les ±30 %. Mesuré à 2,5 clics/s : la 3ᵉ Saison dure ~24 min (la Biorégion s'ouvre et la Lumière part dans les collecteurs), puis chaque Saison dure les 15 minutes de maturité des Graines (§7). Avant les Graines mûres et le sol profond, le Cycle arrivait vers 2 h 50 au bout de Saisons de 1 à 3 minutes.
 
@@ -670,7 +672,7 @@ Les Sources deviennent elles aussi une monnaie à dépenser, sur le modèle des 
 | Bras | Coût (Sources) | Effet |
 |---|---|---|
 | Bras des coteaux | 2 | Ouvre un cinquième site de la biorégion, **les Coteaux** |
-| Bras des crues | 2 | Ouvre les **Cycles à défi** |
+| Bras des crues | 2 | Les sites de la biorégion coûtent **25 % d'Eau de moins** (lot 4 ; ouvrait les Cycles à défi) |
 | Bras des semences | 3, puis 6 | Les Graines mûrissent en 12 min, puis 10 min (au lieu de 15, §7) |
 | Bras de la mémoire | 5 | Après un Cycle, la **moitié** de chaque collecteur et de chaque niveau de site reste (arrondie en dessous) |
 | L'éclusier | 8 | Relance le Cycle tout seul, au palier choisi |
@@ -679,9 +681,9 @@ Tout le delta coûte 26 Sources, soit plusieurs Cycles : le joueur de référenc
 
 **Les Coteaux.** Vignes en terrasses et murets de pierre sèche sur le flanc sud des collines. Comme les autres sites, ils s'étendent avec l'Eau (1ᵉʳ niveau 3 000 Eau, ×2,5 par niveau) et repartent de zéro à chaque Cycle ; au lieu de relever deux bâtiments, chaque niveau donne **clic +25 %** (multiplicatif sur la valeur de base du clic) et rend les **visites** (§9.6) **10 % plus fréquentes** (l'intervalle est divisé par 1 + 0,1 × niveau). Ils n'entrent pas dans « Bassin versant », qui garde les quatre sites d'origine.
 
-**L'éclusier.** Comme le semoir (§7.1), il est éteint par défaut et se règle à l'écran du Cycle : il lance un Cycle libre dès que les Sources à faire jaillir portent les Sources possédées à **×1,25, ×1,5, ×2 ou ×3**. Il n'interrompt jamais un Cycle à défi ni une Saison à défi en cours. Il tourne aussi hors ligne, comme le reste. Quand le semoir et l'éclusier sont prêts dans la même seconde, le Cycle passe d'abord.
+**L'éclusier.** Comme le semoir (§7.1), il est éteint par défaut et se règle à l'écran du Cycle : il lance un Cycle libre dès que les Sources à faire jaillir portent les Sources possédées à **×1,25, ×1,5, ×2 ou ×3**. Il tourne aussi hors ligne, comme le reste. Quand le semoir et l'éclusier sont prêts dans la même seconde, le Cycle passe d'abord.
 
-**Cycles à défi.** Sur le modèle des Saisons à défi (§7.3) : au moment de lancer un Cycle, on peut choisir une contrainte pour tout le Cycle. Recueillir l'objectif d'Eau dans le Cycle lève la contrainte, ramène une espèce rare de la rivière (§9.5) et donne un bonus pour toujours. Chacun ne se gagne qu'une fois.
+**Cycles à défi.** _Retirés par l'allègement (§9.17, lot 4) ; texte gardé pour l'historique._ Sur le modèle des Saisons à défi (§7.3) : au moment de lancer un Cycle, on peut choisir une contrainte pour tout le Cycle. Recueillir l'objectif d'Eau dans le Cycle lève la contrainte, ramène une espèce rare de la rivière (§9.5) et donne un bonus pour toujours. Chacun ne se gagne qu'une fois.
 
 | Défi | Contrainte | Objectif (Eau dans le Cycle) | Espèce | Récompense |
 |---|---|---|---|---|
@@ -689,13 +691,13 @@ Tout le delta coûte 26 Sources, soit plusieurs Cycles : le joueur de référenc
 | La crue | Collecteurs ×10 plus chers | 5 M | Saumon atlantique | Production +10 % |
 | L'eau dormante | Sites ×4 plus chers | 5 M | Cigogne noire | Synergies ×1,1 |
 
-Pendant un Cycle à défi, une pastille dans la barre du haut montre le défi et l'avancée vers son objectif, comme pour une Saison à défi.
+Pendant un Cycle à défi, une pastille dans la barre du haut montrait le défi et l'avancée vers son objectif (retiré au lot 4).
 
-**Écran.** Sous le bilan du Cycle de l'eau, le **delta** est dessiné : la rivière descend sous l'arche et se divise en cinq bras ; un bras ouvert coule (bleu, avec une mare au bout), un bras fermé reste un lit sec en pointillés. Sous le dessin, chaque bras avec son effet et son bouton « Ouvrir ». Puis le réglage de l'éclusier (pastilles Éteint, ×1,25, ×1,5, ×2, ×3) et, quand un Cycle peut commencer, le choix d'un Cycle à défi. Aucun texte narratif.
+**Écran.** Sous le bilan du Cycle de l'eau, le **delta** est dessiné : la rivière descend sous l'arche et se divise en cinq bras ; un bras ouvert coule (bleu, avec une mare au bout), un bras fermé reste un lit sec en pointillés. Sous le dessin, chaque bras avec son effet et son bouton « Ouvrir ». Puis le réglage de l'éclusier (pastilles Éteint, ×1,25, ×1,5, ×2, ×3) Aucun texte narratif.
 
 **Sur la carte.** Chaque niveau des Coteaux dessine des terrasses de vigne sur les quatre collines, du bas vers le haut, avec l'entrée habituelle (anneau doré). Les trois espèces de la rivière vivent au fil de la Rivière retrouvée.
 
-**Jalons (5 de plus, famille « La Biorégion »).** « Premier bras » et « Delta ouvert » (les 6 niveaux du delta) ; « L'éclusier veille » (5 Cycles lancés par l'éclusier) ; « Contre vents et marées » et « Gardien de la rivière » (1 puis 3 Cycles à défi réussis).
+**Jalons (5 de plus, famille « La Biorégion »).** « Premier bras » et « Delta ouvert » (les 6 niveaux du delta) ; « L'éclusier veille » (5 Cycles lancés par l'éclusier) ; « Contre vents et marées » et « Gardien de la rivière » (1 puis 3 Cycles à défi réussis, retirés au lot 4).
 
 **Élargir les bras (M19).** Une fois le delta entièrement ouvert (26 Sources), quatre bras **s'élargissent** niveau par niveau, sur le modèle de la Canopée (§7.1) : 10 niveaux chacun, le 1ᵉʳ à 5 Sources, chaque suivant ×1,5 (environ 570 Sources par bras). Les Sources dépensées ne retirent toujours rien à leur bonus.
 
@@ -704,7 +706,7 @@ Pendant un Cycle à défi, une pastille dans la barre du haut montre le défi et
 | Bras des semences | Les Graines mûrissent 30 s plus tôt (10 min → 5 min au plus large) |
 | Bras de la mémoire | 4 points de plus de chaque collecteur et niveau de site restent après un Cycle (50 % → 90 %) |
 | Bras des coteaux | Les effets des Coteaux (clic, visites) +10 % |
-| Bras des crues | Les récompenses des Cycles à défi gagnés +10 % (Eau ×1,25 devient ×1,275, etc.) |
+| Bras des crues | La remise sur les sites +10 % par élargissement (25 % devient 27,5 %, jusqu'à 50 %) |
 
 Dans l'écran du Cycle, chaque bras élargissable montre sous son effet son élargissement (« élargi 3 fois sur 10 »), l'effet du suivant et le bouton « Élargir » avec son prix ; sur le dessin du delta, le bras coule plus large et sa mare grandit. **Sauvegarde.** Version 21 : les élargissements, à zéro pour une sauvegarde plus ancienne ; une sauvegarde qui en tient plus que ses Sources n'en paient les perd.
 
@@ -715,7 +717,7 @@ Dans l'écran du Cycle, chaque bras élargissable montre sous son effet son éla
 
 La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par les mesures de M19). Code dans `src/game/cities.ts` et `src/game/cityData.ts`, écran `src/ui/Cities.tsx` (bouton « Villes sœurs » du menu), carte de la région `src/ui/RegionMap.tsx`, paysages sur la carte `src/ui/LandscapeArt.tsx`.
 
-**Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit, et ni Saison ni Cycle à défi en cours. Le joueur choisit parmi **cinq paysages** (décision D14 ; la forêt et le marais depuis M30, décision D21) et fonde une ville sœur :
+**Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit. Le joueur choisit parmi **cinq paysages** (décision D14 ; la forêt et le marais depuis M30, décision D21) et fonde une ville sœur :
 
 - **Recommence :** tout ce qu'un Cycle remet à zéro (Lumière, bâtiments, améliorations, projets, Graines, Eau, collecteurs, sites), plus **l'Arbre des Saisons et la Canopée** (« relancer les Saisons ») et les **Sources non dépensées**.
 - **Reste :** le **delta** (ses bras et élargissements, gardés pour toujours, et les Sources qui les ont payés), l'Herbier, les Jalons, les parcelles et les quartiers voisins, le décor, les grands chantiers, le potager, le verger et les villes déjà fondées.
@@ -935,7 +937,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 - **La fleur** : 10, 100, 1 000, 10 000, 100 000 clics ; un clic qui vaut 1 000 puis 1 M Lumière ; caché : « Graine qui dort » (récolter 1 000 Lumière dans une Saison sans aucun bâtiment).
 - **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; « Bouquet » et « Grand bouquet » (3 puis 5 effets en même temps, §5.7, M31) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
 - **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 1, 25, 250 récoltes du potager, « Croisement » et « Grainothèque » (§9.7, M14) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
-- **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
+- **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8 ; retirés au lot 4) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
 
 Les jalons sont conservés d'une Saison à l'autre. Chaque jalon atteint **éclot** en haut de l'écran : un médaillon dont l'anneau doré se dessine, une couronne de laurier qui pousse feuille à feuille, des pétales lilas qui s'ouvrent, avec le nom du jalon, sa condition et « Production +1 % » ; il s'efface après environ 4 s. Plusieurs jalons atteints ensemble éclosent l'un après l'autre (au-delà de trois d'un coup, un seul médaillon les compte). Le compteur du bouton « Jalons » scintille à chaque nouveau jalon. Pas de texte d'ambiance : seulement le nom et la condition. Avec les animations réduites, le médaillon apparaît et disparaît sans mouvement. Les lecteurs d'écran entendent « Jalon atteint : nom ».
 
@@ -958,10 +960,11 @@ Les espèces reviennent à mesure que le quartier reverdit. Chacune revient par 
 | Coccinelle | 25 Serres communautaires | Martinet | Toits vivants |
 | Bourdon | Corridor des pollinisateurs | Ver luisant | Projet Fête des lumières |
 | Moineau | 100 Héliotropes en pot | Pipistrelle | Talent Veilleurs de nuit |
-| Mésange bleue | 10 Canopées urbaines | Martin-pêcheur | La Saison des nuages (§7.3) |
-| Citron | 5 Papillons dorés attrapés | Orchis pyramidal, Lucane cerf-volant, Chouette hulotte | Les trois autres défis (§7.3) |
+| Mésange bleue | 10 Canopées urbaines | Martin-pêcheur | 10 Ruisseaux rouverts (§7.4) |
+| Citron | 5 Papillons dorés attrapés | Orchis pyramidal | Tout l'Arbre des Saisons appris (§7.1) |
+| Lucane cerf-volant | 100 Canopées urbaines | Chouette hulotte | 10 Saisons vécues |
 
-- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (les 18 espèces du quartier) multiplie toute la biodiversité par 1,5. Trois espèces de la rivière, la loutre d'Europe, le saumon atlantique et la cigogne noire, reviennent avec les Cycles à défi (§7.5) : elles comptent chacune un palier de plus, mais ne sont pas exigées pour l'Herbier complet, que les joueurs qui l'avaient gardent. Quatre espèces de la ville, l'alouette des champs, l'hirondelle rustique, la libellule déprimée et le rougequeue noir, reviennent de même avec les visites de la ville (§9.6, M18), chacune après cinq accueils de son visiteur ; elles non plus ne sont pas exigées. 25 espèces en tout.
+- **Effet, par la biodiversité.** Chaque espèce revenue compte comme un palier de biodiversité de plus (+2 %, §5.4) ; elle profite donc de tous les multiplicateurs de biodiversité des parcelles et de l'Arbre. L'Herbier complet (les 18 espèces du quartier) multiplie toute la biodiversité par 1,5. Trois espèces de la rivière, la loutre d'Europe, le saumon atlantique et la cigogne noire, reviennent avec les Cycles (la loutre au 1ᵉʳ Cycle, la cigogne au 5ᵉ) et les zones humides au niveau 10 (le saumon) depuis le lot 4 (§9.17) : elles comptent chacune un palier de plus, mais ne sont pas exigées pour l'Herbier complet, que les joueurs qui l'avaient gardent. Quatre espèces de la ville, l'alouette des champs, l'hirondelle rustique, la libellule déprimée et le rougequeue noir, reviennent de même avec les visites de la ville (§9.6, M18), chacune après cinq accueils de son visiteur ; elles non plus ne sont pas exigées. 25 espèces en tout.
 - **Écran.** « Herbier » s'ouvre du menu dès la première espèce (ou après la 1ʳᵉ Saison). Une planche par espèce : le dessin en couleur dans un médaillon doré une fois revenue, une silhouette pâle avant ; sous chaque nom, ce qui la ramène. Aucun texte narratif.
 - **Retour.** Une notification « De retour dans le quartier : Hérisson » et l'apparition en douceur du médaillon sur la carte (sans animation au chargement, ni avec les animations réduites).
 
@@ -971,7 +974,7 @@ Le quartier restauré raconte ses temps forts sans un mot (§1, §6) : de temps 
 
 | Visiteur | Vient dès | Sur la carte | Effet de l'accueil | Synergie |
 |---|---|---|---|---|
-| **Les voisins et leurs boutures** | 10 Héliotropes en pot | Un vélo-cargo à remorque de jeunes plants arrive sur l'avenue sous l'immeuble | +1 exemplaire gratuit du bâtiment le plus cher possédé (dans la limite d'une Saison à défi) | Troc de graines : +1 bouture |
+| **Les voisins et leurs boutures** | 10 Héliotropes en pot | Un vélo-cargo à remorque de jeunes plants arrive sur l'avenue sous l'immeuble | +1 exemplaire gratuit du bâtiment le plus cher possédé | Troc de graines : +1 bouture |
 | **L'Averse d'été** | 10 Potagers sur le toit | Un nuage qui pleut sur les toits potagers, à gauche de la cour | Potagers, Serres et Eau de la Biorégion ×2 pendant 60 s | Jardins de pluie : dure ×2 |
 | **La Nuée de migrateurs** | 1 Canopée urbaine ou les Toits vivants | Une nuée d'oiseaux qui tourne au-dessus des toits, à droite de la cour | Bonus de biodiversité (§5.4) ×2 pendant 90 s | +10 s par espèce de l'Herbier |
 
@@ -1262,6 +1265,9 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Lot 3 : retirés.** Les grands chantiers (§6.6) et les paniers du potager, le verger, les ruches et le miel (§9.8), les apiculteurs (§7.2). Les fraises s'ouvrent avec la Biorégion. La forêt (§7.6) fait pousser le potager ×1,25 et le réseau ×1,1 au lieu du verger ; la fraise ananas fait pousser le potager ×1,1. La tour des semences et le tram reviendront aux quartiers voisins au lot 7. Cinq Jalons s'en vont (Première pierre, Grands travaux, Premier fruit, Vieux vergers, Vieil arbre) : **146 Jalons**.
 - **Équilibrage (lot 3).** Rien ne bouge au §8 : 1ʳᵉ Saison 59 min, Cycles 2 à 4 en 24, 36 et 40 min, essaimages à 4 h et 5 h de jeu.
 - **Sauvegarde (lot 3).** Version 43 : les chantiers, le verger, le miel et les paniers sont effacés sans compensation ; les cultures en cours restent.
+- **Lot 4 : retirés.** Les Saisons à défi (§7.3) et les Cycles à défi (§7.5), avec leurs contraintes, leurs pastilles, leurs bonus gagnés et leur lumière sur la scène. Leurs sept espèces reviennent par le jeu (§9.5) : martin-pêcheur avec 10 Ruisseaux rouverts, orchis avec tout l'Arbre, lucane avec 100 Canopées urbaines, chouette après 10 Saisons, loutre au 1ᵉʳ Cycle, saumon avec les zones humides au niveau 10, cigogne noire au 5ᵉ Cycle : l'Herbier se complète sans détour. Le bras des crues rend les sites 25 % moins chers (jusqu'à 50 % élargi). Le semoir et l'éclusier relancent toujours. Quatre Jalons s'en vont (Saison bravée, Toutes les saisons du monde, Contre vents et marées, Gardien de la rivière) : **142 Jalons**.
+- **Équilibrage (lot 4).** Rien ne bouge au §8 : 1ʳᵉ Saison 59 min, 2ᵉ Saison 21 min, Cycles 2 à 4 en 24, 36 et 40 min ; le simulateur ne jouait pas les défis.
+- **Sauvegarde (lot 4).** Version 44 : le défi en cours et les défis gagnés sont effacés avec leurs bonus ; les Jalons retirés atteints rejoignent le compte des Jalons d'autrefois.
 
 ## 10. Écrans et interface
 
@@ -1294,7 +1300,7 @@ Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fle
 | Écran | Contenu | Dès |
 |---|---|---|
 | **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
-| **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, choix d'une Saison à défi (§7.3, dès la 2ᵉ Saison), bouton Nouvelle Saison avec confirmation | Prestige disponible |
+| **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, bouton Nouvelle Saison avec confirmation | Prestige disponible |
 | **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi, puis la Canopée à niveaux (§7.1) | 1ʳᵉ Graine |
 | **Cycle de l'eau** | Sources actuelles et à gagner, bonus avant/après, ce qui repart et ce qui reste, bouton Nouveau Cycle avec confirmation (§7.4) | 1ʳᵉ Source à gagner |
 | **Herbier** | Une planche par espèce, dessinée une fois revenue, silhouette avant, avec ce qui la ramène (§9.5) | 1ʳᵉ espèce ou 2ᵉ Saison |
@@ -1370,7 +1376,7 @@ L'or et le lilas (la couleur de la fleur d'héliotrope) forment le duo signature
 
 Le confort en attente depuis M5 (roadmap, « Confort à glisser au fil de l'eau ») : chaque palier se lit d'un coup d'œil, sans texte de plus. Aucun de ces ajouts ne change l'équilibrage. Code dans `src/game/goals.ts`, `src/game/history.ts`, `src/ui/Goals.tsx` et `src/ui/ProductionCurve.tsx`.
 
-- **Temps avant achat.** Sous le prix d'un bâtiment (pour la quantité choisie), de l'amélioration choisie, d'une parcelle ou d'un projet hors de portée : « dans 2 min », la Lumière qui manque divisée par la production actuelle, arrondie à la seconde supérieure. Rien tant que rien n'est produit, ni quand le bâtiment a atteint la limite d'une Saison à défi.
+- **Temps avant achat.** Sous le prix d'un bâtiment (pour la quantité choisie), de l'amélioration choisie, d'une parcelle ou d'un projet hors de portée : « dans 2 min », la Lumière qui manque divisée par la production actuelle, arrondie à la seconde supérieure. Rien tant que rien n'est produit.
 - **Prochain objectif.** Dans le compteur, à côté de la production : « Prochain : Serre, dans 3 min », l'achat proposé le moins cher que la réserve ne couvre pas encore, parmi les bâtiments (le prochain à découvrir compris, à son prix de base, nommé « Encore à découvrir »), les améliorations, les parcelles et les projets. Tant que rien n'est produit (au tout début, où l'on ne fait que cliquer), il dit la Lumière qui manque à la place du temps : « Prochain : Héliotrope en pot, encore 12 Lumière ». C'est la règle d'or du §2 rendue visible ; il disparaît quand tout ce qui est proposé est abordable.
 - **Raccourcis clavier.** Les touches 1 à 8 achètent le bâtiment de ce rang (s'il est découvert) dans la quantité choisie ; M passe à Max, puis revient à ×1 ; U achète toutes les améliorations à portée. Aucune touche ne clique la fleur, pour ne pas encourager l'autoclic. Les raccourcis se taisent dans un champ de texte et quand une fenêtre est ouverte.
 - **Tout acheter.** Dès que deux améliorations au moins sont à portée, un bouton « Tout acheter » et leur nombre s'affichent à côté du titre d'Améliorer : il les achète de la moins chère à la plus chère tant que la réserve suffit, en comptant celles que ces achats débloquent. Les mêmes achats qu'à la main, donc l'équilibrage ne change pas.

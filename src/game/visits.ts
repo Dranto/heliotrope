@@ -5,7 +5,6 @@ import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { bonusesOf, factorOf } from './bonuses';
 import { effectSeconds } from './butterfly';
-import { generatorLimit } from './challenges';
 import type { EffectKind } from './effects';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { addPollen, POLLEN_PER_MOMENT } from './pollen';
@@ -129,7 +128,7 @@ export function cityVisits(state: Pick<GameState, 'visits'>): number {
 /** The building the neighbours bring: the most expensive one owned with room left. */
 export function cuttingsGenerator(state: GameState): GeneratorId | null {
   for (const id of [...GENERATOR_IDS].reverse()) {
-    if (state.generators[id] > 0 && state.generators[id] < generatorLimit(state, id)) return id;
+    if (state.generators[id] > 0) return id;
   }
   return null;
 }
@@ -156,10 +155,7 @@ export function welcomeVisit(state: GameState): WelcomeResult | null {
   if (kind === 'cuttings') {
     const generator = cuttingsGenerator(state);
     if (generator) {
-      const units = Math.min(
-        cuttingsUnits(state),
-        generatorLimit(state, generator) - state.generators[generator],
-      );
+      const units = cuttingsUnits(state);
       next = {
         ...next,
         generators: { ...next.generators, [generator]: state.generators[generator] + units },

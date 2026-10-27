@@ -2,7 +2,6 @@
 import { isIntroduced } from './introductions';
 import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './achievements';
 import { keptGeneratorShare } from './bonuses';
-import { generatorLimit, offeredChallenges, type ChallengeId } from './challenges';
 import { ripeningSeconds } from './delta';
 import { GENERATOR_IDS } from './generators';
 import { startCurve } from './history';
@@ -116,18 +115,13 @@ export function isSeasonsScreenUnlocked(state: GameState): boolean {
 
 /**
  * Replant the neighbourhood: Light, generators, upgrades, projects, the Season total and running
- * butterfly effects start over; `kept` of each generator stays (the Boutures talent, §7.1), within
- * the limits of `challenge`. Everything else carries over; the callers adjust the prestige layers.
+ * butterfly effects start over; `kept` of each generator stays (the Boutures talent, §7.1).
+ * Everything else carries over; the callers adjust the prestige layers.
  */
-export function replant(state: GameState, challenge: ChallengeId | null, kept: number): GameState {
+export function replant(state: GameState, kept: number): GameState {
   const fresh = createInitialState(state.lastUpdate);
   const generators = { ...fresh.generators };
-  for (const id of GENERATOR_IDS) {
-    generators[id] = Math.min(
-      Math.floor(state.generators[id] * kept),
-      generatorLimit({ challenge }, id),
-    );
-  }
+  for (const id of GENERATOR_IDS) generators[id] = Math.floor(state.generators[id] * kept);
   return {
     ...state,
     resources: { ...state.resources, light: 0 },
@@ -137,7 +131,6 @@ export function replant(state: GameState, challenge: ChallengeId | null, kept: n
     seasonSeconds: 0,
     idleSeconds: 0,
     projects: [],
-    challenge,
     butterfly: { nextIn: state.butterfly.nextIn || fresh.butterfly.nextIn, visible: 0 },
     effects: [],
     history: startCurve(state.history, state.seasons + 2),
@@ -145,18 +138,16 @@ export function replant(state: GameState, challenge: ChallengeId | null, kept: n
 }
 
 /**
- * Player action: start a new Season (§7), optionally as a challenge Season (§7.3). Resets Light,
- * generators, upgrades, projects, the Season total and running butterfly effects; keeps Seeds
- * (plus the ones gained), Milestones, restored parcels, the Tree of Seasons and its Cooperatives,
- * challenges won, the Herbier, the Bioregion (§7.4), all-time statistics, options and the clock.
- * With the Boutures talent, a share of each generator is kept too (§7.1), within the challenge's
- * limits. Returns the same state when no ripe Seed would be gained or the challenge is not offered.
+ * Player action: start a new Season (§7). Resets Light, generators, upgrades, projects, the
+ * Season total and running butterfly effects; keeps Seeds (plus the ones gained), Milestones,
+ * restored parcels, the Tree of Seasons and its Cooperatives, the Herbier, the Bioregion (§7.4),
+ * all-time statistics, options and the clock. With the Boutures talent, a share of each
+ * generator is kept too (§7.1). Returns the same state when no ripe Seed would be gained.
  */
-export function startNewSeason(state: GameState, challenge: ChallengeId | null = null): GameState {
+export function startNewSeason(state: GameState): GameState {
   if (!canStartNewSeason(state)) return state;
-  if (challenge && !offeredChallenges(state).some((c) => c.id === challenge)) return state;
   let next: GameState = {
-    ...replant(state, challenge, keptGeneratorShare(state)),
+    ...replant(state, keptGeneratorShare(state)),
     seeds: state.seeds + seedsToGain(state),
     seasons: state.seasons + 1,
   };
@@ -169,12 +160,10 @@ export function startNewSeason(state: GameState, challenge: ChallengeId | null =
 
 /**
  * The sower (§7.1, Canopy) relaunches a free Season once its ripe Seeds bring the Seeds owned to
- * `sowerFactor` times as many; it never interrupts a challenge Season still running.
+ * `sowerFactor` times as many.
  */
 export function isSowerReady(state: GameState): boolean {
-  if (!isSowerWorking(state) || state.challenge !== null || !canStartNewSeason(state)) {
-    return false;
-  }
+  if (!isSowerWorking(state) || !canStartNewSeason(state)) return false;
   return state.seeds + seedsToGain(state) >= state.seeds * state.canopy.sowerFactor;
 }
 

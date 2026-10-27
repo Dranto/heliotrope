@@ -21,7 +21,6 @@ import {
 } from './restoration';
 import type { GameState } from './state';
 import { canBuyGenerator, canBuyUpgrade } from './tick';
-import { upgradesAllowed } from './challenges';
 
 export const PANEL_IDS = [
   'upgrades',
@@ -54,9 +53,7 @@ export function isPanelId(value: unknown): value is PanelId {
 export function isPanelShown(state: GameState, id: PanelId): boolean {
   switch (id) {
     case 'upgrades':
-      return (
-        availableUpgrades(state).length > 0 || state.upgrades.length > 0 || !upgradesAllowed(state)
-      );
+      return availableUpgrades(state).length > 0 || state.upgrades.length > 0;
     case 'generators':
       return true;
     case 'restoration':
