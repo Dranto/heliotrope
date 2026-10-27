@@ -70,7 +70,7 @@ describe('the weather mark on a building', () => {
     const base = withAllIntroduced(createInitialState(0));
     saveGame({ ...base, seasons: 1, generators: { ...base.generators, pot: 60 } });
     renderGenerators();
-    const sky = screen.getByRole('button', { name: /les voies de ce bâtiment jouent/ });
+    const sky = screen.getByRole('button', { name: /ce bâtiment produit/ });
     expect(sky).toHaveAttribute('aria-expanded', 'false');
     expect(document.querySelector('.growth-sky-note')).toBeNull();
     fireEvent.click(sky);

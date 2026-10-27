@@ -65,7 +65,6 @@ import { Restoration } from './Restoration';
 import { Garden } from './Garden';
 import { GreatWorks } from './GreatWorks';
 import { Orchard } from './Orchard';
-import { Requests } from './Requests';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest, harvestAll } from '../game/garden';
 import { Scene } from './Scene';
@@ -99,7 +98,7 @@ const TABS: Tab[] = ['build', 'improve', 'living', 'region', 'more'];
 const TAB_PANELS: Record<Tab, PanelId[]> = {
   build: ['generators', 'cooperatives'],
   improve: ['upgrades', 'restoration'],
-  living: ['garden', 'orchard', 'requests'],
+  living: ['garden', 'orchard'],
   region: ['bioregion', 'greatWorks'],
   more: [],
 };
@@ -119,7 +118,6 @@ const PANEL_CLASS: Record<PanelId, string> = {
   cooperatives: 'cooperatives',
   garden: 'garden-panel',
   orchard: 'orchard-panel',
-  requests: 'requests-panel',
   bioregion: 'bioregion',
   greatWorks: 'works-panel',
 };
@@ -754,7 +752,6 @@ export function App() {
               {awake('restoration') && <Restoration onHighlight={setHighlight} />}
               {awake('garden') && <Garden onHarvest={onHarvest} onHarvestAll={onHarvestAll} />}
               {awake('orchard') && <Orchard onHarvestAll={onHarvestAll} />}
-              {awake('requests') && <Requests />}
               {awake('greatWorks') && <GreatWorks />}
             </div>
             <div className="side-column">

@@ -3,7 +3,6 @@ import {
   canSow,
   CROP_IDS,
   hasRipe,
-  weatherCrop,
   CROPS,
   isCropUnlocked,
   isGardenOpen,
@@ -49,7 +48,6 @@ export function Garden({
   const firstBare = plots.findIndex((p, i) => i < opened && p.crop === null);
   const picking = choosing !== null && plots[choosing]?.crop === null ? choosing : firstBare;
   const crops = CROP_IDS.filter((id) => isCropUnlocked(state, id));
-  const favoured = weatherCrop(state);
   const plant = (index: number, crop: CropId) => {
     store.dispatch((s) => sow(s, index, crop));
     setChoosing(null);
@@ -61,9 +59,6 @@ export function Garden({
         {t.garden.title}
       </PanelTitle>
       <p className="hint">{t.garden.hint}</p>
-      {favoured && (
-        <p className="hint garden-weather">{t.garden.weatherCrop(t.garden.crops[favoured].name)}</p>
-      )}
       {hasRipe(state) && (
         <button
           type="button"

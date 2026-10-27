@@ -5,7 +5,6 @@ import {
   ACHIEVEMENT_FAMILIES,
   ACHIEVEMENT_LIST,
   achievementProgress,
-  isMeasuredInPowers,
   type AchievementDef,
   type AchievementFamily,
   type AchievementId,
@@ -65,23 +64,4 @@ export function nextMilestone(state: GameState, family: AchievementFamily): Next
     if (best === null || (progress ?? -1) > (best.progress ?? -1)) best = { achievement, progress };
   }
   return best;
-}
-
-/** A Milestone this close to its goal can be asked for by the neighbours (§9.11). */
-export const CLOSE_MILESTONE = 0.75;
-
-/**
- * The Milestone closest to its goal over every family, once it is close; the ones counted in
- * powers of ten are left out, as they can still be far.
- */
-export function closeMilestone(state: GameState): AchievementId | null {
-  let best: { id: AchievementId; progress: number } | null = null;
-  for (const achievement of ACHIEVEMENT_LIST) {
-    const { id, condition, hidden } = achievement;
-    if (hidden || state.achievements.includes(id) || isMeasuredInPowers(condition)) continue;
-    const progress = achievementProgress(state, condition);
-    if (progress === null || progress < CLOSE_MILESTONE || progress >= 1) continue;
-    if (best === null || progress > best.progress) best = { id, progress };
-  }
-  return best?.id ?? null;
 }

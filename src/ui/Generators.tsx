@@ -6,14 +6,8 @@ import {
   GROWTH_TIERS,
   pendingTier,
   reachedTiers,
-  strengthen,
 } from '../game/growth';
-import {
-  buildingWeather,
-  favouredBuildings,
-  isWeatherOpen,
-  WEATHER_PATH_FACTOR,
-} from '../game/weather';
+import { buildingWeather, favouredBuildings, isWeatherOpen } from '../game/weather';
 import { WeatherIcon } from './WeatherArt';
 import { GeneratorIcon } from './UpgradeIcon';
 import { bonusText } from '../i18n/restoration';
@@ -206,7 +200,7 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
   const shown = picked ?? pending;
   const forms = t.growth.forms[id];
   if (reached === 0 && picked === null && state.generators[id] < GROWTH_TIERS[0] / 2) return null;
-  // Under its weather, a building's paths play stronger (M33).
+  // Under its weather, a building produces more (§9.10).
   const sky = isWeatherOpen(state) ? buildingWeather(id) : null;
   const favoured = favouredBuildings(state).includes(id);
   return (
@@ -239,15 +233,15 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
             className="growth-sky"
             data-active={favoured}
             aria-expanded={skyNote}
-            aria-label={t.weather.paths(t.weather.day[sky])}
-            title={t.weather.paths(t.weather.day[sky])}
+            aria-label={t.weather.favours(t.weather.day[sky])}
+            title={t.weather.favours(t.weather.day[sky])}
             onClick={() => setSkyNote((open) => !open)}
           >
             <WeatherIcon id={sky} />
           </button>
         )}
       </span>
-      {sky && skyNote && <p className="growth-sky-note">{t.weather.paths(t.weather.day[sky])}</p>}
+      {sky && skyNote && <p className="growth-sky-note">{t.weather.favours(t.weather.day[sky])}</p>}
       {shown !== null && (
         <div className="growth-fork" role="group" aria-label={t.growth.choose(forms[shown]!)}>
           {([0, 1] as const).map((path) => {
@@ -271,9 +265,7 @@ function GrowthPaths({ id, state }: { id: GeneratorId; state: GameState }) {
                   setPicked(null);
                 }}
               >
-                {bonusText(
-                  strengthen(GROWTH[id][shown]![path], favoured ? WEATHER_PATH_FACTOR : 1),
-                )}
+                {bonusText(GROWTH[id][shown]![path])}
               </button>
             );
           })}

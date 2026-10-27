@@ -37,8 +37,6 @@ import {
 } from './neighbourhood';
 import { useMapRenderer } from './rendererPref';
 import { SpeciesLife } from './SpeciesLife';
-import { canGreet, greetSpecies } from '../game/greetings';
-import type { SpeciesId } from '../game/species';
 import { NightLights, VisitLayer } from './VisitArt';
 import { GardenBeds } from './GardenArt';
 import { cropStage, encodeBeds } from './gardenMap';
@@ -60,10 +58,8 @@ import { GreatWorksLayer } from './GreatWorksArt';
 import { GrowthLayer } from './GrowthArt';
 import { PollenWave } from './PollenWave';
 import { WeatherForecast, WeatherLayer } from './WeatherArt';
-import { RequestBubbles } from './RequestArt';
-import { isRequestMet } from '../game/requests';
 import { isFlying } from '../game/pollen';
-import { canSwapForecast, isWeatherOpen, swapForecast, type WeatherId } from '../game/weather';
+import { isWeatherOpen, type WeatherId } from '../game/weather';
 import { encodeGrowth } from './growthMap';
 import { reachedTiers } from '../game/growth';
 import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
@@ -157,8 +153,6 @@ function useSize<T extends HTMLElement>(fallback: Size): [RefObject<T | null>, S
 
 /** Room kept free under the view switch at the top of the map. */
 const CAPTION_ROOM = 52;
-/** Half of the 44 px touch target of §10.3, in screen pixels, around a species that can be greeted. */
-const HIT_PIXELS = 22;
 
 /**
  * The neighbourhood scene (docs/game-design.md §6, §10.4): the city seen from above, where each
@@ -270,10 +264,6 @@ export function Scene({
   const flights = state.pollen.flights;
   const weather = isWeatherOpen(state) ? state.weather.current : null;
   const forecast = state.weather.forecast.join(',');
-  // The neighbours' requests waiting (§9.11), encoded so the bubbles only redraw when one changes.
-  const requests = state.requests.open
-    .map((r) => `${r.need.kind}:${isRequestMet(state, r) ? 1 : 0}`)
-    .join(',');
   const flying = isFlying(state);
   const growth = encodeGrowth(
     Object.fromEntries(GENERATOR_IDS.map((id) => [id, reachedTiers(state, id)])) as Record<
@@ -287,9 +277,6 @@ export function Scene({
   // The landscape of the sister city lived in (§7.6).
   const landscape = state.city.landscape;
   const orchard = encodeOrchard(state.orchard);
-  // The species that can be greeted now (M35), joined so the layer redraws only on a change.
-  const greetable = species.filter((id) => canGreet(state, id)).join();
-  const greet = useCallback((id: SpeciesId) => store.dispatch((s) => greetSpecies(s, id)), [store]);
   const onPick = useCallback(
     (id: FruitId) => store.dispatch((s) => pickFruit(s, id)?.state ?? s),
     [store],
@@ -367,7 +354,6 @@ export function Scene({
         <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <GrowthLayer growth={growth} flying={flying} reduced={reduced} />
         <PollenWave flights={flights} flying={flying} reduced={reduced} />
-        <RequestBubbles bubbles={requests} />
         <ProjectMarks projects={projects} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <GardenBeds beds={beds} onHarvest={onHarvest} />
@@ -382,13 +368,7 @@ export function Scene({
           highlight={highlight}
           onRestore={restore}
         />
-        {/* Last, so a species that can be greeted stays reachable over a parcel on offer. */}
-        <SpeciesLife
-          species={species}
-          greetable={greetable}
-          onGreet={greet}
-          hitRadius={HIT_PIXELS / camera.scale}
-        />
+        <SpeciesLife species={species} />
       </>
     ),
     [
@@ -406,7 +386,6 @@ export function Scene({
       flights,
       flying,
       weather,
-      requests,
       corridors,
       orchard,
       orchardOpen,
@@ -415,8 +394,6 @@ export function Scene({
       restoreNeighbour,
       projects,
       species,
-      greetable,
-      greet,
       bikes,
       reduced,
       visitor,
@@ -432,7 +409,6 @@ export function Scene({
       affordable,
       highlight,
       restore,
-      camera.scale,
     ],
   );
   const overlay = useMemo(
@@ -540,14 +516,7 @@ export function Scene({
           )}
           {furthest === 1 && <span className="scene-phase">{t.phases[1]}</span>}
           {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
-          {weather && (
-            <WeatherForecast
-              now={weather}
-              next={forecast.split(',') as WeatherId[]}
-              canSwap={(i) => canSwapForecast(state, i)}
-              onSwap={(i) => store.dispatch((s) => swapForecast(s, i))}
-            />
-          )}
+          {weather && <WeatherForecast now={weather} next={forecast.split(',') as WeatherId[]} />}
         </div>
         {mode === 'play' && isDecorOpen(state) && (
           <button type="button" className="scene-tool decor-tool" onClick={() => setMode('decor')}>

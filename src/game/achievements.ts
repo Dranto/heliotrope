@@ -2,7 +2,6 @@
 // and descriptions live in src/i18n. Milestones are kept across Seasons.
 import { WEATHER_IDS, type WeatherId } from './weather';
 import { WEATHER_SPECIES } from './species';
-import { totalGreetings } from './greetings';
 import { completeFamilies } from './families';
 import { pathsWorking } from './growth';
 import { BASIN_SITE_IDS, collectorsOwned, siteLevels } from './bioregion';
@@ -42,6 +41,9 @@ export const RETIRED_ACHIEVEMENTS: readonly unknown[] = [
   'grandBloom',
   'bouquet',
   'grandBouquet',
+  'firstFavour',
+  'goodNeighbour',
+  'hello',
 ];
 
 /** Upgrade groups a Milestone can ask to complete within one Season. */
@@ -128,12 +130,8 @@ export type AchievementCondition =
   | { kind: 'weather'; weather: WeatherId }
   /** Every species of the weather back (M33). */
   | { kind: 'weatherSpecies' }
-  /** Species greeted on the map, over the whole game (M35). */
-  | { kind: 'greetings'; count: number }
   /** Families of the Herbier complete (M35). */
   | { kind: 'families'; count: number }
-  /** Neighbours' requests served over the whole game (§9.11). */
-  | { kind: 'requests'; count: number }
   /** Challenge Cycles won (§7.5). */
   | { kind: 'cycleChallenges'; count: number }
   /** Visits of one kind welcomed over all Seasons (§9.6). */
@@ -238,10 +236,7 @@ export type AchievementId =
   | 'weather.mist'
   | 'weather.heat'
   | 'skyCreatures'
-  | 'hello'
   | 'wholeFamily'
-  | 'firstFavour'
-  | 'goodNeighbour'
   | 'lockKeeper'
   | `cycleChallenges.${(typeof CYCLE_CHALLENGE_STEPS)[number]}`
   | 'watershed'
@@ -402,9 +397,6 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   // The pollen (§5.6).
   { id: 'firstFlight', family: 'clicks', condition: { kind: 'flights', count: 1 } },
   { id: 'pollenStorm', family: 'clicks', condition: { kind: 'flights', count: 100 } },
-  // The neighbours' requests (§9.11).
-  { id: 'firstFavour', family: 'neighbourhood', condition: { kind: 'requests', count: 1 } },
-  { id: 'goodNeighbour', family: 'neighbourhood', condition: { kind: 'requests', count: 25 } },
   // The weather (§9.10): one per weather lived.
   ...WEATHER_IDS.map(
     (weather) =>
@@ -415,8 +407,7 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
       }) as const,
   ),
   { id: 'skyCreatures', family: 'neighbourhood', condition: { kind: 'weatherSpecies' } },
-  // The species greeted and the families of the Herbier (M35).
-  { id: 'hello', family: 'neighbourhood', condition: { kind: 'greetings', count: 1 } },
+  // The families of the Herbier (M35).
   { id: 'wholeFamily', family: 'neighbourhood', condition: { kind: 'families', count: 2 } },
   // The orchard (§9.8).
   { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
@@ -680,12 +671,8 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return state.weather.seen.includes(condition.weather);
     case 'weatherSpecies':
       return WEATHER_SPECIES.every((id) => state.species.includes(id));
-    case 'greetings':
-      return totalGreetings(state) >= condition.count;
     case 'families':
       return completeFamilies(state.species).length >= condition.count;
-    case 'requests':
-      return state.requests.served >= condition.count;
     case 'fruitHarvests':
       return state.orchard.harvests >= condition.count;
     case 'fruitVarieties':
@@ -798,12 +785,8 @@ function measure(state: GameState, condition: AchievementCondition): [number, nu
       return [state.garden.rotations, condition.count];
     case 'flights':
       return [state.pollen.flights, condition.count];
-    case 'greetings':
-      return [totalGreetings(state), condition.count];
     case 'families':
       return [completeFamilies(state.species).length, condition.count];
-    case 'requests':
-      return [state.requests.served, condition.count];
     case 'fruitHarvests':
       return [state.orchard.harvests, condition.count];
     case 'fruitVarieties':

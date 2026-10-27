@@ -20,7 +20,6 @@ import { growGarden } from './garden';
 import { growOrchard } from './orchard';
 import { decayPollen, pollinate } from './pollen';
 import { advanceWeather } from './weather';
-import { advanceRequests } from './requests';
 import { runBuilders } from './cities';
 import { recordProduction } from './history';
 import { runSower } from './seasons';
@@ -72,14 +71,11 @@ export function unlockProgress(state: GameState): GameState {
  */
 export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
-  const watered = advanceRequests(
-    advanceWeather(
-      decayPollen(
-        growOrchard(
-          growGarden(
-            earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds),
-            dtSeconds,
-          ),
+  const watered = advanceWeather(
+    decayPollen(
+      growOrchard(
+        growGarden(
+          earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds),
           dtSeconds,
         ),
         dtSeconds,

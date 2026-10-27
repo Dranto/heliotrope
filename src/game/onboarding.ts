@@ -17,7 +17,6 @@ import { isOrchardOpen } from './orchard';
 import { isPanelShown } from './panels';
 import { phaseOf } from './phases';
 import { isPollenOpen } from './pollen';
-import { areRequestsOpen } from './requests';
 import { isSeasonsScreenUnlocked } from './seasons';
 import type { GameState } from './state';
 import { VISIT_KINDS, isVisitUnlocked } from './visits';
@@ -68,8 +67,6 @@ function isOpen(state: GameState, id: FeatureId): boolean {
       return isBioregionOpen(state);
     case 'cooperatives':
       return unlockedCooperatives(state).length > 0;
-    case 'requests':
-      return areRequestsOpen(state);
     case 'weather':
       return isWeatherOpen(state);
     case 'orchard':

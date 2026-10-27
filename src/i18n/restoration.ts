@@ -73,8 +73,6 @@ export function bonusText(bonus: Bonus): string {
       return b.harvestBaskets(bonus.units);
     case 'perPath':
       return b.perPath(formatPercent(bonus.bonus));
-    case 'handSlots':
-      return b.handSlots(bonus.units);
     case 'perMilestoneFamily':
       return b.perMilestoneFamily(formatPercent(bonus.bonus));
   }

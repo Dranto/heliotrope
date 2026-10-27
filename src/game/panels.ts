@@ -22,7 +22,6 @@ import {
   offeredParcels,
   offeredProjects,
 } from './restoration';
-import { areRequestsOpen, canPlayHand, canServe } from './requests';
 import type { GameState } from './state';
 import { canBuyGenerator, canBuyUpgrade } from './tick';
 import { upgradesAllowed } from './challenges';
@@ -34,7 +33,6 @@ export const PANEL_IDS = [
   'cooperatives',
   'garden',
   'orchard',
-  'requests',
   'bioregion',
   'greatWorks',
 ] as const;
@@ -51,7 +49,6 @@ export const PANEL_LAYER: Record<PanelId, LayerId> = {
   cooperatives: 'city',
   garden: 'living',
   orchard: 'living',
-  requests: 'living',
   bioregion: 'region',
   greatWorks: 'region',
 };
@@ -82,8 +79,6 @@ export function isPanelShown(state: GameState, id: PanelId): boolean {
       return isGardenOpen(state);
     case 'orchard':
       return isOrchardOpen(state);
-    case 'requests':
-      return areRequestsOpen(state);
     case 'bioregion':
       return isBioregionOpen(state);
     case 'greatWorks':
@@ -138,11 +133,6 @@ export function panelHasAction(state: GameState, id: PanelId): boolean {
     case 'orchard':
       return FRUIT_IDS.some(
         (fruit) => treeStage(state.orchard.trees[fruit]) === 'ripe' || canPlant(state, fruit),
-      );
-    case 'requests':
-      return (
-        state.requests.open.some((_, i) => canServe(state, i)) ||
-        state.requests.hands.some((_, i) => canPlayHand(state, i))
       );
     case 'bioregion':
       return (

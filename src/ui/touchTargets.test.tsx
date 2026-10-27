@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { GameStore } from '../game/store';
 import { App } from './App';
 import { GameStoreContext } from './useGame';
-import { WeatherForecast } from './WeatherArt';
 
 /** Style rules that apply on a touch screen, as the browser parses the real stylesheets. */
 function coarseRules(): CSSStyleRule[] {
@@ -107,24 +106,6 @@ describe('the controls used all game long on a touch screen', () => {
     );
     for (const control of [buyAll, summary, pill]) {
       expect(least(rules, control!, 'min-height')).toBeGreaterThanOrEqual(2.75);
-    }
-  });
-
-  it('gives the forecast weathers that can be brought next a full touch target', () => {
-    render(
-      <WeatherForecast
-        now="sun"
-        next={['mist', 'shower', 'heat']}
-        canSwap={(index) => index > 0}
-        onSwap={() => {}}
-      />,
-    );
-    const rules = coarseRules();
-    const swaps = screen.getAllByRole('button', { name: /^Faire venir/ });
-    expect(swaps).toHaveLength(2);
-    for (const swap of swaps) {
-      expect(least(rules, swap, 'min-height')).toBeGreaterThanOrEqual(2.75);
-      expect(least(rules, swap, 'min-width')).toBeGreaterThanOrEqual(2.75);
     }
   });
 });

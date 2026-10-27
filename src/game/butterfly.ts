@@ -2,7 +2,6 @@
 // effect when caught. Randomness comes from the seed in GameState, so every transition is pure.
 import { isIntroduced } from './introductions';
 import { addPollen, FLIGHT_BUTTERFLY_FACTOR, POLLEN_PER_MOMENT } from './pollen';
-import { isWeatherOpen, type WeatherId } from './weather';
 import { JUST_IN_TIME_SECONDS, unlockAchievement } from './achievements';
 import { effectDurationFactor, factorOf } from './bonuses';
 import {
@@ -35,23 +34,6 @@ export interface ButterflyOdds {
 
 /** §9.2 odds: Floraison 50%, Récolte 40%, Pollinisation 10%. */
 export const BUTTERFLY_ODDS: ButterflyOdds = { bloom: 0.5, harvest: 0.4 };
-
-/**
- * §5.7 (M31): the butterfly takes the colour of the weather. Its three effects stay, but more
- * Floraisons come under grand soleil, more Récoltes in the wind and more Pollinisations in the
- * mist. The other weathers keep the §9.2 odds.
- */
-export const WEATHER_BUTTERFLY_ODDS: Partial<Record<WeatherId, ButterflyOdds>> = {
-  sun: { bloom: 0.6, harvest: 0.3 },
-  wind: { bloom: 0.4, harvest: 0.5 },
-  mist: { bloom: 0.45, harvest: 0.35 },
-};
-
-/** The odds in force: the weather's once the sky is open (§9.10), §9.2's otherwise. */
-export function butterflyOdds(state: GameState): ButterflyOdds {
-  if (!isWeatherOpen(state)) return BUTTERFLY_ODDS;
-  return WEATHER_BUTTERFLY_ODDS[state.weather.current] ?? BUTTERFLY_ODDS;
-}
 
 export function butterflyOutcome(
   random: number,
@@ -136,7 +118,7 @@ export interface CatchResult {
 export function catchButterfly(state: GameState): CatchResult | null {
   if (state.butterfly.visible <= 0) return null;
   const [random, rngSeed] = nextRandom(state.rngSeed);
-  const outcome = butterflyOutcome(random, butterflyOdds(state));
+  const outcome = butterflyOutcome(random, BUTTERFLY_ODDS);
   let next: GameState = { ...state, rngSeed, butterflies: state.butterflies + 1 };
   let light = 0;
   if (outcome === 'harvest') {

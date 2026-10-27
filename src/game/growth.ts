@@ -3,7 +3,6 @@
 import type { Bonus } from './bonuses';
 import { GENERATOR_IDS, type GeneratorId } from './generators';
 import type { GameState } from './state';
-import { WEATHER_PATH_FACTOR } from './weather';
 
 /** Units owned at which a building grows into its next form. */
 export const GROWTH_TIERS = [50, 100, 200] as const;
@@ -113,42 +112,18 @@ export function reachedTiers(
   return GROWTH_TIERS.filter((tier) => (state.generators[id] ?? 0) >= tier).length;
 }
 
-/**
- * A path played `scale` times as strong (M33): the part of its effect above none grows, whatever
- * its shape; a shorter interval gets shorter still. Offline hours are kept as they are.
- */
-export function strengthen(bonus: Bonus, scale: number): Bonus {
-  if (scale === 1) return bonus;
-  if ('factor' in bonus) return { ...bonus, factor: 1 + (bonus.factor - 1) * scale };
-  if ('bonus' in bonus) return { ...bonus, bonus: bonus.bonus * scale };
-  if ('bonusPerUnit' in bonus) return { ...bonus, bonusPerUnit: bonus.bonusPerUnit * scale };
-  if ('amount' in bonus) return { ...bonus, amount: bonus.amount * scale };
-  if ('fraction' in bonus) return { ...bonus, fraction: bonus.fraction * scale };
-  return bonus;
-}
-
-/**
- * Bonuses of every path picked at a tier reached; those of the `favoured` buildings, under their
- * weather (M33), play `skyScale` stronger (more with the weather's family complete, M35).
- */
-export function growthBonuses(
-  state: {
-    generators: Readonly<Record<string, number>>;
-    growth: GrowthState;
-  },
-  favoured: readonly GeneratorId[] = [],
-  skyScale = WEATHER_PATH_FACTOR,
-): Bonus[] {
+/** Bonuses of every path picked at a tier reached. */
+export function growthBonuses(state: {
+  generators: Readonly<Record<string, number>>;
+  growth: GrowthState;
+}): Bonus[] {
   const bonuses: Bonus[] = [];
   for (const id of GENERATOR_IDS) {
     const reached = reachedTiers(state, id);
     const paths = state.growth.paths[id];
-    const scale = favoured.includes(id) ? skyScale : 1;
     for (let tier = 0; tier < reached; tier++) {
       const path = paths[tier];
-      if (path !== null && path !== undefined) {
-        bonuses.push(strengthen(GROWTH[id][tier]![path], scale));
-      }
+      if (path !== null && path !== undefined) bonuses.push(GROWTH[id][tier]![path]);
     }
   }
   return bonuses;

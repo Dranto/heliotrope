@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { butterflyOdds, BUTTERFLY_ODDS, butterflyOutcome, catchButterfly } from './butterfly';
+import { catchButterfly } from './butterfly';
 import {
   addPollen,
   POLLEN_PER_CLICK,
@@ -26,26 +26,6 @@ function fresh(extra: Partial<GameState> = {}): GameState {
 }
 
 describe('the moments that chain together (§5.7, M31)', () => {
-  it('gives the butterfly the colour of the weather once the sky is open', () => {
-    const first = fresh({ seasons: 0 });
-    expect(butterflyOdds(first)).toEqual(BUTTERFLY_ODDS);
-    const sunny = fresh({ seasons: 1, weather: { ...first.weather, current: 'sun' } });
-    const windy = fresh({ seasons: 1, weather: { ...first.weather, current: 'wind' } });
-    const misty = fresh({ seasons: 1, weather: { ...first.weather, current: 'mist' } });
-    const hot = fresh({ seasons: 1, weather: { ...first.weather, current: 'heat' } });
-    expect(butterflyOdds(sunny).bloom).toBeGreaterThan(BUTTERFLY_ODDS.bloom);
-    expect(butterflyOdds(windy).harvest).toBeGreaterThan(BUTTERFLY_ODDS.harvest);
-    expect(butterflyOutcome(0.95, butterflyOdds(misty))).toBe('pollination');
-    expect(butterflyOutcome(0.85, butterflyOdds(misty))).toBe('pollination');
-    expect(butterflyOdds(hot)).toEqual(BUTTERFLY_ODDS);
-    // Every effect keeps a chance under every sky.
-    for (const odds of [sunny, windy, misty, hot].map(butterflyOdds)) {
-      expect(odds.bloom).toBeGreaterThan(0);
-      expect(odds.harvest).toBeGreaterThan(0);
-      expect(odds.bloom + odds.harvest).toBeLessThan(1);
-    }
-  });
-
   it('leaves pollen on the flower when the butterfly is caught or a visitor welcomed', () => {
     const butterfly = fresh({ butterfly: { nextIn: 0, visible: 5 } });
     expect(catchButterfly(butterfly)!.state.pollen.gauge).toBeCloseTo(POLLEN_PER_MOMENT);

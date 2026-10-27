@@ -113,6 +113,25 @@ describe('save', () => {
     expect(deserialize(serialize(state), 0)!.retiredAchievements).toBe(2);
   });
 
+  it('drops the requests, the greetings and the forecast swap (slimming plan, lot 2)', () => {
+    const played = JSON.parse(serialize(playedState()));
+    const old = {
+      ...played,
+      version: 41,
+      achievements: ['light.3', 'firstFavour', 'hello'],
+      retiredAchievements: 1,
+      requests: { open: [], nextIn: 10, seed: 1, hands: ['bloom'], served: 3, bonds: {} },
+      greetings: { counts: { bee: 2 }, last: {} },
+      weather: { ...played.weather, swapped: 0 },
+    };
+    const state = deserialize(JSON.stringify(old), 0)!;
+    expect(state.achievements).toEqual(['light.3']);
+    expect(state.retiredAchievements).toBe(3);
+    expect('requests' in state).toBe(false);
+    expect('greetings' in state).toBe(false);
+    expect('swapped' in state.weather).toBe(false);
+  });
+
   it('rejects corrupt or future saves', () => {
     expect(deserialize('not json', 0)).toBeNull();
     expect(deserialize('null', 0)).toBeNull();

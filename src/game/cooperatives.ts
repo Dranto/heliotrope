@@ -24,15 +24,7 @@ import {
 } from './production';
 import type { GameState } from './state';
 import { CANOPY_LIST, TALENT_LIST } from './talents';
-import {
-  canSow,
-  CROP_IDS,
-  isCropUnlocked,
-  openPlots,
-  sow,
-  weatherCrop,
-  type CropId,
-} from './garden';
+import { canSow, CROP_IDS, isCropUnlocked, openPlots, sow, type CropId } from './garden';
 import { carryHoney } from './greatWorks';
 import { HIVE_COSTS } from './orchard';
 import { PROJECTS, type ProjectId } from './projects';
@@ -240,12 +232,10 @@ function nextPurchase(state: GameState): Purchase | null {
 }
 
 /**
- * What the growers sow after `last` (M36): the crop of the weather when it differs, otherwise
- * the next crop unlocked after it, so every bed rotates; the same crop when it is the only one.
+ * What the growers sow after `last` (M36): the next crop unlocked after it, so every bed
+ * rotates; the same crop when it is the only one.
  */
 export function growersCrop(state: GameState, last: CropId): CropId {
-  const sky = weatherCrop(state);
-  if (sky !== null && sky !== last && isCropUnlocked(state, sky)) return sky;
   const from = CROP_IDS.indexOf(last);
   for (let step = 1; step < CROP_IDS.length; step++) {
     const crop = CROP_IDS[(from + step) % CROP_IDS.length]!;
