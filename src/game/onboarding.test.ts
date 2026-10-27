@@ -76,7 +76,6 @@ describe('progressive introductions (§10.8)', () => {
       'herbier',
       'butterfly',
       'visits',
-      'decor',
       'seasons',
     ];
     let state: GameState = {
@@ -110,12 +109,11 @@ describe('progressive introductions (§10.8)', () => {
       'herbier',
       'butterfly',
       'visits',
-      'decor',
       'seasons',
     ]);
     for (const gap of gaps(times)) expect(gap).toBeGreaterThanOrEqual(INTRO_GAP_SECONDS - 2);
     expect(times.get('pollen')!).toBeLessThan(60);
-    expect(times.get('decor')!).toBeLessThan(10 * 60);
+    expect(times.get('visits')!).toBeLessThan(10 * 60);
   }, 60_000);
 
   it('brings the second Season’s mechanics one by one instead of all at once', () => {

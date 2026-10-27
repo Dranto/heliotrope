@@ -5,7 +5,6 @@ import {
   type AchievementDef,
   type AchievementFamily,
 } from '../game/achievements';
-import { familyColour } from '../game/decor';
 import { formatNumber, formatPercent } from '../game/format';
 import {
   familyMilestones,
@@ -16,7 +15,6 @@ import {
 import { t } from '../i18n';
 import { achievementDescription, achievementName } from '../i18n/achievements';
 import { bonusesText } from '../i18n/restoration';
-import { COROLLAS } from './decorMap';
 import { Dialog } from './Dialog';
 import { useGameState } from './useGame';
 
@@ -89,9 +87,7 @@ export function Achievements({ onClose }: { onClose: () => void }) {
         const counted = familyMilestones(family);
         const reached = counted.filter((a) => unlocked.has(a.id)).length;
         const complete = isMilestoneFamilyComplete(state.achievements, family);
-        const colour = familyColour(family);
         const reward = bonusesText(MILESTONE_FAMILY_BONUSES[family]);
-        const colourName = t.decor.colours[colour].toLowerCase();
         const next = complete ? null : nextMilestone(state, family);
         return (
           // A plain section, found by its heading: named, it would be a landmark sharing the
@@ -106,14 +102,7 @@ export function Achievements({ onClose }: { onClose: () => void }) {
               </span>
             </h3>
             <p className="achievement-family-reward">
-              <span
-                className="colour-dot"
-                style={{ background: COROLLAS[colour][0]![1] }}
-                aria-hidden="true"
-              />
-              {complete
-                ? t.achievements.reward(reward, colourName)
-                : t.achievements.toComplete(reward, colourName)}
+              {complete ? t.achievements.reward(reward) : t.achievements.toComplete(reward)}
             </p>
             {next && (
               <div className="achievement-next" data-testid={`next-${family}`}>

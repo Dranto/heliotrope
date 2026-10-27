@@ -18,7 +18,6 @@ import { validGrowth } from './growth';
 import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './pollen';
 import { validWeather } from './weather';
 import { isPanelId, shownPanels, type PanelId } from './panels';
-import { isFlowerColour, validDecorSlots } from './decor';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
 import { isVarietyId, type VarietyId } from './seedBank';
 import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
@@ -153,6 +152,9 @@ const migrations: Record<number, Migration> = {
   // v44 (lot 4): the challenge Seasons and Cycles leave. Their fields are dropped below, their
   // Milestones counted as retired; the species they brought back stay in the Herbier.
   43: (raw) => ({ ...raw, version: 44 }),
+  // v45 (lot 4): the decor, the heliotrope's colours and the photo mode leave; the decor is
+  // dropped below without compensation, the heliotrope blooms lilac again.
+  44: (raw) => ({ ...raw, version: 45 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -272,11 +274,6 @@ export function deserialize(json: string, now: number): GameState | null {
     const cycle = changed?.[id];
     if (isCount(cycle)) state.futures.changed[id] = cycle;
   }
-  const decor = data.decor as Record<string, unknown> | undefined;
-  state.decor = {
-    slots: validDecorSlots(decor?.slots),
-    flower: isFlowerColour(decor?.flower) ? decor.flower : 'lilac',
-  };
   if (Array.isArray(data.districts)) {
     state.districts = [...new Set<DistrictId>(data.districts.filter(isDistrictId))];
   }

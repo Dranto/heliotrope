@@ -3,7 +3,7 @@ import { GameStore } from '../game/store';
 import { App } from './App';
 import { GameStoreContext } from './useGame';
 
-// The SVG map holds species to greet, garden beds, decor and visits that answer a click or a
+// The SVG map holds species to greet, garden beds and visits that answer a click or a
 // key: an image role would make them presentational and hide them from screen readers.
 describe('the SVG map', () => {
   beforeEach(() => localStorage.clear());

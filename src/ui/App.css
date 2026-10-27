@@ -428,7 +428,6 @@ button {
 .app[data-arrived='herbier'] .herbier-button,
 .app[data-arrived='seasons'] .menu-button.seasons-button:not(.cycles-button),
 .app[data-arrived='tree'] .tree-button,
-.app[data-arrived='decor'] .decor-tool,
 .app[data-arrived='weather'] .scene-weather {
   animation: arrival-glow 2.4s ease-in-out 4;
 }
@@ -3692,13 +3691,6 @@ button {
   color: var(--ink-soft);
 }
 
-.achievement-family-reward .colour-dot {
-  flex: none;
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 50%;
-}
-
 .achievement-family[data-complete='true'] .achievement-family-reward {
   color: var(--ink);
   font-weight: 600;
@@ -4084,12 +4076,6 @@ button {
 
   .caption-row > * {
     flex: none;
-  }
-
-  /* Decorating and the photo mode stay in sight under the row, in the map's top-right corner,
-     instead of waiting past the weather at the far end of the scroll. */
-  .caption-row + .scene-tool {
-    margin-left: auto;
   }
 
   .views button {

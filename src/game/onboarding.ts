@@ -3,7 +3,6 @@
 import { isBioregionOpen } from './bioregion';
 import { isButterflyUnlocked } from './butterfly';
 import { unlockedCooperatives } from './cooperatives';
-import { isDecorOpen } from './decor';
 import { isGardenOpen } from './garden';
 import {
   FEATURE_IDS,
@@ -55,8 +54,6 @@ function isOpen(state: GameState, id: FeatureId): boolean {
       return isButterflyUnlocked(state);
     case 'visits':
       return VISIT_KINDS.some((kind) => isVisitUnlocked(state, kind));
-    case 'decor':
-      return isDecorOpen(state);
     case 'seasons':
       return isSeasonsScreenUnlocked(state);
     case 'tree':

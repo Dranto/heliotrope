@@ -11,7 +11,6 @@ export const FEATURE_IDS = [
   'herbier',
   'butterfly',
   'visits',
-  'decor',
   'seasons',
   'tree',
   'bioregion',

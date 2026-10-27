@@ -52,8 +52,6 @@ import {
 import { daylightOf, type Daylight } from './daylight';
 import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
-import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
-import { DecorLayer } from './DecorArt';
 import { GrowthLayer } from './GrowthArt';
 import { PollenWave } from './PollenWave';
 import { WeatherForecast, WeatherLayer } from './WeatherArt';
@@ -69,8 +67,6 @@ import { encodeCorridors } from './corridorMap';
 import { corridors as corridorsOf } from '../game/corridors';
 import { ReturnReplay } from './ReturnReplay';
 import { replaySeconds, returnMarks, returnSkies, returnSweeps } from './returnMap';
-import { encodeDecor } from './decorMap';
-import { DecorToolbar, PhotoToolbar, type PhotoLook } from './MapTools';
 import { useGameState, useGameStore } from './useGame';
 
 /** The enriched WebGL map (§10.4), downloaded only where it is drawn. */
@@ -193,19 +189,7 @@ export function Scene({
     [store],
   );
   const visitor = state.visit.kind;
-  const clock = useDaylight();
-  // Decorating and the photo mode (§6.5) take over the map for a while.
-  const [mode, setMode] = useState<'play' | 'decor' | 'photo'>('play');
-  const [look, setLook] = useState<PhotoLook>({ daylight: 'day', season: 'summer' });
-  const photo = mode === 'photo';
-  const editing = mode === 'decor';
-  const daylight = photo ? look.daylight : clock;
-  const decor = encodeDecor(state.decor.slots);
-  const setDecor = useCallback(
-    (slot: number) =>
-      store.dispatch((s) => placeDecor(s, slot, nextDecor(s, s.decor.slots[slot] ?? null))),
-    [store],
-  );
+  const daylight = useDaylight();
   // The return in images (§9.1): what grew while away, replayed once after loading.
   const [replay] = useState(() =>
     store.offlineSeconds >= 60
@@ -335,7 +319,6 @@ export function Scene({
         <ProjectMarks projects={projects} />
         <CooperativeBikes cooperatives={parseBikes(bikes)} reduced={reduced} />
         <GardenBeds beds={beds} onHarvest={onHarvest} />
-        <DecorLayer slots={decor} editing={editing} onSlot={setDecor} />
         {replaying && replay && !reduced && (
           <ReturnReplay marks={replay.marks} skies={replay.skies} />
         )}
@@ -373,9 +356,6 @@ export function Scene({
       welcome,
       beds,
       onHarvest,
-      decor,
-      editing,
-      setDecor,
       replaying,
       replay,
       offered,
@@ -395,7 +375,7 @@ export function Scene({
   );
   // The heliotrope stands in the home courtyard, at the heart of the city, and follows the camera.
   const flower = flowerFrame(camera, width, height, PLANTER);
-  const season = photo ? look.season : visualSeason(state);
+  const season = visualSeason(state);
   // 0 with nothing built, 1 around 100 000 Light/s, well into the city phase. Rounded so the
   // map only redraws when the colour visibly changes.
   const greenness = Math.round(Math.min(1, Math.log10(1 + lightPerSecond(state)) / 5) * 20) / 20;
@@ -419,12 +399,7 @@ export function Scene({
   );
 
   return (
-    <figure
-      className="panel scene"
-      data-photo={photo || undefined}
-      data-phase={phase}
-      data-season={season ?? 'none'}
-    >
+    <figure className="panel scene" data-phase={phase} data-season={season ?? 'none'}>
       <div className="scene-map" ref={mapRef}>
         {enhanced ? (
           <Suspense fallback={svgMap}>
@@ -466,7 +441,7 @@ export function Scene({
         <Butterfly onCatch={onCatch} />
       </div>
       <figcaption className="scene-caption">
-        {/* On a phone this row scrolls sideways while the tools after it stay in reach. */}
+        {/* On a phone this row scrolls sideways. */}
         <div className="caption-row">
           {furthest > 1 && (
             <div className="segmented views" role="radiogroup" aria-label={t.layout.views}>
@@ -490,35 +465,7 @@ export function Scene({
           {season && <span className="scene-season">{t.visualSeasons[season]}</span>}
           {weather && <WeatherForecast now={weather} next={forecast.split(',') as WeatherId[]} />}
         </div>
-        {mode === 'play' && isDecorOpen(state) && (
-          <button type="button" className="scene-tool decor-tool" onClick={() => setMode('decor')}>
-            <ToolIcon path={DECOR_ICON} />
-            <span className="tool-label">{t.decor.open}</span>
-          </button>
-        )}
-        {mode === 'play' && (
-          <button
-            type="button"
-            className="scene-tool"
-            onClick={() => {
-              setLook({ daylight: clock, season: visualSeason(state) ?? 'summer' });
-              setMode('photo');
-            }}
-          >
-            <ToolIcon path={PHOTO_ICON} />
-            <span className="tool-label">{t.photo.open}</span>
-          </button>
-        )}
       </figcaption>
-      {editing && <DecorToolbar onDone={() => setMode('play')} />}
-      {photo && (
-        <PhotoToolbar
-          look={look}
-          onLook={setLook}
-          map={() => mapRef.current}
-          onClose={() => setMode('play')}
-        />
-      )}
     </figure>
   );
 }
@@ -554,18 +501,4 @@ function parseBikes(encoded: string) {
 
 function split(ids: string): ParcelId[] {
   return ids === '' ? [] : (ids.split(',') as ParcelId[]);
-}
-
-/** Fine-line glyphs of the map's tools: a flower to decorate, a camera for the photo. */
-const DECOR_ICON =
-  'M12 21v-8M12 13a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM12 8.6C11 6 11 4.5 12 3c1 1.5 1 3 0 5.6zM14.2 10.8c2.6-1 4.1-1 5.6 0-1.5 1-3 1-5.6 0zM9.8 10.8c-2.6-1-4.1-1-5.6 0 1.5 1 3 1 5.6 0zM12 17.5c-1.6-1.5-3.2-2-5-1.5 1.2 1.6 2.8 2 5 1.5z';
-const PHOTO_ICON =
-  'M4 8.5h3.2L8.8 6h6.4l1.6 2.5H20V19H4zM12 16.5a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6z';
-
-function ToolIcon({ path }: { path: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className="tool-icon" aria-hidden="true">
-      <path d={path} />
-    </svg>
-  );
 }

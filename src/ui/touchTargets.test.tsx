@@ -7,7 +7,7 @@ import { GameStoreContext } from './useGame';
 /** Style rules that apply on a touch screen, as the browser parses the real stylesheets. */
 function coarseRules(): CSSStyleRule[] {
   const style = document.createElement('style');
-  style.textContent = ['./App.css', './decor.css', './restoration.css', './weather.css']
+  style.textContent = ['./App.css', './restoration.css', './weather.css']
     .map((file) => readFileSync(new URL(file, import.meta.url), 'utf8'))
     .join('\n');
   document.head.append(style);
@@ -31,27 +31,15 @@ function least(rules: CSSStyleRule[], element: Element, property: string): numbe
 }
 
 /**
- * §10.3: touch targets are at least 44 px (2.75rem). The map's view switch and its decor and
- * photo buttons, used all game long on phones, were 30 to 35 px tall. Layout is not computed
+ * §10.3: touch targets are at least 44 px (2.75rem). The map's view switch, used all game long
+ * on phones, was 30 to 35 px tall. Layout is not computed
  * here, so the test reads the stylesheets.
  */
 describe('the controls used all game long on a touch screen', () => {
   beforeEach(() => localStorage.clear());
 
-  it('gives the photo button and each view a full touch target', () => {
-    render(
-      <GameStoreContext.Provider value={new GameStore(localStorage, () => 0)}>
-        <App />
-      </GameStoreContext.Provider>,
-    );
+  it('gives each view a full touch target', () => {
     const rules = coarseRules();
-    const photo = screen.getByRole('button', { name: 'Photo' });
-    expect(photo).toHaveClass('scene-tool');
-    // On phones the label is hidden visually but still names the button.
-    expect(photo.querySelector('.tool-icon')).toHaveAttribute('aria-hidden', 'true');
-    expect(photo.querySelector('.tool-label')).toHaveTextContent('Photo');
-    expect(least(rules, photo, 'min-height')).toBeGreaterThanOrEqual(2.75);
-
     // A view button, as the scene draws it once a second view opens.
     const scene = document.createElement('div');
     scene.className = 'scene';

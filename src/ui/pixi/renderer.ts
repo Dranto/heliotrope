@@ -86,7 +86,6 @@ import {
   type Sun,
 } from './model';
 import { GradeFilter, ReliefFilter } from './light';
-import { mapPicture } from '../mapPicture';
 import { Snapshots } from './snapshot';
 import { mapSources, type SourceGroup } from './sources';
 
@@ -536,8 +535,6 @@ export class MapRenderer {
     this.host = host;
     this.deviceResolution = this.app.renderer.resolution;
     host.dataset.quality = '0';
-    // The photo mode reads the canvas right after drawing it (§6.5).
-    mapPicture.renderNow = () => this.app.render();
     this.app.stage.eventMode = 'none';
     host.appendChild(this.app.canvas);
     this.build();
@@ -1687,7 +1684,6 @@ export class MapRenderer {
     cancelAnimationFrame(this.pending);
     if (!this.ready) return;
     this.ready = false;
-    mapPicture.renderNow = null;
     this.app.destroy(true, { children: true, texture: true, textureSource: true });
     for (const entry of this.textures.values()) {
       entry.promise.then((texture) => texture.destroy(true)).catch(() => undefined);

@@ -9,7 +9,6 @@ import type { ParcelId } from '../game/parcels';
 import type { DistrictId } from '../game/districts';
 import type { VisualSeason } from '../game/phases';
 import type { ProjectId } from '../game/projects';
-import type { DecorId, FlowerColour } from '../game/decor';
 import type { DeltaId } from '../game/delta';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
@@ -132,57 +131,6 @@ export const fr = {
     autumn: 'Automne',
     winter: 'Hiver',
   } satisfies Record<VisualSeason, string>,
-  decor: {
-    open: 'Décorer',
-    done: 'Terminer',
-    title: 'Décorer le quartier',
-    hint: 'Cliquez un emplacement de la carte pour y poser un élément gagné, puis encore pour changer.',
-    slot: (index: number, piece: string) => `Emplacement ${index}\u00a0: ${piece}`,
-    empty: 'vide',
-    names: {
-      bench: 'Banc',
-      planter: 'Jardinière',
-      lanterns: 'Guirlande de lampions',
-      birdhouse: 'Nichoir',
-      fresco: 'Fresque au sol',
-      fountain: 'Fontaine',
-      insectHotel: 'Hôtel à insectes',
-    } satisfies Record<DecorId, string>,
-    flowerTitle: 'Couleur de l’héliotrope',
-    colours: {
-      lilac: 'Lilas',
-      gold: 'Or',
-      rose: 'Rose',
-      blue: 'Bleu',
-      white: 'Blanc',
-      sunny: 'Soleil',
-      moss: 'Mousse',
-      saffron: 'Safran',
-      coral: 'Corail',
-      indigo: 'Indigo',
-      meadow: 'Prairie',
-      autumn: 'Automne',
-      stream: 'Eau vive',
-    } satisfies Record<FlowerColour, string>,
-    won: 'Gagnés',
-    toWin: 'À gagner',
-    achievements: (count: number) => `${count} jalons`,
-    species: (count: number) => `${count} espèces de l’Herbier`,
-    milestoneFamily: (family: string) => `Tous les jalons de la famille ${family}`,
-    colourToWin: (colour: string, condition: string) => `${colour} à gagner\u00a0: ${condition}`,
-  },
-  photo: {
-    open: 'Photo',
-    title: 'Mode photo',
-    daylight: 'Heure',
-    daylights: { day: 'Jour', evening: 'Soir', night: 'Nuit' },
-    season: 'Saison',
-    save: 'Enregistrer l’image',
-    close: 'Quitter le mode photo',
-    saved: 'Image enregistrée',
-    failed: 'L’image n’a pas pu être créée.',
-    fileName: 'mon-quartier-heliotrope.png',
-  },
   layout: {
     views: 'Vue de la carte',
     viewNames: { 1: 'Balcon', 2: 'Quartier', 3: 'Ville', 4: 'Biorégion' } as Record<
@@ -284,9 +232,8 @@ export const fr = {
     next: (name: string) => `Prochain\u00a0: ${name}`,
     progress: (percent: string) => `${percent}\u00a0%`,
     complete: 'Famille complète',
-    reward: (bonus: string, colour: string) => `${bonus} · fleur ${colour}`,
-    toComplete: (bonus: string, colour: string) =>
-      `Complète, elle donnera\u00a0: ${bonus} · fleur ${colour}`,
+    reward: (bonus: string) => bonus,
+    toComplete: (bonus: string) => `Complète, elle donnera\u00a0: ${bonus}`,
     locked: 'À atteindre',
     hiddenName: 'Jalon caché',
     names: {
@@ -738,7 +685,7 @@ export const fr = {
     open: 'Villes sœurs',
     title: 'Les villes sœurs',
     close: 'Fermer les villes sœurs',
-    hint: 'Essaimer fonde une ville sœur ailleurs dans la région\u00a0: les Saisons, la Biorégion et les Cycles recommencent. L’Herbier, les Jalons, le décor, le potager, le delta et les villes déjà fondées restent.',
+    hint: 'Essaimer fonde une ville sœur ailleurs dans la région\u00a0: les Saisons, la Biorégion et les Cycles recommencent. L’Herbier, les Jalons, le potager, le delta et les villes déjà fondées restent.',
     savoirs: (count: string) => `${count} Savoirs`,
     earned: (count: string, percent: string) =>
       `${count} Savoirs gagnés en tout\u00a0: production +${percent}\u00a0%`,
