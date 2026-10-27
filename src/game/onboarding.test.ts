@@ -85,9 +85,9 @@ describe('progressive introductions (§10.8)', () => {
       seeds: 3,
       intro: { introduced: first, sinceLast: 1000 },
     };
-    expect(dueFeatures(state)).toEqual(['tree', 'requests', 'weather']);
+    expect(dueFeatures(state)).toEqual(['tree', 'weather']);
     const order: FeatureId[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       const next = advanceIntroductions(state, i === 0 ? 0 : INTRO_GAP_SECONDS);
       order.push(next.intro.introduced.at(-1)!);
       // Nothing more comes until the next gap.
@@ -96,7 +96,7 @@ describe('progressive introductions (§10.8)', () => {
       );
       state = next;
     }
-    expect(order).toEqual(['tree', 'requests', 'weather']);
+    expect(order).toEqual(['tree', 'weather']);
     expect(dueFeatures(state)).toEqual([]);
   });
 
@@ -122,7 +122,7 @@ describe('progressive introductions (§10.8)', () => {
     const first = simulate({ stopWhenAdvised: true, maxSeconds: 3 * 3600 });
     const second = learnReferenceTalents(startNewSeason(first.state));
     const times = introductionTimes(second, 6 * 60);
-    expect([...times.keys()]).toEqual(['tree', 'cooperatives', 'requests', 'weather']);
+    expect([...times.keys()]).toEqual(['tree', 'cooperatives', 'weather']);
     expect(times.get('tree')!).toBeLessThan(5);
     for (const gap of gaps(times)) expect(gap).toBeGreaterThanOrEqual(INTRO_GAP_SECONDS - 2);
   }, 60_000);
@@ -180,7 +180,7 @@ describe('progressive introductions (§10.8)', () => {
     expect(dueFeatures(loaded)).toEqual([]);
     expect(loaded.intro.introduced).toEqual(introduceAllDue(older).intro.introduced);
     expect(loaded.intro.introduced).toEqual(
-      expect.arrayContaining(['garden', 'tree', 'requests', 'weather', 'bioregion', 'orchard']),
+      expect.arrayContaining(['garden', 'tree', 'weather', 'bioregion', 'orchard']),
     );
     expect(arrivedFeature(loaded)).toBeNull();
   });

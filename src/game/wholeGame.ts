@@ -2,9 +2,8 @@
 // plays from the first click to the second sister city, in sessions: an hour
 // of play, then three hours away while the game goes on offline (§9.1), as a player who comes
 // back every few hours. At each coming and going it tends the small loops: the courtyard garden,
-// the orchard and its hives, the great works and the neighbours' requests. Since
-// v5 (M36) it also rotates its crops with the strawberries, greets the species on the map and
-// brings the sun forward in the forecast. Pure and headless, like the simulator it drives.
+// the orchard and its hives and the great works. Since v5 (M36) it also rotates its crops with
+// the strawberries. Pure and headless, like the simulator it drives.
 import { buyWorkshop, canSwarm, swarm, type LandscapeId, type WorkshopId } from './cities';
 import { CROP_IDS, canSow, harvest, isRipe, sow, type CropId } from './garden';
 import { canContribute, isStageReady, missing, WORK_IDS, contribute } from './greatWorks';
@@ -12,9 +11,6 @@ import { canPlant, canSetHive, pickFruit, plant, setHive, treeStage } from './or
 import { FRUIT_IDS } from './fruits';
 import { applyOfflineProgress } from './offline';
 import { lightPerSecond } from './production';
-import { canPlayHand, canServe, playHand, serveRequest } from './requests';
-import { canGreet, greetSpecies } from './greetings';
-import { canSwapForecast, swapForecast } from './weather';
 import {
   learnReferenceTalents,
   simulateCycles,
@@ -68,14 +64,6 @@ function tendGarden(state: GameState): GameState {
   return next;
 }
 
-/** Greet every species back on the map (M35), and bring the sun forward once a Season (M33). */
-function tendSky(state: GameState): GameState {
-  let next = state.species.reduce((s, id) => (canGreet(s, id) ? greetSpecies(s, id) : s), state);
-  const sun = next.weather.forecast.indexOf('sun');
-  if (sun > 0 && canSwapForecast(next, sun)) next = swapForecast(next, sun);
-  return next;
-}
-
 /** Pick every ripe tree, plant the trees the baskets allow, then the hives. */
 function tendOrchard(state: GameState): GameState {
   let next = state;
@@ -106,21 +94,9 @@ function tendWorks(state: GameState): GameState {
   return next;
 }
 
-/** Serve every request met, then play the hands at once. */
-function tendRequests(state: GameState): GameState {
-  let next = state;
-  for (let i = next.requests.open.length - 1; i >= 0; i--) {
-    if (canServe(next, i)) next = serveRequest(next, i);
-  }
-  for (let i = next.requests.hands.length - 1; i >= 0; i--) {
-    if (canPlayHand(next, i)) next = playHand(next, i);
-  }
-  return next;
-}
-
 /** Everything the reference player does on a visit to the small loops. */
 export function tendLoops(state: GameState): GameState {
-  return tendRequests(tendWorks(tendOrchard(tendSky(tendGarden(state)))));
+  return tendWorks(tendOrchard(tendGarden(state)));
 }
 
 /** Learn the reference rules of the workshop as far as the Savoirs go, cheapest level first. */

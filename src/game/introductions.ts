@@ -16,7 +16,6 @@ export const FEATURE_IDS = [
   'tree',
   'bioregion',
   'cooperatives',
-  'requests',
   'weather',
   'orchard',
   'greatWorks',

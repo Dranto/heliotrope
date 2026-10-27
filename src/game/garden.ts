@@ -21,7 +21,6 @@ import {
   type FruitId,
 } from './orchard';
 import { addPollen } from './pollen';
-import { isWeatherOpen, type WeatherId } from './weather';
 import { nextRandom } from './random';
 import { VARIETIES, type CropId, type VarietyId } from './seedBank';
 import type { GameState } from './state';
@@ -64,18 +63,6 @@ export const BASKETS: Record<CropId, number> = {
 
 /** The rotation (M32): a crop sown after a different one grows this much faster. */
 export const ROTATION_FACTOR = 1.2;
-
-/**
- * Each crop has its weather (M32): grand soleil ripens the sunflowers, the wind the radishes,
- * the mist the beans and the heat the squashes. The shower waters the whole garden (§9.10).
- */
-export const CROP_WEATHER: Partial<Record<WeatherId, CropId>> = {
-  sun: 'sunflower',
-  wind: 'radish',
-  mist: 'beans',
-  heat: 'squash',
-};
-export const CROP_WEATHER_FACTOR = 1.5;
 
 /** Beds in the courtyard: three at first, one more for each step of the game reached. */
 export const MAX_PLOTS = 6;
@@ -190,19 +177,10 @@ export function growthSpeed(state: GameState): number {
   return shower * rain * factorOf(state, 'gardenGrowth') * pollination(state);
 }
 
-/** How fast one bed grows: the garden's speed, the rotation and its crop's weather (M32). */
+/** How fast one bed grows: the garden's speed and the rotation (M32). */
 export function plotSpeed(state: GameState, plot: Plot): number {
   if (plot.crop === null) return 0;
-  const weather =
-    isWeatherOpen(state) && CROP_WEATHER[state.weather.current] === plot.crop
-      ? CROP_WEATHER_FACTOR
-      : 1;
-  return growthSpeed(state) * (plot.rotated ? ROTATION_FACTOR : 1) * weather;
-}
-
-/** The crop the weather favours now, if the sky is open. */
-export function weatherCrop(state: GameState): CropId | null {
-  return isWeatherOpen(state) ? (CROP_WEATHER[state.weather.current] ?? null) : null;
+  return growthSpeed(state) * (plot.rotated ? ROTATION_FACTOR : 1);
 }
 
 export function isRipe(plot: Plot): boolean {

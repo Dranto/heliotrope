@@ -18,7 +18,6 @@ export type SoundName =
   | 'season'
   | 'harvest'
   | 'work'
-  | 'greet'
   | 'bird';
 
 interface Note {
@@ -70,9 +69,6 @@ export function notesFor(name: SoundName, variant = 0): Note[] {
       return [note(4, 0, 0.3, 0.06, 'triangle'), note(6, 0.09, 0.5, 0.05, 'triangle')];
     case 'work':
       return [note(0, 0, 1.4, 0.06, 'triangle'), note(4, 0.1, 1.4, 0.05), note(7, 0.2, 1.6, 0.04)];
-    // M35: a species greeted on the map, two light notes rising.
-    case 'greet':
-      return [note(6, 0, 0.35, 0.035), note(8, 0.08, 0.5, 0.03)];
     case 'bird': {
       const base = 2600 + variant * 900;
       return [0, 0.16, 0.3].map((at, i) => ({

@@ -129,67 +129,6 @@
   height: 0.95rem;
 }
 
-/* Once per Season, the two later forecast weathers can be brought next (M33). */
-.weather-next[data-swappable] {
-  opacity: 0.85;
-}
-
-.weather-swap {
-  display: inline-flex;
-  padding: 0.05rem;
-  border: 1px dashed rgb(217 154 43 / 0.7);
-  border-radius: 999px;
-  background: rgb(255 244 214 / 0.7);
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.weather-swap:hover,
-.weather-swap:focus-visible {
-  border-style: solid;
-  background: rgb(255 236 180 / 0.95);
-}
-
-/* On a touch screen the two forecast buttons answer over 44 px (§10.3): the button grows to a
-   full target while its dashed ring stays around the icon, and negative margins keep the
-   caption's pill as tall as before. */
-@media (pointer: coarse) {
-  .weather-next[data-swappable] {
-    gap: 0;
-  }
-
-  .weather-swap {
-    justify-content: center;
-    align-items: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    margin-block: -0.75rem;
-    border: none;
-    background: none;
-  }
-
-  .weather-swap .weather-icon {
-    box-sizing: content-box;
-    width: 1.1rem;
-    height: 1.1rem;
-    padding: 0.15rem;
-    border: 1px dashed rgb(217 154 43 / 0.7);
-    border-radius: 999px;
-    background: rgb(255 244 214 / 0.7);
-  }
-
-  .weather-swap:hover .weather-icon,
-  .weather-swap:focus-visible .weather-icon {
-    border-style: solid;
-    background: rgb(255 236 180 / 0.95);
-  }
-
-  .weather-swap:hover,
-  .weather-swap:focus-visible {
-    background: none;
-  }
-}
-
 .weather-icon {
   width: 1.3rem;
   height: 1.3rem;

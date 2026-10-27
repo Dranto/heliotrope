@@ -4,13 +4,7 @@
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import { completeMilestoneFamilies, milestoneFamilyBonuses } from './milestoneFamilies';
 import type { IntroState } from './introductions';
-import { bondBonuses, type Bonds } from './bonds';
-import {
-  favouredBuildings,
-  WEATHER_PATH_FACTOR,
-  weatherBonuses,
-  type WeatherState,
-} from './weather';
+import { weatherBonuses, type WeatherState } from './weather';
 import type { GameState } from './state';
 import { cityBonuses, type CitySource } from './cityData';
 import { corridorBonuses } from './corridors';
@@ -23,7 +17,7 @@ import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './del
 import { DISTRICTS, type DistrictId } from './districts';
 import { greatWorksBonuses, type WorkId } from './greatWorks';
 import { growthBonuses, pathsWorking, type GrowthState } from './growth';
-import { familyBonuses, isFamilyComplete, WEATHER_FAMILY_PATH_FACTOR } from './families';
+import { familyBonuses } from './families';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
@@ -90,8 +84,6 @@ export type Bonus =
   | { kind: 'harvestBaskets'; units: number }
   /** Adds `bonus` to global production per path working on the buildings (§9.9, M34). */
   | { kind: 'perPath'; bonus: number }
-  /** The reserve of helping hands holds `units` more (§9.11, M34). */
-  | { kind: 'handSlots'; units: number }
   /** Adds `bonus` to global production per family of Milestones complete (§9.16, M37). */
   | { kind: 'perMilestoneFamily'; bonus: number };
 
@@ -136,8 +128,6 @@ export interface BonusSource {
   intro?: IntroState;
   /** Cycles of water done: the weather opens with the second Season or the first Cycle. */
   cycles?: number;
-  /** The bonds with the neighbouring districts (§9.11, M29); absent where none can be. */
-  requests?: { bonds: Bonds };
   seasons: number;
   generators: Readonly<Record<string, number>>;
 }
@@ -182,7 +172,6 @@ function collectBonuses(source: BonusSource): Bonus[] {
     city,
     growth,
     weather,
-    requests,
   } = source;
   const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
@@ -201,22 +190,7 @@ function collectBonuses(source: BonusSource): Bonus[] {
     ...corridorBonuses({ parcels, futures }),
     ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
     ...(city ? cityBonuses(city) : []),
-    ...(growth
-      ? growthBonuses(
-          { generators: source.generators, growth },
-          weather && source.intro
-            ? favouredBuildings({
-                weather,
-                seasons: source.seasons,
-                cycles: source.cycles,
-                intro: source.intro,
-              })
-            : [],
-          isGameState(source) && isFamilyComplete(source.species, 'weather')
-            ? WEATHER_FAMILY_PATH_FACTOR
-            : WEATHER_PATH_FACTOR,
-        )
-      : []),
+    ...(growth ? growthBonuses({ generators: source.generators, growth }) : []),
     ...(weather && source.intro
       ? weatherBonuses({
           weather,
@@ -225,7 +199,6 @@ function collectBonuses(source: BonusSource): Bonus[] {
           intro: source.intro,
         })
       : []),
-    ...(requests ? bondBonuses(requests.bonds) : []),
     ...(isGameState(source) ? familyBonuses(source.species) : []),
     ...(isGameState(source) ? milestoneFamilyBonuses(source.achievements) : []),
   ];
@@ -320,9 +293,4 @@ export function offlineCapBonus(source: BonusSource): number {
 /** Baskets added to each harvest of the courtyard garden. */
 export function extraHarvestBaskets(source: BonusSource): number {
   return bonusesOf(source, 'harvestBaskets').reduce((sum, b) => sum + b.units, 0);
-}
-
-/** Places added to the reserve of helping hands. */
-export function extraHandSlots(source: BonusSource): number {
-  return bonusesOf(source, 'handSlots').reduce((sum, b) => sum + b.units, 0);
 }

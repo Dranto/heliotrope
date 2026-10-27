@@ -52,7 +52,8 @@ describe('Herbier (§9.5)', () => {
       2 * BIODIVERSITY_STEP,
     );
     expect(biodiversityBonus(state({ species: [...SPECIES_IDS] as SpeciesId[] }))).toBeCloseTo(
-      SPECIES_IDS.length * BIODIVERSITY_STEP * HERBIER_COMPLETE_FACTOR,
+      // The weather's family complete gives biodiversity ×1.1 (§9.17).
+      SPECIES_IDS.length * BIODIVERSITY_STEP * HERBIER_COMPLETE_FACTOR * 1.1,
     );
   });
 

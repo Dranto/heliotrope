@@ -76,11 +76,10 @@ describe('the friends of the garden (M36)', () => {
     expect(run.cooperatives.purchases.growers).toBe(1);
   });
 
-  it('sow the crop of the weather when it changes the bed', () => {
+  it('sow the next crop unlocked, so every bed rotates', () => {
     const state = late();
-    const sunny = { ...state, weather: { ...state.weather, current: 'sun' as const } };
-    expect(growersCrop(sunny, 'beans')).toBe('sunflower');
-    expect(growersCrop(sunny, 'sunflower')).toBe('beans');
+    expect(growersCrop(state, 'beans')).toBe('squash');
+    expect(growersCrop(state, 'squash')).not.toBe('squash');
   });
 
   it('stay home without their canopy talent', () => {

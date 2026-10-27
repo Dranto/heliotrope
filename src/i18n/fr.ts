@@ -23,7 +23,6 @@ import type { FamilyId } from '../game/families';
 import type { CanopyId, TalentBranch, TalentId } from '../game/talents';
 import type { CropId, VarietyId } from '../game/seedBank';
 import type { ClickSynergyId, ClickUpgradeId, SynergyId, UpgradeSynergyId } from '../game/upgrades';
-import type { HandId } from '../game/requests';
 
 export interface GeneratorText {
   name: string;
@@ -60,49 +59,6 @@ export const fr = {
   perSecond: '/ s',
   clickFlower: 'Récolter la lumière de l’héliotrope',
   pollen: (percent: string) => `Jauge de pollen\u00a0: ${percent}\u00a0%`,
-  requests: {
-    title: 'Les demandes des voisins',
-    hint: 'Rendre service garde un coup de main en réserve, trois au plus, à lancer quand vous voulez.',
-    needs: {
-      harvests: (count: number) => `${count}\u00a0récoltes du potager`,
-      fruit: (count: number) => `${count}\u00a0cueillettes du verger`,
-      flights: (count: number) => `${count}\u00a0envolées de pollen`,
-      butterflies: (count: number) => `${count}\u00a0Papillons dorés attrapés`,
-      owned: (count: number, generator: string) => `${count}\u00a0× ${generator}`,
-      greet: (species: string) => `Saluer sur la carte\u00a0: ${species}`,
-      milestone: (name: string) => `Atteindre le jalon\u00a0: ${name}`,
-      honey: (count: number) => (count > 1 ? `${count}\u00a0pots de miel` : 'Un pot de miel'),
-      paths: (count: number) =>
-        count > 1 ? `${count}\u00a0nouvelles formes de bâtiment` : 'Une nouvelle forme de bâtiment',
-    },
-    hands: {
-      quarter: 'Un quart d’heure de production',
-      bloom: 'Une Floraison',
-      ripen: 'Une culture mûre d’un coup',
-      flight: 'Une envolée de pollen',
-      works: 'Un quart d’étape de grand chantier',
-      sky: 'Un échange de prévision de plus',
-    },
-    progress: (done: string, count: string) => `Avancement\u00a0: ${done} sur ${count}`,
-    offers: (hand: string) => `Offre\u00a0: ${hand}`,
-    from: (district: string) => `De ${district}`,
-    serve: 'Rendre service',
-    serveLabel: (need: string) => `Rendre service\u00a0: ${need}`,
-    decline: 'Refuser',
-    declineLabel: (need: string) => `Refuser\u00a0: ${need}`,
-    waiting: 'Une demande arrive bientôt.',
-    reserve: 'Coups de main',
-    reserveEmpty: 'Aucun coup de main en réserve.',
-    handWaits: {
-      ripen: 'Semez d’abord une culture au potager.',
-      works: 'Attend un grand chantier en cours.',
-      sky: 'Servira une fois l’échange de prévision de la Saison utilisé.',
-    } as Partial<Record<HandId, string>>,
-    reserveFull: 'Réserve pleine\u00a0: lancez un coup de main pour faire de la place.',
-    play: 'Lancer',
-    playLabel: (hand: string) => `Lancer\u00a0: ${hand}`,
-    bond: (district: string, percent: string) => `Lien avec ${district}\u00a0: +${percent}\u00a0%`,
-  },
   weather: {
     names: {
       sun: 'Grand soleil',
@@ -119,9 +75,7 @@ export const fr = {
       heat: 'un jour de chaleur',
     },
     forecast: (now: string, next: string) => `Le temps\u00a0: ${now}, puis ${next}`,
-    swap: (name: string) => `Faire venir ${name} juste après (une fois par Saison)`,
-    swapUsed: 'Prévision déjà échangée cette Saison',
-    paths: (day: string) => `Par ${day}, les voies de ce bâtiment jouent ×1,5`,
+    favours: (day: string) => `Par ${day}, ce bâtiment produit ×1,25`,
   },
   generatorsTitle: 'Bâtir',
   owned: 'possédés',
@@ -476,7 +430,6 @@ export const fr = {
       oldOrchard: 'Vieux vergers',
       rotation: 'La terre se repose',
       oldTree: 'Vieil arbre',
-      hello: 'Bonjour voisin',
       wholeFamily: 'Toute la famille',
       skyCreatures: 'Les bêtes du ciel',
       'cities.1': 'Essaimage',
@@ -485,8 +438,6 @@ export const fr = {
       manyPaths: 'La ville aux mille formes',
       firstFlight: 'Première envolée',
       pollenStorm: 'Tempête de pollen',
-      firstFavour: 'Coup de main',
-      goodNeighbour: 'Bon voisin',
       'weather.sun': 'Plein soleil',
       'weather.shower': 'Chanter sous la pluie',
       'weather.wind': 'Le vent se lève',
@@ -602,8 +553,6 @@ export const fr = {
           ? 'Choisir la voie d’un bâtiment qui grandit'
           : `Faire jouer ${count} voies de bâtiments`,
       weather: (day: string) => `Vivre ${day}`,
-      requests: (count: number) =>
-        count === 1 ? 'Rendre service à un voisin' : `Rendre ${count} services aux voisins`,
       flights: (count: number) =>
         count === 1
           ? 'Remplir la jauge de pollen et lancer une envolée'
@@ -612,7 +561,6 @@ export const fr = {
       rotations: (count: number) =>
         `Récolter ${count}\u00a0cultures semées après une culture différente`,
       oldTree: 'Cueillir un fruitier jusqu’à ce qu’il devienne un vieil arbre',
-      greetings: 'Saluer une espèce sur la carte',
       families: (count: number) => `Réunir ${count}\u00a0familles entières de l’Herbier`,
       weatherSpecies: 'Voir revenir les cinq espèces du temps',
       cycleChallenges: (count: number) =>
@@ -735,10 +683,6 @@ export const fr = {
       perPath: (percent: string) => `+${percent}\u00a0% de production par voie qui joue`,
       perMilestoneFamily: (percent: string) =>
         `+${percent}\u00a0% de production par famille de Jalons complète`,
-      handSlots: (units: number) =>
-        units === 1
-          ? 'Une place de plus pour les coups de main'
-          : `${units} places de plus pour les coups de main`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
       orchardGrowth: (factor: string) => `Le verger pousse ×${factor} plus vite`,
       pollenFill: (factor: string) => `La jauge de pollen se remplit ×${factor} plus vite`,
@@ -847,7 +791,6 @@ export const fr = {
     harvestAllHint:
       'Récolte tout ce qui est mûr au potager et au verger, et ressème la même culture.',
     rotated: 'En rotation\u00a0: pousse ×1,2',
-    weatherCrop: (crop: string) => `Le temps qu’il fait favorise\u00a0: ${crop} ×1,5`,
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
   },
   cities: {
@@ -967,7 +910,6 @@ export const fr = {
     returnedMany: (count: string) => `${count} espèces reviennent dans le quartier\u00a0!`,
     unknown: 'Espèce à retrouver',
     found: 'Revenue',
-    greet: (name: string) => `Saluer\u00a0: ${name}`,
     families: 'Familles de l’Herbier',
     familyNames: {
       pollinators: 'Pollinisateurs',

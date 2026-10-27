@@ -17,19 +17,16 @@ export const FAMILIES: Record<FamilyId, readonly SpeciesId[]> = {
 
 /**
  * What a complete family gives: the pollinators the pollen gauge, the birds the Flock of
- * migrating birds, the river the Water, the night the fireflies; the weather's species make the
- * paths play stronger still under their sky (read in bonuses.ts).
+ * migrating birds, the river the Water, the night the fireflies, the weather's species the
+ * biodiversity.
  */
 export const FAMILY_BONUSES: Record<FamilyId, readonly Bonus[]> = {
   pollinators: [{ kind: 'pollenFill', factor: 1.15 }],
   birds: [{ kind: 'effectDuration', effect: 'birds', factor: 1.25 }],
   river: [{ kind: 'water', factor: 1.1 }],
   night: [{ kind: 'effectDuration', effect: 'fireflies', factor: 1.25 }],
-  weather: [],
+  weather: [{ kind: 'biodiversityFactor', factor: 1.1 }],
 };
-
-/** The weather family complete: the paths play ×1.75 under their sky instead of ×1.5. */
-export const WEATHER_FAMILY_PATH_FACTOR = 1.75;
 
 export function familyOf(id: SpeciesId): FamilyId | null {
   return FAMILY_IDS.find((family) => FAMILIES[family].includes(id)) ?? null;

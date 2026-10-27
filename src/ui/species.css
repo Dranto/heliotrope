@@ -3,50 +3,6 @@
   pointer-events: none;
 }
 
-/* A species that can be greeted (M35) takes the pointer and glows softly. */
-.species [data-greet] {
-  cursor: pointer;
-  pointer-events: auto;
-  outline: none;
-}
-
-/* Its invisible hit disc, sized from the camera zoom, lets a small species be tapped on a phone. */
-.species-hit {
-  fill: transparent;
-  pointer-events: all;
-}
-
-.species [data-greet] .species-halo {
-  stroke: rgb(233 169 59 / 1);
-  stroke-width: 1.2;
-  animation: greet-glow 2.6s ease-in-out infinite;
-}
-
-.species [data-greet]:focus-visible .species-halo {
-  stroke: var(--leaf, #2f6b4f);
-  stroke-width: 1.6;
-}
-
-/* The keyboard focus rings the thumb-sized hit disc, so it shows at every zoom and on the flying
-   species, which have no halo. */
-.species [data-greet]:focus-visible .species-hit {
-  stroke: var(--leaf, #2f6b4f);
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
-@keyframes greet-glow {
-  50% {
-    stroke-opacity: 0.4;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .species [data-greet] .species-halo {
-    animation: none;
-  }
-}
-
 .species-halo {
   fill: rgb(255 251 240 / 0.95);
   stroke: rgb(233 169 59 / 0.75);

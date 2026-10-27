@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { factorOf } from './bonuses';
 import { unlockSpecies } from './species';
 import { generatorMultiplier } from './production';
 import { deserialize, serialize } from './save';
@@ -66,16 +65,15 @@ describe('the weather (§9.10, M28)', () => {
     expect(tick(state, 3 * WEATHER_SECONDS.max).rngSeed).toBe(state.rngSeed);
   });
 
-  it('favours a family of buildings and systems, never a penalty', () => {
-    const base = opened();
+  it('favours its buildings, never a penalty', () => {
     const sunny = under('sun');
     const calm = under('wind');
     expect(generatorMultiplier(sunny, 'balconyPanel')).toBeCloseTo(
       generatorMultiplier(calm, 'balconyPanel') * 1.25,
     );
-    expect(factorOf(under('shower', base), 'gardenGrowth')).toBeCloseTo(1.25);
-    expect(factorOf(under('wind', base), 'harvestFactor')).toBeCloseTo(1.5);
-    expect(factorOf(under('mist', base), 'biodiversityFactor')).toBeCloseTo(1.15);
+    expect(generatorMultiplier(under('shower'), 'pot')).toBeCloseTo(
+      generatorMultiplier(calm, 'pot') * 1.25,
+    );
     expect(generatorMultiplier(under('heat'), 'urbanCanopy')).toBeCloseTo(
       generatorMultiplier(calm, 'urbanCanopy') * 1.25,
     );

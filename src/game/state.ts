@@ -8,7 +8,6 @@ import { createDeltaState, type DeltaState } from './delta';
 import { createGreatWorksState, type GreatWorksState } from './greatWorks';
 import { createOrchardState, type OrchardState } from './orchard';
 import { createCityState, type CityState } from './cities';
-import { createGreetingsState, type GreetingsState } from './greetings';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
 import type { ActiveEffect } from './effects';
@@ -26,13 +25,12 @@ import { createCanopyState, type CanopyState, type TalentId } from './talents';
 import { createGrowthState, type GrowthState } from './growth';
 import { createPollenState, type PollenState } from './pollen';
 import { createWeatherState, type WeatherState } from './weather';
-import { createRequestsState, type RequestsState } from './requests';
 import type { PanelId } from './panels';
 import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 41;
+export const STATE_VERSION = 42;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -147,16 +145,12 @@ export interface GameState {
   orchard: OrchardState;
   /** The sister cities (§7.6, M23): the city lived in, the network, the Savoirs. */
   city: CityState;
-  /** The species greeted on the map (§9.15, M35). Kept forever. */
-  greetings: GreetingsState;
   /** The paths picked as the buildings grow (§5.5, M26). Kept across Seasons and Cycles. */
   growth: GrowthState;
   /** The pollen gauge around the flower and the flights sent (§5.6, M27). */
   pollen: PollenState;
   /** The sky over the neighbourhood and its forecast (§9.10, M28). Kept across Seasons. */
   weather: WeatherState;
-  /** The neighbours' requests and the helping hands in reserve (§9.11, M29). */
-  requests: RequestsState;
   /** Side menu panels the player has touched (§10.1, M25); the others glow until then. */
   seenPanels: PanelId[];
   /** The mechanics introduced so far, one at a time (§10.8). Kept across Seasons and Cycles. */
@@ -244,12 +238,10 @@ export function createInitialState(now: number): GameState {
     greatWorks: createGreatWorksState(),
     orchard: createOrchardState(),
     city: createCityState(),
-    greetings: createGreetingsState(),
     growth: createGrowthState(),
     pollen: createPollenState(),
     // Its own seed, so the weather never changes what the butterfly gives.
     weather: createWeatherState((rngSeed ^ 0x5bd1e995) >>> 0),
-    requests: createRequestsState((rngSeed ^ 0x27d4eb2f) >>> 0),
     seenPanels: ['generators'],
     intro: createIntroState(),
     butterflies: 0,

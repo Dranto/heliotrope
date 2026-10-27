@@ -1,21 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import {
-  ACHIEVEMENTS,
-  achievementProgress,
-  unlockAchievements,
-  type AchievementId,
-} from './achievements';
+import { ACHIEVEMENTS, achievementProgress, type AchievementId } from './achievements';
 import { factorOf, globalBonus } from './bonuses';
 import { familyColour, isFlowerColourUnlocked } from './decor';
 import { withAllIntroduced } from './introductions';
 import {
-  closeMilestone,
   completeMilestoneFamilies,
   familyMilestones,
   isMilestoneFamilyComplete,
   nextMilestone,
 } from './milestoneFamilies';
-import { isRequestMet, validRequests, type Request } from './requests';
 import { createInitialState, type GameState } from './state';
 
 function second(extra: Partial<GameState> = {}): GameState {
@@ -65,26 +58,5 @@ describe('the families of Milestones (M37)', () => {
     const complete = { ...laurels, achievements: [...ids('clicks'), ...ids('upgrades')] };
     const without = { ...state, achievements: complete.achievements };
     expect(globalBonus(complete) - globalBonus(without)).toBeCloseTo(0.12);
-  });
-});
-
-describe('what else reads the Milestones (M37)', () => {
-  it('the neighbours ask for a Milestone close to its goal', () => {
-    const state = second({ clicks: 90, achievements: ['clicks.10'] });
-    expect(closeMilestone(state)).toBe('clicks.100');
-    expect(closeMilestone({ ...state, clicks: 20 })).toBeNull();
-    const request: Request = {
-      need: { kind: 'milestone', id: 'clicks.100', count: 1 },
-      base: 0,
-      hand: 'quarter',
-      from: null,
-    };
-    const open = { ...state, requests: { ...state.requests, open: [request] } };
-    expect(isRequestMet(open, request)).toBe(false);
-    const reached = unlockAchievements({ ...open, clicks: 100 });
-    expect(isRequestMet(reached, request)).toBe(true);
-    expect(validRequests({ ...state.requests, open: [request] }, state.requests).open).toEqual([
-      request,
-    ]);
   });
 });

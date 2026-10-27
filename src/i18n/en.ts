@@ -19,48 +19,6 @@ export const en: Texts = {
   perSecond: '/ s',
   clickFlower: 'Harvest the heliotrope’s light',
   pollen: (percent: string) => `Pollen gauge: ${percent}%`,
-  requests: {
-    title: 'Neighbours’ requests',
-    hint: 'Serving a request keeps a helping hand in reserve, three at most, to play when you like.',
-    needs: {
-      harvests: (count: number) => `${count} garden harvests`,
-      fruit: (count: number) => `${count} orchard pickings`,
-      flights: (count: number) => `${count} pollen flights`,
-      butterflies: (count: number) => `${count} Golden Butterflies caught`,
-      owned: (count: number, generator: string) => `${count} × ${generator}`,
-      greet: (species: string) => `Greet on the map: ${species}`,
-      milestone: (name: string) => `Reach the Milestone: ${name}`,
-      honey: (count: number) => (count > 1 ? `${count} jars of honey` : 'A jar of honey'),
-      paths: (count: number) => (count > 1 ? `${count} new building forms` : 'A new building form'),
-    },
-    hands: {
-      quarter: 'A quarter of an hour of production',
-      bloom: 'A Bloom',
-      ripen: 'A crop ripe at once',
-      flight: 'A pollen flight',
-      works: 'A quarter of a great work stage',
-      sky: 'One more forecast swap',
-    },
-    progress: (done: string, count: string) => `Progress: ${done} of ${count}`,
-    offers: (hand: string) => `Offers: ${hand}`,
-    from: (district: string) => `From ${district}`,
-    serve: 'Help out',
-    serveLabel: (need: string) => `Help out: ${need}`,
-    decline: 'Decline',
-    declineLabel: (need: string) => `Decline: ${need}`,
-    waiting: 'A request is on its way.',
-    reserve: 'Helping hands',
-    reserveEmpty: 'No helping hand in reserve.',
-    handWaits: {
-      ripen: 'Sow a crop in the garden first.',
-      works: 'Waits for a great work under way.',
-      sky: 'Usable once this Season’s forecast swap is spent.',
-    },
-    reserveFull: 'Reserve full: play a helping hand to make room.',
-    play: 'Play',
-    playLabel: (hand: string) => `Play: ${hand}`,
-    bond: (district: string, percent: string) => `Bond with ${district}: +${percent}%`,
-  },
   weather: {
     names: {
       sun: 'Bright sun',
@@ -77,9 +35,7 @@ export const en: Texts = {
       heat: 'a hot day',
     },
     forecast: (now: string, next: string) => `Weather: ${now}, then ${next}`,
-    swap: (name: string) => `Bring ${name} next (once per Season)`,
-    swapUsed: 'Forecast already swapped this Season',
-    paths: (day: string) => `On ${day}, this building's paths play ×1.5`,
+    favours: (day: string) => `On ${day}, this building produces ×1.25`,
   },
   generatorsTitle: 'Build',
   owned: 'owned',
@@ -420,7 +376,6 @@ export const en: Texts = {
       oldOrchard: 'Old orchards',
       rotation: 'The soil rests',
       oldTree: 'Old tree',
-      hello: 'Hello, neighbour',
       wholeFamily: 'The whole family',
       skyCreatures: 'Creatures of the sky',
       'cities.1': 'Swarming',
@@ -429,8 +384,6 @@ export const en: Texts = {
       manyPaths: 'A city of a thousand shapes',
       firstFlight: 'First flight',
       pollenStorm: 'Pollen storm',
-      firstFavour: 'A helping hand',
-      goodNeighbour: 'Good neighbour',
       'weather.sun': 'Full sun',
       'weather.shower': 'Singing in the rain',
       'weather.wind': 'The wind rises',
@@ -538,14 +491,11 @@ export const en: Texts = {
           ? 'Pick the path of a growing building'
           : `Have ${count} building paths at work`,
       weather: (day: string) => `Live through ${day}`,
-      requests: (count: number) =>
-        count === 1 ? 'Help out a neighbour' : `Help out the neighbours ${count} times`,
       flights: (count: number) =>
         count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
       fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       rotations: (count: number) => `Harvest ${count} crops sown after a different one`,
       oldTree: 'Pick a fruit tree until it becomes an old tree',
-      greetings: 'Greet a species on the map',
       families: (count: number) => `Bring ${count} whole families of the Herbier back`,
       weatherSpecies: 'See the five species of the weather come back',
       cycleChallenges: (count: number) =>
@@ -663,8 +613,6 @@ export const en: Texts = {
       perPath: (percent: string) => `+${percent}% production per working path`,
       perMilestoneFamily: (percent: string) =>
         `+${percent}% production per complete family of Milestones`,
-      handSlots: (units: number) =>
-        units === 1 ? 'One more place for helping hands' : `${units} more places for helping hands`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
       orchardGrowth: (factor: string) => `The orchard grows ×${factor} faster`,
       pollenFill: (factor: string) => `The pollen gauge fills ×${factor} faster`,
@@ -776,7 +724,6 @@ export const en: Texts = {
     harvestAllHint:
       'Harvests everything ripe in the garden and the orchard, and sows the same crop again.',
     rotated: 'Rotated: grows ×1.2',
-    weatherCrop: (crop: string) => `The weather favours: ${crop} ×1.5`,
     variety: (name: string) => `New variety: ${name}!`,
   },
   cities: {
@@ -893,7 +840,6 @@ export const en: Texts = {
     returnedMany: (count: string) => `${count} species come back to the neighbourhood!`,
     unknown: 'Species to find',
     found: 'Back',
-    greet: (name: string) => `Greet: ${name}`,
     families: 'Families of the Herbier',
     familyNames: {
       pollinators: 'Pollinators',

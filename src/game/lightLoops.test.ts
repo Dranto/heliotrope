@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { unlockAchievements } from './achievements';
 import {
-  CROP_WEATHER_FACTOR,
   CROPS,
   growthSpeed,
   harvest,
@@ -13,7 +12,6 @@ import {
   sow,
   STRAWBERRY_POLLEN,
   varietyOf,
-  weatherCrop,
 } from './garden';
 import { withAllIntroduced } from './introductions';
 import {
@@ -62,19 +60,6 @@ describe('the lighter garden and orchard (M32)', () => {
     );
     const harvested = harvest(ripen(other, 0), 0)!.state;
     expect(harvested.garden.rotations).toBe(1);
-  });
-
-  it('lets each weather favour its crop once the sky is open', () => {
-    const base = sow(opened(), 0, 'sunflower');
-    const sunny = { ...base, weather: { ...base.weather, current: 'sun' as const } };
-    const misty = { ...base, weather: { ...base.weather, current: 'mist' as const } };
-    expect(weatherCrop(sunny)).toBe('sunflower');
-    expect(plotSpeed(sunny, sunny.garden.plots[0]!) / growthSpeed(sunny)).toBeCloseTo(
-      CROP_WEATHER_FACTOR,
-    );
-    expect(plotSpeed(misty, misty.garden.plots[0]!)).toBeCloseTo(growthSpeed(misty));
-    const first = { ...sunny, seasons: 0, cycles: 0 };
-    expect(weatherCrop(first)).toBeNull();
   });
 
   it('opens the strawberries with the first hive; they fill the pollen gauge', () => {

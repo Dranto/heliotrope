@@ -284,10 +284,6 @@ button {
   order: 6;
 }
 
-.side .requests-panel {
-  order: 7;
-}
-
 .side .works-panel {
   order: 8;
 }
@@ -372,12 +368,12 @@ button {
 }
 
 @media (min-width: 40.01rem) and (max-width: 109.99rem) {
-  .app[data-layer='city'] .side :is(.garden-panel, .orchard-panel, .requests-panel),
+  .app[data-layer='city'] .side :is(.garden-panel, .orchard-panel),
   .app[data-layer='city'] .side :is(.bioregion, .works-panel),
   .app[data-layer='living'] .side :is(.upgrades, .generators, .restoration, .cooperatives),
   .app[data-layer='living'] .side :is(.bioregion, .works-panel),
   .app[data-layer='region'] .side :is(.upgrades, .generators, .restoration, .cooperatives),
-  .app[data-layer='region'] .side :is(.garden-panel, .orchard-panel, .requests-panel) {
+  .app[data-layer='region'] .side :is(.garden-panel, .orchard-panel) {
     display: none;
   }
 
@@ -399,7 +395,6 @@ button {
 .side-panels[data-new~='cooperatives'] .cooperatives,
 .side-panels[data-new~='garden'] .garden-panel,
 .side-panels[data-new~='orchard'] .orchard-panel,
-.side-panels[data-new~='requests'] .requests-panel,
 .side-panels[data-new~='bioregion'] .bioregion,
 .side-panels[data-new~='greatWorks'] .works-panel {
   animation: fresh-panel 2.4s ease-in-out infinite;
@@ -411,7 +406,6 @@ button {
 .side-panels[data-action~='restoration'] .restoration,
 .side-panels[data-action~='garden'] .garden-panel,
 .side-panels[data-action~='orchard'] .orchard-panel,
-.side-panels[data-action~='requests'] .requests-panel,
 .side-panels[data-action~='bioregion'] .bioregion,
 .side-panels[data-action~='greatWorks'] .works-panel {
   --action-dot: var(--gold);
@@ -590,7 +584,7 @@ button {
 }
 
 /* The panels of M14 to M24 had no inner margin of their own (M25). */
-:is(.garden-panel, .orchard-panel, .works-panel, .requests-panel) {
+:is(.garden-panel, .orchard-panel, .works-panel) {
   padding: 1.25rem;
 }
 
@@ -4150,7 +4144,7 @@ button {
   /* §10.3: one section at a time, picked in the tab bar. */
   .app:not([data-tab='build']) :is(.generators, .cooperatives),
   .app:not([data-tab='improve']) :is(.upgrades, .restoration),
-  .app:not([data-tab='living']) :is(.garden-panel, .orchard-panel, .requests-panel),
+  .app:not([data-tab='living']) :is(.garden-panel, .orchard-panel),
   .app:not([data-tab='region']) :is(.bioregion, .works-panel),
   .app[data-tab='more'] .layout > :not(.menu) {
     display: none;
