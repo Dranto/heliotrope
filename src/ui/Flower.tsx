@@ -40,7 +40,6 @@ import {
 import { clickLevel } from './neighbourhood';
 import { guideStep } from '../game/guide';
 import { useGameState, useGameStore } from './useGame';
-import { COROLLAS } from './decorMap';
 
 interface Floater {
   id: number;
@@ -289,6 +288,13 @@ function round(value: number): number {
  * the Light of the current Season leafs it out and makes it bloom through seven stages. Each
  * click upgrade plants a gilded sprig at its foot, and each Season completed a golden seed.
  */
+/** The three shades of the flower heads: light, middle and deep stops of their gradient. */
+const COROLLA_SHADES = [
+  ['#E6DAF5', '#B79AD6', '#8E6CBB'],
+  ['#D9C6F0', '#A486CB', '#7A58A8'],
+  ['#F0E6FA', '#C6ADE2', '#9B7CC6'],
+] as const;
+
 export function Flower() {
   const store = useGameStore();
   const state = useGameState();
@@ -402,7 +408,7 @@ export function Flower() {
               <stop offset="60%" className="halo-b" />
               <stop offset="100%" className="halo-c" />
             </radialGradient>
-            {COROLLAS[state.decor.flower].map(([a, b, c], i) => (
+            {COROLLA_SHADES.map(([a, b, c], i) => (
               <radialGradient key={i} id={`corolla-${i}`} cx="50%" cy="50%" r="55%">
                 <stop offset="0%" stopColor={a} />
                 <stop offset="55%" stopColor={b} />

@@ -393,6 +393,8 @@ Le quartier restauré ressemble au joueur : chaque parcelle a **deux avenirs**, 
 | Toits vivants | Toits potagers | Des rangs de cultures sur les toits | Biodiversité ×1,5, Potagers sur le toit ×2 |
 | Places plantées | Places des fontaines | Une fontaine au centre de chaque place | +1,5 % par Saison achevée (au lieu de +1 % de plus par Jalon) |
 
+> Le décor, les couleurs de l'héliotrope et le mode photo sont retirés par l'allègement (§9.17, lot 4) ; textes gardés pour l'historique. L'héliotrope fleurit lilas.
+
 **Le décor.** Des pièces purement décoratives se gagnent avec les Jalons et l'Herbier, pour toujours. Le bouton « Décorer » de la carte s'ouvre avec la première pièce : huit emplacements cerclés apparaissent dans la cour et les rues ; un clic sur un emplacement fait défiler les pièces gagnées puis le vide. La barre d'outils montre les pièces gagnées, celles à gagner et leur condition, et la couleur des fleurs de l'héliotrope.
 
 | Pièce | Condition | Couleur de l'héliotrope | Condition |
@@ -720,7 +722,7 @@ La **troisième couche** de prestige (roadmap P22, décision D11 confirmée par 
 **Essaimer.** Le bouton apparaît quand **le delta est entièrement ouvert** (§7.5, vers le 6ᵉ Cycle). Essaimer demande **25 Sources gagnées dans la ville** où l'on vit. Le joueur choisit parmi **cinq paysages** (décision D14 ; la forêt et le marais depuis M30, décision D21) et fonde une ville sœur :
 
 - **Recommence :** tout ce qu'un Cycle remet à zéro (Lumière, bâtiments, améliorations, projets, Graines, Eau, collecteurs, sites), plus **l'Arbre des Saisons et la Canopée** (« relancer les Saisons ») et les **Sources non dépensées**.
-- **Reste :** le **delta** (ses bras et élargissements, gardés pour toujours, et les Sources qui les ont payés), l'Herbier, les Jalons, les parcelles et les quartiers voisins, le décor, les grands chantiers, le potager, le verger et les villes déjà fondées.
+- **Reste :** le **delta** (ses bras et élargissements, gardés pour toujours, et les Sources qui les ont payés), l'Herbier, les Jalons, les parcelles et les quartiers voisins, les grands chantiers, le potager, le verger et les villes déjà fondées.
 - **Les Sources d'une ville sœur** viennent de l'Eau recueillie depuis sa fondation, au-dessus de celles qu'elle garde : le rythme des Cycles repart du début, avec tous les bonus gardés.
 
 **Les Savoirs.** Essaimer rapporte **⌊√(Sources gagnées dans la ville) / 2⌋ + ⌊log₁₀(1 + Graines du Cycle)⌋** Savoirs : les Graines, qui n'avaient plus d'usage une fois la Canopée complète (§8, fin de partie), comptent enfin (décision D12 tenue : ni les chantiers ni le reste ne les dépensent). Chaque Savoir gagné donne **+3 % de production** pour toujours, qu'il soit dépensé ou non.
@@ -1229,7 +1231,7 @@ Roadmap P36, ajout d'Antoine (« ajoute aussi des interactions avec les jalons e
 | Le quartier, Saisons | Le potager pousse de 10 min (§9.7) |
 | La Biorégion | Une goutte d'Eau : 30 s d'Eau (§7.4) |
 
-- **Les familles complètes.** Une famille dont tous les Jalons sont atteints (les cachés sont un bonus et ne comptent pas) dore son titre dans l'écran des Jalons (« Famille complète ») et donne, pour toujours, un bonus relié à son monde et une **couleur de l'héliotrope** (§6.5). Avant, l'écran dit ce qu'elle donnera.
+- **Les familles complètes.** Une famille dont tous les Jalons sont atteints (les cachés sont un bonus et ne comptent pas) dore son titre dans l'écran des Jalons (« Famille complète ») et donne, pour toujours, un bonus relié à son monde (la couleur de l'héliotrope qu'elle donnait part au lot 4, §9.17). Avant, l'écran dit ce qu'elle donnera.
 
 | Famille | Bonus | Couleur |
 |---|---|---|
@@ -1268,6 +1270,8 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Lot 4 : retirés.** Les Saisons à défi (§7.3) et les Cycles à défi (§7.5), avec leurs contraintes, leurs pastilles, leurs bonus gagnés et leur lumière sur la scène. Leurs sept espèces reviennent par le jeu (§9.5) : martin-pêcheur avec 10 Ruisseaux rouverts, orchis avec tout l'Arbre, lucane avec 100 Canopées urbaines, chouette après 10 Saisons, loutre au 1ᵉʳ Cycle, saumon avec les zones humides au niveau 10, cigogne noire au 5ᵉ Cycle : l'Herbier se complète sans détour. Le bras des crues rend les sites 25 % moins chers (jusqu'à 50 % élargi). Le semoir et l'éclusier relancent toujours. Quatre Jalons s'en vont (Saison bravée, Toutes les saisons du monde, Contre vents et marées, Gardien de la rivière) : **142 Jalons**.
 - **Équilibrage (lot 4).** Rien ne bouge au §8 : 1ʳᵉ Saison 59 min, 2ᵉ Saison 21 min, Cycles 2 à 4 en 24, 36 et 40 min ; le simulateur ne jouait pas les défis.
 - **Sauvegarde (lot 4).** Version 44 : le défi en cours et les défis gagnés sont effacés avec leurs bonus ; les Jalons retirés atteints rejoignent le compte des Jalons d'autrefois.
+- **Lot 4, suite : retirés.** Le décor (§6.5) et son bouton « Décorer », les treize couleurs de l'héliotrope (les familles de Jalons gardent leur bonus, §9.16) et le mode photo. Rien ne changeait la production ni le rythme. L'héliotrope fleurit lilas, la carte garde son soir et sa nuit.
+- **Sauvegarde (lot 4, suite).** Version 45 : les emplacements de décor et la couleur choisie sont effacés sans compensation.
 
 ## 10. Écrans et interface
 
@@ -1409,10 +1413,10 @@ Roadmap P24 : avec la v2 et la v3, le menu latéral avait neuf panneaux. Code da
 Mesuré sur une partie neuve avant ce changement (joueur de référence du §8) : le potager, les améliorations et le bouton des Jalons arrivaient ensemble à 8 s, l'Herbier, le Papillon, les visites et le décor entre 3 et 5 min, et la 2ᵉ Saison ouvrait d'un coup l'Arbre, les Coopératives, les demandes des voisins et la météo. Code dans `src/game/introductions.ts` (ce qui est introduit) et `src/game/onboarding.ts` (l'ordre et le rythme).
 
 - **Le principe.** Chaque mécanique garde sa condition d'ouverture ; une fois cette condition remplie, elle attend son tour. Une seule entre dans le jeu à la fois, **au moins 45 s de jeu après la précédente** (hors ligne compris : c'est du temps écoulé). La toute première attend 45 s après le début de la partie : la première minute reste à la fleur et au premier pot (§10.6). Tant qu'elle n'est pas introduite, une mécanique n'existe pas : ni panneau, ni effet, ni production (un Papillon ne vient pas, la météo ne joue pas).
-- **L'ordre**, quand plusieurs attendent ensemble : le pollen, le potager, Le quartier (parcelles et projets), les Jalons, l'Herbier, le Papillon doré, les visites, le décor, les Saisons, l'Arbre des Saisons, la Biorégion, les Coopératives, la météo. Les améliorations et les bâtiments ne passent pas par là.
+- **L'ordre**, quand plusieurs attendent ensemble : le pollen, le potager, Le quartier (parcelles et projets), les Jalons, l'Herbier, le Papillon doré, les visites, les Saisons, l'Arbre des Saisons, la Biorégion, les Coopératives, la météo. Les améliorations et les bâtiments ne passent pas par là.
 - **La jauge de pollen** (§5.6) n'est plus là dès le début : elle rejoint la fleur avec la première amélioration de clic (Mains tièdes, 15 clics), et reste dès la 2ᵉ Saison. Avant, les clics ne la remplissent pas.
 - **Le signal, sans texte.** À l'arrivée de chaque mécanique, une lueur dorée s'allume sur la couronne de l'arbre héliotrope et trois anneaux dorés en partent, une fois. Puis la nouveauté se montre elle-même : un panneau s'entoure de son anneau doré et son onglet de son point (§10.7) ; un bouton (Jalons, Herbier, Saisons, Arbre), l'outil Décor ou la prévision du temps luisent quatre fois ; la jauge de pollen se dessine en or au pied de l'arbre ; le premier Papillon et la première visite arrivent 5 s après (au lieu d'attendre leur tirage). Avec les animations réduites (§10.4), rien ne bouge ni ne luit : il reste le point doré des onglets.
-- **Rythme mesuré** (joueur de référence, `src/game/onboarding.test.ts`) : 1ʳᵉ Saison, pollen 0:45, potager 1:30, Le quartier 2:15, Jalons 3:00, Herbier 3:45, Papillon 4:35, visites 5:20, décor 6:05, Saisons vers 19 min ; 2ᵉ Saison, l'Arbre tout de suite, puis Coopératives, demandes et météo de 45 s en 45 s ; 3ᵉ Saison, la Biorégion tout de suite, puis le verger et les grands chantiers. Les cibles du §8 tiennent (les retards se comptent en dizaines de secondes).
+- **Rythme mesuré** (joueur de référence, `src/game/onboarding.test.ts`) : 1ʳᵉ Saison, pollen 0:45, potager 1:30, Le quartier 2:15, Jalons 3:00, Herbier 3:45, Papillon 4:35, visites 5:20, Saisons vers 19 min (le décor, à 6:05, part au lot 4) ; 2ᵉ Saison, l'Arbre tout de suite, puis Coopératives, demandes et météo de 45 s en 45 s ; 3ᵉ Saison, la Biorégion tout de suite, puis le verger et les grands chantiers. Les cibles du §8 tiennent (les retards se comptent en dizaines de secondes).
 - **Sauvegarde.** Version 32 : les mécaniques introduites et le temps depuis la dernière. Une sauvegarde plus ancienne reçoit toutes celles qu'elle montre déjà : rien ne disparaît.
 
 ## 11. Contraintes pour l'implémentation

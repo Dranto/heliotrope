@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ACHIEVEMENTS, achievementProgress, type AchievementId } from './achievements';
 import { factorOf, globalBonus } from './bonuses';
-import { familyColour, isFlowerColourUnlocked } from './decor';
 import { withAllIntroduced } from './introductions';
 import {
   completeMilestoneFamilies,
@@ -28,13 +27,10 @@ describe('the families of Milestones (M37)', () => {
     expect(completeMilestoneFamilies([...upgrades, ...clicks])).toEqual(['upgrades', 'clicks']);
   });
 
-  it('give a lasting bonus and a colour of the heliotrope', () => {
+  it('give a lasting bonus', () => {
     const state = second();
     const complete = { ...state, achievements: ids('clicks') };
     expect(factorOf(complete, 'pollenFill') / factorOf(state, 'pollenFill')).toBeCloseTo(1.15);
-    const colour = familyColour('clicks');
-    expect(isFlowerColourUnlocked(state, colour)).toBe(false);
-    expect(isFlowerColourUnlocked(complete, colour)).toBe(true);
   });
 
   it('show the next Milestone closest to its goal, with its progress', () => {

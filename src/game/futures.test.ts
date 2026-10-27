@@ -1,21 +1,9 @@
 import { ACHIEVEMENT_LIST } from './achievements';
-import {
-  createDecorState,
-  DECOR_IDS,
-  DECOR_SLOTS,
-  isDecorOpen,
-  isFlowerColourUnlocked,
-  nextDecor,
-  placeDecor,
-  setFlowerColour,
-  unlockedDecor,
-} from './decor';
 import { PARCEL_LIST, parcelBonuses } from './parcels';
 import { clickValue, generatorMultiplier } from './production';
 import { canChangeFuture, changeFuture, futureOf, restoreParcel } from './restoration';
 import { deserialize, serialize } from './save';
 import { startNewSeason } from './seasons';
-import { SPECIES_IDS } from './species';
 import { createInitialState, type GameState } from './state';
 import { withAllIntroduced } from './introductions';
 
@@ -72,50 +60,11 @@ describe('The two futures of a parcel (§6.5, M16)', () => {
   });
 });
 
-describe('The decor of the neighbourhood (§6.5, M16)', () => {
-  it('opens with the tenth Milestone, then pieces come with Milestones and species', () => {
-    expect(isDecorOpen(rich({ achievements: milestones(9) }))).toBe(false);
-    const ten = rich({ achievements: milestones(10) });
-    expect(unlockedDecor(ten)).toEqual(['bench']);
-    const many = rich({ achievements: milestones(80), species: [...SPECIES_IDS] });
-    expect(unlockedDecor(many)).toEqual([...DECOR_IDS]);
-  });
-
-  it('a spot cycles through the pieces won, then empties again', () => {
-    const state = rich({ achievements: milestones(10), species: SPECIES_IDS.slice(0, 3) });
-    expect(nextDecor(state, null)).toBe('bench');
-    expect(nextDecor(state, 'bench')).toBe('planter');
-    expect(nextDecor(state, 'planter')).toBeNull();
-    const placed = placeDecor(state, 2, 'planter');
-    expect(placed.decor.slots[2]).toBe('planter');
-    expect(placeDecor(placed, 2, 'fresco')).toBe(placed);
-    expect(placeDecor(placed, DECOR_SLOTS, 'bench')).toBe(placed);
-    expect(placeDecor(placed, 2, null).decor.slots).toEqual(createDecorState().slots);
-    expect(startNewSeason(placed).decor).toEqual(placed.decor);
-  });
-
-  it('the flower colours come with Milestones and species', () => {
-    const state = rich({ achievements: milestones(20) });
-    expect(isFlowerColourUnlocked(state, 'gold')).toBe(true);
-    expect(setFlowerColour(state, 'blue')).toBe(state);
-    expect(setFlowerColour(state, 'gold').decor.flower).toBe('gold');
-  });
-
-  it('round-trips through a save and migrates a v17 save without decor', () => {
-    const state = setFlowerColour(
-      placeDecor(rich({ achievements: milestones(30) }), 0, 'lanterns'),
-      'gold',
-    );
-    expect(deserialize(serialize(state), 0)!.decor).toEqual(state.decor);
-    const { decor: _decor, futures: _futures, ...rest } = state;
+describe('The futures in a save (§6.5, M16)', () => {
+  it('migrates a v17 save with the first futures', () => {
+    const state = rich({ achievements: milestones(30) });
+    const { futures: _futures, ...rest } = state;
     const old = deserialize(JSON.stringify({ ...rest, version: 17 }), 0)!;
-    expect(old.decor).toEqual(createDecorState());
     expect(old.futures).toEqual({ chosen: {}, changed: {} });
-    const raw = JSON.parse(serialize(state));
-    raw.decor = { slots: ['rocket', 'bench'], flower: 'black' };
-    expect(deserialize(JSON.stringify(raw), 0)!.decor).toEqual({
-      ...createDecorState(),
-      slots: [null, 'bench', ...createDecorState().slots.slice(2)],
-    });
   });
 });

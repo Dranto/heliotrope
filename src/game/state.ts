@@ -1,7 +1,6 @@
 import { createIntroState, type IntroState } from './introductions';
 import type { AchievementId } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
-import { createDecorState, type DecorState } from './decor';
 import { createDeltaState, type DeltaState } from './delta';
 import { createCityState, type CityState } from './cities';
 import type { DistrictId } from './districts';
@@ -26,7 +25,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 44;
+export const STATE_VERSION = 45;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -99,8 +98,6 @@ export interface GameState {
   districts: DistrictId[];
   /** The future chosen for each restored parcel (§6.5). Kept forever. */
   futures: FuturesState;
-  /** The decor set on the map and the colour of the heliotrope (§6.5). Kept forever. */
-  decor: DecorState;
   /** Neighbourhood projects carried out this Season, in order (§6.2). */
   projects: ProjectId[];
   /** Talents of the Tree of Seasons learnt, in order (§7.1). Kept across Seasons. */
@@ -201,7 +198,6 @@ export function createInitialState(now: number): GameState {
     parcels: [],
     districts: [],
     futures: createFuturesState(),
-    decor: createDecorState(),
     projects: [],
     talents: [],
     canopy: createCanopyState(),

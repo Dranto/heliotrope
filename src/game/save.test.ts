@@ -168,6 +168,18 @@ describe('save', () => {
     }
   });
 
+  it('drops the decor and the colour of the heliotrope (slimming plan, lot 4)', () => {
+    const played = JSON.parse(serialize(playedState()));
+    const old = {
+      ...played,
+      version: 44,
+      decor: { slots: ['bench', null], flower: 'gold' },
+    };
+    const state = deserialize(JSON.stringify(old), 0)!;
+    expect('decor' in state).toBe(false);
+    expect(state.version).toBe(STATE_VERSION);
+  });
+
   it('rejects corrupt or future saves', () => {
     expect(deserialize('not json', 0)).toBeNull();
     expect(deserialize('null', 0)).toBeNull();
