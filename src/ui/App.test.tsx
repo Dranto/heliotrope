@@ -579,7 +579,7 @@ describe('App', () => {
     const store = renderApp();
     const forms = screen.getByRole('group', { name: 'Formes\u00a0: Héliotrope en pot' });
     const fork = within(forms).getByRole('group', { name: /Jardinière fleurie/ });
-    fireEvent.click(within(fork).getByRole('button', { name: /Le clic rapporte \+0,25/ }));
+    fireEvent.click(within(fork).getByRole('button', { name: /production ×1,5/ }));
     expect(store.getState().growth.paths.pot[0]).toBe(0);
     expect(document.querySelector('[data-growth="pot"] .growth-wreath')).toHaveAttribute(
       'data-path',

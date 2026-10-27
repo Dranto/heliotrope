@@ -1,8 +1,8 @@
 // Prestige: the Seasons (docs/game-design.md §7). Pure formulas and the new Season transition.
 import { isIntroduced } from './introductions';
 import { LATE_HARVEST_SEEDS, unlockAchievement, unlockAchievements } from './achievements';
-import { keptGeneratorShare } from './bonuses';
-import { ripeningSeconds } from './delta';
+import { keptGeneratorShare, ripeningBonus } from './bonuses';
+import { MIN_RIPENING_SECONDS, ripeningSeconds } from './delta';
 import { GENERATOR_IDS } from './generators';
 import { startCurve } from './history';
 import { createInitialState, type GameState } from './state';
@@ -53,19 +53,28 @@ export function lightForSeeds(seeds: number): number {
   return DEEP_SOIL_LIGHT * (seeds / DEEP_SOIL_SEEDS) ** 3;
 }
 
+/**
+ * Seconds a Season must last before its Seeds are ripe (§7): the seed arm's time, shortened by
+ * the paths of the buildings (§5.5), never under five minutes.
+ */
+export function seasonRipeningSeconds(state: GameState): number {
+  const arm = ripeningSeconds(state);
+  return Math.max(Math.min(arm, MIN_RIPENING_SECONDS), arm - ripeningBonus(state));
+}
+
 /** Share of the ripening time the Season has lasted, from 0 to 1 (§7). */
 export function seasonRipeness(state: GameState): number {
-  return Math.min(1, state.seasonSeconds / ripeningSeconds(state));
+  return Math.min(1, state.seasonSeconds / seasonRipeningSeconds(state));
 }
 
 /** The Seeds of the Season are ripe: a new Season can harvest them (§7). */
 export function areSeedsRipe(state: GameState): boolean {
-  return state.seasonSeconds >= ripeningSeconds(state);
+  return state.seasonSeconds >= seasonRipeningSeconds(state);
 }
 
 /** Seconds of Season left before its Seeds are ripe. */
 export function secondsToRipeness(state: GameState): number {
-  return Math.max(0, ripeningSeconds(state) - state.seasonSeconds);
+  return Math.max(0, seasonRipeningSeconds(state) - state.seasonSeconds);
 }
 
 /** Seeds the Light of the Cycle adds to the ones already obtained, ripe or not. */

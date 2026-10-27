@@ -180,6 +180,18 @@ describe('save', () => {
     expect(state.version).toBe(STATE_VERSION);
   });
 
+  it('lets every working path change once more after the move to once per Cycle (lot 5)', () => {
+    const played = JSON.parse(serialize(playedState()));
+    const old = {
+      ...played,
+      version: 45,
+      growth: { paths: { ...played.growth.paths, pot: [0, null, null] }, swapped: { pot: 7 } },
+    };
+    const state = deserialize(JSON.stringify(old), 0)!;
+    expect(state.growth.paths.pot).toEqual([0, null, null]);
+    expect(state.growth.swapped).toEqual({});
+  });
+
   it('rejects corrupt or future saves', () => {
     expect(deserialize('not json', 0)).toBeNull();
     expect(deserialize('null', 0)).toBeNull();

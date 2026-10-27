@@ -3,7 +3,7 @@
 // neighbourhood's buildings. Collectors, sites and Water are kept from one Season to the next;
 // only a new Cycle of water (cycles.ts) resets them. Names live in src/i18n, the art in src/ui.
 import { isIntroduced } from './introductions';
-import { bonusesOf } from './bonuses';
+import { bonusesOf, discountFactor } from './bonuses';
 import { floodSiteFactor, isArmOpen } from './delta';
 import { effectFactor } from './effects';
 import type { GeneratorId } from './generators';
@@ -106,12 +106,21 @@ export function waterPerSecond(state: GameState): number {
 
 /** Light cost of the next unit of a collector. */
 export function collectorCost(state: GameState, id: CollectorId): number {
-  return COLLECTORS[id].baseCost * COLLECTOR_COST_GROWTH ** state.collectors[id];
+  return (
+    COLLECTORS[id].baseCost *
+    COLLECTOR_COST_GROWTH ** state.collectors[id] *
+    discountFactor(state, 'collectorDiscount')
+  );
 }
 
-/** Water cost of the next level of a site, lower with the flood arm (§7.5). */
+/** Water cost of the next level of a site, lower with the flood arm (§7.5) and the paths (§5.5). */
 export function siteCost(state: GameState, id: SiteId): number {
-  return SITES[id].baseCost * SITE_COST_GROWTH ** state.sites[id] * floodSiteFactor(state);
+  return (
+    SITES[id].baseCost *
+    SITE_COST_GROWTH ** state.sites[id] *
+    floodSiteFactor(state) *
+    discountFactor(state, 'siteDiscount')
+  );
 }
 
 /**

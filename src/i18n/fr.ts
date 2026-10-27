@@ -154,9 +154,9 @@ export const fr = {
     label: (name: string) => `Formes\u00a0: ${name}`,
     tier: (form: string, count: string) => `${form}, dès ${count}`,
     choose: (form: string) => `${form}\u00a0: choisir une voie`,
-    locked: 'Une voie déjà changée cette Saison',
+    locked: 'Une voie déjà changée dans ce Cycle',
     lockedNote:
-      'Ce bâtiment a déjà changé de voie cette Saison\u00a0: il pourra en changer de nouveau à la prochaine.',
+      'Ce bâtiment a déjà changé de voie dans ce Cycle de l’eau\u00a0: il pourra en changer de nouveau au prochain.',
     forms: {
       pot: ['Jardinière fleurie', 'Mur de pots', 'Cascade de pots'],
       balconyPanel: ['Pergola solaire', 'Treille photovoltaïque', 'Façade solaire'],
@@ -602,6 +602,11 @@ export const fr = {
       perPath: (percent: string) => `+${percent}\u00a0% de production par voie qui joue`,
       perMilestoneFamily: (percent: string) =>
         `+${percent}\u00a0% de production par famille de Jalons complète`,
+      ripening: (duration: string) => `Les Graines de la Saison mûrissent ${duration} plus tôt`,
+      collectorDiscount: (percent: string) =>
+        `Les collecteurs d’eau coûtent ${percent}\u00a0% de moins`,
+      siteDiscount: (percent: string) =>
+        `Les sites de la biorégion coûtent ${percent}\u00a0% d’Eau de moins`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
       pollenFill: (factor: string) => `La jauge de pollen se remplit ×${factor} plus vite`,
       cuttingsGift: (units: number) =>

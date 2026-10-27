@@ -77,7 +77,13 @@ export type Bonus =
   /** Adds `bonus` to global production per path working on the buildings (§9.9, M34). */
   | { kind: 'perPath'; bonus: number }
   /** Adds `bonus` to global production per family of Milestones complete (§9.16, M37). */
-  | { kind: 'perMilestoneFamily'; bonus: number };
+  | { kind: 'perMilestoneFamily'; bonus: number }
+  /** The Seeds of the Season ripen this many seconds sooner (§5.5, slimming plan lot 5). */
+  | { kind: 'ripening'; seconds: number }
+  /** Water collectors cost this share less Light (§7.4). */
+  | { kind: 'collectorDiscount'; fraction: number }
+  /** Site levels cost this share less Water (§7.4). */
+  | { kind: 'siteDiscount'; fraction: number };
 
 export type BonusKind = Bonus['kind'];
 type BonusOf<K extends BonusKind> = Extract<Bonus, { kind: K }>;
@@ -211,6 +217,19 @@ export function factorOf(
     | 'pollenFill',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);
+}
+
+/** Seconds the Seeds of the Season ripen sooner. */
+export function ripeningBonus(source: BonusSource): number {
+  return bonusesOf(source, 'ripening').reduce((sum, b) => sum + b.seconds, 0);
+}
+
+/** Cost factor of a discount kind other than the buildings': each one stacks multiplicatively. */
+export function discountFactor(
+  source: BonusSource,
+  kind: 'collectorDiscount' | 'siteDiscount',
+): number {
+  return bonusesOf(source, kind).reduce((product, b) => product * (1 - b.fraction), 1);
 }
 
 /** Generator cost factor: each discount stacks multiplicatively. */

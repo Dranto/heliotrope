@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { WHOLE_GAME_TARGETS, simulateWholeGame, tendLoops, tendWorkshop } from './wholeGame';
+import {
+  REFERENCE_AWAY_SECONDS,
+  REFERENCE_SESSION_SECONDS,
+  WHOLE_GAME_TARGETS,
+  simulateWholeGame,
+  tendLoops,
+  tendWorkshop,
+} from './wholeGame';
 import { createInitialState } from './state';
 
 // The whole game (docs/game-design.md §8, M30): the reference player, in sessions of an hour of
@@ -23,8 +30,11 @@ describe('the whole game (§8, M30)', () => {
     expect(state.city.landscape).toBe('forest');
     expect(state.garden.harvests).toBeGreaterThan(0);
     expect(Object.keys(state.city.workshop).length).toBeGreaterThan(0);
-    // Real time runs four times as fast as play: an hour played for three away.
-    expect(run.swarms[0]!.real).toBeCloseTo(run.swarms[0]!.played * 4, -4);
+    // Each full hour played is followed by three hours away.
+    const { played, real } = run.swarms[0]!;
+    expect(real - played).toBe(
+      Math.floor(played / REFERENCE_SESSION_SECONDS) * REFERENCE_AWAY_SECONDS,
+    );
   });
 
   it('leaves a fresh game alone, with nothing to tend', () => {

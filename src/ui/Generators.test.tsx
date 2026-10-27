@@ -58,7 +58,7 @@ describe('a growth path that cannot change yet', () => {
     const other = document.querySelector<HTMLButtonElement>('.growth-path[data-path="1"]')!;
     expect(other).toHaveAttribute('aria-disabled', 'true');
     fireEvent.click(other);
-    expect(note.textContent).toMatch(/déjà changé de voie cette Saison/);
+    expect(note.textContent).toMatch(/déjà changé de voie dans ce Cycle/);
     expect(store.getState().growth.paths.pot[0]).toBe(0);
   });
 });

@@ -212,23 +212,27 @@ Mécanique passive propre au thème : **chaque type de générateur possédé à
 
 Roadmap P25. Chaque bâtiment prend **trois formes** à **50, 100 et 200 exemplaires** possédés dans la Saison, et à chacune le joueur **choisit une voie** parmi deux. Les deux voies se valent : l'une renforce souvent le bâtiment lui-même, l'autre le relie à un autre système. Code dans `src/game/growth.ts`, choix dans le panneau Bâtir (`src/ui/Generators.tsx`), marques sur la carte dans `src/ui/GrowthArt.tsx`.
 
+> Lot 5 de l'allègement (§9.17) : les voies engagent. La première renforce fort le bâtiment (×1,5, ×1,75, ×2 selon la forme) ; la seconde le relie à ce qui fixe le rythme, avec un effet net. Le tableau de M26 est remplacé.
+
 | Bâtiment | 50 exemplaires | 100 exemplaires | 200 exemplaires |
 |---|---|---|---|
-| Héliotrope en pot | Jardinière fleurie : clic +0,25 par pot · ou le Potager sur le toit +0,25 % par pot | Mur de pots : pots ×1,5 · ou le potager de la cour pousse ×1,15 plus vite | Cascade de pots : pots +5 % par espèce de l'Herbier · ou la jauge de pollen (§5.6) se remplit ×1,25 plus vite |
-| Panneau de balcon | Pergola solaire : clic +1 par panneau · ou la Serre +0,25 % par panneau | Treille photovoltaïque : panneaux ×1,5 · ou la Floraison dure ×1,25 | Façade solaire : panneaux ×1,5 · ou panneaux +5 % par parcelle restaurée |
-| Potager sur le toit | Potager en terrasses : le potager de la cour pousse ×1,15 plus vite · ou potagers +4 % par parcelle | Toit nourricier : potagers ×1,5 · ou la Ferme verticale +0,2 % par potager | Jardin suspendu : Récolte du Papillon ×1,5 · ou potagers +2,5 % par espèce |
-| Serre communautaire | Serre à étages : serres ×1,25 · ou le Potager sur le toit +0,5 % par serre | Jardin d'hiver : le potager pousse ×1,2 plus vite · ou serres +2,5 % par espèce | Palais de verre : serres ×1,5 · ou toute la production +2 % |
-| Ferme verticale | Tour maraîchère : fermes ×1,25 · ou clic +25 par ferme | Ferme-cathédrale : la Centrale +0,25 % par ferme · ou fermes ×1,4 | Ferme-forêt : fermes ×1,5 · ou biodiversité ×1,05 |
-| Centrale à miroirs | Miroirs-tournesols : la Floraison dure ×1,25 · ou l'Eau ×1,15 | Couronne de miroirs : centrales ×1,5 · ou le Papillon revient 10 % plus vite | Soleil captif : centrales ×1,5 · ou la Canopée urbaine +0,5 % par centrale |
-| Canopée urbaine | Allée ombragée : canopées ×1,25 · ou les visites reviennent 10 % plus vite | Forêt urbaine : canopées +1 % par espèce · ou biodiversité ×1,05 | Canopée continue : canopées ×1,5 · ou +1 h de plafond hors ligne |
-| Arcologie vivante | Arcologie fleurie : arcologies ×1,25 · ou bâtiments 5 % moins chers | Arcologie-jardin : arcologies +1 % par espèce · ou toute la production +3 % | Arcologie-monde : arcologies ×1,5 · ou +1 % de production par type de bâtiment |
+| Héliotrope en pot | pots ×1,5 · ou clic +1 par pot | pots ×1,75 · ou le potager pousse ×1,3 plus vite | pots ×2 · ou la jauge de pollen se remplit ×1,5 plus vite |
+| Panneau de balcon | panneaux ×1,5 · ou clic +4 par panneau | panneaux ×1,75 · ou la Floraison dure ×1,5 | panneaux ×2 · ou les Graines mûrissent 20 s plus tôt |
+| Potager sur le toit | potagers ×1,5 · ou le potager pousse ×1,3 plus vite | potagers ×1,75 · ou Récolte du Papillon ×2 | potagers ×2 · ou les Graines mûrissent 20 s plus tôt |
+| Serre communautaire | serres ×1,5 · ou le potager pousse ×1,3 plus vite | serres ×1,75 · ou les Graines mûrissent 20 s plus tôt | serres ×2 · ou les Graines mûrissent 30 s plus tôt |
+| Ferme verticale | fermes ×1,5 · ou clic +100 par ferme | fermes ×1,75 · ou bâtiments 5 % moins chers | fermes ×2 · ou les Graines mûrissent 30 s plus tôt |
+| Centrale à miroirs | centrales ×1,5 · ou l'Eau ×1,3 | centrales ×1,75 · ou le Papillon revient 20 % plus vite | centrales ×2 · ou collecteurs d'eau 20 % moins chers |
+| Canopée urbaine | canopées ×1,5 · ou les visites reviennent 20 % plus vite | canopées ×1,75 · ou l'Eau ×1,3 | canopées ×2 · ou sites de la biorégion 20 % moins chers en Eau |
+| Arcologie vivante | arcologies ×1,5 · ou bâtiments 10 % moins chers | arcologies ×1,75 · ou les Graines mûrissent 30 s plus tôt | arcologies ×2 · ou l'Eau ×1,5 |
 
-Les liens entre bâtiments (« +0,25 % par pot ») s'ajoutent aux synergies du §5.3 et suivent leurs multiplicateurs.
+Les Graines plus tôt s'ajoutent au bras des semences (§7.5) et jouent dès que la forme est atteinte dans la Saison ; jamais sous 5 min. Toutes les secondes voies ensemble font mûrir la Saison 2 min 30 plus tôt.
+
+Les liens entre bâtiments de M26 (« +0,25 % par pot ») sont partis au lot 5 : les synergies du §5.3 les portent déjà.
 
 - **Choisir.** Sous chaque bâtiment, trois pastilles montrent ses formes : vide avant le seuil, pleine une fois atteint, dorée pour la première voie, lilas pour la seconde. Un seuil atteint sans voie fait respirer sa pastille et ouvre seul le choix : deux boutons, chacun avec son effet. Le panneau replié porte alors son point doré (§10.7). Une voie se choisit aussi **à l'avance**, avant son seuil : elle jouera dès qu'il sera atteint.
-- **Changer (décision D18).** Une voie pas encore atteinte se change librement. Une voie qui joue se change **une fois par bâtiment et par Saison**. Les voies restent d'une Saison, d'un Cycle et d'une ville à l'autre ; comme les bâtiments recommencent à chaque Saison, chaque forme se regagne.
+- **Changer (décision D18, lot 5).** Une voie pas encore atteinte se change librement. Une voie qui joue se change **une fois par bâtiment et par Cycle de l'eau** (une fois par Saison avant le lot 5) : c'est une orientation, pas un réglage de Saison. Les voies restent d'une Saison, d'un Cycle et d'une ville à l'autre ; comme les bâtiments recommencent à chaque Saison, chaque forme se regagne.
 - **Sur la carte.** Chaque forme atteinte avec sa voie couronne les premières places du bâtiment (les pots du coin de la cour, les panneaux des toits, les premières serres et fermes, la tour des miroirs, les premiers arbres, l'arcologie) : une couronne de feuilles aux baies de la couleur de la voie, puis une fleur, puis un halo qui respire (immobile avec les animations réduites). Dessinées en SVG par-dessus les deux rendus.
-- **Simulateur.** Le joueur de référence prend la première voie partout, choisie à l'avance (`withReferencePaths`). La 1ʳᵉ Saison conseillée passe de 74 à 72 min (cible 80 min), la Centrale à miroirs de 23 à 22 min : un adoucissement par synergies, comme voulu (§5.3). Les voies restent modestes (×1,25 à ×1,5) parce qu'elles jouent dans toutes les Saisons suivantes : deux fois plus fortes, elles faisaient tenir le 2ᵉ Cycle en 2 Saisons au lieu de 3 (24 min pour une cible de 35). Avec ces valeurs, ses Sources atteignent 7,4 sur 8 au bout de 2 Saisons avec la première voie partout, 7,9 avec la seconde. Le simulateur compte aussi le premier exemplaire acheté par une Coopérative (§7.2).
+- **Simulateur.** Le joueur de référence prend la première voie partout, choisie à l'avance (`withReferencePaths`) ; mesures du lot 5 au §9.17. La 1ʳᵉ Saison conseillée passe de 74 à 72 min (cible 80 min), la Centrale à miroirs de 23 à 22 min : un adoucissement par synergies, comme voulu (§5.3). Les voies restent modestes (×1,25 à ×1,5) parce qu'elles jouent dans toutes les Saisons suivantes : deux fois plus fortes, elles faisaient tenir le 2ᵉ Cycle en 2 Saisons au lieu de 3 (24 min pour une cible de 35). Avec ces valeurs, ses Sources atteignent 7,4 sur 8 au bout de 2 Saisons avec la première voie partout, 7,9 avec la seconde. Le simulateur compte aussi le premier exemplaire acheté par une Coopérative (§7.2).
 - **Jalons (2).** « Première voie » (une voie qui joue), « La ville aux mille formes » (12 voies qui jouent). 142 jalons en tout.
 - **Sauvegarde.** Version 27 : les voies et la Saison du dernier changement de chaque bâtiment, vides pour une sauvegarde plus ancienne.
 
@@ -1272,6 +1276,9 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Sauvegarde (lot 4).** Version 44 : le défi en cours et les défis gagnés sont effacés avec leurs bonus ; les Jalons retirés atteints rejoignent le compte des Jalons d'autrefois.
 - **Lot 4, suite : retirés.** Le décor (§6.5) et son bouton « Décorer », les treize couleurs de l'héliotrope (les familles de Jalons gardent leur bonus, §9.16) et le mode photo. Rien ne changeait la production ni le rythme. L'héliotrope fleurit lilas, la carte garde son soir et sa nuit.
 - **Sauvegarde (lot 4, suite).** Version 45 : les emplacements de décor et la couleur choisie sont effacés sans compensation.
+- **Lot 5 : les voies engagent (§5.5).** À chaque forme, la première voie renforce le bâtiment (×1,5, ×1,75 puis ×2 au lieu de ×1,25 à ×1,5) et la seconde le relie au rythme : Graines qui mûrissent jusqu'à 30 s plus tôt, Eau ×1,3 à ×1,5, collecteurs et sites 20 % moins chers, bâtiments moins chers, clic, potager. Une voie qui joue se change une fois par Cycle. Le panneau Bâtir dit l'effet de chaque voie.
+- **Équilibrage (lot 5).** Le joueur de référence prend toujours la première voie : 1ʳᵉ Saison conseillée 53 min (cible 67), 2ᵉ Saison 18 min ; Cycles 2 à 4 en 24, 36 et 45 min ; essaimages à 2 h 55 et 4 h de jeu (cibles 4 h et 5 h). Le premier essaimage bascule plus tôt, comme l'audit l'avait vu (règle de relance ×1,5, lot 9). Des voies ×2 partout faisaient tomber la 1ʳᵉ Saison à 49 min.
+- **Sauvegarde (lot 5).** Version 46 : les voies restent, chaque bâtiment peut changer une fois de plus.
 
 ## 10. Écrans et interface
 
