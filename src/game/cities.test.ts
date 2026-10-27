@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { factorOf, globalBonus } from './bonuses';
-import { growOrchard } from './orchard';
 import { generatorMultiplier } from './production';
 import {
   areCitiesOpen,
@@ -142,26 +141,18 @@ describe('the sister cities (§7.6)', () => {
     const base = endOfDelta(100, { parcels: ['gardenStreet', 'park'] });
     const forest = swarm(base, 'forest');
     expect(forest.city.landscape).toBe('forest');
-    expect(factorOf(forest, 'orchardGrowth')).toBeCloseTo(1.5);
+    expect(factorOf(forest, 'gardenGrowth')).toBeCloseTo(1.25 * factorOf(base, 'gardenGrowth'));
     expect(generatorMultiplier(forest, 'mirrorPlant')).toBeCloseTo(
       generatorMultiplier(swarm(base, 'plain'), 'mirrorPlant') * 0.5,
     );
-    const planted = {
-      ...forest,
-      orchard: {
-        ...forest.orchard,
-        trees: { ...forest.orchard.trees, apple: { age: 0, fruit: 0 } },
-      },
-    };
-    expect(growOrchard(planted, 1000).orchard.trees.apple.age).toBeCloseTo(1500);
     const marsh = swarm(base, 'marsh');
     expect(factorOf(marsh, 'biodiversityFactor')).toBeCloseTo(1.5);
-    // Once left, the forest sends a faster orchard to the network.
+    // Once left, the forest sends a faster garden to the network.
     const after = swarm(
       { ...forest, sources: forest.sources + 100, city: { ...forest.city, sourcesBase: 0 } },
       'marsh',
     );
-    expect(factorOf(after, 'orchardGrowth')).toBeCloseTo(1.1);
+    expect(factorOf(after, 'gardenGrowth')).toBeCloseTo(1.1 * factorOf(base, 'gardenGrowth'));
   });
 
   it('lets the builders raise the cheapest sites when the Water allows', () => {

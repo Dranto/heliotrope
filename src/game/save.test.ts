@@ -56,7 +56,6 @@ function playedState(): GameState {
         foresters: 0,
         council: 0,
         growers: 0,
-        beekeepers: 0,
         fountaineers: 0,
       },
     },
@@ -130,6 +129,25 @@ describe('save', () => {
     expect('requests' in state).toBe(false);
     expect('greetings' in state).toBe(false);
     expect('swapped' in state.weather).toBe(false);
+  });
+
+  it('drops the great works, the orchard and the baskets (slimming plan, lot 3)', () => {
+    const played = JSON.parse(serialize(playedState()));
+    const old = {
+      ...played,
+      version: 42,
+      achievements: ['light.3', 'works.1', 'firstFruit'],
+      retiredAchievements: 0,
+      garden: { ...played.garden, baskets: 12 },
+      greatWorks: { works: {} },
+      orchard: { trees: {}, hives: 2, honey: 3, harvests: 1, varieties: [] },
+    };
+    const state = deserialize(JSON.stringify(old), 0)!;
+    expect(state.achievements).toEqual(['light.3']);
+    expect(state.retiredAchievements).toBe(2);
+    expect('greatWorks' in state).toBe(false);
+    expect('orchard' in state).toBe(false);
+    expect('baskets' in state.garden).toBe(false);
   });
 
   it('rejects corrupt or future saves', () => {
@@ -509,7 +527,6 @@ describe('export and import', () => {
       council: 0,
       fountaineers: 0,
       growers: 0,
-      beekeepers: 0,
     });
   });
 

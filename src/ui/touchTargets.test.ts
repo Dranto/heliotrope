@@ -2,11 +2,7 @@ import { readFileSync } from 'node:fs';
 
 // Buttons pressed many times a game answer over a full 44 px on a touch screen (§10.3): the
 // action buttons of the Season-2 panels by their height.
-const RULES: [file: string, selector: string][] = [
-  ['./greatWorks.css', '.works-card .works-give'],
-  ['./orchard.css', '.orchard-card .buy'],
-  ['./garden.css', '.ghost.garden-sow'],
-];
+const RULES: [file: string, selector: string][] = [['./garden.css', '.ghost.garden-sow']];
 
 function coarseBlocks(css: string): string[] {
   const blocks: string[] = [];

@@ -1,16 +1,11 @@
 // The whole game measured (docs/game-design.md §8, M30): the reference player of the simulator
 // plays from the first click to the second sister city, in sessions: an hour
 // of play, then three hours away while the game goes on offline (§9.1), as a player who comes
-// back every few hours. At each coming and going it tends the small loops: the courtyard garden,
-// the orchard and its hives and the great works. Since v5 (M36) it also rotates its crops with
-// the strawberries. Pure and headless, like the simulator it drives.
+// back every few hours. At each coming and going it tends the courtyard garden, rotating its
+// crops with the strawberries since v5 (M36). Pure and headless, like the simulator it drives.
 import { buyWorkshop, canSwarm, swarm, type LandscapeId, type WorkshopId } from './cities';
 import { CROP_IDS, canSow, harvest, isRipe, sow, type CropId } from './garden';
-import { canContribute, isStageReady, missing, WORK_IDS, contribute } from './greatWorks';
-import { canPlant, canSetHive, pickFruit, plant, setHive, treeStage } from './orchard';
-import { FRUIT_IDS } from './fruits';
 import { applyOfflineProgress } from './offline';
-import { lightPerSecond } from './production';
 import {
   learnReferenceTalents,
   simulateCycles,
@@ -24,8 +19,6 @@ import type { GameState } from './state';
 export const REFERENCE_SESSION_SECONDS = 3600;
 /** ...then is away this long, the game going on offline. */
 export const REFERENCE_AWAY_SECONDS = 3 * 3600;
-/** Light it gives a great work at once: at most this many seconds of production. */
-export const REFERENCE_WORK_BUDGET = 10 * 60;
 /**
  * What the reference player sows in each bed, in turn: different neighbours for varieties, and
  * each bed rotates through them (M32), the strawberries ripening while it is away.
@@ -64,39 +57,9 @@ function tendGarden(state: GameState): GameState {
   return next;
 }
 
-/** Pick every ripe tree, plant the trees the baskets allow, then the hives. */
-function tendOrchard(state: GameState): GameState {
-  let next = state;
-  for (const id of FRUIT_IDS) {
-    if (treeStage(next.orchard.trees[id]) === 'ripe') next = pickFruit(next, id)?.state ?? next;
-  }
-  for (const id of FRUIT_IDS) if (canPlant(next, id)) next = plant(next, id);
-  while (canSetHive(next)) next = setHive(next);
-  return next;
-}
-
-/**
- * Pay a stage of a great work once all of it can be paid at once, its Light within a few
- * minutes of production, so the works never hold back the buildings.
- */
-function tendWorks(state: GameState): GameState {
-  let next = state;
-  for (const id of WORK_IDS) {
-    if (!canContribute(next, id)) continue;
-    const left = missing(next, id);
-    const affordable =
-      left.light <= Math.min(next.resources.light, lightPerSecond(next) * REFERENCE_WORK_BUDGET) &&
-      left.water <= next.resources.water &&
-      left.baskets <= next.garden.baskets &&
-      left.honey <= next.orchard.honey;
-    if (affordable || isStageReady(next, id)) next = contribute(next, id);
-  }
-  return next;
-}
-
 /** Everything the reference player does on a visit to the small loops. */
 export function tendLoops(state: GameState): GameState {
-  return tendWorks(tendOrchard(tendGarden(state)));
+  return tendGarden(state);
 }
 
 /** Learn the reference rules of the workshop as far as the Savoirs go, cheapest level first. */

@@ -6,20 +6,11 @@
 import { isIntroduced } from './introductions';
 import { unlockAchievements } from './achievements';
 import { earnWater, isBioregionOpen, waterPerSecond } from './bioregion';
-import { extraHarvestBaskets, factorOf } from './bonuses';
+import { factorOf } from './bonuses';
 import { effectSeconds } from './butterfly';
 import { effectFactor } from './effects';
 import { earnLight } from './light';
 import { lightPerSecond } from './production';
-import {
-  FRUIT_IDS,
-  HIVE_VARIETY_CHANCE,
-  pickFruit,
-  pollination,
-  treeStage,
-  type FruitHarvest,
-  type FruitId,
-} from './orchard';
 import { addPollen } from './pollen';
 import { nextRandom } from './random';
 import { VARIETIES, type CropId, type VarietyId } from './seedBank';
@@ -52,15 +43,6 @@ export const SQUASH_SECONDS = 30 * 60;
 /** Strawberries (M32): their scent fills a quarter of the pollen gauge (§5.6). */
 export const STRAWBERRY_POLLEN = 0.25;
 
-/** Baskets each harvest fills for the great works (§6.6, M20): the longer the crop, the more. */
-export const BASKETS: Record<CropId, number> = {
-  radish: 1,
-  sunflower: 2,
-  beans: 3,
-  squash: 5,
-  strawberry: 1,
-};
-
 /** The rotation (M32): a crop sown after a different one grows this much faster. */
 export const ROTATION_FACTOR = 1.2;
 
@@ -90,8 +72,6 @@ export interface GardenState {
   harvests: number;
   /** Varieties of the seed bank, in order of discovery. */
   varieties: VarietyId[];
-  /** Baskets of harvests kept for the great works (§6.6, M20), spent there. */
-  baskets: number;
   /** Harvests of a crop grown after a different one (M32, Milestones). */
   rotations: number;
 }
@@ -101,7 +81,6 @@ export function createGardenState(): GardenState {
     plots: Array.from({ length: MAX_PLOTS }, () => BARE),
     harvests: 0,
     varieties: [],
-    baskets: 0,
     rotations: 0,
   };
 }
@@ -121,7 +100,7 @@ export function isGardenOpen(state: GameState): boolean {
 /**
  * Crops the player can sow: radishes from the start, sunflowers once ten pots stand around the
  * courtyard, climbing beans from the second Season, squashes once the Bioregion is open, and
- * strawberries with the first hive of the orchard (M32).
+ * strawberries with the Bioregion too (M32, slimming plan lot 3).
  */
 export function isCropUnlocked(state: GameState, id: CropId): boolean {
   switch (id) {
@@ -132,9 +111,8 @@ export function isCropUnlocked(state: GameState, id: CropId): boolean {
     case 'beans':
       return state.seasons > 0;
     case 'squash':
-      return isBioregionOpen(state);
     case 'strawberry':
-      return state.orchard.hives > 0;
+      return isBioregionOpen(state);
   }
 }
 
@@ -174,7 +152,7 @@ export function plotsToCome(state: GameState): PlotCondition[] {
 export function growthSpeed(state: GameState): number {
   const shower = effectFactor(state.effects, 'shower');
   const rain = state.parcels.includes('rainGardens') ? 1.25 : 1;
-  return shower * rain * factorOf(state, 'gardenGrowth') * pollination(state);
+  return shower * rain * factorOf(state, 'gardenGrowth');
 }
 
 /** How fast one bed grows: the garden's speed and the rotation (M32). */
@@ -348,15 +326,15 @@ export function harvest(state: GameState, index: number): HarvestResult | null {
   if (possible.length > 0) {
     const [roll, rngSeed] = nextRandom(next.rngSeed);
     next = { ...next, rngSeed };
-    const chance = VARIETY_CHANCE + HIVE_VARIETY_CHANCE * state.orchard.hives;
-    if (roll < chance) variety = possible[Math.floor((roll / chance) * possible.length)]!;
+    if (roll < VARIETY_CHANCE) {
+      variety = possible[Math.floor((roll / VARIETY_CHANCE) * possible.length)]!;
+    }
   }
   next = {
     ...next,
     garden: {
       ...next.garden,
       harvests: next.garden.harvests + 1,
-      baskets: next.garden.baskets + BASKETS[crop] + extraHarvestBaskets(state),
       rotations: next.garden.rotations + Number(plot.rotated === true),
       varieties: variety ? [...next.garden.varieties, variety] : next.garden.varieties,
     },
@@ -368,27 +346,21 @@ export interface HarvestAllResult {
   state: GameState;
   /** Every crop harvested, in bed order. */
   crops: HarvestResult[];
-  /** Every tree picked. */
-  fruits: (FruitHarvest & { id: FruitId })[];
 }
 
-/** Something is ripe in the garden or the orchard: "harvest all" has work to do. */
+/** Something is ripe in the garden: "harvest all" has work to do. */
 export function hasRipe(state: GameState): boolean {
-  return (
-    state.garden.plots.some(isRipe) ||
-    FRUIT_IDS.some((id) => treeStage(state.orchard.trees[id]) === 'ripe')
-  );
+  return state.garden.plots.some(isRipe);
 }
 
 /**
  * Player action (M32, decision D24): harvest every ripe crop and sow the same one again in its
- * bed, then pick every ripe tree. Returns null when nothing is ripe.
+ * bed. Returns null when nothing is ripe.
  */
 export function harvestAll(state: GameState): HarvestAllResult | null {
   if (!hasRipe(state)) return null;
   let next = state;
   const crops: HarvestResult[] = [];
-  const fruits: HarvestAllResult['fruits'] = [];
   next.garden.plots.forEach((plot, index) => {
     if (!isRipe(plot) || plot.crop === null) return;
     const result = harvest(next, index);
@@ -396,13 +368,7 @@ export function harvestAll(state: GameState): HarvestAllResult | null {
     crops.push(result);
     next = sow(result.state, index, plot.crop);
   });
-  for (const id of FRUIT_IDS) {
-    const result = pickFruit(next, id);
-    if (!result) continue;
-    fruits.push({ ...result, id });
-    next = result.state;
-  }
-  return { state: next, crops, fruits };
+  return { state: next, crops };
 }
 
 /** Keep only what a save can hold: known crops, growth within the crop's time. */

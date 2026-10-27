@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { GENERATOR_IDS } from '../game/generators';
-import { WORK_IDS } from '../game/greatWorks';
 import { phaseOf } from '../game/phases';
 import type { GameState } from '../game/state';
 import { VISIT_KINDS } from '../game/visits';
@@ -27,16 +26,13 @@ function counters(state: GameState): Record<Exclude<SoundName, 'bird'>, number> 
     butterfly: state.butterflies + VISIT_KINDS.reduce((sum, kind) => sum + state.visits[kind], 0),
     milestone: state.achievements.length,
     season: state.seasons,
-    harvest: state.garden.harvests + state.orchard.harvests,
-    work:
-      WORK_IDS.reduce((sum, id) => sum + state.greatWorks.works[id].stage, 0) + state.orchard.hives,
+    harvest: state.garden.harvests,
   };
 }
 
 /** Rarest first: when one action changes several counters, only the most special one sounds. */
 const PRIORITY = [
   'season',
-  'work',
   'restore',
   'project',
   'milestone',

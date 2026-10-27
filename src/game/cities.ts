@@ -1,8 +1,7 @@
 // The sister cities (docs/game-design.md §7.6, M23), the third layer of prestige. Once the delta
 // is fully open and enough Sources were earned in the city, the player can swarm: found a sister
 // city elsewhere in the region, in one of three landscapes. The Seasons, the Bioregion and the
-// Cycles start again; the Herbier, the Milestones, the decor, the great works, the garden and the
-// orchard, the delta and the cities already founded stay. Savoirs are earned from the Sources of
+// Cycles start again; the Herbier, the Milestones, the decor, the garden, the delta and the cities already founded stay. Savoirs are earned from the Sources of
 // the city and the Seeds of the Cycle, and spent in a workshop that changes the rules.
 import { unlockAchievements } from './achievements';
 import { COLLECTOR_IDS, raiseSite, SITE_IDS, canRaiseSite, siteCost } from './bioregion';

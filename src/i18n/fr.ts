@@ -2,8 +2,6 @@
 // (`en.ts`) has the same shape, `Texts`; the UI reads the current one through `t` in `index.ts`.
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
-import type { FruitId } from '../game/fruits';
-import type { TreeStage } from '../game/orchard';
 import type { AchievementFamily, AchievementId } from '../game/achievements';
 import type { Language } from '../game/format';
 import type { GeneratorId } from '../game/generators';
@@ -15,7 +13,6 @@ import type { ChallengeId } from '../game/challenges';
 import type { CycleChallengeId } from '../game/cycleChallenges';
 import type { DecorId, FlowerColour } from '../game/decor';
 import type { DeltaId } from '../game/delta';
-import type { WorkId } from '../game/greatWorks';
 import type { CollectorId, SiteId } from '../game/bioregion';
 import type { CooperativeId } from '../game/cooperatives';
 import type { SpeciesId } from '../game/species';
@@ -424,12 +421,7 @@ export const fr = {
       floodTide: 'Grandes eaux',
       'delta.1': 'Premier bras',
       'delta.6': 'Delta ouvert',
-      'works.1': 'Première pierre',
-      'works.4': 'Grands travaux',
-      firstFruit: 'Premier fruit',
-      oldOrchard: 'Vieux vergers',
       rotation: 'La terre se repose',
-      oldTree: 'Vieil arbre',
       wholeFamily: 'Toute la famille',
       skyCreatures: 'Les bêtes du ciel',
       'cities.1': 'Essaimage',
@@ -542,10 +534,6 @@ export const fr = {
       deltaLevels: (count: number) =>
         count === 1 ? 'Ouvrir un premier bras du delta' : `Ouvrir les ${count} niveaux du delta`,
       lockCycles: (count: number) => `Laisser l’éclusier commencer ${count} Cycles`,
-      worksBuilt: (count: number) =>
-        count === 1 ? 'Achever un grand chantier' : `Achever les ${count} grands chantiers`,
-      fruitHarvests: (count: number) =>
-        count === 1 ? 'Cueillir un premier fruit au verger' : `Cueillir ${count} fois au verger`,
       sisterCities: (count: number) =>
         count === 1 ? 'Fonder une ville sœur' : `Fonder ${count} villes sœurs`,
       paths: (count: number) =>
@@ -557,10 +545,8 @@ export const fr = {
         count === 1
           ? 'Remplir la jauge de pollen et lancer une envolée'
           : `Lancer ${count} envolées de pollen`,
-      fruitVarieties: (count: number) => `Retrouver les ${count} variétés anciennes du verger`,
       rotations: (count: number) =>
         `Récolter ${count}\u00a0cultures semées après une culture différente`,
-      oldTree: 'Cueillir un fruitier jusqu’à ce qu’il devienne un vieil arbre',
       families: (count: number) => `Réunir ${count}\u00a0familles entières de l’Herbier`,
       weatherSpecies: 'Voir revenir les cinq espèces du temps',
       cycleChallenges: (count: number) =>
@@ -676,15 +662,10 @@ export const fr = {
         `${generator}\u00a0: +${percent}\u00a0% par espèce de l’Herbier`,
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}\u00a0: +${percent}\u00a0% par parcelle restaurée`,
-      harvestBaskets: (units: number) =>
-        units === 1
-          ? 'Chaque récolte du potager donne un panier de plus'
-          : `Chaque récolte du potager donne ${units} paniers de plus`,
       perPath: (percent: string) => `+${percent}\u00a0% de production par voie qui joue`,
       perMilestoneFamily: (percent: string) =>
         `+${percent}\u00a0% de production par famille de Jalons complète`,
       gardenGrowth: (factor: string) => `Le potager pousse ×${factor} plus vite`,
-      orchardGrowth: (factor: string) => `Le verger pousse ×${factor} plus vite`,
       pollenFill: (factor: string) => `La jauge de pollen se remplit ×${factor} plus vite`,
       cuttingsGift: (units: number) =>
         units === 1
@@ -703,35 +684,6 @@ export const fr = {
       fleaMarket: 'La Brocante solaire',
       flight: 'L’Envolée de pollen',
     },
-  },
-  greatWorks: {
-    title: 'Les grands chantiers',
-    hint: 'Chaque étape se paie en Lumière, en Eau et en paniers du potager, les dernières aussi en miel des ruches. Ce qui est versé reste versé.',
-    baskets: (count: string) => `${count} paniers`,
-    basketsHint: 'Chaque récolte du potager remplit des paniers.',
-    names: {
-      tram: 'Le tram solaire',
-      river: 'La rivière rouverte',
-      hall: 'Les halles nourricières',
-      tower: 'La tour des semences',
-    } satisfies Record<WorkId, string>,
-    stages: {
-      tram: ['Les rails', 'Les caténaires fleuries', 'Les stations', 'Le premier tram'],
-      river: ['La dalle cassée', 'Les berges', 'Les passerelles', 'La baignade'],
-      hall: ['La charpente', 'Les étals', 'La cuisine commune'],
-      tower: ['Les fondations', 'Les étages cultivés', 'La grainothèque', 'Le belvédère'],
-    } satisfies Record<WorkId, readonly string[]>,
-    stage: (built: string, count: string) => `${built} étapes sur ${count}`,
-    next: (stage: string) => `Prochaine étape\u00a0: ${stage}`,
-    light: 'Lumière',
-    water: 'Eau',
-    basketsLabel: 'Paniers',
-    honeyLabel: 'Miel',
-    species: (have: string, need: string) => `Espèces de l’Herbier\u00a0: ${have} sur ${need}`,
-    contribute: 'Verser',
-    contributeLabel: (work: string) => `Verser pour ${work}`,
-    complete: 'Achevé',
-    built: 'Déjà bâti',
   },
   garden: {
     title: 'Le potager de la cour',
@@ -784,12 +736,11 @@ export const fr = {
       effect: (seconds: string) =>
         `Haricots grimpants\u00a0! Potagers et Serres ×2 pendant ${seconds}.`,
       pollen: 'Les fraises parfument la fleur\u00a0: la jauge de pollen se remplit.',
-      all: (crops: number, fruits: number) =>
-        `Tout est récolté\u00a0: ${crops}\u00a0récolte${crops > 1 ? 's' : ''} ressemée${crops > 1 ? 's' : ''}, ${fruits}\u00a0cueillette${fruits > 1 ? 's' : ''}.`,
+      all: (crops: number) =>
+        `Tout est récolté\u00a0: ${crops}\u00a0récolte${crops > 1 ? 's' : ''} ressemée${crops > 1 ? 's' : ''}.`,
     },
     harvestAll: 'Tout récolter et ressemer',
-    harvestAllHint:
-      'Récolte tout ce qui est mûr au potager et au verger, et ressème la même culture.',
+    harvestAllHint: 'Récolte tout ce qui est mûr au potager et ressème la même culture.',
     rotated: 'En rotation\u00a0: pousse ×1,2',
     variety: (name: string) => `Nouvelle variété\u00a0: ${name}\u00a0!`,
   },
@@ -797,7 +748,7 @@ export const fr = {
     open: 'Villes sœurs',
     title: 'Les villes sœurs',
     close: 'Fermer les villes sœurs',
-    hint: 'Essaimer fonde une ville sœur ailleurs dans la région\u00a0: les Saisons, la Biorégion et les Cycles recommencent. L’Herbier, les Jalons, le décor, les grands chantiers, le potager, le verger, le delta et les villes déjà fondées restent.',
+    hint: 'Essaimer fonde une ville sœur ailleurs dans la région\u00a0: les Saisons, la Biorégion et les Cycles recommencent. L’Herbier, les Jalons, le décor, le potager, le delta et les villes déjà fondées restent.',
     savoirs: (count: string) => `${count} Savoirs`,
     earned: (count: string, percent: string) =>
       `${count} Savoirs gagnés en tout\u00a0: production +${percent}\u00a0%`,
@@ -850,48 +801,6 @@ export const fr = {
     deepen: 'Approfondir',
     learnt: 'Appris',
     level: (level: number, max: number) => `Niveau ${level}/${max}`,
-  },
-  orchard: {
-    title: 'Le verger et les ruches',
-    hint: 'Un arbre se plante une fois, grandit deux jours puis donne des fruits toutes les huit heures, en ligne comme hors ligne. Chaque cueillette rapporte une heure de production et des paniers, et parfois une variété ancienne.',
-    names: {
-      apple: 'Pommier',
-      pear: 'Poirier',
-      cherry: 'Cerisier',
-      plum: 'Prunier',
-    } satisfies Record<FruitId, string>,
-    varieties: {
-      apple: 'Pomme reinette',
-      pear: 'Poire curé',
-      cherry: 'Cerise burlat',
-      plum: 'Reine-claude',
-    } satisfies Record<FruitId, string>,
-    stages: {
-      none: 'À planter',
-      sapling: 'Jeune plant',
-      flowering: 'En fleurs',
-      fruiting: 'Les fruits mûrissent',
-      ripe: 'Fruits mûrs',
-    } satisfies Record<TreeStage, string>,
-    next: (time: string) => `encore ${time}`,
-    plant: 'Planter',
-    plantLabel: (name: string) => `Planter\u00a0: ${name}`,
-    free: 'offert',
-    cost: (baskets: string) => `${baskets} paniers`,
-    pick: 'Cueillir',
-    pickLabel: (name: string) => `Cueillir\u00a0: ${name}`,
-    hives: (count: string, max: string) => `Ruches\u00a0: ${count} sur ${max}`,
-    hiveHint:
-      'Chaque ruche fait tout pousser ×1,2 plus vite au potager et au verger, rend une variété du potager plus probable et donne un pot de miel toutes les 6\u00a0h, pour les grands chantiers.',
-    setHive: 'Poser une ruche',
-    honey: (count: string) => `${count} pots de miel`,
-    found: (name: string) => `Variété ancienne retrouvée\u00a0: ${name}\u00a0!`,
-    spendHoney: 'Lancer une envolée',
-    spendHoneyCost: '1 pot de miel',
-    age: (age: number) => ['', 'Arbre de deux ans', 'Arbre de cinq ans', 'Vieil arbre'][age] ?? '',
-    basketsPerPick: (count: string) => `${count} paniers par cueillette`,
-    varietiesTitle: 'Variétés anciennes',
-    unknownVariety: (tree: string) => `Une variété ancienne du ${tree.toLowerCase()}`,
   },
   corridors: {
     family: { green: 'verte', blue: 'bleue' } satisfies Record<CorridorFamily, string>,
@@ -1323,14 +1232,11 @@ export const fr = {
       council: 'Le conseil de quartier',
       fountaineers: 'Les fontainiers',
       growers: 'Les amis du potager',
-      beekeepers: 'Les apiculteurs',
     } satisfies Record<CooperativeId, string>,
     upgrades: 'Les améliorations',
     upgradesAndProjects: 'Les améliorations et les projets',
     resows: 'Ressème les carrés récoltés du potager, sans jamais récolter',
-    carriesHoney: 'Porte le miel au-delà de deux pots vers le grand chantier en cours',
     sowings: (count: string) => `${count} semis`,
-    jars: (count: string) => `${count} pots portés`,
     collectors: 'Les collecteurs d’eau',
     buys: (buys: string) => `Achète ${buys}`,
     and: (first: string, second: string) => `${first} et ${second}`,

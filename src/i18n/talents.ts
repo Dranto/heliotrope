@@ -8,26 +8,24 @@ import { bonusesText } from './restoration';
 export function cooperativeBuysText(id: CooperativeId): string {
   if (id === 'fountaineers') return t.cooperatives.collectors;
   if (id === 'growers') return t.cooperatives.resows;
-  if (id === 'beekeepers') return t.cooperatives.carriesHoney;
   const generators = COOPERATIVE_GENERATORS[id].map((g) => t.generators[g].name);
   const [first, second] = generators;
   if (first === undefined) return t.cooperatives.upgrades;
   return second === undefined ? first : t.cooperatives.and(first, second);
 }
 
-/** What a cooperative does, as the panel shows it (M36: the growers and beekeepers do not buy). */
+/** What a cooperative does, as the panel shows it (M36: the growers do not buy). */
 export function cooperativeDoesText(id: CooperativeId, leadsProjects: boolean): string {
-  if (id === 'growers' || id === 'beekeepers') return cooperativeBuysText(id);
+  if (id === 'growers') return cooperativeBuysText(id);
   if (id === 'council' && leadsProjects) {
     return t.cooperatives.buys(t.cooperatives.upgradesAndProjects.toLowerCase());
   }
   return t.cooperatives.buys(cooperativeBuysText(id).toLowerCase());
 }
 
-/** The count under a cooperative: purchases, sowings or jars carried. */
+/** The count under a cooperative: purchases or sowings. */
 export function cooperativeCountText(id: CooperativeId, count: string): string {
   if (id === 'growers') return t.cooperatives.sowings(count);
-  if (id === 'beekeepers') return t.cooperatives.jars(count);
   return t.cooperatives.purchases(count);
 }
 

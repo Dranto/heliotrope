@@ -3,16 +3,13 @@
 import { useSyncExternalStore } from 'react';
 
 /** The panels of the side menu that can sleep while hidden. */
-export type SleepingPanel =
-  'cooperatives' | 'restoration' | 'garden' | 'orchard' | 'greatWorks' | 'bioregion';
+export type SleepingPanel = 'cooperatives' | 'restoration' | 'garden' | 'bioregion';
 
 /** The tab of the phone layout (§10.3) that shows each panel. */
 const PANEL_TAB: Record<SleepingPanel, 'build' | 'improve' | 'living' | 'region'> = {
   cooperatives: 'build',
   restoration: 'improve',
   garden: 'living',
-  orchard: 'living',
-  greatWorks: 'region',
   bioregion: 'region',
 };
 

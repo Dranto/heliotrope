@@ -77,7 +77,7 @@ export const VARIETIES: Record<VarietyId, VarietyDef> = {
   pineberry: {
     id: 'pineberry',
     parents: ['squash', 'strawberry'],
-    bonuses: [{ kind: 'orchardGrowth', factor: 1.1 }],
+    bonuses: [{ kind: 'gardenGrowth', factor: 1.1 }],
   },
 };
 

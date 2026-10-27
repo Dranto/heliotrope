@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { FRUIT_IDS, FRUITS, fruitVarietyBonuses, isFruitId } from './fruits';
 import { varietyOf } from './garden';
 import { CROP_IDS, isVarietyId, VARIETIES, VARIETY_IDS, varietyBonuses } from './seedBank';
 
@@ -37,24 +36,6 @@ describe('the seed bank', () => {
     expect(varietyBonuses(['flameRadish', 'threeSisters'])).toEqual([
       { kind: 'clickMultiplier', factor: 1.5 },
       { kind: 'biodiversityFactor', factor: 1.25 },
-    ]);
-  });
-});
-
-describe('the orchard trees', () => {
-  it('makes the first tree free and each next one dearer', () => {
-    const baskets = FRUIT_IDS.map((id) => FRUITS[id].baskets);
-    expect(baskets[0]).toBe(0);
-    for (let i = 1; i < baskets.length; i++) expect(baskets[i]).toBeGreaterThan(baskets[i - 1]!);
-  });
-
-  it('recognises only its own fruit ids and adds up their old varieties', () => {
-    expect(isFruitId('plum')).toBe(true);
-    expect(isFruitId('radish')).toBe(false);
-    expect(isFruitId('hasOwnProperty')).toBe(false);
-    expect(fruitVarietyBonuses(['apple', 'pear'])).toEqual([
-      { kind: 'global', bonus: 0.05 },
-      { kind: 'water', factor: 1.1 },
     ]);
   });
 });

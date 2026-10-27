@@ -45,16 +45,16 @@ export const LANDSCAPES: Record<LandscapeId, LandscapeDef> = {
     ],
     network: [{ kind: 'discount', fraction: 0.03 }],
   },
-  // The forest (M30): the trees of the parcels count double and the orchard grows faster, but
+  // The forest (M30): the trees of the parcels count double and the garden grows faster, but
   // the mirrors stand in the shade.
   forest: {
     id: 'forest',
     rule: [
       { kind: 'perParcel', bonus: 0.04 },
-      { kind: 'orchardGrowth', factor: 1.5 },
+      { kind: 'gardenGrowth', factor: 1.25 },
       { kind: 'generatorMultiplier', generator: 'mirrorPlant', factor: 0.5 },
     ],
-    network: [{ kind: 'orchardGrowth', factor: 1.1 }],
+    network: [{ kind: 'gardenGrowth', factor: 1.1 }],
   },
   // The marsh (M30): the species count more and the Water flows, but the vertical farms sink in
   // the soft ground.

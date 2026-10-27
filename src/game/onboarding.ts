@@ -5,7 +5,6 @@ import { isButterflyUnlocked } from './butterfly';
 import { unlockedCooperatives } from './cooperatives';
 import { isDecorOpen } from './decor';
 import { isGardenOpen } from './garden';
-import { areGreatWorksOpen } from './greatWorks';
 import {
   FEATURE_IDS,
   INTRO_GAP_SECONDS,
@@ -13,7 +12,6 @@ import {
   type FeatureId,
   type IntroState,
 } from './introductions';
-import { isOrchardOpen } from './orchard';
 import { isPanelShown } from './panels';
 import { phaseOf } from './phases';
 import { isPollenOpen } from './pollen';
@@ -69,10 +67,6 @@ function isOpen(state: GameState, id: FeatureId): boolean {
       return unlockedCooperatives(state).length > 0;
     case 'weather':
       return isWeatherOpen(state);
-    case 'orchard':
-      return isOrchardOpen(state);
-    case 'greatWorks':
-      return areGreatWorksOpen(state);
   }
 }
 

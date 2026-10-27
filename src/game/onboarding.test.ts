@@ -180,7 +180,7 @@ describe('progressive introductions (§10.8)', () => {
     expect(dueFeatures(loaded)).toEqual([]);
     expect(loaded.intro.introduced).toEqual(introduceAllDue(older).intro.introduced);
     expect(loaded.intro.introduced).toEqual(
-      expect.arrayContaining(['garden', 'tree', 'weather', 'bioregion', 'orchard']),
+      expect.arrayContaining(['garden', 'tree', 'weather', 'bioregion']),
     );
     expect(arrivedFeature(loaded)).toBeNull();
   });
