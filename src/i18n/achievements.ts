@@ -75,8 +75,6 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.varieties(condition.count);
     case 'species':
       return describe.species(condition.count);
-    case 'challenges':
-      return describe.challenges(condition.count);
     case 'cooperativePurchases':
       return describe.cooperativePurchases(round(condition.count));
     case 'allTimeWater':
@@ -107,8 +105,6 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.weather(t.weather.day[condition.weather]);
     case 'lockCycles':
       return describe.lockCycles(condition.count);
-    case 'cycleChallenges':
-      return describe.cycleChallenges(condition.count);
     case 'playSeconds':
       return describe.playHours(condition.seconds / 3600);
     case 'seasonSeconds':

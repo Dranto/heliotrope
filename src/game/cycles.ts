@@ -3,7 +3,6 @@
 // Seeds, Water, collectors and sites go back to zero, while the Tree of Seasons keeps its talents.
 import { FLOOD_TIDE_SOURCES, unlockAchievement, unlockAchievements } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS } from './bioregion';
-import { offeredCycleChallenges, type CycleChallengeId } from './cycleChallenges';
 import { isLockKeeperWorking, keptByMemory } from './delta';
 import { replant } from './seasons';
 import { treeSeedsSpent } from './talents';
@@ -69,23 +68,18 @@ export function isCycleScreenUnlocked(state: GameState): boolean {
 /**
  * Player action: start a new Cycle of water (§7.4). Everything a new Season resets is reset
  * (§7), and so are the Seeds (the Light of the Cycle starts over), the Water, the collectors and
- * the sites, and a running challenge. The Sources gained are added; the talents and canopy levels of
- * the Tree of Seasons stay learnt, their Seeds rooted so the tree is not paid for twice. Milestones,
- * parcels, the Herbier, challenges won, the Seasons count and the Cooperatives' settings stay, and
- * so does the delta (§7.5): with its memory arm, half of each collector and site level stays.
- * Optionally starts a challenge Cycle (§7.5). Returns the same state when no Source would be
- * gained or the challenge is not offered.
+ * the sites. The Sources gained are added; the talents and canopy levels of the Tree of Seasons
+ * stay learnt, their Seeds rooted so the tree is not paid for twice. Milestones, parcels, the
+ * Herbier, the Seasons count and the Cooperatives' settings stay, and so does the delta (§7.5):
+ * with its memory arm, half of each collector and site level stays. Returns the same state when
+ * no Source would be gained.
  */
-export function startNewCycle(
-  state: GameState,
-  challenge: CycleChallengeId | null = null,
-): GameState {
+export function startNewCycle(state: GameState): GameState {
   if (!canStartNewCycle(state)) return state;
-  if (challenge && !offeredCycleChallenges(state).some((c) => c.id === challenge)) return state;
   const kept = keptByMemory(state);
   const sources = state.sources + sourcesToGain(state);
   // The whole neighbourhood is replanted, without the Boutures; the next Season begins.
-  const replanted = replant(state, null, 0);
+  const replanted = replant(state, 0);
   const next: GameState = {
     ...replanted,
     seasons: state.seasons + 1,
@@ -99,7 +93,6 @@ export function startNewCycle(
     sites: Object.fromEntries(
       SITE_IDS.map((id) => [id, Math.floor(state.sites[id] * kept)]),
     ) as GameState['sites'],
-    cycleChallenge: challenge,
     waterBeforeCycle: state.allTimeWater,
     sources,
     cycles: state.cycles + 1,
@@ -112,11 +105,10 @@ export function startNewCycle(
 
 /**
  * The lock keeper (§7.5, delta) starts a free Cycle once its Sources bring the ones owned to
- * `lockFactor` times as many; it never interrupts a challenge Cycle or a challenge Season.
+ * `lockFactor` times as many.
  */
 export function isLockKeeperReady(state: GameState): boolean {
   if (!isLockKeeperWorking(state) || !canStartNewCycle(state)) return false;
-  if (state.cycleChallenge !== null || state.challenge !== null) return false;
   return state.sources + sourcesToGain(state) >= state.sources * state.delta.lockFactor;
 }
 

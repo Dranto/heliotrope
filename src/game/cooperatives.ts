@@ -13,7 +13,6 @@ import {
   isCollectorRevealed,
   type CollectorId,
 } from './bioregion';
-import { generatorLimit } from './challenges';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import {
   availableUpgrades,
@@ -190,7 +189,7 @@ function nextPurchase(state: GameState): Purchase | null {
   if (collector) return collector;
   const scores = new Map<GeneratorId, number>();
   for (const id of GENERATOR_IDS) {
-    if (isGeneratorRevealed(state, id) && state.generators[id] < generatorLimit(state, id)) {
+    if (isGeneratorRevealed(state, id)) {
       scores.set(id, payback(state, id));
     }
   }

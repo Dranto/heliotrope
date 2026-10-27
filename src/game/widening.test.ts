@@ -1,6 +1,4 @@
-import { collectorCost } from './bioregion';
-import { factorOf } from './bonuses';
-import { CYCLE_CHALLENGES } from './cycleChallenges';
+import { collectorCost, siteCost } from './bioregion';
 import { startNewCycle, waterForSources } from './cycles';
 import {
   availableSources,
@@ -82,20 +80,14 @@ describe('Widening the arms of the delta (§7.5, M19)', () => {
     expect(collectorCost(base, 'roofTanks')).toBeGreaterThan(0);
   });
 
-  it('strengthens the hillsides and the challenge Cycles won', () => {
+  it('strengthens the hillsides and lowers the price of the sites further', () => {
     const state = {
       ...openDelta(10_000),
       sites: { ...createInitialState(0).sites, hillsides: 2 },
-      cycleChallenges: ['flood' as const],
     };
     const wide = widen(widen(state, 'hillsArm', 5), 'floodArm', 5);
     expect(clickValue(wide)).toBeGreaterThan(clickValue(state));
-    const reward = CYCLE_CHALLENGES.still.bonuses[0]!;
-    expect(reward.kind).toBe('synergyFactor');
-    const still = { ...state, cycleChallenges: ['still' as const] };
-    const wideStill = { ...widen(state, 'floodArm', 5), cycleChallenges: ['still' as const] };
-    expect(factorOf(still, 'synergyFactor')).toBeCloseTo(1.1);
-    expect(factorOf(wideStill, 'synergyFactor')).toBeCloseTo(1.15);
+    expect(siteCost(wide, 'wetlands') / siteCost(state, 'wetlands')).toBeCloseTo(0.625 / 0.75);
   });
 
   it('keeps its widenings in the save, and drops more than the Sources pay for', () => {

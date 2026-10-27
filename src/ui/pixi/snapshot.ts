@@ -69,7 +69,7 @@ export function paddedBox(box: { x: number; y: number; width: number; height: nu
 
 /**
  * Reads drawings from the hidden SVG that PixiMap renders. Results are kept while the drawing's
- * markup and the scene's look (phase, season, challenge) stay the same.
+ * markup and the scene's look (phase, season) stay the same.
  */
 export class Snapshots {
   private cache = new Map<string, { html: string; look: string; art: Art }>();
@@ -99,9 +99,7 @@ export class Snapshots {
 
   private look(): string {
     const scene = this.root.closest('.scene');
-    return ['data-phase', 'data-season', 'data-challenge']
-      .map((name) => scene?.getAttribute(name) ?? '')
-      .join('|');
+    return ['data-phase', 'data-season'].map((name) => scene?.getAttribute(name) ?? '').join('|');
   }
 
   private patterns(look: string): string {

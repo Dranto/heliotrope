@@ -1,15 +1,14 @@
 // The Herbier (docs/game-design.md §9.5): species that come back as the neighbourhood greens.
 // Each one returns when a condition of the game is met (a parcel restored, enough of a building,
-// Golden Butterflies caught, a challenge Season won), then lives on the map for good. Species are
+// Golden Butterflies caught, Seasons or Cycles done), then lives on the map for good. Species are
 // kept across Seasons. Names live in src/i18n, drawings and places in src/ui.
-import type { ChallengeId } from './challenges';
+import type { CollectorId, SiteId } from './bioregion';
 import { longestCorridor, SPECIES_LENGTH, type CorridorFamily } from './corridors';
-import type { CycleChallengeId } from './cycleChallenges';
 import type { GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
 import type { ProjectId } from './projects';
 import type { GameState } from './state';
-import type { TalentId } from './talents';
+import { isCanopyOpen, type TalentId } from './talents';
 import type { VisitKind } from './visits';
 import { isWeatherOpen, type WeatherId } from './weather';
 
@@ -56,10 +55,16 @@ export type SpeciesCondition =
   /** A neighbourhood project carried out at least once (the species stays after the Season). */
   | { kind: 'project'; project: ProjectId }
   | { kind: 'talent'; talent: TalentId }
-  /** Won by completing a challenge Season (§7.3). */
-  | { kind: 'challenge'; challenge: ChallengeId }
-  /** Won by completing a challenge Cycle of water (§7.5). */
-  | { kind: 'cycleChallenge'; challenge: CycleChallengeId }
+  /** The whole Tree of Seasons learnt (§7.1). */
+  | { kind: 'fullTree' }
+  /** Seasons done over the whole game (§7). */
+  | { kind: 'seasons'; count: number }
+  /** Cycles of water done over the whole game (§7.4). */
+  | { kind: 'cycles'; count: number }
+  /** Units of a water collector of the Bioregion (§7.4). */
+  | { kind: 'collector'; collector: CollectorId; count: number }
+  /** A regional site raised to this level (§7.4). */
+  | { kind: 'site'; site: SiteId; level: number }
   /** Won by welcoming a visitor of the city (§9.6, M18) a few times. */
   | { kind: 'visit'; visit: VisitKind; count: number }
   /** A corridor of a family at least this long (§6.7, M21). */
@@ -80,8 +85,8 @@ export const SPECIES_STEPS = 1;
 
 /**
  * §9.5: the complete Herbier multiplies the whole biodiversity bonus. It counts the species of
- * the neighbourhood; the river species of the challenge Cycles (§7.5) and the species of the
- * city's visits (§9.6) come on top.
+ * the neighbourhood; the river species of the Cycles (§7.5) and the species of the city's visits
+ * (§9.6) come on top.
  */
 export const HERBIER_COMPLETE_FACTOR = 1.5;
 
@@ -104,13 +109,14 @@ export const SPECIES_LIST: readonly SpeciesDef[] = [
   { id: 'swift', condition: { kind: 'parcel', parcel: 'livingRoofs' } },
   { id: 'glowWorm', condition: { kind: 'project', project: 'lightFestival' } },
   { id: 'bat', condition: { kind: 'talent', talent: 'nightWatch' } },
-  { id: 'kingfisher', condition: { kind: 'challenge', challenge: 'cloudy' } },
-  { id: 'orchid', condition: { kind: 'challenge', challenge: 'wild' } },
-  { id: 'stagBeetle', condition: { kind: 'challenge', challenge: 'frugal' } },
-  { id: 'owl', condition: { kind: 'challenge', challenge: 'hands' } },
-  { id: 'otter', condition: { kind: 'cycleChallenge', challenge: 'drought' } },
-  { id: 'salmon', condition: { kind: 'cycleChallenge', challenge: 'flood' } },
-  { id: 'blackStork', condition: { kind: 'cycleChallenge', challenge: 'still' } },
+  // Slimming plan, lot 4: the species of the challenges come back with the game itself.
+  { id: 'kingfisher', condition: { kind: 'collector', collector: 'streams', count: 10 } },
+  { id: 'orchid', condition: { kind: 'fullTree' } },
+  { id: 'stagBeetle', condition: { kind: 'owned', generator: 'urbanCanopy', count: 100 } },
+  { id: 'owl', condition: { kind: 'seasons', count: 10 } },
+  { id: 'otter', condition: { kind: 'cycles', count: 1 } },
+  { id: 'salmon', condition: { kind: 'site', site: 'wetlands', level: 10 } },
+  { id: 'blackStork', condition: { kind: 'cycles', count: 5 } },
   { id: 'skylark', condition: { kind: 'visit', visit: 'sheep', count: CITY_SPECIES_VISITS } },
   { id: 'swallow', condition: { kind: 'visit', visit: 'festival', count: CITY_SPECIES_VISITS } },
   { id: 'dragonfly', condition: { kind: 'visit', visit: 'fireflies', count: CITY_SPECIES_VISITS } },
@@ -164,10 +170,16 @@ function isMet(state: GameState, condition: SpeciesCondition): boolean {
       return state.projects.includes(condition.project);
     case 'talent':
       return state.talents.includes(condition.talent);
-    case 'challenge':
-      return state.challenges.includes(condition.challenge);
-    case 'cycleChallenge':
-      return state.cycleChallenges.includes(condition.challenge);
+    case 'fullTree':
+      return isCanopyOpen(state);
+    case 'seasons':
+      return state.seasons >= condition.count;
+    case 'cycles':
+      return state.cycles >= condition.count;
+    case 'collector':
+      return state.collectors[condition.collector] >= condition.count;
+    case 'site':
+      return state.sites[condition.site] >= condition.level;
     case 'visit':
       return state.visits[condition.visit] >= condition.count;
     case 'corridor':

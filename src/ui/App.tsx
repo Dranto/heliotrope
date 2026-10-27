@@ -9,9 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { cycleWater, isBioregionOpen, waterPerSecond } from '../game/bioregion';
-import { activeChallenge } from '../game/challenges';
-import { activeCycleChallenge } from '../game/cycleChallenges';
+import { isBioregionOpen, waterPerSecond } from '../game/bioregion';
 import {
   canStartNewCycle,
   isCycleScreenUnlocked,
@@ -47,13 +45,7 @@ import {
 import type { ParcelId } from '../game/parcels';
 import type { GameState } from '../game/state';
 import { availableSeeds, canSowInTree } from '../game/talents';
-import {
-  challengeRulesText,
-  challengeTitle,
-  cycleChallengeRulesText,
-  cycleChallengeTitle,
-  speciesName,
-} from '../i18n/herbier';
+import { speciesName } from '../i18n/herbier';
 import { setLanguage, shownLanguage, subscribeTexts, t, textsVersion } from '../i18n';
 import { Bioregion, WaterIcon } from './Bioregion';
 import { Cooperatives } from './Cooperatives';
@@ -66,7 +58,6 @@ import { Garden } from './Garden';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest, harvestAll } from '../game/garden';
 import { Scene } from './Scene';
-import { SpeciesArt } from './SpeciesArt';
 import { Upgrades } from './Upgrades';
 import { isPanelHidden, useScreen, type SleepingPanel } from './panelVisibility';
 import { useGameState, useGameStore } from './useGame';
@@ -273,7 +264,7 @@ export function App() {
     setTimeout(() => setToasts((list) => list.filter((toast) => toast.id !== id)), TOAST_MS);
   }, []);
 
-  // Announce species as they come back (§9.5) and challenges as they are won (§7.3).
+  // Announce species as they come back (§9.5).
   const seenSpecies = useRef(state.species.length);
   useEffect(() => {
     const fresh = state.species.slice(seenSpecies.current);
@@ -281,18 +272,6 @@ export function App() {
     if (fresh.length > 3) notify(t.herbier.returnedMany(formatNumber(fresh.length)));
     else for (const id of fresh) notify(t.herbier.returned(speciesName(id)));
   }, [state.species, notify]);
-  const seenChallenges = useRef(state.challenges.length);
-  useEffect(() => {
-    const fresh = state.challenges.slice(seenChallenges.current);
-    seenChallenges.current = state.challenges.length;
-    for (const id of fresh) notify(t.challenges.won(challengeTitle(id)));
-  }, [state.challenges, notify]);
-  const seenCycleChallenges = useRef(state.cycleChallenges.length);
-  useEffect(() => {
-    const fresh = state.cycleChallenges.slice(seenCycleChallenges.current);
-    seenCycleChallenges.current = state.cycleChallenges.length;
-    for (const id of fresh) notify(t.cycleChallenges.won(cycleChallengeTitle(id)));
-  }, [state.cycleChallenges, notify]);
 
   const onCatch = useCallback(
     ({ outcome, light }: CatchResult) => {
@@ -358,12 +337,6 @@ export function App() {
     [notify],
   );
 
-  const challenge = activeChallenge(state);
-  const challengeProgress = challenge ? Math.min(1, state.totalLight / challenge.goal) : 0;
-  const cycleChallenge = activeCycleChallenge(state);
-  const cycleChallengeProgress = cycleChallenge
-    ? Math.min(1, cycleWater(state) / cycleChallenge.goal)
-    : 0;
   const gain = seedsToGain(state);
   const seedsToSow = availableSeeds(state);
   const canSow = canSowInTree(state);
@@ -615,44 +588,6 @@ export function App() {
                 {t.cycles.chip(
                   formatNumber(state.sources),
                   formatPercent(sourceBonus(state.sources)),
-                )}
-              </span>
-            </span>
-          )}
-          {challenge && (
-            <span
-              className="challenge-chip"
-              data-testid="challenge-chip"
-              title={challengeRulesText(challenge)}
-            >
-              <SpeciesArt id={challenge.species} />
-              {challengeTitle(challenge.id)}
-              <span className="challenge-meter" aria-hidden="true">
-                <span style={{ width: `${challengeProgress * 100}%` }} />
-              </span>
-              <span className="visually-hidden">
-                {t.challenges.progress(
-                  challengeTitle(challenge.id),
-                  formatPercent(challengeProgress),
-                )}
-              </span>
-            </span>
-          )}
-          {cycleChallenge && (
-            <span
-              className="challenge-chip"
-              data-testid="cycle-challenge-chip"
-              title={cycleChallengeRulesText(cycleChallenge)}
-            >
-              <SpeciesArt id={cycleChallenge.species} />
-              {cycleChallengeTitle(cycleChallenge.id)}
-              <span className="challenge-meter" aria-hidden="true">
-                <span style={{ width: `${cycleChallengeProgress * 100}%` }} />
-              </span>
-              <span className="visually-hidden">
-                {t.cycleChallenges.progress(
-                  cycleChallengeTitle(cycleChallenge.id),
-                  formatPercent(cycleChallengeProgress),
                 )}
               </span>
             </span>

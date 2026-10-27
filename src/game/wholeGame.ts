@@ -121,7 +121,7 @@ export interface WholeGame {
  * Play the whole game (§8, M30): the home city as the endgame measures it, Cycle after Cycle
  * until swarming is allowed, then each sister city of REFERENCE_LANDSCAPES the same way, the
  * small loops tended all along. Stops once `cities` cities are left behind, or after
- * `maxSeconds` of play. The grand bloom (§9.9) is not measured: it needs every challenge played.
+ * `maxSeconds` of play.
  */
 export function simulateWholeGame({
   cities = REFERENCE_LANDSCAPES.length,

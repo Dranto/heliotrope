@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { offeredCycleChallenges, type CycleChallengeId } from '../game/cycleChallenges';
 import {
   ADVISED_FIRST_CYCLE_SOURCES,
   canStartNewCycle,
@@ -15,6 +14,7 @@ import {
   canWidenArm,
   DELTA,
   DELTA_IDS,
+  FLOOD_SITE_DISCOUNT,
   isArmOpen,
   isDeltaOpen,
   keptByMemory,
@@ -35,14 +35,7 @@ import {
 import { formatCost, formatDecimal, formatNumber, formatPercent } from '../game/format';
 import type { GameState } from '../game/state';
 import { t } from '../i18n';
-import {
-  cycleChallengeGoalText,
-  cycleChallengeRewardText,
-  cycleChallengeRulesText,
-  cycleChallengeTitle,
-} from '../i18n/herbier';
 import { Dialog } from './Dialog';
-import { SpeciesArt } from './SpeciesArt';
 import { useGameState, useGameStore } from './useGame';
 import './delta.css';
 
@@ -139,7 +132,7 @@ function widthEffect(state: GameState, id: WideArmId, width: number): string {
     case 'hillsArm':
       return effects.hillsArm(formatPercent(widenFactor(width) - 1));
     case 'floodArm':
-      return effects.floodArm(formatPercent(widenFactor(width) - 1));
+      return effects.floodArm(formatPercent(FLOOD_SITE_DISCOUNT * widenFactor(width)));
   }
 }
 
@@ -245,8 +238,8 @@ function Delta({
 
 /**
  * The Water Cycle screen (docs/game-design.md §7.4): the second prestige. Sources owned and to
- * gain, the bonus before and after, what is reset and what stays; then the delta (§7.5), the lock
- * keeper's setting and the choice of a challenge Cycle.
+ * gain, the bonus before and after, what is reset and what stays; then the delta (§7.5) and the
+ * lock keeper's setting.
  */
 export function Cycles({ onClose }: { onClose: () => void }) {
   const store = useGameStore();
@@ -255,15 +248,12 @@ export function Cycles({ onClose }: { onClose: () => void }) {
   const [message, setMessage] = useState('');
   // A tap on the blocked start button stresses the line that says why, rather than repeat it.
   const [stressed, setStressed] = useState(false);
-  const challenges = offeredCycleChallenges(state);
-  const [challenge, setChallenge] = useState<CycleChallengeId | null>(null);
   const gain = sourcesToGain(state);
   const available = canStartNewCycle(state);
   const premature = isCyclePremature(state);
 
   function start() {
-    store.dispatch((s) => startNewCycle(s, challenge));
-    setChallenge(null);
+    store.dispatch((s) => startNewCycle(s));
     store.save();
     setConfirming(false);
     setMessage(t.cycles.started);
@@ -383,43 +373,6 @@ export function Cycles({ onClose }: { onClose: () => void }) {
         </fieldset>
       )}
 
-      {challenges.length > 0 && available && (
-        <fieldset className="challenge-choice">
-          <legend>{t.cycleChallenges.title}</legend>
-          <p className="hint">{t.cycleChallenges.hint}</p>
-          <label className="challenge-option">
-            <input
-              type="radio"
-              name="cycle-challenge"
-              checked={challenge === null}
-              onChange={() => setChallenge(null)}
-            />
-            <span aria-hidden="true" />
-            <span>
-              <strong>{t.cycleChallenges.free}</strong>
-              <span>{t.cycleChallenges.freeHint}</span>
-            </span>
-          </label>
-          {challenges.map((c) => (
-            <label key={c.id} className="challenge-option" data-challenge={c.id}>
-              <input
-                type="radio"
-                name="cycle-challenge"
-                checked={challenge === c.id}
-                onChange={() => setChallenge(c.id)}
-              />
-              <SpeciesArt id={c.species} />
-              <span>
-                <strong>{cycleChallengeTitle(c.id)}</strong>
-                <span>{cycleChallengeRulesText(c)}</span>
-                <span>{cycleChallengeGoalText(c)}</span>
-                <span className="challenge-reward">{cycleChallengeRewardText(c.id)}</span>
-              </span>
-            </label>
-          ))}
-        </fieldset>
-      )}
-
       {!available && (
         <p className="hint start-blocked" id="cycle-blocked" data-stressed={stressed || undefined}>
           {t.cycles.noSourceYet}
@@ -431,9 +384,7 @@ export function Cycles({ onClose }: { onClose: () => void }) {
           <div className="confirm-row">
             <span>{t.cycles.confirm(formatNumber(gain))}</span>
             <button type="button" className="season-button cycle-button" onClick={start}>
-              {challenge
-                ? t.cycleChallenges.startWith(t.cycleChallenges.names[challenge])
-                : t.cycles.confirmYes}
+              {t.cycles.confirmYes}
             </button>
             <button type="button" className="ghost" onClick={() => setConfirming(false)}>
               {t.cycles.cancel}

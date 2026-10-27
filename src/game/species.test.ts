@@ -24,7 +24,7 @@ describe('Herbier (§9.5)', () => {
     expect(unlockSpecies(state({ parcels: ['river'] })).species).toEqual(['frog']);
   });
 
-  it('brings species back from buildings, butterflies, projects, talents and challenges', () => {
+  it('brings species back from buildings, butterflies, projects, talents and Seasons', () => {
     const base = createInitialState(0);
     const next = unlockSpecies(
       state({
@@ -32,10 +32,10 @@ describe('Herbier (§9.5)', () => {
         butterflies: 5,
         projects: ['lightFestival'],
         talents: ['nightWatch'],
-        challenges: ['wild'],
+        seasons: 10,
       }),
     );
-    expect(next.species).toEqual(['bee', 'brimstone', 'glowWorm', 'bat', 'orchid']);
+    expect(next.species).toEqual(['bee', 'brimstone', 'glowWorm', 'bat', 'owl']);
   });
 
   it('returns the same state when no species is new', () => {

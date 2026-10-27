@@ -1,11 +1,9 @@
 import { BASIN_SITE_IDS } from './bioregion';
 import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
-import { CHALLENGE_IDS, type ChallengeId } from './challenges';
-import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
+import { SEED_RIPENING_SECONDS } from './seasons';
 import {
   ADVISED_CYCLE_TARGET,
-  learnReferenceTalents,
   PACING_TARGETS,
   simulate,
   simulateFirstCycle,
@@ -64,24 +62,6 @@ describe('two Seasons in a row', () => {
   it('makes the next Season advisable sooner', () => {
     expect(second.advisedSeason!).toBeLessThan(first.advisedSeason!);
   });
-});
-
-describe('challenge Seasons (§7.3)', () => {
-  // Third Season of the reference player, as a challenge: each one should take a little longer
-  // than a free Season (about 20 min at this point), and stay winnable within the hour. The
-  // challenges leave with lot 4 of the slimming plan.
-  const { second } = twoSeasons;
-  const start = (id: ChallengeId) => learnReferenceTalents(startNewSeason(second.state, id));
-
-  it.each(CHALLENGE_IDS)(
-    'wins %s between 15 minutes and an hour',
-    (id) => {
-      const { challengeWon } = simulate({ state: start(id), maxSeconds: 3600, stopWhenWon: true });
-      expect(challengeWon).toBeGreaterThan(15 * 60);
-      expect(challengeWon).toBeLessThan(60 * 60);
-    },
-    30_000,
-  );
 });
 
 describe('the Bioregion and the first Cycle of water (§7.4)', () => {

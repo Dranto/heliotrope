@@ -1,6 +1,5 @@
 import { useEffect, useId, useState } from 'react';
 import { guideStep } from '../game/guide';
-import { upgradesAllowed } from '../game/challenges';
 import { formatCost, formatNumber } from '../game/format';
 import { availableUpgrades, upgradeInSight } from '../game/production';
 import { affordableUpgrades, buyAffordableUpgrades, buyUpgrade, canBuyUpgrade } from '../game/tick';
@@ -27,7 +26,6 @@ export function Upgrades() {
   const [selectedId, setSelectedId] = useState<UpgradeId | null>(null);
   const [open, toggle] = usePanelOpen('upgrades');
   const selected = available.find((u) => u.id === selectedId) ?? available[0];
-  const wild = !upgradesAllowed(state);
   const guide = guideStep(state);
   const affordable = affordableUpgrades(state).length;
 
@@ -42,7 +40,7 @@ export function Upgrades() {
   }, [store]);
 
   // Nothing to show before the first upgrade unlocks.
-  if (selected === undefined && state.upgrades.length === 0 && !wild) return null;
+  if (selected === undefined && state.upgrades.length === 0) return null;
 
   return (
     <section className="panel upgrades" aria-labelledby="upgrades-title" data-open={open}>
@@ -66,8 +64,8 @@ export function Upgrades() {
       </div>
       {selected === undefined ? (
         <>
-          <p className="empty">{wild ? t.challenges.noUpgrades : t.noUpgrades}</p>
-          {!wild && <UpgradeInSightLine />}
+          <p className="empty">{t.noUpgrades}</p>
+          <UpgradeInSightLine />
         </>
       ) : (
         <>

@@ -1,5 +1,5 @@
-// Effects of restored parcels and neighbouring districts, neighbourhood projects, talents and canopy of the Tree of Seasons and won
-// challenge Seasons (docs/game-design.md §6.1, §6.2, §7.1, §7.3). Their tables describe their
+// Effects of restored parcels and neighbouring districts, neighbourhood projects, talents and
+// canopy of the Tree of Seasons (docs/game-design.md §6.1, §6.2, §7.1). Their tables describe their
 // effect with the same `Bonus` shape; the formulas in production.ts,
 // butterfly.ts and offline.ts read the totals through the helpers below.
 import { completeMilestoneFamilies, milestoneFamilyBonuses } from './milestoneFamilies';
@@ -10,9 +10,7 @@ import { cityBonuses, type CitySource } from './cityData';
 import { corridorBonuses } from './corridors';
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
-import { CHALLENGES, type ChallengeId } from './challenges';
-import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
-import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './delta';
+import { hillsidesBonuses, widenFactor, type WideArmId } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
 import { growthBonuses, pathsWorking, type GrowthState } from './growth';
 import { familyBonuses } from './families';
@@ -98,12 +96,8 @@ export interface BonusSource {
   talents: readonly TalentId[];
   /** Levels of the Canopy above the tree (§7.1); absent where none can be. */
   canopy?: Pick<CanopyState, 'levels'>;
-  /** Challenge Seasons won (§7.3). */
-  challenges: readonly ChallengeId[];
   /** The garden's seed bank (§9.7); absent where none can be. */
   garden?: { varieties: readonly VarietyId[] };
-  /** Challenge Cycles won (§7.5); absent where none can be. */
-  cycleChallenges?: readonly CycleChallengeId[];
   /** Levels of the Bioregion's sites, read for the hillsides (§7.5); absent where none can be. */
   sites?: { hillsides: number };
   /** Widenings of the delta's arms, read for the hillsides and the flood arm (M19). */
@@ -129,8 +123,7 @@ function isGameState(source: BonusSource): source is GameState {
 
 /**
  * Every bonus in force: parcels, then neighbouring districts, then projects, then talents and the
- * canopy, then challenges won, then the varieties of the garden's seed bank, then challenge
- * Cycles won and the hillsides site (§7.5).
+ * canopy, then the varieties of the garden's seed bank, then the hillsides site (§7.5).
  */
 export function activeBonuses(source: BonusSource): Bonus[] {
   // States are never mutated, so the list is computed once per state: the formulas ask for it
@@ -152,27 +145,20 @@ function collectBonuses(source: BonusSource): Bonus[] {
     projects,
     talents,
     canopy,
-    challenges,
     garden,
-    cycleChallenges = [],
     sites,
     delta,
     city,
     growth,
     weather,
   } = source;
-  const floodScale = widenFactor(delta?.widths.floodArm ?? 0);
   return [
     ...parcels.flatMap((id) => parcelBonuses(id, futures?.chosen[id])),
     ...districts.flatMap((id) => DISTRICTS[id].bonuses),
     ...projects.flatMap((id) => PROJECTS[id].bonuses),
     ...talents.flatMap((id) => TALENTS[id].bonuses),
     ...(canopy ? canopyBonuses(canopy.levels) : []),
-    ...challenges.flatMap((id) => CHALLENGES[id].bonuses),
     ...(garden ? varietyBonuses(garden.varieties) : []),
-    ...cycleChallenges.flatMap((id) =>
-      CYCLE_CHALLENGES[id].bonuses.map((b) => scaleBonus(b, floodScale)),
-    ),
     ...(sites ? hillsidesBonuses(sites.hillsides, widenFactor(delta?.widths.hillsArm ?? 0)) : []),
     ...corridorBonuses({ parcels, futures }),
     ...(city ? cityBonuses(city) : []),

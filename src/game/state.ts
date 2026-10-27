@@ -1,8 +1,6 @@
 import { createIntroState, type IntroState } from './introductions';
 import type { AchievementId } from './achievements';
 import { COLLECTOR_IDS, SITE_IDS, type CollectorId, type SiteId } from './bioregion';
-import type { ChallengeId } from './challenges';
-import type { CycleChallengeId } from './cycleChallenges';
 import { createDecorState, type DecorState } from './decor';
 import { createDeltaState, type DeltaState } from './delta';
 import { createCityState, type CityState } from './cities';
@@ -28,7 +26,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 43;
+export const STATE_VERSION = 44;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -111,10 +109,6 @@ export interface GameState {
   canopy: CanopyState;
   /** Cooperatives' settings and purchases (§7.2). Kept across Seasons. */
   cooperatives: CooperativesState;
-  /** Challenge running this Season (§7.3), null once won or without one. */
-  challenge: ChallengeId | null;
-  /** Challenge Seasons won, in order (§7.3). Kept across Seasons. */
-  challenges: ChallengeId[];
   /** Species of the Herbier back in the neighbourhood, in order (§9.5). Kept across Seasons. */
   species: SpeciesId[];
   /** Water collectors built (§7.4). Kept across Seasons, reset by a Cycle. */
@@ -131,10 +125,6 @@ export interface GameState {
   cycles: number;
   /** Arms of the delta opened with Sources and the lock keeper's settings (§7.5). Kept forever. */
   delta: DeltaState;
-  /** Challenge running this Cycle of water (§7.5), null once won or without one. */
-  cycleChallenge: CycleChallengeId | null;
-  /** Challenge Cycles won, in order (§7.5). Kept forever. */
-  cycleChallenges: CycleChallengeId[];
   /** The courtyard garden's beds, harvests and seed bank (§9.7). Kept forever. */
   garden: GardenState;
   /** The sister cities (§7.6, M23): the city lived in, the network, the Savoirs. */
@@ -216,8 +206,6 @@ export function createInitialState(now: number): GameState {
     talents: [],
     canopy: createCanopyState(),
     cooperatives: createCooperativesState(),
-    challenge: null,
-    challenges: [],
     species: [],
     collectors: zeroes(COLLECTOR_IDS),
     sites: zeroes(SITE_IDS),
@@ -226,8 +214,6 @@ export function createInitialState(now: number): GameState {
     sources: 0,
     cycles: 0,
     delta: createDeltaState(),
-    cycleChallenge: null,
-    cycleChallenges: [],
     garden: createGardenState(),
     city: createCityState(),
     growth: createGrowthState(),

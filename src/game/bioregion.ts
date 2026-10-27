@@ -4,12 +4,7 @@
 // only a new Cycle of water (cycles.ts) resets them. Names live in src/i18n, the art in src/ui.
 import { isIntroduced } from './introductions';
 import { bonusesOf } from './bonuses';
-import {
-  challengeCollectorCostFactor,
-  challengeSiteCostFactor,
-  challengeWaterFactor,
-} from './cycleChallenges';
-import { isArmOpen } from './delta';
+import { floodSiteFactor, isArmOpen } from './delta';
 import { effectFactor } from './effects';
 import type { GeneratorId } from './generators';
 import type { GameState } from './state';
@@ -88,7 +83,7 @@ export function waterMultiplier(state: GameState): number {
   const bonuses = bonusesOf(state, 'water').reduce((product, b) => product * b.factor, 1);
   // §9.6: the summer shower fills the collectors too.
   const shower = effectFactor(state.effects, 'shower');
-  return (1 + SOURCE_WATER_BONUS * state.sources) * bonuses * shower * challengeWaterFactor(state);
+  return (1 + SOURCE_WATER_BONUS * state.sources) * bonuses * shower;
 }
 
 /** Water per second of one more unit of a collector, with the multipliers in force. */
@@ -111,16 +106,12 @@ export function waterPerSecond(state: GameState): number {
 
 /** Light cost of the next unit of a collector. */
 export function collectorCost(state: GameState, id: CollectorId): number {
-  return (
-    COLLECTORS[id].baseCost *
-    COLLECTOR_COST_GROWTH ** state.collectors[id] *
-    challengeCollectorCostFactor(state)
-  );
+  return COLLECTORS[id].baseCost * COLLECTOR_COST_GROWTH ** state.collectors[id];
 }
 
-/** Water cost of the next level of a site. */
+/** Water cost of the next level of a site, lower with the flood arm (§7.5). */
 export function siteCost(state: GameState, id: SiteId): number {
-  return SITES[id].baseCost * SITE_COST_GROWTH ** state.sites[id] * challengeSiteCostFactor(state);
+  return SITES[id].baseCost * SITE_COST_GROWTH ** state.sites[id] * floodSiteFactor(state);
 }
 
 /**

@@ -154,7 +154,7 @@ const CAPTION_ROOM = 52;
  * home courtyard at its heart. The player switches between the views opened so far: the courtyard, the neighbourhood,
  * the city, then the Bioregion around it (§7.4); each one keeps its part of the city whole and as large as the screen allows. The
  * light and the shadows follow the phase (dawn, noon, late afternoon) and, after the first
- * Season, the season's tint; a challenge Season (§7.3) changes it again. The species of the
+ * Season, the season's tint. The species of the
  * Herbier (§9.5) live on it and the Golden Butterfly flies across it.
  */
 export function Scene({
@@ -424,7 +424,6 @@ export function Scene({
       data-photo={photo || undefined}
       data-phase={phase}
       data-season={season ?? 'none'}
-      data-challenge={state.challenge ?? undefined}
     >
       <div className="scene-map" ref={mapRef}>
         {enhanced ? (

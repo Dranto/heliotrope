@@ -1,4 +1,3 @@
-import { generatorLimit } from './challenges';
 import { offeredDistrict, type DistrictId } from './districts';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
@@ -37,7 +36,6 @@ function offers(state: GameState): Goal[] {
   const goals: Goal[] = [];
   const next = GENERATOR_IDS.find((id) => !isGeneratorRevealed(state, id));
   for (const id of GENERATOR_IDS) {
-    if (generatorLimit(state, id) <= state.generators[id]) continue;
     if (isGeneratorRevealed(state, id)) {
       goals.push({ kind: 'generator', id, cost: generatorCost(state, id), discovered: true });
     } else if (id === next) {

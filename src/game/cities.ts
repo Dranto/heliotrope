@@ -88,12 +88,7 @@ export function areCitiesOpen(state: GameState): boolean {
 }
 
 export function canSwarm(state: GameState): boolean {
-  return (
-    areCitiesOpen(state) &&
-    citySources(state) >= SWARM_SOURCES &&
-    state.challenge === null &&
-    state.cycleChallenge === null
-  );
+  return areCitiesOpen(state) && citySources(state) >= SWARM_SOURCES;
 }
 
 /**
@@ -114,7 +109,7 @@ export function swarm(state: GameState, landscape: LandscapeId): GameState {
   const sources = spent + remembered;
   const keepTree = workshopLevel(city.workshop, 'seedlings') > 0;
   const kept = WELLS_SHARE * workshopLevel(city.workshop, 'wells');
-  const replanted = replant(state, null, 0);
+  const replanted = replant(state, 0);
   const next: GameState = {
     ...replanted,
     seasons: state.seasons + 1,
@@ -128,7 +123,6 @@ export function swarm(state: GameState, landscape: LandscapeId): GameState {
       COLLECTOR_IDS.map((id) => [id, Math.floor(state.collectors[id] * kept)]),
     ) as GameState['collectors'],
     sites: Object.fromEntries(SITE_IDS.map((id) => [id, 0])) as GameState['sites'],
-    cycleChallenge: null,
     lightBeforeCycle: state.allTimeLight,
     waterBeforeCycle: state.allTimeWater,
     sources,

@@ -136,12 +136,11 @@ describe('The sower (§7.1, M13)', () => {
     expect(runSower(state)).toBe(state);
   });
 
-  it('relaunches a free Season once the ripe Seeds reach the chosen factor', () => {
+  it('relaunches a Season once the ripe Seeds reach the chosen factor', () => {
     const on = setSowerFactor(ripe(50), 2);
     const next = runSower(on);
     expect(next.seasons).toBe(on.seasons + 1);
     expect(next.seeds).toBe(100);
-    expect(next.challenge).toBeNull();
     expect(next.canopy.sowerSeasons).toBe(1);
     expect(next.canopy.sowerFactor).toBe(2);
   });
@@ -151,11 +150,6 @@ describe('The sower (§7.1, M13)', () => {
     expect(runSower(higher)).toBe(higher);
     const green = setSowerFactor(ripe(50, { seasonSeconds: 60 }), 2);
     expect(runSower(green)).toBe(green);
-  });
-
-  it('never interrupts a challenge Season', () => {
-    const state = setSowerFactor(ripe(50, { challenge: 'cloudy' }), 1.5);
-    expect(runSower(state)).toBe(state);
   });
 
   it('works from the tick, so offline progress sows too', () => {

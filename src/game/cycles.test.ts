@@ -24,7 +24,6 @@ function ready(overrides: Partial<GameState> = {}): GameState {
     collectors: { roofTanks: 5, swales: 3, ponds: 2, streams: 1 },
     sites: { wetlands: 4, meadows: 2, foodForests: 1, oldForest: 0, hillsides: 0 },
     parcels: ['river'],
-    challenges: ['wild'],
     species: ['poppy'],
     ...overrides,
   };
@@ -75,7 +74,6 @@ describe('new Cycle', () => {
     expect(Object.values(next.generators).every((n) => n === 0)).toBe(true);
     expect(next.talents).toEqual(state.talents);
     expect(next.parcels).toEqual(['river']);
-    expect(next.challenges).toEqual(['wild']);
     expect(next.species).toEqual(['poppy']);
     expect(next.allTimeLight).toBe(state.allTimeLight);
     expect(next.allTimeWater).toBe(state.allTimeWater);
