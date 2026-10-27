@@ -1,10 +1,8 @@
 // Prints the balancing simulator's pacing table (docs/game-design.md §8): `npm run simulate`.
 // The first Season is played until it is advisable (10 Seeds), then a second Season is played
 // with those Seeds to check that it reaches every event sooner (§12, milestone 3).
-import { CHALLENGE_IDS } from '../src/game/challenges';
 import { canSwarm, citySources, savoirsToGain, swarm } from '../src/game/cities';
 import { GENERATOR_IDS } from '../src/game/generators';
-import { startNewSeason } from '../src/game/seasons';
 import {
   learnReferenceTalents,
   PACING_TARGETS,
@@ -12,7 +10,6 @@ import {
   ADVISED_CYCLE_TARGET,
   CYCLE_TARGETS,
   simulateCycles,
-  simulate,
   simulateFirstCycle,
   simulateSeasonsAfterCycle,
   simulateTwoSeasons,
@@ -73,18 +70,6 @@ for (const [name, result] of [
   );
 }
 
-// Challenge Seasons (§7.3), played as the third Season.
-console.log('\nChallenge Seasons, as the third Season (won at):');
-for (const id of CHALLENGE_IDS) {
-  const start = learnReferenceTalents(startNewSeason(second.state, id));
-  const { challengeWon } = simulate({
-    state: start,
-    clicksPerSecond,
-    maxSeconds: 2 * 3600,
-    stopWhenWon: true,
-  });
-  console.log(id.padEnd(16), minutes(challengeWon).padStart(12));
-}
 console.log('Species back after two Seasons:', second.state.species.join(', ') || 'none');
 
 // The Bioregion and the first Cycle of water (§7.4): each later Season doubles the Seeds.
@@ -177,16 +162,10 @@ console.log(
 );
 const end = whole.state;
 console.log(
-  'Then: great works',
-  JSON.stringify(
-    Object.fromEntries(Object.entries(end.greatWorks.works).map(([id, w]) => [id, w.stage])),
-  ),
-  '· species',
+  'Then: species',
   end.species.length,
-  '· alliances',
-  end.alliances.chosen.join(', '),
-  '· requests served',
-  end.requests.served,
+  '· districts',
+  end.districts.length,
   '· workshop',
   JSON.stringify(end.city.workshop),
 );

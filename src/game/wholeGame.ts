@@ -14,6 +14,7 @@ import {
   type SimulationOptions,
 } from './simulator';
 import type { GameState } from './state';
+import { welcomeVisit } from './visits';
 
 /** The reference player plays this many seconds at a time... */
 export const REFERENCE_SESSION_SECONDS = 3600;
@@ -25,7 +26,16 @@ export const REFERENCE_AWAY_SECONDS = 3 * 3600;
  */
 export const REFERENCE_CROPS: readonly CropId[] = ['beans', 'squash', 'sunflower', 'strawberry'];
 /** §8 whole-game targets (M30): seconds of play when each sister city is founded. */
-export const WHOLE_GAME_TARGETS: readonly number[] = [4 * 3600, 5 * 3600];
+export const WHOLE_GAME_TARGETS: readonly number[] = [3 * 3600, 4 * 3600];
+/**
+ * The attentive player (slimming plan, lot 9) never leaves: it tends the garden every few minutes
+ * and welcomes every visitor. Seconds of play between two visits to the garden.
+ */
+export const ATTENTIVE_GARDEN_SECONDS = 180;
+/** §8 targets of the attentive player: seconds of play to each sister city. */
+export const ATTENTIVE_TARGETS: readonly number[] = [2 * 3600, 3 * 3600];
+/** §8 target of the attentive player: seconds of play of the advised first Season. */
+export const ATTENTIVE_SEASON_TARGET = 35 * 60;
 /** The landscapes of the two sister cities the reference player founds, in order. */
 export const REFERENCE_LANDSCAPES: readonly LandscapeId[] = ['plain', 'forest'];
 /** The workshop's rules the reference player learns, in this order, as far as the Savoirs go. */
@@ -93,6 +103,24 @@ export function referenceSessions(): {
   };
 }
 
+/** The attentive player's play, as a tend hook for the simulator: no time away. */
+export function attentiveSessions(): {
+  tend: NonNullable<SimulationOptions['tend']>;
+  away: () => number;
+} {
+  let sinceGarden = 0;
+  return {
+    tend: (state, dt) => {
+      const next = state.visit.kind !== null ? (welcomeVisit(state)?.state ?? state) : state;
+      sinceGarden += dt;
+      if (sinceGarden < ATTENTIVE_GARDEN_SECONDS) return next;
+      sinceGarden = 0;
+      return tendLoops(next);
+    },
+    away: () => 0,
+  };
+}
+
 export interface CityRun {
   /** Seconds of play in this city, from its foundation (or the first click) to swarming. */
   seconds: number;
@@ -127,13 +155,16 @@ export function simulateWholeGame({
   cities = REFERENCE_LANDSCAPES.length,
   maxSeconds = 120 * 3600,
   maxCityCycles = 30,
+  attentive = false,
   ...options
 }: Omit<SimulationOptions, 'state' | 'stopAtSeeds' | 'maxSeconds' | 'tend'> & {
   cities?: number;
   maxSeconds?: number;
   maxCityCycles?: number;
+  /** Play as the attentive player (attentiveSessions) instead of the reference one. */
+  attentive?: boolean;
 } = {}): WholeGame {
-  const { tend, away } = referenceSessions();
+  const { tend, away } = attentive ? attentiveSessions() : referenceSessions();
   const runs: CityRun[] = [];
   const swarms: Moment[] = [];
   let total = 0;

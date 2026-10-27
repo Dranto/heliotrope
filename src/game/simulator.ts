@@ -369,9 +369,10 @@ export function simulateTwoSeasons(options: Omit<SimulationOptions, 'state'> = {
 
 /**
  * §7.4 pacing target: the first Cycle of water advisable, in seconds of play. Brought from 2 h 45
- * to 2 h 10 once the cheaper mid and late synergies (2026-10-13) quickened it for every seed.
+ * to 2 h 10 once the cheaper mid and late synergies (2026-10-13) quickened it for every seed,
+ * then to 1 h 50 by the slimmed game (slimming plan, lot 9).
  */
-export const ADVISED_CYCLE_TARGET = (2 + 1 / 6) * 3600;
+export const ADVISED_CYCLE_TARGET = (1 + 5 / 6) * 3600;
 
 /** §8 pacing targets for a first active playthrough, in seconds. */
 export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
@@ -381,21 +382,20 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
   greenhouse: 5.5 * 60,
   verticalFarm: 12 * 60,
   // Brought closer in M19, then again after the growing buildings, the pollen and the chained
-  // moments (M26, M27, M31) quickened the second half of the Season.
+  // moments (M26, M27, M31) quickened the second half of the Season, and the paths that commit
+  // and the rules of the upgrades (slimming plan, lots 5 and 6) its end.
   mirrorPlant: 21 * 60,
   urbanCanopy: 37 * 60,
   arcology: 57 * 60,
-  advisedSeason: 67 * 60,
+  advisedSeason: 55 * 60,
 };
 
 /**
- * §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. Cycle 2
- * takes two or three Seasons of about 12 min depending on the Sources of the first (slimming
- * plan, lot 1): its target sits between the two until lot 9 fixes the relaunch rule. Cycles 3
- * and 4 last 22 and 26 min or 26 and 35 min depending on when the Canopy opens (lot 8): their
- * targets cover both until then.
+ * §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. Since the
+ * slimming plan's lot 9 a Cycle ends the minute its Sources reach the goal, often within a Season:
+ * its length follows the Water smoothly instead of jumping by whole Seasons.
  */
-export const CYCLE_TARGETS: readonly number[] = [30 * 60, 28 * 60, 32 * 60];
+export const CYCLE_TARGETS: readonly number[] = [18 * 60, 18 * 60, 20 * 60];
 
 /**
  * The reference player's later Seasons: each one is played until it would at least double the
@@ -438,9 +438,9 @@ export function simulateFirstCycle({
       Math.ceil(state.seeds * REFERENCE_SEED_GROWTH),
     );
     let played = 0;
-    // Check the Sources between short stretches, so the Cycle is caught when it becomes advisable.
+    // Check the Sources every minute, so the Cycle is caught when it becomes advisable.
     while (played < 4 * 3600 && total < maxSeconds) {
-      const stretch = Math.min(15 * 60, maxSeconds - total);
+      const stretch = Math.min(CYCLE_CHECK_SECONDS, maxSeconds - total);
       const result = simulate({ ...options, state, stopAtSeeds: target, maxSeconds: stretch });
       state = result.state;
       played += result.seconds;
@@ -521,6 +521,14 @@ export function tendDelta(state: GameState): GameState {
   }
 }
 
+/**
+ * Seconds of play between two looks at the Sources: the reference player starts the next Cycle
+ * within a minute of reaching its goal, as the lock keeper does (slimming plan, lot 9). Checked
+ * once per Season before, a Cycle lasted two or three whole Seasons, and a small bonus anywhere
+ * could tip it from one to the other.
+ */
+export const CYCLE_CHECK_SECONDS = 60;
+
 /** The reference player starts the next Cycle once it multiplies the Sources by this much. */
 export const REFERENCE_SOURCE_GROWTH = 1.5;
 
@@ -568,7 +576,7 @@ export function simulateCycles({
       );
       let played = 0;
       while (played < 4 * 3600 && seconds < maxCycleSeconds) {
-        const stretch = Math.min(15 * 60, maxCycleSeconds - seconds);
+        const stretch = Math.min(CYCLE_CHECK_SECONDS, maxCycleSeconds - seconds);
         const result = simulate({ ...options, state, stopAtSeeds: target, maxSeconds: stretch });
         state = result.state;
         played += result.seconds;
