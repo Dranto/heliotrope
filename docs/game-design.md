@@ -1253,3 +1253,236 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Lot 2 : retirés.** Les demandes des voisins (§9.11), leurs coups de main et les liens des quartiers voisins ; saluer une espèce (§9.15) ; l'échange de prévision (§9.13). **Le temps se simplifie** (§9.10) : chaque temps favorise ses bâtiments ×1,25, rien d'autre (plus d'effet sur le Papillon, les voies, le potager, la biodiversité ou les parcelles). Les Coopératives du potager sèment la culture qui suit la dernière, sans regarder le ciel. La famille des espèces du temps donne biodiversité ×1,1. Trois Jalons s'en vont (Coup de main, Bon voisin, Bonjour) : **151 Jalons**.
 - **Équilibrage (lot 2).** Rien ne bouge au §8 : 1ʳᵉ Saison 59 min, 2ᵉ Saison 21 min, Cycles 2 à 4 en 24, 36 et 40 min.
 - **Sauvegarde (lot 2).** Version 42 : les demandes, les coups de main, les liens, les saluts et l'échange de prévision sont effacés ; les Jalons retirés atteints rejoignent le compte des Jalons d'autrefois.
+
+## 10. Écrans et interface
+
+### 10.1 Écran principal (bureau)
+
+Refonte du 2026-10-10 (demande d'Antoine) : la carte prend tout l'écran, la fleur pousse au centre de la ville, le menu latéral s'élargit et se replie.
+
+```
+┌───────────────────────────────────────────────────────────────────────┐
+│ HELIOTROPE        ☀ 1,23 M Lumière  +4 560 /s       [Jalons] [Options]│
+├────────────────────────────────────────────────────┬─┬────────────────┤
+│ [Balcon|Quartier|Ville]                            │›│ Améliorer ⌄    │
+│                       ╭──╮                         │ │ [▣][▣][▣][▢]   │
+│                       │✿ │ fleur dans la cour      │ │ Bâtir ⌄ ×1 ×10 │
+│                       ╰──╯                         │ │ Héliotrope  42 │
+│              Scène du quartier                     │ │ Panneau     18 │
+│        (toute la hauteur de la fenêtre)            │ │ Le quartier ⌄  │
+│                                                    │ │ Coopératives ⌄ │
+└────────────────────────────────────────────────────┴─┴────────────────┘
+```
+
+- **Haut :** une barre fine : titre, compteur de Lumière et production/s, menu. Aucun texte sous le titre.
+- **Carte :** la scène du quartier vue du dessus (§6) occupe toute la hauteur restante et toute la largeur que laisse le menu. Le sélecteur de vue est en haut à gauche, avec la teinte de saison. Le Papillon doré la traverse.
+- **Arbre héliotrope :** l'arbre cliquable pousse au centre de la ville, dans la cour de l'immeuble du joueur, sur le massif entouré d'une lueur dorée dont la couronne de fleurs s'étoffe avec les améliorations de clic (§10.4). Son ombre se pose sur les pavés et son halo entoure sa couronne sans cadre, pour qu'il fasse partie de la cour plutôt que d'un panneau posé dessus. Il suit la caméra d'une vue à l'autre et grandit avec le zoom (136 à 290 px de large, au plus un quart de la largeur de la carte quand elle est étroite ; sur une carte basse, il rapetisse pour ne pas dépasser le haut de la carte) ; les pots du quartier se rangent de part et d'autre du massif. Seul l'arbre capte le clic, et sa couronne reste dans une zone fixe pour ne jamais couvrir les espèces posées autour de la cour. Aucun texte sous l'arbre : chaque clic fait flotter sa valeur.
+- **Menu latéral :** Améliorer, Bâtir, Le quartier (parcelles et projets, §6.1, §6.2) et les Coopératives (§7.2), dans cet ordre ; il défile seul et la page ne défile pas. Large d'environ un tiers de l'écran, il passe à deux colonnes sur les très grands écrans (dès 1760 px) pour tout montrer d'un coup. Le titre de chaque panneau le replie ou le déplie, et la poignée entre la carte et le menu replie tout le menu pour donner toute la largeur à la carte. Ces choix sont gardés dans le navigateur. **Par couches (M25)** : voir §10.7.
+- **Tablette :** la carte en haut (environ 60 % de la hauteur), les panneaux en deux colonnes dessous.
+
+### 10.2 Autres écrans (onglets ou panneaux)
+
+| Écran | Contenu | Dès |
+|---|---|---|
+| **Jalons** | Grille des succès, débloqués en couleur, cachés en « ? » | Phase 2 |
+| **Saisons** | Graines actuelles, Graines à gagner, bonus avant/après, choix d'une Saison à défi (§7.3, dès la 2ᵉ Saison), bouton Nouvelle Saison avec confirmation | Prestige disponible |
+| **Arbre des Saisons** | L'arbre de talents dessiné, Graines à semer, détail et bouton Semer du talent choisi, puis la Canopée à niveaux (§7.1) | 1ʳᵉ Graine |
+| **Cycle de l'eau** | Sources actuelles et à gagner, bonus avant/après, ce qui repart et ce qui reste, bouton Nouveau Cycle avec confirmation (§7.4) | 1ʳᵉ Source à gagner |
+| **Herbier** | Une planche par espèce, dessinée une fois revenue, silhouette avant, avec ce qui la ramène (§9.5) | 1ʳᵉ espèce ou 2ᵉ Saison |
+| **Statistiques** | Lumière totale (saison / toutes), clics, temps de jeu, papillons, saisons, courbe de la production des dernières Saisons (§10.5) | Toujours |
+| **Options** | Langue (français ou anglais), notation des nombres, animations réduites, volume et son coupé, sauvegarde manuelle, export / import, remise à zéro | Toujours |
+| **Retour hors ligne** | Fenêtre modale du gain d'absence | Au chargement |
+
+Les Options proposent aussi de réduire les animations, en plus du réglage `prefers-reduced-motion` de l'appareil (§10.4), et, depuis M6, de régler le volume des sons ou de les couper (§6.3).
+
+### 10.3 Mobile
+
+Même contenu, une colonne : compteur en haut, carte avec la fleur dedans, barre d'onglets en bas (Bâtir / Améliorer / Le vivant / La région / Plus, depuis M25, §10.7). La carte reste visible sur chaque onglet : grande sur Le vivant (le potager et le verger s'y cueillent), plus basse ailleurs pour voir chaque achat pousser ; « Plus » la remplace par le menu. Les cibles tactiles font au moins 44 px. *Livré au jalon 4 : « Plus » rassemble les Jalons, les Saisons, les Statistiques et les Options.*
+
+### 10.4 Direction artistique
+
+**Intention (décidée par Antoine, 2026-10-10) :** élégant et très moderne, dans un esprit solarpunk ensoleillé, avec une touche florale et naturelle légère. On vise l'interface d'un bel objet design, pas un jeu « cartoon » : beaucoup d'air, des lignes fines, de la lumière dorée.
+
+**Mots-clés.** Lumière de fin d'après-midi · verre dépoli · lignes botaniques fines · arches et courbes inspirées de l'Art nouveau · sobriété.
+
+**Typographie.**
+
+- **Titres et noms (générateurs, Saisons, Jalons) : [Fraunces](https://fonts.google.com/specimen/Fraunces)**, serif variable aux formes douces et organiques ; réglée avec un peu de « SOFT » pour un côté floral sans être fantaisiste.
+- **Interface et chiffres : [Manrope](https://fonts.google.com/specimen/Manrope)**, sans-serif géométrique moderne, avec chiffres tabulaires (`font-variant-numeric: tabular-nums`) pour que les compteurs ne « sautent » pas.
+- Deux polices au maximum, toutes deux sous licence libre (OFL) et hébergées avec le jeu (pas d'appel à un service tiers au chargement).
+
+**Palette.**
+
+| Rôle | Couleur | Valeur indicative |
+|---|---|---|
+| Fond principal | Crème lumineuse | `#FBF6EC` |
+| Accent principal (Lumière, boutons) | Or soleil | `#E9A93B` |
+| Accent secondaire | Vert sauge | `#8FAE8B` |
+| Végétation, succès | Vert feuille profond | `#2F6B4F` |
+| Touche florale | Rose héliotrope / lilas | `#B79AD6` |
+| Chaleur | Terracotta | `#C8734F` |
+| Texte | Vert-noir encre | `#1F2A24` |
+| Monde non restauré | Gris béton | `#A7A39C` |
+
+L'or et le lilas (la couleur de la fleur d'héliotrope) forment le duo signature ; le reste reste discret.
+
+**Formes et matières.**
+
+- Cartes et panneaux en verre dépoli légèrement translucide sur un fond en dégradé doux (aube → midi → fin d'après-midi selon la phase), coins arrondis généreux, ombres très légères.
+- Motifs botaniques en trait fin (tiges, feuilles, pétales) en filigrane dans les bordures et les séparateurs, jamais chargés.
+- Arches et cadres courbes inspirés de l'Art nouveau pour les éléments importants (écran des Saisons, du Cycle de l'eau).
+- Illustrations de la scène en vectoriel (SVG), aplats doux et dégradés subtils, un léger grain pour éviter l'effet « plat numérique ».
+- Icônes en trait fin, cohérentes avec les motifs botaniques.
+
+**Mouvement.** Animations lentes et fluides : l'héliotrope pivote doucement vers le curseur ou le soleil, les pétales s'ouvrent au clic, des particules de pollen dorées flottent. Rien de clignotant.
+
+**L'arbre héliotrope (2026-10-13).** Demande d'Antoine : à la place de la fleur, un arbre qui grandit au fil de toute la partie, au dessin procédural, avec des branches, des feuilles et des racines qui parcourent petit à petit le quartier, la ville puis la Biorégion, au centre de la transformation de l'écosystème. Il remplace la fleur en pot et sa tonnelle (2026-10-10) ; le clic, son équilibrage et tout ce qui s'y accrochait restent les mêmes. Code : `src/ui/tree.ts` (l'arbre), `src/ui/treeRoots.ts` (les racines), `src/ui/flower.ts` (les stades et les têtes de fleurs).
+
+- **Un arbre à soi.** Chaque partie tire sa graine d'arbre (`treeSeed`, gardée pour toujours ; les sauvegardes existantes la tirent de leur graine aléatoire). Toutes les branches que l'arbre aura un jour sont tirées une fois de cette graine : le tronc s'ouvre en trois ou quatre charpentières, puis chaque branche fourche en deux (parfois trois), avec une branche latérale à mi-hauteur des plus grosses, six ordres en tout. Chaque branche a l'âge où elle commence à pousser et le temps qu'elle met à atteindre sa longueur : l'arbre ne fait que s'ajouter du bois, rien ne bouge d'un chargement à l'autre.
+- **Il grandit avec les Saisons.** Son âge compte une unité par Saison accomplie, plus l'avancée de la Saison en cours (les sept stades de Lumière, de façon continue). Pendant la 1ʳᵉ Saison, il passe de la graine (deux cotylédons) à une tige feuillue puis à un jeune arbre à trois ordres de branches ; il est presque adulte vers la 4ᵉ Saison et continue ensuite de s'étoffer. L'épaisseur des branches suit le modèle des tuyaux (chaque branche porte le bois qui la prolonge), donc le tronc s'épaissit avec la couronne. Une Nouvelle Saison ne le replante pas.
+- **Il refeuille et refleurit à chaque Saison.** La Lumière de la Saison le fait passer des bourgeons nus au plein feuillage (dès le 3ᵉ stade), en touffes de feuilles éclairées du haut à gauche, aux tons de la saison visuelle (vert, vert tendre au printemps, roux et or à l'automne). Puis il fleurit de têtes d'héliotrope (dômes de fleurettes à cinq lobes selon l'angle d'or, à la couleur choisie dans le Décor, §6.5) : boutons au 1ᵉʳ stade, de plus en plus de têtes et de plus en plus ouvertes ensuite (jusqu'à seize), les mêmes rameaux fleurissant d'abord ; pollen doré qui flotte au 5ᵉ, cœurs dorés et rayons qui tournent lentement au 6ᵉ.
+- **Au pied de l'arbre.** Des racines de surface s'étalent avec l'âge ; chaque amélioration de clic plante un brin doré sur le devant du massif ; chaque Saison accomplie laisse une graine dorée (jusqu'à six). La jauge de pollen (§5.6) est un anneau doré posé au sol autour du tronc, les pétales du bouquet (§5.7) l'entourent ; les anneaux d'arrivée d'une mécanique (§10.8) partent de la couronne.
+- **Les racines sur la carte.** De fines racines brunes, où court une lumière dorée, partent de la cour sous la carte (dans les deux rendus, sous toutes les autres marques) : des radicelles dans la cour (une de plus par demi-Saison, sept au plus), puis, à chaque vue ouverte, jusqu'aux quatre rues autour de l'îlot et aux carrefours (Quartier), le long des avenues jusqu'aux bords de la ville (Ville), et quatre grandes racines vers la campagne (Biorégion). Chaque parcelle restaurée, chaque quartier voisin restauré et chaque site régional relevé reçoit sa racine depuis la racine fixe la plus proche, avec une pousse (deux feuilles et un bourgeon doré) à son bout. Chaque racine a un parent fixe et un tracé tiré de la graine de l'arbre et de son nom : une racine ne bouge jamais une fois poussée, quel que soit l'ordre des restaurations. Elle se dessine en entrant ; avec les animations réduites, la lumière reste fixe.
+- **Mouvement.** Au passage d'un stade, l'arbre s'étire et s'illumine une fois ; à chaque clic, sa couronne frémit ; au repos, il se balance très lentement et penche un peu vers le curseur. Aucun texte n'annonce sa croissance : seule l'image raconte.
+
+**Détails de la scène (2026-10-10).** Les bâtiments montrent leur façade sud (une bande de fenêtres dont la hauteur suit le nombre d'étages) et un toit éclairé du côté du soleil, avec ses équipements (verrières, citernes, climatiseurs). Les rues ont trottoirs et passages piétons, l'asphalte un léger grain, la cour un dallage. Les parkings ont des voitures aux teintes éteintes, les friches des fissures, des gravats et des herbes folles. Les arbres alternent trois essences (tilleul, platane, cerisier en fleur) à houppier lobé, avec une ombre qui suit le soleil. Quand le quartier reverdit, des touffes d'herbe et de petites fleurs gagnent les îlots.
+
+**Rendu enrichi (2026-10-10).** La carte est dessinée en WebGL avec PixiJS (`src/ui/pixi/`), à partir du même plan et des mêmes données que la scène SVG. C'est le rendu par défaut quand l'appareil a une vraie carte graphique (WebGL refusé s'il n'était qu'émulé par le processeur) ; sinon, ou si l'option « Rendu enrichi » est décochée (choix mémorisé par navigateur, hors sauvegarde), la scène SVG reste, et elle revient d'elle-même si WebGL échoue. Les éléments des générateurs sont des dessins SVG plus détaillés (façades à fenêtres par étage, équipements de toit, bacs de potager en bois, verrières à arceaux, houppiers en trois profondeurs de feuilles) convertis en textures. Les parcelles restaurées, la Biorégion (plaine, collines, champs, sites régionaux, mares) et les collecteurs de la ville sont pris tels quels à la scène SVG, avec leur style, puis convertis en textures : les deux rendus montrent toujours les mêmes dessins. Chaque nouvel élément garde son entrée (croissance et anneau doré ; dévoilement circulaire depuis l'épingle pour une parcelle). La carte graphique ajoute : des ombres douces projetées qui suivent un soleil qui oscille lentement autour de sa position de phase, des ombres de nuages qui passent, l'eau vivante (rivière retrouvée, bassin de l'arcologie, rivière, canaux et ruisseaux de la Biorégion : reflets du ciel, ondulations, scintillements), l'averse qui traverse la campagne quand l'Eau coule, des reflets qui balaient les verrières, un halo chaud, du pollen et des lointains flous. Le calque SVG garde par-dessus ce qui se touche ou bouge de lui-même (parcelles proposées, projets, espèces, vélos-cargos). Avec les animations réduites, l'image est fixe.
+
+**Assets de la carte enrichie (2026-10-11).** Demande d'Antoine : exploiter pleinement le rendu WebGL pour détailler tous les éléments de la carte. Chaque générateur a un dessin plus fouillé, toujours éclairé du côté du soleil : arbres à houppier en touffes de feuilles (ombre et lumière sur chaque touffe, moucheture de feuilles, fleurs de lilas, d'or ou de cerisier) que la brise balance par vagues ; pots d'héliotrope à dôme de fleurettes (violet au cœur, lilas au bord, cœurs dorés au troisième palier) ; panneaux à cellules et fils d'argent où glisse le ciel ; potagers sur plancher de bois, bacs à salades, tomates tuteurées, lavande puis tournesols, avec un récupérateur d'eau ; serres à vitres, ciel reflété, allée centrale, porte, lucarnes ouvertes avec les paliers ; fermes verticales en terrasses de bois qui s'ombrent l'une l'autre, débordant d'arbustes, arbres d'angle, garde-corps vitrés, verrière et lames solaires ; héliostats à quatre facettes et reflet de soleil, sur une prairie à allées de gravier autour de la tour, dont le récepteur rayonne et luit ; arcologie à pétales en gradins plantés ou vitrés à meneaux. Les bâtiments gagnent fenêtres encadrées, jardinières en fleurs et lierre à mesure que la ville reverdit, gravier et jardinières sur les toits, et des toits de sedum en nappes de verts et de roux traversées d'une allée. Au printemps, les feuilles restent vertes et seules les fleurs rosissent. Le rendu SVG de secours garde ses dessins plus simples.
+
+**Parcelles, Biorégion et voisins détaillés (2026-10-11).** Les dessins SVG partagés, que la carte enrichie reprend en textures, gagnent la même finesse : sols texturés (brins de prairie, gazon tondu en bandes, pavés jointoyés), touffes d'herbe, arbres à lobes ombrés et éclairés (fruits au verger, fleurs au printemps), bancs à dossier ; noues avec lit, reflets, pas japonais, roseaux et iris ; hôtels à insectes sur les bandes fleuries ; parc avec allée bordée, berge, nénuphars et massif fleuri ; places pavées en dalles ; toits de sedum en nappes de trois tons. Les seconds avenirs reprennent ces sols. Dans la Biorégion, les collines ont ombre et lumière, les champs une bordure et un vieil arbre d'angle, la forêt nourricière des houppiers à lobes et des fruits, l'étang nénuphars et roseaux. Les vélos-cargos portent un cycliste aux bras sur le guidon et des feuilles et fleurs dans la caisse ; les arbres des quartiers voisins ont des houppiers à lobes. Au printemps, dans les deux rendus, les feuilles restent vertes et seules les fleurs rosissent.
+
+**Matière et lumière (2026-10-13).** Demande d'Antoine : des assets plus détaillés et peaufinés ; premier lot, sans changer les dessins, par la lumière que la carte graphique pose dessus (`src/ui/pixi/light.ts`). Tout ce qui se dresse (bâtiments, générateurs, arbres) reçoit un liseré de soleil sur les bords tournés vers lui et une ombre douce sur les bords opposés, ce qui donne du volume aux toits, aux pots et aux houppiers ; ce liseré suit le soleil dans sa lente oscillation. Une ombre de contact serrée entoure le pied des bâtiments. Toute la carte passe ensuite par un étalonnage : les sombres et les tons moyens s'approfondissent (les clairs ne brûlent pas : la carte est pâle et pastel), les couleurs gagnent un peu d'éclat, les ombres tirent vers une encre lilas et les lumières vers l'or de l'heure ; le côté du soleil se réchauffe et le côté opposé se rafraîchit, à la place de l'ancien voile clair qui délavait les couleurs. Un lavis de pigment inégal, fixé au sol, et un fin grain de papier, immobile, donnent à la carte l'air d'une feuille peinte ; ils restent discrets sur les sols pâles et la brume. L'hiver, à la lumière pâle, l'effet est un peu moins marqué. Le rendu SVG de secours reste tel quel.
+
+**Accessibilité.** Contraste AA sur tout le texte (l'or et le lilas servent d'accents, pas de couleur de texte sur fond clair), animations réduites si `prefers-reduced-motion`, aucune information portée par la couleur seule.
+
+### 10.5 Confort et lisibilité (M10)
+
+Le confort en attente depuis M5 (roadmap, « Confort à glisser au fil de l'eau ») : chaque palier se lit d'un coup d'œil, sans texte de plus. Aucun de ces ajouts ne change l'équilibrage. Code dans `src/game/goals.ts`, `src/game/history.ts`, `src/ui/Goals.tsx` et `src/ui/ProductionCurve.tsx`.
+
+- **Temps avant achat.** Sous le prix d'un bâtiment (pour la quantité choisie), de l'amélioration choisie, d'une parcelle ou d'un projet hors de portée : « dans 2 min », la Lumière qui manque divisée par la production actuelle, arrondie à la seconde supérieure. Rien tant que rien n'est produit, ni quand le bâtiment a atteint la limite d'une Saison à défi.
+- **Prochain objectif.** Dans le compteur, à côté de la production : « Prochain : Serre, dans 3 min », l'achat proposé le moins cher que la réserve ne couvre pas encore, parmi les bâtiments (le prochain à découvrir compris, à son prix de base, nommé « Encore à découvrir »), les améliorations, les parcelles et les projets. Tant que rien n'est produit (au tout début, où l'on ne fait que cliquer), il dit la Lumière qui manque à la place du temps : « Prochain : Héliotrope en pot, encore 12 Lumière ». C'est la règle d'or du §2 rendue visible ; il disparaît quand tout ce qui est proposé est abordable.
+- **Raccourcis clavier.** Les touches 1 à 8 achètent le bâtiment de ce rang (s'il est découvert) dans la quantité choisie ; M passe à Max, puis revient à ×1 ; U achète toutes les améliorations à portée. Aucune touche ne clique la fleur, pour ne pas encourager l'autoclic. Les raccourcis se taisent dans un champ de texte et quand une fenêtre est ouverte.
+- **Tout acheter.** Dès que deux améliorations au moins sont à portée, un bouton « Tout acheter » et leur nombre s'affichent à côté du titre d'Améliorer : il les achète de la moins chère à la plus chère tant que la réserve suffit, en comptant celles que ces achats débloquent. Les mêmes achats qu'à la main, donc l'équilibrage ne change pas.
+- **Courbe de la production.** Dans les Statistiques, la Lumière par seconde au fil de chaque Saison, pour les six dernières (celle en cours comprise), sur une échelle logarithmique pour que la première et la dernière tiennent ensemble. La Saison en cours est le trait vert foncé (tant qu'elle n'a pas encore de trait, juste après son début, la dernière Saison finie le prend), les précédentes en vert sauge, de plus en plus pâles à chaque rang pour rester distinctes, avec leur nom en légende. Pointer la courbe lit la production de chaque Saison à ce moment. Un point toutes les 30 s de Saison ; à 120 points, l'intervalle double, pour garder toute la Saison en peu de place. Une longue absence dessine un plateau à la production du retour, sans inventer de forme. Les courbes sont dans la sauvegarde (version 12) ; une sauvegarde plus ancienne commence la sienne à la Saison en cours.
+- **Installation en application.** Le jeu s'installe comme une application (manifeste et icônes) et se recharge sans connexion une fois chargé : un service worker sert la page depuis le réseau s'il y en a un, sinon depuis son cache, et garde les fichiers du jeu (au plus 80, les plus anciens partant en premier). La sauvegarde reste dans le navigateur, comme avant.
+
+### 10.6 L'accueil et les rappels (M17)
+
+- **Première minute guidée, sans texte.** Pendant la toute première Saison, un halo doré respire sur le geste suivant : la fleur tant qu'on ne l'a pas cliquée, puis le bouton d'achat de l'Héliotrope en pot dès qu'on peut se l'offrir, puis la première amélioration abordable. Il disparaît dès que le geste est fait et ne revient plus après la première amélioration achetée, ni après la première Saison. Aucune bulle d'explication. Code dans `src/game/guide.ts`.
+- **Rappels facultatifs (décision D8).** Dans les Options, « Rappels », **désactivés par défaut** : une fois le navigateur autorisé, une notification quand les Graines deviennent mûres ou qu'une culture du potager est prête, seulement quand le jeu est ouvert dans un onglet caché ou une fenêtre d'application en arrière-plan. Le jeu ne pousse jamais à revenir à heure fixe (§1). Code dans `src/ui/useReminders.ts`.
+- **Sauvegarde.** Version 19 : le volume de la musique (vide tant que le joueur ne l'a pas réglé) et les rappels (désactivés).
+
+---
+
+### 10.7 Une interface rangée (M25)
+
+Roadmap P24 : avec la v2 et la v3, le menu latéral avait neuf panneaux. Code dans `src/game/panels.ts` (pur) et `src/ui/App.tsx`.
+
+- **Trois couches.** Les panneaux se rangent sous trois onglets à icône, en haut du menu : **La ville** (Améliorer, Bâtir, Le quartier, Coopératives), **Le vivant** (Potager, Verger) et **La région** (Biorégion, Grands chantiers). Une couche n'apparaît qu'avec son premier panneau ; la barre n'apparaît qu'avec la deuxième couche (le potager, dès le premier pot ; la région arrive avec la Biorégion). Un seul onglet à la fois, gardé dans le navigateur. Sur les très grands écrans (dès 1760 px), les deux colonnes montrent toujours tout et la barre disparaît.
+- **Téléphone.** La barre d'onglets du bas devient Bâtir (bâtiments, Coopératives), Améliorer (améliorations, Le quartier), Le vivant, La région et Plus ; un onglet n'apparaît qu'avec sa couche.
+- **Ce qui vient de s'ouvrir.** Un panneau que le joueur n'a pas encore touché s'entoure d'un **anneau doré qui respire**, jusqu'au premier toucher (clic ou focus clavier). L'onglet qui le contient porte un **point doré** tant qu'il n'est pas choisi (et « nouveau » pour les lecteurs d'écran). Aucun texte. Une sauvegarde plus ancienne compte comme vus tous les panneaux qu'elle montre déjà.
+- **Ce qui attend.** Un panneau **replié** qui a quelque chose à faire maintenant (un achat possible, une récolte mûre, un arbre à planter, une étape de chantier prête) montre un point doré après son titre.
+- **Les écrans** gardent leur barre d'icônes avec leurs pastilles (Graines mûres, Graines à semer, Sources) ; ils se chargent maintenant à leur première ouverture, ce qui allège le chargement de la carte (le fichier principal passe de 639 à 437 ko, 195 à 133 ko compressé, une partie se retrouvant dans des morceaux partagés).
+- **Les doigts.** Sur écran tactile, les carrés mûrs du potager, les arbres mûrs du verger et les visites se touchent dans un cercle plus large que leur dessin. Le Papillon fait déjà 56 px.
+- **Les sons** des systèmes récents (§6.3) : récolte et cueillette, étape de chantier et ruche.
+- **Sauvegarde.** Version 26 : les panneaux déjà touchés.
+
+### 10.8 Une nouveauté à la fois
+
+Mesuré sur une partie neuve avant ce changement (joueur de référence du §8) : le potager, les améliorations et le bouton des Jalons arrivaient ensemble à 8 s, l'Herbier, le Papillon, les visites et le décor entre 3 et 5 min, et la 2ᵉ Saison ouvrait d'un coup l'Arbre, les Coopératives, les demandes des voisins et la météo. Code dans `src/game/introductions.ts` (ce qui est introduit) et `src/game/onboarding.ts` (l'ordre et le rythme).
+
+- **Le principe.** Chaque mécanique garde sa condition d'ouverture ; une fois cette condition remplie, elle attend son tour. Une seule entre dans le jeu à la fois, **au moins 45 s de jeu après la précédente** (hors ligne compris : c'est du temps écoulé). La toute première attend 45 s après le début de la partie : la première minute reste à la fleur et au premier pot (§10.6). Tant qu'elle n'est pas introduite, une mécanique n'existe pas : ni panneau, ni effet, ni production (un Papillon ne vient pas, la météo ne joue pas).
+- **L'ordre**, quand plusieurs attendent ensemble : le pollen, le potager, Le quartier (parcelles et projets), les Jalons, l'Herbier, le Papillon doré, les visites, le décor, les Saisons, l'Arbre des Saisons, la Biorégion, les Coopératives, la météo, le verger, les grands chantiers. Les améliorations et les bâtiments ne passent pas par là.
+- **La jauge de pollen** (§5.6) n'est plus là dès le début : elle rejoint la fleur avec la première amélioration de clic (Mains tièdes, 15 clics), et reste dès la 2ᵉ Saison. Avant, les clics ne la remplissent pas.
+- **Le signal, sans texte.** À l'arrivée de chaque mécanique, une lueur dorée s'allume sur la couronne de l'arbre héliotrope et trois anneaux dorés en partent, une fois. Puis la nouveauté se montre elle-même : un panneau s'entoure de son anneau doré et son onglet de son point (§10.7) ; un bouton (Jalons, Herbier, Saisons, Arbre), l'outil Décor ou la prévision du temps luisent quatre fois ; la jauge de pollen se dessine en or au pied de l'arbre ; le premier Papillon et la première visite arrivent 5 s après (au lieu d'attendre leur tirage). Avec les animations réduites (§10.4), rien ne bouge ni ne luit : il reste le point doré des onglets.
+- **Rythme mesuré** (joueur de référence, `src/game/onboarding.test.ts`) : 1ʳᵉ Saison, pollen 0:45, potager 1:30, Le quartier 2:15, Jalons 3:00, Herbier 3:45, Papillon 4:35, visites 5:20, décor 6:05, Saisons vers 19 min ; 2ᵉ Saison, l'Arbre tout de suite, puis Coopératives, demandes et météo de 45 s en 45 s ; 3ᵉ Saison, la Biorégion tout de suite, puis le verger et les grands chantiers. Les cibles du §8 tiennent (les retards se comptent en dizaines de secondes).
+- **Sauvegarde.** Version 32 : les mécaniques introduites et le temps depuis la dernière. Une sauvegarde plus ancienne reçoit toutes celles qu'elle montre déjà : rien ne disparaît.
+
+## 11. Contraintes pour l'implémentation
+
+Ces points ne choisissent pas la technique (c'est le rôle du fil de mise en place), mais en découlent directement du design :
+
+- **Contenu piloté par les données.** Générateurs, améliorations et jalons sont décrits dans des fichiers de données, pas codés en dur. Ajouter un générateur ne doit pas demander de toucher la logique.
+- **Logique pure, séparée de l'affichage.** Calcul de la production, des coûts, du prestige : fonctions pures testables et réutilisées par le simulateur (§8).
+- **Boucle basée sur le temps écoulé**, pas sur le nombre d'images : la production dépend du delta de temps réel, ce qui rend la progression hors ligne et les onglets en arrière-plan cohérents.
+- **Grands nombres.** Le MVP reste sous 1e300 ; les nombres JavaScript standards suffisent, mais tous les calculs passent par un petit module numérique pour pouvoir basculer plus tard vers une bibliothèque de grands nombres.
+- **Textes externalisés** pour pouvoir traduire le jeu.
+
+---
+
+## 12. Périmètre MVP et jalons
+
+Chaque jalon est livrable et jouable seul, et peut être pris par un fil d'implémentation distinct. Le jalon M0 (mise en place du projet, outillage, CI, déploiement) est traité à part.
+
+### M1 — Boucle de base
+
+- État du jeu, boucle de mise à jour basée sur le temps.
+- Clic sur l'héliotrope, compteur de Lumière et production/s.
+- Générateurs 1 à 4 avec coût exponentiel, achat ×1.
+- Formatage des nombres (§8).
+- Données des générateurs dans un fichier de données.
+
+**Critère de fin :** on peut jouer 15 minutes, acheter les 4 premiers générateurs, et les nombres s'affichent correctement.
+
+### M2 — Contenu complet et persistance
+
+- Les 8 générateurs, achat ×10 / ×100 / Max, apparition progressive (silhouette).
+- Améliorations : ×2 par générateur, clic, synergies, bonus de biodiversité.
+- Sauvegarde automatique, export / import, progression hors ligne.
+- Simulateur d'équilibrage et première passe d'équilibrage sur le tableau du §8.
+
+**Critère de fin :** une partie de 4 h est jouable, survit à un rechargement, et le simulateur sort les temps cibles à ±30 %.
+
+### M3 — Les Saisons (prestige)
+
+- Calcul des Graines, écran des Saisons, confirmation, remise à zéro, bonus.
+- Écran Statistiques.
+
+**Critère de fin :** on peut enchaîner deux Saisons, et la seconde atteint plus vite chaque palier.
+
+*Livré (jalon 3) : Graines, écran des Saisons avec conseil et confirmation, écran Statistiques, sauvegarde v4 ; le simulateur vérifie le critère de fin.*
+
+### M4 — Vie et finitions
+
+- Jalons (succès) et leur bonus.
+- Papillon doré.
+- ~~Journal du quartier~~ (retiré le 2026-10-10, voir §6).
+- Scène centrale évolutive par phase, saisons visuelles.
+- Mise en page mobile, accessibilité, écran Options complet.
+
+**Critère de fin :** le jeu est présentable à des joueurs extérieurs.
+
+*Livré (jalon 4) : 43 Jalons et leur écran, Papillon doré, Journal du quartier (retiré depuis, §6), ciel par phase et teintes de saison, barre d'onglets mobile, options d'affichage, fenêtres accessibles au clavier, sauvegarde v5 ; nouvelle passe d'équilibrage (§4, §8, §9.2).*
+
+**Le MVP = M1 à M4.**
+
+---
+
+## 13. Au-delà du MVP
+
+Idées à reprendre quand le MVP est stable, par ordre de priorité proposé  (la suite, de M13 à M30, est planifiée dans `docs/roadmap.md`) :
+
+1. ~~**Carte du quartier.**~~ *Livré en M6 (§6.1).* Une grille de parcelles grises (friches, parkings, toits nus) à restaurer contre de la Lumière. Chaque parcelle restaurée apporte un bonus ciblé (un parc : +clic ; une rivière dépolluée : +1 h de plafond hors ligne ; un verger : +% à un générateur). Rend la restauration du monde concrète et visuelle.
+2. ~~**Arbre des Saisons** (§7) : talents permanents achetés avec les Graines.~~ *Livré en M7 (§7.1), avec les Coopératives (§7.2).*
+3. **Cycle jour / nuit et batteries.** La production solaire varie au fil d'une journée de jeu ; des batteries stockent le surplus. À tester avec prudence : ne doit jamais punir le joueur absent.
+4. ~~**Deuxième couche : la Biorégion.** Nouvelle ressource (Eau ou Biodiversité), nouveaux générateurs, deuxième niveau de prestige.~~ *Livré en M9 (§7.4).*
+5. ~~**Défis de Saison.** Saisons à contraintes (« sans Panneaux », « clic seulement ») qui donnent des récompenses uniques.~~ *Livré en M8 (§7.3), avec l'Herbier (§9.5).*
+6. ~~**Sons discrets** (§1) et leur réglage de volume dans les Options.~~ *Livré en M6 (§6.3).*
+
+---
+
+## 14. Questions ouvertes
+
+Décisions qui appartiennent à Antoine. En attendant sa réponse, le document applique le choix recommandé.
+
+| # | Question | Choix recommandé (appliqué par défaut) |
+|---|---|---|
+| Q1 | Langue de l'interface du jeu ? | Français d'abord. *Livré en M8 :* version anglaise complète, choisie dans les Options (le français reste la langue par défaut). Tous les textes sont dans `src/i18n/` (`fr.ts` fait référence, `en.ts` a la même forme). |
+| Q2 | Plateforme visée ? | Navigateur, bureau d'abord, mais jouable sur mobile (responsive) |
+| Q3 | Production hors ligne : 100 % plafonnée à 8 h ? | Oui |
+| Q4 | La Carte du quartier dans le MVP ou après ? | Après le MVP : livrée en M6 (parcelles, §6.1) |
+| Q5 | ~~Style graphique ?~~ | **Décidé :** élégant, très moderne, solarpunk ensoleillé et légèrement floral (voir §10.4) |
+| Q6 | Monétisation ? | Aucune : jeu gratuit, sans pub |
+| Q7 | ~~Récit : simple ambiance (Journal) ou vraie histoire avec personnages ?~~ | **Décidé (2026-10-10) :** ni l'un ni l'autre. Pas de journal ni de texte narratif : l'histoire est racontée uniquement par le gameplay (scène, animations, événements en jeu), voir §1 et §6 |
