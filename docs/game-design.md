@@ -381,14 +381,16 @@ Autour de la ville, la périphérie grise (§6) s'ouvre quand le quartier est **
 
 | Quartier voisin | Ancien usage, place | Coût | Effet |
 |---|---|---|---|
-| Jardins d'eau des Tanneries | Tanneries, à l'est | 100 Md | Eau ×1,5 ; l'Averse d'été dure ×1,5 |
-| Forêt de la gare de triage | Gare de triage, au nord | 500 Md | Canopées urbaines ×2 ; la Nuée de migrateurs dure ×1,5 |
-| Verger du centre commercial | Centre commercial, au sud | 2,5 Bn | Les voisins apportent une bouture de plus ; Potagers ×1,5 |
-| Halles du parking relais | Parking relais, à l'ouest | 12,5 Bn | Récolte du Papillon doré ×1,5 |
-| Parc de l'échangeur | Échangeur, au nord-est | 60 Bn | Les visites reviennent 20 % plus vite, le Papillon 10 % |
-| Tiers-lieu des bureaux | Bureaux, au sud-ouest | 300 Bn | Synergies ×1,25 |
-| Ateliers solaires | Zone industrielle, au sud-est | 1,5 Bd | Tous les bâtiments coûtent 10 % de moins |
-| Tours vivantes | Quartier des cheminées, au nord-ouest | 7,5 Bd | Arcologies ×2 ; chaque jalon donne +0,5 % de plus |
+| Jardins d'eau des Tanneries | Tanneries, à l'est | 100 Md | Eau ×1,5 ; l'Averse d'été dure ×1,5 ; sites 10 % moins chers |
+| Forêt de la gare de triage | Gare de triage, au nord | 500 Md | Canopées urbaines ×2 ; la Nuée de migrateurs dure ×1,5 ; les Graines mûrissent 30 s plus tôt |
+| Verger du centre commercial | Centre commercial, au sud | 2,5 Bn | Les voisins apportent une bouture de plus ; Potagers ×1,5 ; collecteurs 10 % moins chers |
+| Halles du parking relais | Parking relais, à l'ouest | 12,5 Bn | Récolte du Papillon doré ×1,5 ; sites 10 % moins chers ; le tram : +1 % de production par quartier voisin restauré |
+| Parc de l'échangeur | Échangeur, au nord-est | 60 Bn | Les visites reviennent 20 % plus vite, le Papillon 10 % ; collecteurs 10 % moins chers |
+| Tiers-lieu des bureaux | Bureaux, au sud-ouest | 300 Bn | Synergies ×1,25 ; collecteurs 10 % moins chers |
+| Ateliers solaires | Zone industrielle, au sud-est | 1,5 Bd | Tous les bâtiments coûtent 10 % de moins ; sites 10 % moins chers |
+| Tours vivantes | Quartier des cheminées, au nord-ouest | 7,5 Bd | Arcologies ×2 ; chaque jalon donne +0,5 % de plus ; les Graines mûrissent 30 s plus tôt |
+
+Depuis le lot 7 (§9.17), chaque quartier ajoute aussi **+3 % de production** (la part de l'ancienne tour des semences), et le dernier effet de chaque ligne agit sur le rythme. Le joueur de référence les restaure dès que sa réserve les couvre.
 
 - **Quand un quartier est proposé.** Le suivant dans l'ordre, dès que la Saison en cours a récolté la moitié de son prix, comme une parcelle. Il rejoint les offres du panneau « Le quartier » (et le prochain objectif du compteur, §10.5) ; la rangée de pastilles du panneau compte alors les quartiers voisins au lieu des parcelles.
 - **Sur la carte.** Chaque quartier occupe un îlot de la périphérie, au-delà de la rocade. Celui qui est proposé est cerné d'un pointillé doré qui respire, avec une grande épingle en forme de pousse au centre ; un clic dessus le restaure quand on peut se l'offrir. Restauré, l'îlot gris laisse place à son dessin : bassins et roseaux des jardins d'eau, rangées d'arbres le long des anciennes voies, verger en quinconce, halles aux auvents rayés, boucles de l'échangeur devenues allées, place plantée entre des toits verts, ateliers couverts de panneaux, tours en terrasses plantées. Il apparaît avec l'entrée habituelle de la carte (anneau doré), sans animation au chargement.
@@ -398,20 +400,22 @@ Autour de la ville, la périphérie grise (§6) s'ouvre quand le quartier est **
 
 ### 6.5 Un quartier à son image (M16)
 
-Le quartier restauré ressemble au joueur : chaque parcelle a **deux avenirs**, des pièces de **décor** se posent sur la carte, et un **mode photo** garde une image du quartier. Rien ici n'ajoute de vitesse : les deux avenirs d'une parcelle se valent, ils orientent le jeu autrement. Données dans `src/game/parcels.ts` (champ `second`), `src/game/restoration.ts` et `src/game/decor.ts` ; dessins dans `src/ui/RestorationArt.tsx`, `src/ui/DecorArt.tsx`, `src/ui/decorMap.ts`, barres d'outils dans `src/ui/MapTools.tsx`, image dans `src/ui/photo.ts`.
+Le quartier restauré ressemble au joueur : chaque parcelle a **deux avenirs**, des pièces de **décor** se posent sur la carte, et un **mode photo** garde une image du quartier. Les deux avenirs d'une parcelle se valent, ils orientent le jeu autrement. Données dans `src/game/parcels.ts` (champ `second`), `src/game/restoration.ts` et `src/game/decor.ts` ; dessins dans `src/ui/RestorationArt.tsx`, `src/ui/DecorArt.tsx`, `src/ui/decorMap.ts`, barres d'outils dans `src/ui/MapTools.tsx`, image dans `src/ui/photo.ts`.
 
 **Les deux avenirs.** Avant de restaurer une parcelle, le panneau « Le quartier » propose ses deux avenirs (pastilles) : le premier est celui du §6.1, le second a un autre dessin et un autre effet. Une parcelle restaurée peut **changer d'avenir une fois par Cycle de l'eau** (décision D7), gratuitement, dans la liste repliable « Les avenirs des parcelles » du même panneau. Le changement reste d'une Saison à l'autre.
 
 | Parcelle (1ᵉʳ avenir) | Second avenir | Dessin | Effet du second avenir |
 |---|---|---|---|
-| Rue jardin | Rue des enfants | Marelle, bacs à sable, arbres d'alignement | Héliotropes en pot ×2, Panneaux de balcon ×2 (au lieu du clic ×2) |
-| Jardins de pluie | Bassin d'orage | Un grand bassin en gradins, roseaux | Héliotropes en pot ×1,5, Panneaux de balcon ×2, Eau ×1,25 ; l'Averse dure ×2 |
-| Corridor des pollinisateurs | Haie bocagère | Une haie continue d'arbustes | Les visites reviennent 30 % plus vite, le Papillon 10 % |
-| Rivière retrouvée | Rivière baignade | Un ponton et des baigneurs | Eau ×1,75, +1 h de plafond hors ligne |
-| Parc du parking | Marché couvert | Une halle aux toits rayés et ses étals | +1,25 % de production par parcelle restaurée (+10 % avec les huit) |
-| Verger de l'entrepôt | Serres de l'entrepôt | Des serres vitrées | Fermes verticales ×1,5, Centrales à miroirs ×1,5 |
-| Toits vivants | Toits potagers | Des rangs de cultures sur les toits | Biodiversité ×1,5, Potagers sur le toit ×2 |
-| Places plantées | Places des fontaines | Une fontaine au centre de chaque place | +1,5 % par Saison achevée (au lieu de +1 % de plus par Jalon) |
+| Rue jardin | Rue des enfants | Marelle, bacs à sable, arbres d'alignement | Les Graines mûrissent 20 s plus tôt (au lieu du clic ×2) |
+| Jardins de pluie | Bassin d'orage | Un grand bassin en gradins, roseaux | Eau ×1,5 ; l'Averse dure ×2 |
+| Corridor des pollinisateurs | Haie bocagère | Une haie continue d'arbustes | Les Graines mûrissent 20 s plus tôt, les visites reviennent 20 % plus vite |
+| Rivière retrouvée | Rivière baignade | Un ponton et des baigneurs | Les Graines mûrissent 30 s plus tôt, +1 h de plafond hors ligne |
+| Parc du parking | Marché couvert | Une halle aux toits rayés et ses étals | Collecteurs d'eau 20 % moins chers |
+| Verger de l'entrepôt | Serres de l'entrepôt | Des serres vitrées | Les Graines mûrissent 20 s plus tôt |
+| Toits vivants | Toits potagers | Des rangs de cultures sur les toits | Biodiversité ×1,5, Eau ×1,5 |
+| Places plantées | Places des fontaines | Une fontaine au centre de chaque place | Sites de la biorégion 20 % moins chers en Eau (au lieu de +1 % de plus par Jalon) |
+
+Depuis le lot 7 (§9.17), les deux avenirs sont deux styles : le premier sert la Lumière, le second les Graines ou l'Eau.
 
 > Le décor, les couleurs de l'héliotrope et le mode photo sont retirés par l'allègement (§9.17, lot 4) ; textes gardés pour l'historique. L'héliotrope fleurit lilas.
 
@@ -1297,6 +1301,8 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Sauvegarde (lot 5).** Version 46 : les voies restent, chaque bâtiment peut changer une fois de plus.
 - **Lot 6 : des paliers qui changent une règle (§5.1, §5.3).** À 150 et 300 exemplaires, l'amélioration d'un bâtiment change une règle au lieu de doubler : clic, Floraison, potager, Papillon, Graines jusqu'à 30 s plus tôt, collecteurs et sites 25 % moins chers, Eau, biodiversité. « Synergies renforcées » double toutes les synergies une fois 15 d'entre elles achetées. Les règles suivent la forme commune des bonus (`rule`).
 - **Équilibrage (lot 6).** Le joueur de référence achète les règles dès que sa réserve les couvre. 1ʳᵉ Saison conseillée 53 min, Cycles 2 à 4 en 24, 36 et 42 min, essaimages à 3 h et 4 h de jeu. Deux doublements de moins par bâtiment ne se voient pas : passé le 1ᵉʳ Cycle, la maturité des Graines fixe la Saison, et les règles qui la raccourcissent compensent.
+- **Lot 7 : le quartier compte (§6.4, §6.5).** Les seconds avenirs servent les Graines (20 à 30 s plus tôt) ou l'Eau (×1,5, collecteurs ou sites 20 % moins chers). Chaque quartier voisin ajoute +3 % de production (l'ancienne tour des semences) et un effet sur le rythme : 30 s de maturité en moins pour deux d'entre eux, collecteurs ou sites 10 % moins chers pour les autres ; les Halles reprennent le tram (+1 % par quartier restauré). Le simulateur restaure les quartiers dès que sa réserve les couvre.
+- **Équilibrage (lot 7).** 1ʳᵉ Saison conseillée 53 min ; Cycles 2 à 4 en 22, 26 et 35 min (cibles 30, 35 et 45, entre −28 % et −23 %) ; essaimages à 2 h 53 et 3 h 53 de jeu (cibles 4 h et 5 h). 30 s de maturité par quartier faisaient tomber le 2ᵉ Cycle à 20 min : seuls deux quartiers la raccourcissent. Le lot 9 remesure les cibles.
 
 ## 10. Écrans et interface
 

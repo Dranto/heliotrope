@@ -3,6 +3,7 @@ import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
 import { SEED_RIPENING_SECONDS } from './seasons';
 import { RULES_RIPENING_SECONDS } from './upgrades';
+import { DISTRICTS_RIPENING_SECONDS } from './districts';
 import {
   ADVISED_CYCLE_TARGET,
   PACING_TARGETS,
@@ -83,8 +84,10 @@ describe('the Bioregion and the first Cycle of water (§7.4)', () => {
 
   it('keeps every later Season at least as long as the Seeds take to ripen (§7)', () => {
     // The first one finishes the second Season, the last one is cut short by the Cycle.
+    // The rules of the buildings and the districts (lots 6 and 7) shorten the ripening.
+    const shortest = SEED_RIPENING_SECONDS - RULES_RIPENING_SECONDS - DISTRICTS_RIPENING_SECONDS;
     for (const seconds of run.seasons.slice(1, -1)) {
-      expect(seconds).toBeGreaterThanOrEqual(SEED_RIPENING_SECONDS);
+      expect(seconds).toBeGreaterThanOrEqual(shortest);
     }
   });
 
@@ -103,7 +106,7 @@ describe('later Seasons, after the first Cycle (§7)', () => {
 
   it('lasts at least the ripening time, Season after Season', () => {
     // The rules of the buildings (lot 6) shorten the ripening once their tier is reached.
-    const shortest = SEED_RIPENING_SECONDS - RULES_RIPENING_SECONDS;
+    const shortest = SEED_RIPENING_SECONDS - RULES_RIPENING_SECONDS - DISTRICTS_RIPENING_SECONDS;
     for (const seconds of seasons) expect(seconds).toBeGreaterThanOrEqual(shortest);
   });
 

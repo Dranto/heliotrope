@@ -22,6 +22,13 @@ import { buyGenerator, buyUpgrade, canBuyGenerator, earnLight, tick } from './ti
 import type { UpgradeId } from './upgrades';
 import { PARCELS, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
+import {
+  canRestoreDistrict,
+  DISTRICTS,
+  offeredDistrict,
+  restoreDistrict,
+  type DistrictId,
+} from './districts';
 import { carryOutProject, offeredParcels, offeredProjects, restoreParcel } from './restoration';
 import {
   CANOPY_IDS,
@@ -78,7 +85,8 @@ type Option =
   | { kind: 'generator'; id: GeneratorId }
   | { kind: 'upgrade'; id: UpgradeId }
   | { kind: 'parcel'; id: ParcelId }
-  | { kind: 'project'; id: ProjectId };
+  | { kind: 'project'; id: ProjectId }
+  | { kind: 'district'; id: DistrictId };
 
 function income(state: GameState, clicksPerSecond: number): number {
   return lightPerSecond(state) + clicksPerSecond * clickValue(state);
@@ -94,6 +102,8 @@ function apply(state: GameState, option: Option): GameState {
       return restoreParcel(state, option.id);
     case 'project':
       return carryOutProject(state, option.id);
+    case 'district':
+      return restoreDistrict(state, option.id);
   }
 }
 
@@ -107,6 +117,8 @@ function cost(state: GameState, option: Option): number {
       return PARCELS[option.id].cost;
     case 'project':
       return PROJECTS[option.id].cost;
+    case 'district':
+      return DISTRICTS[option.id].cost;
   }
 }
 
@@ -126,6 +138,11 @@ function bestOption(state: GameState, clicksPerSecond: number): Option {
     (u) => u.effect.kind === 'rule' && u.cost <= state.resources.light,
   );
   if (rule) return { kind: 'upgrade', id: rule.id };
+  // The neighbouring districts too (lot 7): their pace shows in the Seeds and the Water.
+  const district = offeredDistrict(state);
+  if (district && canRestoreDistrict(state, district.id)) {
+    return { kind: 'district', id: district.id };
+  }
   const current = income(state, clicksPerSecond);
   const options: Option[] = [
     ...GENERATOR_IDS.map((id) => ({ kind: 'generator', id }) as const),

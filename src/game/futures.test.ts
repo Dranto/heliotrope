@@ -1,9 +1,9 @@
 import { ACHIEVEMENT_LIST } from './achievements';
 import { PARCEL_LIST, parcelBonuses } from './parcels';
-import { clickValue, generatorMultiplier } from './production';
+import { clickValue } from './production';
 import { canChangeFuture, changeFuture, futureOf, restoreParcel } from './restoration';
 import { deserialize, serialize } from './save';
-import { startNewSeason } from './seasons';
+import { seasonRipeningSeconds, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import { withAllIntroduced } from './introductions';
 
@@ -35,7 +35,8 @@ describe('The two futures of a parcel (§6.5, M16)', () => {
     expect(futureOf(first, 'gardenStreet')).toBe(0);
     expect(futureOf(second, 'gardenStreet')).toBe(1);
     expect(clickValue(first) / clickValue(second)).toBeCloseTo(2);
-    expect(generatorMultiplier(second, 'pot') / generatorMultiplier(first, 'pot')).toBeCloseTo(2);
+    // Since lot 7 the second future serves the Seeds: the Season ripens 20 s sooner.
+    expect(seasonRipeningSeconds(first) - seasonRipeningSeconds(second)).toBe(20);
   });
 
   it('changes once in every Cycle of water, and keeps the change across Seasons', () => {

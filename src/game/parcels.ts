@@ -24,7 +24,8 @@ export interface ParcelDef {
   bonuses: readonly Bonus[];
   /**
    * Its second future (§6.5, M16): another drawing and an effect of the same
-   * weight, chosen when restoring and changeable once per Cycle of water.
+   * weight, chosen when restoring and changeable once per Cycle of water. Since lot 7 of the
+   * slimming plan, the first future serves the Light and the second the Seeds or the Water.
    */
   second: readonly Bonus[];
 }
@@ -41,11 +42,8 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
     cost: 1_500,
     phase: 1,
     bonuses: [{ kind: 'clickMultiplier', factor: 2 }],
-    // The play street: the first buildings rather than the click.
-    second: [
-      { kind: 'generatorMultiplier', generator: 'pot', factor: 2 },
-      { kind: 'generatorMultiplier', generator: 'balconyPanel', factor: 2 },
-    ],
+    // The play street: the Season ripens sooner rather than a stronger click.
+    second: [{ kind: 'ripening', seconds: 20 }],
   },
   {
     id: 'rainGardens',
@@ -57,11 +55,9 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
       { kind: 'water', factor: 1.25 },
       { kind: 'effectDuration', effect: 'shower', factor: 2 },
     ],
-    // The storm pond: the same, the panels first.
+    // The storm pond: the rain kept for the Bioregion.
     second: [
-      { kind: 'generatorMultiplier', generator: 'pot', factor: 1.5 },
-      { kind: 'generatorMultiplier', generator: 'balconyPanel', factor: 2 },
-      { kind: 'water', factor: 1.25 },
+      { kind: 'water', factor: 1.5 },
       { kind: 'effectDuration', effect: 'shower', factor: 2 },
     ],
   },
@@ -73,10 +69,10 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
       { kind: 'butterflyInterval', factor: 0.8 },
       { kind: 'visitInterval', factor: 0.8 },
     ],
-    // The hedgerow: more visits, fewer butterflies.
+    // The hedgerow: more visits, and the Seeds ripen sooner.
     second: [
-      { kind: 'butterflyInterval', factor: 0.9 },
-      { kind: 'visitInterval', factor: 0.7 },
+      { kind: 'ripening', seconds: 20 },
+      { kind: 'visitInterval', factor: 0.8 },
     ],
   },
   {
@@ -87,10 +83,10 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
       { kind: 'offlineCap', seconds: 2 * 3600 },
       { kind: 'water', factor: 1.5 },
     ],
-    // The bathing river: more Water, a shorter absence.
+    // The bathing river: the Seeds ripen sooner, a shorter absence.
     second: [
       { kind: 'offlineCap', seconds: 3600 },
-      { kind: 'water', factor: 1.75 },
+      { kind: 'ripening', seconds: 30 },
     ],
   },
   {
@@ -98,8 +94,8 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
     cost: 3e7,
     phase: 3,
     bonuses: [{ kind: 'global', bonus: 0.1 }],
-    // The covered market: +10% once the eight parcels are restored.
-    second: [{ kind: 'perParcel', bonus: 0.0125 }],
+    // The covered market: the collectors' materials come cheaper.
+    second: [{ kind: 'collectorDiscount', fraction: 0.2 }],
   },
   {
     id: 'orchard',
@@ -109,21 +105,18 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
       { kind: 'generatorMultiplier', generator: 'rooftopGarden', factor: 1.5 },
       { kind: 'generatorMultiplier', generator: 'greenhouse', factor: 1.5 },
     ],
-    // The warehouse glasshouses: the next two buildings.
-    second: [
-      { kind: 'generatorMultiplier', generator: 'verticalFarm', factor: 1.5 },
-      { kind: 'generatorMultiplier', generator: 'mirrorPlant', factor: 1.5 },
-    ],
+    // The warehouse glasshouses: seedlings ready sooner.
+    second: [{ kind: 'ripening', seconds: 20 }],
   },
   {
     id: 'livingRoofs',
     cost: 3e9,
     phase: 3,
     bonuses: [{ kind: 'biodiversityFactor', factor: 2 }],
-    // Kitchen-garden roofs: a little less biodiversity, twice the rooftop gardens.
+    // Kitchen-garden roofs: a little less biodiversity, the roofs gather rain.
     second: [
       { kind: 'biodiversityFactor', factor: 1.5 },
-      { kind: 'generatorMultiplier', generator: 'rooftopGarden', factor: 2 },
+      { kind: 'water', factor: 1.5 },
     ],
   },
   {
@@ -131,8 +124,8 @@ export const PARCEL_LIST: readonly ParcelDef[] = [
     cost: 3e10,
     phase: 3,
     bonuses: [{ kind: 'perAchievement', bonus: 0.01 }],
-    // Fountain squares: they grow with the Seasons rather than the Milestones.
-    second: [{ kind: 'perSeason', bonus: 0.015 }],
+    // Fountain squares: the sites of the Bioregion cost less Water.
+    second: [{ kind: 'siteDiscount', fraction: 0.2 }],
   },
 ];
 
