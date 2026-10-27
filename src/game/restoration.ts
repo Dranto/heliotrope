@@ -1,5 +1,6 @@
 // Restoring the neighbourhood (docs/game-design.md §6.1, §6.2): when parcels and projects are
 // offered, and the player actions that carry them out. Pure functions returning new state.
+import { discountFactor } from './bonuses';
 import { isIntroduced } from './introductions';
 import {
   PARCEL_LIST,
@@ -25,13 +26,23 @@ export function isParcelOffered(state: GameState, id: ParcelId): boolean {
   );
 }
 
+/** Light a parcel costs, with the talents of the Quartier (§7.1). */
+export function parcelCost(state: GameState, id: ParcelId): number {
+  return PARCELS[id].cost * discountFactor(state, 'landDiscount');
+}
+
+/** Light a project costs, with the talents of the Quartier (§7.1). */
+export function projectCost(state: GameState, id: ProjectId): number {
+  return PROJECTS[id].cost * discountFactor(state, 'projectDiscount');
+}
+
 /** Parcels offered and not restored yet, cheapest first. */
 export function offeredParcels(state: GameState): ParcelDef[] {
   return PARCEL_LIST.filter((p) => isParcelOffered(state, p.id));
 }
 
 export function canRestoreParcel(state: GameState, id: ParcelId): boolean {
-  return isParcelOffered(state, id) && state.resources.light >= PARCELS[id].cost;
+  return isParcelOffered(state, id) && state.resources.light >= parcelCost(state, id);
 }
 
 /**
@@ -42,7 +53,10 @@ export function restoreParcel(state: GameState, id: ParcelId, future: Future = 0
   if (!canRestoreParcel(state, id)) return state;
   return {
     ...state,
-    resources: { ...state.resources, light: Math.max(0, state.resources.light - PARCELS[id].cost) },
+    resources: {
+      ...state.resources,
+      light: Math.max(0, state.resources.light - parcelCost(state, id)),
+    },
     parcels: [...state.parcels, id],
     futures: withFuture(state.futures, id, future),
     idleSeconds: 0,
@@ -113,7 +127,7 @@ export function canCarryOutProject(state: GameState, id: ProjectId): boolean {
   return (
     !state.projects.includes(id) &&
     isProjectUnlocked(state, id) &&
-    state.resources.light >= PROJECTS[id].cost
+    state.resources.light >= projectCost(state, id)
   );
 }
 
@@ -124,7 +138,7 @@ export function carryOutProject(state: GameState, id: ProjectId): GameState {
     ...state,
     resources: {
       ...state.resources,
-      light: Math.max(0, state.resources.light - PROJECTS[id].cost),
+      light: Math.max(0, state.resources.light - projectCost(state, id)),
     },
     projects: [...state.projects, id],
     idleSeconds: 0,
@@ -135,7 +149,8 @@ export function carryOutProject(state: GameState, id: ProjectId): GameState {
 export function affordableProjects(state: GameState): ProjectId[] {
   const ids: ProjectId[] = [];
   let light = state.resources.light;
-  for (const { id, cost } of [...offeredProjects(state)].sort((a, b) => a.cost - b.cost)) {
+  for (const { id } of [...offeredProjects(state)].sort((a, b) => a.cost - b.cost)) {
+    const cost = projectCost(state, id);
     if (cost > light) break;
     light -= cost;
     ids.push(id);

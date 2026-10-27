@@ -2,7 +2,7 @@ import { achievementBonus } from '../game/achievements';
 import { formatNumber, formatPercent } from '../game/format';
 import { biodiversityBonus, clickValue, lightPerSecond } from '../game/production';
 import { seedBonus } from '../game/seasons';
-import { TALENT_LIST } from '../game/talents';
+import { TREE_SIZE } from '../game/talents';
 import { t } from '../i18n';
 import { Dialog } from './Dialog';
 import { ProductionCurve } from './ProductionCurve';
@@ -110,10 +110,7 @@ export function Stats({ onClose }: { onClose: () => void }) {
             value={t.stats.percent(formatPercent(achievementBonus(state)))}
           />
           {state.seeds > 0 && (
-            <Row
-              label={t.stats.talents}
-              value={`${state.talents.length} / ${TALENT_LIST.length}`}
-            />
+            <Row label={t.stats.talents} value={`${state.talents.length} / ${TREE_SIZE}`} />
           )}
           {state.allTimeWater > 0 && (
             <Row

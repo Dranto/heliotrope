@@ -4,7 +4,7 @@
 // an effect on the pace (Seeds that ripen sooner, cheaper collectors or sites, slimming plan
 // lot 7) and the +3% of production the seed tower gave.
 // Names live in src/i18n, places and art in src/ui.
-import type { Bonus } from './bonuses';
+import { discountFactor, type Bonus } from './bonuses';
 import { PARCEL_IDS } from './parcels';
 import type { GameState } from './state';
 
@@ -157,8 +157,13 @@ export function offeredDistrict(state: GameState): DistrictDef | null {
   return next && state.totalLight >= next.cost * DISTRICT_REVEAL_SHARE ? next : null;
 }
 
+/** Light a district costs, with the talents of the Quartier (§7.1). */
+export function districtCost(state: GameState, id: DistrictId): number {
+  return DISTRICTS[id].cost * discountFactor(state, 'landDiscount');
+}
+
 export function canRestoreDistrict(state: GameState, id: DistrictId): boolean {
-  return offeredDistrict(state)?.id === id && state.resources.light >= DISTRICTS[id].cost;
+  return offeredDistrict(state)?.id === id && state.resources.light >= districtCost(state, id);
 }
 
 /** Player action: restore a district. It stays restored in every later Season and Cycle. */
@@ -166,7 +171,7 @@ export function restoreDistrict(state: GameState, id: DistrictId): GameState {
   if (!canRestoreDistrict(state, id)) return state;
   return {
     ...state,
-    resources: { ...state.resources, light: state.resources.light - DISTRICTS[id].cost },
+    resources: { ...state.resources, light: state.resources.light - districtCost(state, id) },
     districts: [...state.districts, id],
     idleSeconds: 0,
   };

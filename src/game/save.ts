@@ -20,7 +20,7 @@ import { validWeather } from './weather';
 import { isPanelId, shownPanels, type PanelId } from './panels';
 import { deltaSourcesSpent, LOCK_FACTORS, validDeltaLevels, validWidths } from './delta';
 import { isVarietyId, type VarietyId } from './seedBank';
-import { SOWER_FACTORS, validCanopyLevels, validTalents } from './talents';
+import { SOWER_FACTORS, validCanopyLevels, validTalentSwaps, validTalents } from './talents';
 import { COOPERATIVE_IDS, isCooperativeId } from './cooperatives';
 import { isSpeciesId, type SpeciesId } from './species';
 import { emptyCurve, validHistory } from './history';
@@ -161,6 +161,8 @@ const migrations: Record<number, Migration> = {
     const growth = raw.growth as Record<string, unknown> | undefined;
     return { ...raw, version: 46, growth: growth ? { ...growth, swapped: {} } : growth };
   },
+  // v47 (lot 8): the forks of the tree, never swapped for an older save (the default below).
+  46: (raw) => ({ ...raw, version: 47 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -289,6 +291,7 @@ export function deserialize(json: string, now: number): GameState | null {
   if (Array.isArray(data.talents)) {
     state.talents = validTalents(data.talents, state.seeds + state.rootedSeeds);
   }
+  state.talentSwaps = validTalentSwaps(data.talentSwaps);
   const canopy = data.canopy as Record<string, unknown> | undefined;
   state.canopy = {
     levels: validCanopyLevels(canopy?.levels, state.talents, state.seeds + state.rootedSeeds),

@@ -1,4 +1,4 @@
-import { offeredDistrict, type DistrictId } from './districts';
+import { districtCost, offeredDistrict, type DistrictId } from './districts';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 import type { ParcelId } from './parcels';
 import {
@@ -8,7 +8,7 @@ import {
   lightPerSecond,
 } from './production';
 import type { ProjectId } from './projects';
-import { offeredParcels, offeredProjects } from './restoration';
+import { offeredParcels, offeredProjects, parcelCost, projectCost } from './restoration';
 import type { GameState } from './state';
 import type { UpgradeId } from './upgrades';
 
@@ -44,10 +44,13 @@ function offers(state: GameState): Goal[] {
     }
   }
   for (const u of availableUpgrades(state)) goals.push({ kind: 'upgrade', id: u.id, cost: u.cost });
-  for (const p of offeredParcels(state)) goals.push({ kind: 'parcel', id: p.id, cost: p.cost });
-  for (const p of offeredProjects(state)) goals.push({ kind: 'project', id: p.id, cost: p.cost });
+  for (const p of offeredParcels(state))
+    goals.push({ kind: 'parcel', id: p.id, cost: parcelCost(state, p.id) });
+  for (const p of offeredProjects(state))
+    goals.push({ kind: 'project', id: p.id, cost: projectCost(state, p.id) });
   const district = offeredDistrict(state);
-  if (district) goals.push({ kind: 'district', id: district.id, cost: district.cost });
+  if (district)
+    goals.push({ kind: 'district', id: district.id, cost: districtCost(state, district.id) });
   return goals;
 }
 

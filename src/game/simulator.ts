@@ -20,16 +20,23 @@ import { ADVISED_FIRST_SEASON_SEEDS, lightForSeeds, seedsToGain, startNewSeason 
 import { createInitialState, type GameState } from './state';
 import { buyGenerator, buyUpgrade, canBuyGenerator, earnLight, tick } from './tick';
 import type { UpgradeId } from './upgrades';
-import { PARCELS, type ParcelId } from './parcels';
-import { PROJECTS, type ProjectId } from './projects';
+import { type ParcelId } from './parcels';
+import { type ProjectId } from './projects';
 import {
   canRestoreDistrict,
-  DISTRICTS,
+  districtCost,
   offeredDistrict,
   restoreDistrict,
   type DistrictId,
 } from './districts';
-import { carryOutProject, offeredParcels, offeredProjects, restoreParcel } from './restoration';
+import {
+  carryOutProject,
+  offeredParcels,
+  offeredProjects,
+  parcelCost,
+  projectCost,
+  restoreParcel,
+} from './restoration';
 import {
   CANOPY_IDS,
   canRaiseCanopy,
@@ -114,11 +121,11 @@ function cost(state: GameState, option: Option): number {
     case 'upgrade':
       return availableUpgrades(state).find((u) => u.id === option.id)!.cost;
     case 'parcel':
-      return PARCELS[option.id].cost;
+      return parcelCost(state, option.id);
     case 'project':
-      return PROJECTS[option.id].cost;
+      return projectCost(state, option.id);
     case 'district':
-      return DISTRICTS[option.id].cost;
+      return districtCost(state, option.id);
   }
 }
 
@@ -310,7 +317,8 @@ export function tendBioregion(state: GameState, income: number): GameState {
 
 /**
  * Talents the reference player learns at the start of a Season, in this order, as far as the
- * Seeds go (§7.1): the gardeners and roofers first, then a little of each branch.
+ * Seeds go (§7.1): the gardeners and roofers first, then a little of each branch. At the forks it
+ * keeps the first talent (Boutures, Longue floraison, Veilleurs de nuit).
  */
 export const REFERENCE_TALENTS: readonly TalentId[] = [
   'gardenersCoop',
@@ -330,6 +338,11 @@ export const REFERENCE_TALENTS: readonly TalentId[] = [
   'motherForest',
   'beeDance',
   'longMemory',
+  'tramMarket',
+  'commonWorks',
+  'deepRoots',
+  'landTrust',
+  'openStreets',
 ];
 
 /** Learn the reference talents the Seeds left in the tree can pay for. */
@@ -378,9 +391,11 @@ export const PACING_TARGETS: Record<GeneratorId | 'advisedSeason', number> = {
 /**
  * §8 endgame targets (M19): length of the Cycles of water after the first, in seconds. Cycle 2
  * takes two or three Seasons of about 12 min depending on the Sources of the first (slimming
- * plan, lot 1): its target sits between the two until lot 9 fixes the relaunch rule.
+ * plan, lot 1): its target sits between the two until lot 9 fixes the relaunch rule. Cycles 3
+ * and 4 last 22 and 26 min or 26 and 35 min depending on when the Canopy opens (lot 8): their
+ * targets cover both until then.
  */
-export const CYCLE_TARGETS: readonly number[] = [30 * 60, 35 * 60, 45 * 60];
+export const CYCLE_TARGETS: readonly number[] = [30 * 60, 28 * 60, 32 * 60];
 
 /**
  * The reference player's later Seasons: each one is played until it would at least double the

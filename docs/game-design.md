@@ -551,7 +551,7 @@ Ni l'une ni l'autre ne suffit seule : un sol plus exigeant seul laissait des Sai
 
 Les Graines servent aussi de monnaie pour un arbre de talents permanents. Dépenser une Graine **ne réduit pas** le bonus de +5 % : le bonus dépend des Graines obtenues au total, la monnaie dépensable est un compteur séparé (`Graines à semer = Graines obtenues − Graines dépensées`). C'est le modèle de Cookie Clicker (niveau de prestige vs. puces célestes) : le joueur n'est jamais puni pour avoir dépensé. Les talents appris restent acquis d'une Saison à l'autre, et l'Arbre n'est accessible qu'avec une première Graine, donc dès la 2ᵉ Saison : la 1ʳᵉ Saison garde toutes ses décisions (décision D3).
 
-L'arbre compte **17 talents en trois branches**. Chaque talent demande son parent (le talent d'où part sa branche), sauf le premier de chaque branche. Les effets réutilisent la forme des bonus des parcelles et des projets (§6.1, §6.2), et chacun se lie à une mécanique existante plutôt que d'ajouter un multiplicateur isolé (synergies, biodiversité, Papillon doré, Saisons, hors ligne).
+L'arbre compte **17 talents en trois branches** ; depuis le lot 8 de l'allègement (§9.17), **25 talents en quatre branches, dont trois fourches** (ci-dessous). Chaque talent demande son parent (le talent d'où part sa branche), sauf le premier de chaque branche. Les effets réutilisent la forme des bonus des parcelles et des projets (§6.1, §6.2), et chacun se lie à une mécanique existante plutôt que d'ajouter un multiplicateur isolé (synergies, biodiversité, Papillon doré, Saisons, hors ligne).
 
 | Branche | Talent | Coût | Après | Effet |
 |---|---|---|---|---|
@@ -572,6 +572,21 @@ L'arbre compte **17 talents en trois branches**. Chaque talent demande son paren
 | | Le conseil de quartier | 3 | Les maraîchers | Coopérative : les améliorations |
 | | Les forestiers | 5 | Les ingénieurs du soleil | Coopérative : canopées et arcologies |
 | | Longue mémoire | 5 | Veilleurs de nuit | +12 h de plafond hors ligne (24 h avec les Veilleurs) |
+| **Le Quartier** (lot 8) | Marché du tram | 1 | — | Clic ×2 |
+| | Chantiers communs | 2 | Marché du tram | Les projets de quartier coûtent 25 % de moins |
+| | Racines profondes | 3 | Marché du tram | Bâtiments 10 % moins chers |
+| | Foncière solidaire | 3 | Chantiers communs | Les parcelles et les quartiers voisins coûtent 25 % de moins |
+| | Rues ouvertes | 5 | Racines profondes | Les visiteurs reviennent 25 % plus vite |
+
+**Les fourches (lot 8).** À trois endroits, deux talents de même parent et de même prix s'excluent : on apprend l'un **ou** l'autre, et l'un comme l'autre ouvre la suite de la branche.
+
+| Fourche | Talent | Ou bien | Coût | Après |
+|---|---|---|---|---|
+| Sol | Boutures : chaque Saison garde 10 % de chaque bâtiment | **Terre profonde** : les Graines mûrissent 2 min plus tôt | 2 | Mycorhizes |
+| Floraison | Longue floraison : la Floraison dure ×1,5 | **Prairie sauvage** : le potager pousse ×1,5 plus vite | 2 | Haies fleuries |
+| Veille | Veilleurs de nuit : +4 h de plafond hors ligne | **Gardiens des sources** : Eau ×1,25 | 1 | Les jardiniers |
+
+Un talent appris d'une fourche s'échange contre l'autre, sans Graine de plus, **une fois par Cycle de l'eau** : c'est l'orientation de toute une série de Saisons. L'arbre complet compte 22 talents (un par fourche) et coûte 58 Graines. Sur le dessin, le Quartier pousse bas à gauche, au-dessus du sol ; le talent écarté d'une fourche reste un bourgeon en pointillés à côté de la fleur de l'autre, et son panneau propose « Prendre à la place » ou dit que le choix se refait au prochain Cycle. Données dans `src/game/talents.ts` (`FORKS`).
 
 L'arbre complet coûte 44 Graines : un joueur en a 10 après sa 1ʳᵉ Saison conseillée, puis de plus en plus à chaque Saison. Les premières Graines suffisent pour un premier talent dans chaque branche et les deux premières coopératives.
 
@@ -579,7 +594,7 @@ L'arbre complet coûte 44 Graines : un joueur en a 10 après sa 1ʳᵉ Saison co
 
 #### La Canopée (M13)
 
-Une fois les 17 talents appris, l'Arbre a encore une place pour les Graines des Saisons tardives, qui en rapportent des centaines : au-dessus de la ramure s'ouvre la **Canopée**, des talents **à niveaux** dont chaque niveau coûte plus cher que le précédent. Les Graines semées y sont gardées pour toujours, comme les talents, et enracinées par un Cycle de l'eau (§7.4). Données dans `src/game/talents.ts` (`CANOPY_LIST`).
+Une fois les 17 talents appris (22 depuis le lot 8, un par fourche), l'Arbre a encore une place pour les Graines des Saisons tardives, qui en rapportent des centaines : au-dessus de la ramure s'ouvre la **Canopée**, des talents **à niveaux** dont chaque niveau coûte plus cher que le précédent. Les Graines semées y sont gardées pour toujours, comme les talents, et enracinées par un Cycle de l'eau (§7.4). Données dans `src/game/talents.ts` (`CANOPY_LIST`).
 
 | Talent | 1ᵉʳ niveau | Prix ×, par niveau | Niveaux | Effet au niveau *n* |
 |---|---|---|---|---|
@@ -596,7 +611,7 @@ Une fois les 17 talents appris, l'Arbre a encore une place pour les Graines des 
 La Canopée complète coûte environ 2 000 Graines : un puits de long terme, qui se remplit Cycle après Cycle. Ses effets restent liés à l'existant (synergies, Papillon, visites, Boutures) et modestes, pour allonger et alléger les Saisons tardives sans relancer leur emballement (§7, §8) ; le simulateur ne la joue pas, et les cibles du §8 ne bougent pas.
 
 - **Le semoir.** Une fois semé, un réglage de l'écran des Saisons choisit quand il relance : **éteint** (par défaut, décision D6 de la feuille de route), ou dès que les Graines mûres de la Saison multiplient celles déjà obtenues par **×1,5, ×2, ×3 ou ×5**. Il lance la Saison suivante ; il travaille à chaque pas de simulation, donc hors ligne aussi. C'est l'automatisation de la couche du dessous, comme les Coopératives pour les bâtiments.
-- **Écran.** Sous l'arbre, la section « La Canopée » liste ses neuf talents, leur niveau (des pastilles dorées), l'effet d'aujourd'hui et celui du niveau suivant, et le bouton Semer avec son prix. Avant les 17 talents, une ligne dit quand elle s'ouvre. Sur le dessin, une feuille dorée s'ajoute au-dessus du feuillage à chaque niveau semé et se balance doucement.
+- **Écran.** Sous l'arbre, la section « La Canopée » liste ses neuf talents, leur niveau (des pastilles dorées), l'effet d'aujourd'hui et celui du niveau suivant, et le bouton Semer avec son prix. Avant l'Arbre complet (22 talents), une ligne dit quand elle s'ouvre. Sur le dessin, une feuille dorée s'ajoute au-dessus du feuillage à chaque niveau semé et se balance doucement.
 - **Jalons (4).** Jeune canopée (1 niveau), Canopée touffue (18 niveaux), Cime (la Canopée complète), Semis spontané (le semoir lance 10 Saisons). 120 jalons en tout.
 - **Sauvegarde.** Version 15 : les niveaux de la Canopée et les réglages du semoir, rien de semé et le semoir éteint pour une sauvegarde plus ancienne.
 
@@ -874,8 +889,8 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 |---|---|---|---|---|
 | 1ᵉʳ (conseillé) | ~2 h 10 | 2 h 08 | une dizaine | 5 |
 | 2ᵉ | ~30 min | 24 min | 2 de 12 min | 9 |
-| 3ᵉ | ~35 min | 36 min | 3 de 12 min | 15 |
-| 4ᵉ | ~45 min | 40 min | 4 de 10 min | 24 |
+| 3ᵉ | ~28 min (35 avant le lot 8) | 22 min | 2 de 11 min | 17 |
+| 4ᵉ | ~32 min (45 avant le lot 8) | 26 min | 3 de 9 min | 28 |
 | 5ᵉ | (~1 h) | 1 h 10 | 6, de 10 à 16 min | 57 |
 | 6ᵉ | (~1 h 10) | 1 h 28 | 6, la dernière de 29 min | 90 |
 
@@ -962,7 +977,7 @@ Environ 40 jalons dans le MVP, chacun donnant **+1 % de production globale**. Fa
 - **Améliorations** (dans une même Saison) : 10, 25, 50, 75 améliorations ; « Fil doré » (une première synergie entre bâtiments), « Toile dorée » (les 18 synergies entre bâtiments), « Mains d'or » (les 10 améliorations du clic).
 - **La fleur** : 10, 100, 1 000, 10 000, 100 000 clics ; un clic qui vaut 1 000 puis 1 M Lumière ; caché : « Graine qui dort » (récolter 1 000 Lumière dans une Saison sans aucun bâtiment).
 - **Papillon doré** : 1, 10, 25, 50, 100 papillons ; « Pollen d'or » (cliquer la fleur pendant une Pollinisation) ; « Bouquet » et « Grand bouquet » (3 puis 5 effets en même temps, §5.7, M31) ; caché : « De justesse » (attraper le papillon dans ses 2 dernières secondes).
-- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 1, 25, 250 récoltes du potager, « Croisement » et « Grainothèque » (§9.7, M14) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
+- **Le quartier** : 1, 4, 8 parcelles restaurées ; 1, 8, 15 projets dans une même Saison ; 1, 9, 17, 22 talents de l'Arbre des Saisons ; 1 et 18 niveaux de la Canopée, « Cime » (la Canopée complète), « Semis spontané » (10 Saisons lancées par le semoir) (§7.1, M13) ; 1, 25, 250 récoltes du potager, « Croisement » et « Grainothèque » (§9.7, M14) ; 100 et 1 000 achats des coopératives ; 1, 10 et 18 espèces de l'Herbier revenues (§9.5, M8).
 - **Saisons** : 1, 3, 5, 10, 25 Saisons ; 1 h et 24 h de jeu ; « Saison éclair » (la Lumière de 10 Graines en moins de 30 min de Saison) ; « Longue saison » (4 h dans la même Saison) ; « Moisson tardive » (gagner 50 Graines d'un coup) ; 1 puis 4 Saisons à défi réussies (§7.3, M8 ; retirés au lot 4) ; cachés : « Photosynthèse lente » (10 min sans rien acheter, avec au moins un bâtiment), « Semis précoce » (lancer une Saison avant les 10 Graines conseillées).
 
 Les jalons sont conservés d'une Saison à l'autre. Chaque jalon atteint **éclot** en haut de l'écran : un médaillon dont l'anneau doré se dessine, une couronne de laurier qui pousse feuille à feuille, des pétales lilas qui s'ouvrent, avec le nom du jalon, sa condition et « Production +1 % » ; il s'efface après environ 4 s. Plusieurs jalons atteints ensemble éclosent l'un après l'autre (au-delà de trois d'un coup, un seul médaillon les compte). Le compteur du bouton « Jalons » scintille à chaque nouveau jalon. Pas de texte d'ambiance : seulement le nom et la condition. Avec les animations réduites, le médaillon apparaît et disparaît sans mouvement. Les lecteurs d'écran entendent « Jalon atteint : nom ».
@@ -1303,6 +1318,9 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Équilibrage (lot 6).** Le joueur de référence achète les règles dès que sa réserve les couvre. 1ʳᵉ Saison conseillée 53 min, Cycles 2 à 4 en 24, 36 et 42 min, essaimages à 3 h et 4 h de jeu. Deux doublements de moins par bâtiment ne se voient pas : passé le 1ᵉʳ Cycle, la maturité des Graines fixe la Saison, et les règles qui la raccourcissent compensent.
 - **Lot 7 : le quartier compte (§6.4, §6.5).** Les seconds avenirs servent les Graines (20 à 30 s plus tôt) ou l'Eau (×1,5, collecteurs ou sites 20 % moins chers). Chaque quartier voisin ajoute +3 % de production (l'ancienne tour des semences) et un effet sur le rythme : 30 s de maturité en moins pour deux d'entre eux, collecteurs ou sites 10 % moins chers pour les autres ; les Halles reprennent le tram (+1 % par quartier restauré). Le simulateur restaure les quartiers dès que sa réserve les couvre.
 - **Équilibrage (lot 7).** 1ʳᵉ Saison conseillée 53 min ; Cycles 2 à 4 en 22, 26 et 35 min (cibles 30, 35 et 45, entre −28 % et −23 %) ; essaimages à 2 h 53 et 3 h 53 de jeu (cibles 4 h et 5 h). 30 s de maturité par quartier faisaient tomber le 2ᵉ Cycle à 20 min : seuls deux quartiers la raccourcissent. Le lot 9 remesure les cibles.
+- **Lot 8 : l'Arbre s'étend (§7.1).** Une quatrième branche, Le Quartier (5 talents) : clic ×2 de l'ancien Marché du tram, projets 25 % moins chers, bâtiments 10 % moins chers des anciennes Racines profondes, parcelles et quartiers voisins 25 % moins chers, visiteurs 25 % plus fréquents. Trois fourches opposent Boutures et Terre profonde (2 min de maturité), Longue floraison et Prairie sauvage (potager ×1,5), Veilleurs de nuit et Gardiens des sources (Eau ×1,25) ; l'échange se fait une fois par Cycle. La Canopée s'ouvre avec 22 talents. Un Jalon : « Arbre du quartier » (22 talents), **143 Jalons**.
+- **Équilibrage (lot 8).** Le joueur de référence garde le premier talent de chaque fourche et apprend le Quartier après les trois anciennes branches. 1ʳᵉ Saison conseillée 53 min ; Cycles 2 à 4 en 23, 22 et 26 min ; essaimages à 2 h 54 et 3 h 49 de jeu (cibles 4 h et 5 h). L'Arbre complet ouvre la Canopée plus tard dans la partie, et sa Pépinière raccourcit alors les Saisons des Cycles 3 et 4 (9 min au lieu de 11) : selon le moment où les Sources franchissent ×1,5, ces Cycles durent 22 et 26 min ou 26 et 35 min. Les cibles des Cycles 3 et 4 passent de 35 et 45 min à 28 et 32 min pour couvrir les deux, en attendant que le lot 9 corrige la règle de relance ×1,5 et remesure le §8.
+- **Sauvegarde (lot 8).** Version 47 : aucune fourche n'a encore été échangée ; une sauvegarde qui tiendrait les deux talents d'une fourche garde le premier appris.
 
 ## 10. Écrans et interface
 

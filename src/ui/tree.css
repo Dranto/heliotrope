@@ -19,6 +19,12 @@
   --branch-ink: #24563f;
 }
 
+[data-branch='quarter'] {
+  --branch: #3f7fa3;
+  --branch-soft: #bfd9e6;
+  --branch-ink: #24536e;
+}
+
 /* ---------- Tree screen ---------- */
 
 .tree-dialog {
@@ -180,6 +186,13 @@
   opacity: 0.55;
 }
 
+/* The other talent of a learnt fork: a dashed bud beside its twin's blossom. */
+.tree-node[data-state='excluded'] .tree-bud {
+  stroke: var(--branch);
+  stroke-dasharray: 2 2;
+  opacity: 0.7;
+}
+
 .tree-blossom .petal {
   fill: var(--branch-soft);
   stroke: var(--branch);
@@ -264,6 +277,12 @@
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--leaf);
+}
+
+.tree-fork {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
 }
 
 .tree-learnt-tag,

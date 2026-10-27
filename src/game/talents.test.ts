@@ -1,15 +1,26 @@
-import { globalMultiplier, clickValue } from './production';
-import { SEED_RIPENING_SECONDS, startNewSeason } from './seasons';
+import { factorOf } from './bonuses';
+import { globalMultiplier, clickValue, generatorCost } from './production';
+import { districtCost } from './districts';
+import { parcelCost, projectCost } from './restoration';
+import { deserialize, serialize } from './save';
+import { SEED_RIPENING_SECONDS, seasonRipeningSeconds, startNewSeason } from './seasons';
 import { createInitialState, type GameState } from './state';
 import {
   availableSeeds,
   canLearnTalent,
+  canSwapTalent,
+  FORK_IDS,
+  FORKS,
+  isCanopyOpen,
+  isTalentExcluded,
   isTalentReachable,
   learnTalent,
   seedsSpent,
+  swapTalent,
   TALENT_BRANCHES,
   TALENT_LIST,
   TALENTS,
+  TREE_SIZE,
 } from './talents';
 import { offlineCap } from './offline';
 import { effectSeconds } from './butterfly';
@@ -19,7 +30,7 @@ function withSeeds(seeds: number, extra: Partial<GameState> = {}): GameState {
 }
 
 describe('Tree of Seasons (§7.1)', () => {
-  it('has three branches, each rooted in one talent, with parents learnt first', () => {
+  it('has four branches, each rooted in one talent, with parents learnt first', () => {
     for (const branch of TALENT_BRANCHES) {
       const talents = TALENT_LIST.filter((t) => t.branch === branch);
       expect(talents.filter((t) => t.parent === undefined)).toHaveLength(1);
@@ -111,5 +122,79 @@ describe('Tree of Seasons (§7.1)', () => {
     expect(effectSeconds(bloom, 'bloom')).toBe(1.5 * effectSeconds(base, 'bloom'));
     const watched = withSeeds(20, { talents: ['gardenersCoop', 'nightWatch', 'longMemory'] });
     expect(offlineCap(watched)).toBe(24 * 3600);
+  });
+
+  it('the Quartier lowers the prices of the neighbourhood and brings the visitors back sooner', () => {
+    const base = withSeeds(20);
+    const quarter = withSeeds(20, {
+      talents: ['tramMarket', 'commonWorks', 'deepRoots', 'landTrust', 'openStreets'],
+    });
+    expect(clickValue(learnTalent(base, 'tramMarket'))).toBe(2 * clickValue(base));
+    expect(projectCost(quarter, 'seedSwap')).toBeCloseTo(0.75 * projectCost(base, 'seedSwap'));
+    expect(parcelCost(quarter, 'gardenStreet')).toBeCloseTo(
+      0.75 * parcelCost(base, 'gardenStreet'),
+    );
+    expect(districtCost(quarter, 'tanneries')).toBeCloseTo(0.75 * districtCost(base, 'tanneries'));
+    expect(generatorCost(quarter, 'pot')).toBeLessThan(generatorCost(base, 'pot'));
+    expect(factorOf(quarter, 'visitInterval')).toBeCloseTo(0.75 * factorOf(base, 'visitInterval'));
+  });
+});
+
+describe('forks of the Tree of Seasons (§7.1, slimming plan lot 8)', () => {
+  it('pairs two talents with the same parent and cost', () => {
+    for (const fork of FORK_IDS) {
+      const [a, b] = FORKS[fork].map((id) => TALENTS[id]);
+      expect(a!.parent).toBe(b!.parent);
+      expect(a!.cost).toBe(b!.cost);
+      expect(a!.branch).toBe(b!.branch);
+    }
+    expect(TREE_SIZE).toBe(TALENT_LIST.length - 3);
+  });
+
+  it('learning one talent of a fork shuts its twin, and both lead on', () => {
+    const rooted = learnTalent(withSeeds(20), 'mycorrhiza');
+    const deep = learnTalent(rooted, 'deepSoil');
+    expect(isTalentExcluded(deep, 'cuttings')).toBe(true);
+    expect(canLearnTalent(deep, 'cuttings')).toBe(false);
+    expect(learnTalent(deep, 'cuttings')).toBe(deep);
+    expect(canLearnTalent(deep, 'livingSoil')).toBe(true);
+    expect(seasonRipeningSeconds(rooted) - seasonRipeningSeconds(deep)).toBe(120);
+  });
+
+  it('swaps a fork once per Cycle of water, for the same Seeds', () => {
+    const state = withSeeds(20, { talents: ['mycorrhiza', 'cuttings', 'livingSoil'] });
+    expect(canSwapTalent(state, 'cuttings')).toBe(false);
+    const swapped = swapTalent(state, 'deepSoil');
+    expect(swapped.talents).toEqual(['mycorrhiza', 'deepSoil', 'livingSoil']);
+    expect(availableSeeds(swapped)).toBe(availableSeeds(state));
+    expect(canSwapTalent(swapped, 'cuttings')).toBe(false);
+    expect(swapTalent(swapped, 'cuttings')).toBe(swapped);
+    // Another fork has its own choice; the next Cycle opens this one again.
+    expect(canSwapTalent(learnTalent(swapped, 'nectarFlowers'), 'cuttings')).toBe(false);
+    expect(canSwapTalent({ ...swapped, cycles: 1 }, 'cuttings')).toBe(true);
+  });
+
+  it('opens the Canopy with one talent per fork', () => {
+    const tree = TALENT_LIST.map((t) => t.id).filter(
+      (id) => !FORK_IDS.some((fork) => FORKS[fork][0] === id),
+    );
+    expect(tree).toHaveLength(TREE_SIZE);
+    expect(isCanopyOpen({ talents: tree })).toBe(true);
+    expect(isCanopyOpen({ talents: tree.slice(1) })).toBe(false);
+  });
+
+  it('a save keeps the swaps and never both twins', () => {
+    const state = swapTalent(
+      withSeeds(20, { talents: ['gardenersCoop', 'nightWatch'], cycles: 2 }),
+      'springWatch',
+    );
+    const loaded = deserialize(serialize(state), 0)!;
+    expect(loaded.talents).toEqual(['gardenersCoop', 'springWatch']);
+    expect(loaded.talentSwaps).toEqual({ watch: 2 });
+    const cheat = deserialize(
+      serialize({ ...state, talents: [...state.talents, 'nightWatch'] }),
+      0,
+    )!;
+    expect(cheat.talents).toEqual(['gardenersCoop', 'springWatch']);
   });
 });

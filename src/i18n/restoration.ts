@@ -77,6 +77,10 @@ export function bonusText(bonus: Bonus): string {
       return b.collectorDiscount(formatPercent(bonus.fraction));
     case 'siteDiscount':
       return b.siteDiscount(formatPercent(bonus.fraction));
+    case 'projectDiscount':
+      return b.projectDiscount(formatPercent(bonus.fraction));
+    case 'landDiscount':
+      return b.landDiscount(formatPercent(bonus.fraction));
   }
 }
 

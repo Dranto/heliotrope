@@ -9,12 +9,17 @@ import {
   nextCanopyCost,
   raiseCanopy,
   canLearnTalent,
+  canSwapTalent,
   hasTalent,
+  isTalentExcluded,
   isTalentReachable,
   learnTalent,
+  swapTalent,
   TALENT_BRANCHES,
   TALENT_LIST,
   TALENTS,
+  TREE_SIZE,
+  twinOf,
   type CanopyId,
   type TalentDef,
   type TalentId,
@@ -35,10 +40,11 @@ import {
 import { useGameState, useGameStore } from './useGame';
 import './tree.css';
 
-type NodeState = 'learnt' | 'ready' | 'reachable' | 'locked';
+type NodeState = 'learnt' | 'excluded' | 'ready' | 'reachable' | 'locked';
 
 function nodeState(state: GameState, id: TalentId): NodeState {
   if (hasTalent(state, id)) return 'learnt';
+  if (isTalentExcluded(state, id)) return 'excluded';
   if (canLearnTalent(state, id)) return 'ready';
   if (isTalentReachable(state, id)) return 'reachable';
   return 'locked';
@@ -102,8 +108,8 @@ function Blossom({ x, y, open }: { x: number; y: number; open: boolean }) {
 }
 
 /**
- * The drawing: a trunk rising from the soil, roots for the Racines under it, and a canopy shared
- * by the Pollinisateurs (left) and the Mémoire (right). The trunk thickens and the foliage fills
+ * The drawing: a trunk rising from the soil, roots for the Racines under it, a canopy shared
+ * by the Pollinisateurs (left) and the Mémoire (right), and the Quartier low on the left. The trunk thickens and the foliage fills
  * in as talents are learnt; a newly learnt one sends a golden sap along its branch, then opens.
  */
 function TreeArt({ state, fresh }: { state: GameState; fresh: ReadonlySet<TalentId> }) {
@@ -181,23 +187,41 @@ function Detail({
   talent,
   state,
   onLearn,
+  onSwap,
 }: {
   talent: TalentDef;
   state: GameState;
   onLearn: () => void;
+  onSwap: () => void;
 }) {
   const name = talentName(talent);
   const cost = t.tree.cost(talent.cost);
   const status = nodeState(state, talent.id);
+  const twin = twinOf(talent.id);
+  const twinName = twin ? talentName(TALENTS[twin]) : '';
   return (
     <div className="tree-detail" data-branch={talent.branch} aria-live="polite">
       <div>
         <span className="tree-branch-tag">{t.tree.branches[talent.branch]}</span>
         <h3>{name}</h3>
         <p className="tree-effect">{talentEffectText(talent)}</p>
+        {twin && <p className="tree-fork">{t.tree.fork(twinName)}</p>}
       </div>
       {status === 'learnt' ? (
         <span className="tree-learnt-tag">{t.tree.learntTag}</span>
+      ) : status === 'excluded' ? (
+        canSwapTalent(state, talent.id) ? (
+          <button
+            type="button"
+            className="buy tree-learn"
+            aria-label={t.tree.swapLabel(name, twinName)}
+            onClick={onSwap}
+          >
+            <span className="buy-verb">{t.tree.swap}</span>
+          </button>
+        ) : (
+          <span className="tree-locked-tag">{t.tree.swapWaits}</span>
+        )
       ) : status === 'locked' && talent.parent ? (
         <span className="tree-locked-tag">
           {t.tree.lockedTag(talentName(TALENTS[talent.parent]))}
@@ -219,12 +243,12 @@ function Detail({
 }
 
 /**
- * The Canopy (§7.1, M13): levelled talents above the crown, shown once the 17 talents are learnt;
+ * The Canopy (§7.1, M13): levelled talents above the crown, shown once the whole tree is learnt;
  * before that, a line saying when it opens.
  */
 function Canopy({ state, onRaise }: { state: GameState; onRaise: (id: CanopyId) => void }) {
   if (!isCanopyOpen(state)) {
-    return <p className="hint canopy-locked">{t.tree.canopy.locked(TALENT_LIST.length)}</p>;
+    return <p className="hint canopy-locked">{t.tree.canopy.locked(TREE_SIZE)}</p>;
   }
   return (
     <section className="canopy" aria-labelledby="canopy-title">
@@ -321,7 +345,7 @@ export function SeasonTree({ onClose }: { onClose: () => void }) {
           <dt>{t.tree.learnt}</dt>
           <dd>
             <strong>
-              {state.talents.length} / {TALENT_LIST.length}
+              {state.talents.length} / {TREE_SIZE}
             </strong>
             <span className="tree-legend">
               {TALENT_BRANCHES.map((branch) => (
@@ -365,6 +389,7 @@ export function SeasonTree({ onClose }: { onClose: () => void }) {
         talent={selected}
         state={state}
         onLearn={() => store.dispatch((s) => learnTalent(s, selected.id))}
+        onSwap={() => store.dispatch((s) => swapTalent(s, selected.id))}
       />
 
       <Canopy state={state} onRaise={(id) => store.dispatch((s) => raiseCanopy(s, id))} />

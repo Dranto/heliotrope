@@ -1,6 +1,6 @@
 // Layout of the Tree of Seasons drawing (docs/game-design.md §7.1, §10.4): where each talent sits
 // and how branches join it. Pure data and helpers, so the drawing stays testable.
-import { TALENT_LIST, TALENTS, type TalentBranch, type TalentId } from '../game/talents';
+import { TALENTS, TREE_SIZE, type TalentBranch, type TalentId } from '../game/talents';
 
 /** The drawing's coordinate space. */
 export const TREE_VIEW = { width: 360, height: 330 } as const;
@@ -13,9 +13,13 @@ export const BRANCH_ORIGINS: Record<TalentBranch, [number, number]> = {
   roots: [180, 214],
   pollinators: [172, 140],
   memory: [188, 140],
+  quarter: [174, 186],
 };
 
-/** Position of each talent: roots fan out under the soil, the two branches share the canopy. */
+/**
+ * Position of each talent: roots fan out under the soil, two branches share the canopy and the
+ * Quartier grows low on the left, above the soil. A fork's twins sit side by side.
+ */
 export const TALENT_SPOTS: Record<TalentId, [number, number]> = {
   mycorrhiza: [180, 246],
   earlyDiversity: [118, 274],
@@ -34,6 +38,14 @@ export const TALENT_SPOTS: Record<TalentId, [number, number]> = {
   neighbourhoodCouncil: [178, 40],
   forestersCoop: [300, 22],
   longMemory: [326, 76],
+  deepSoil: [204, 300],
+  wildMeadow: [52, 118],
+  springWatch: [316, 134],
+  tramMarket: [134, 178],
+  commonWorks: [92, 164],
+  landTrust: [46, 150],
+  deepRoots: [96, 196],
+  openStreets: [50, 190],
 };
 
 /** A gently curved branch (or root) from `from` to `to`. */
@@ -55,9 +67,9 @@ export function talentBranch(id: TalentId): string {
   return branchPath(from, TALENT_SPOTS[id]);
 }
 
-/** How much the tree has grown, from 0 (bare sapling) to 1 (every talent learnt). */
+/** How much the tree has grown, from 0 (bare sapling) to 1 (the whole tree learnt). */
 export function treeGrowth(learnt: readonly TalentId[]): number {
-  return learnt.length / TALENT_LIST.length;
+  return Math.min(1, learnt.length / TREE_SIZE);
 }
 
 /** Leaves of the Canopy (§7.1): one per level sown, along an arc above the crown. */

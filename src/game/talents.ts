@@ -6,8 +6,11 @@ import type { Bonus } from './bonuses';
 import type { CooperativeId } from './cooperatives';
 import type { GameState } from './state';
 
-export const TALENT_BRANCHES = ['roots', 'pollinators', 'memory'] as const;
-/** Racines (production), Pollinisateurs (active play), Mémoire (comfort and automation). */
+export const TALENT_BRANCHES = ['roots', 'pollinators', 'memory', 'quarter'] as const;
+/**
+ * Racines (production), Pollinisateurs (active play), Mémoire (comfort and automation), Le
+ * Quartier (the prices of the neighbourhood and the pace of the Season).
+ */
 export type TalentBranch = (typeof TALENT_BRANCHES)[number];
 
 export const TALENT_IDS = [
@@ -28,6 +31,14 @@ export const TALENT_IDS = [
   'neighbourhoodCouncil',
   'forestersCoop',
   'longMemory',
+  'deepSoil',
+  'wildMeadow',
+  'springWatch',
+  'tramMarket',
+  'commonWorks',
+  'deepRoots',
+  'landTrust',
+  'openStreets',
 ] as const;
 export type TalentId = (typeof TALENT_IDS)[number];
 
@@ -171,12 +182,97 @@ export const TALENT_LIST: readonly TalentDef[] = [
     parent: 'nightWatch',
     bonuses: [{ kind: 'offlineCap', seconds: 12 * 3600 }],
   },
+  // The twins of the forks (FORKS): same parent and cost as the talent they exclude.
+  {
+    id: 'deepSoil',
+    branch: 'roots',
+    cost: 2,
+    parent: 'mycorrhiza',
+    bonuses: [{ kind: 'ripening', seconds: 120 }],
+  },
+  {
+    id: 'wildMeadow',
+    branch: 'pollinators',
+    cost: 2,
+    parent: 'hedgerows',
+    bonuses: [{ kind: 'gardenGrowth', factor: 1.5 }],
+  },
+  {
+    id: 'springWatch',
+    branch: 'memory',
+    cost: 1,
+    parent: 'gardenersCoop',
+    bonuses: [{ kind: 'water', factor: 1.25 }],
+  },
+  // Le Quartier: the neighbourhood restores itself for less.
+  {
+    id: 'tramMarket',
+    branch: 'quarter',
+    cost: 1,
+    bonuses: [{ kind: 'clickMultiplier', factor: 2 }],
+  },
+  {
+    id: 'commonWorks',
+    branch: 'quarter',
+    cost: 2,
+    parent: 'tramMarket',
+    bonuses: [{ kind: 'projectDiscount', fraction: 0.25 }],
+  },
+  {
+    id: 'deepRoots',
+    branch: 'quarter',
+    cost: 3,
+    parent: 'tramMarket',
+    bonuses: [{ kind: 'discount', fraction: 0.1 }],
+  },
+  {
+    id: 'landTrust',
+    branch: 'quarter',
+    cost: 3,
+    parent: 'commonWorks',
+    bonuses: [{ kind: 'landDiscount', fraction: 0.25 }],
+  },
+  {
+    id: 'openStreets',
+    branch: 'quarter',
+    cost: 5,
+    parent: 'deepRoots',
+    bonuses: [{ kind: 'visitInterval', factor: 0.75 }],
+  },
 ];
 
 export const TALENTS = Object.fromEntries(TALENT_LIST.map((t) => [t.id, t])) as Record<
   TalentId,
   TalentDef
 >;
+
+/**
+ * The forks of the tree (slimming plan, lot 8): two talents with the same parent and cost, of
+ * which only one can be learnt. A learnt one can be swapped for its twin once per Cycle of water.
+ */
+export const FORKS = {
+  soil: ['cuttings', 'deepSoil'],
+  bloom: ['longBloom', 'wildMeadow'],
+  watch: ['nightWatch', 'springWatch'],
+} as const satisfies Record<string, readonly [TalentId, TalentId]>;
+export type ForkId = keyof typeof FORKS;
+export const FORK_IDS = Object.keys(FORKS) as ForkId[];
+
+/** Talents of a whole tree: one of each fork. */
+export const TREE_SIZE = TALENT_LIST.length - FORK_IDS.length;
+
+/** The fork a talent belongs to, if any. */
+export function forkOf(id: TalentId): ForkId | undefined {
+  return FORK_IDS.find((fork) => (FORKS[fork] as readonly TalentId[]).includes(id));
+}
+
+/** The talent a fork's talent excludes. */
+export function twinOf(id: TalentId): TalentId | undefined {
+  const fork = forkOf(id);
+  if (!fork) return undefined;
+  const [a, b] = FORKS[fork];
+  return id === a ? b : a;
+}
 
 export function isTalentId(value: unknown): value is TalentId {
   return typeof value === 'string' && Object.hasOwn(TALENTS, value);
@@ -187,8 +283,8 @@ export function seedsSpent(talents: readonly TalentId[]): number {
   return talents.reduce((sum, id) => sum + TALENTS[id].cost, 0);
 }
 
-// The Canopy (§7.1 "La Canopée", M13): above the crown, levelled talents that open once the 17
-// talents are learnt, so the Seeds of the late Seasons always have a use.
+// The Canopy (§7.1 "La Canopée", M13): above the crown, levelled talents that open once the whole
+// tree is learnt, so the Seeds of the late Seasons always have a use.
 
 export const CANOPY_IDS = [
   'rootsBough',
@@ -347,10 +443,28 @@ export function hasTalent(state: GameState, id: TalentId): boolean {
   return state.talents.includes(id);
 }
 
+/** A talent's parent, or the parent's twin, is learnt (a fork's two talents both lead on). */
+function hasParent(talents: readonly TalentId[], id: TalentId): boolean {
+  const { parent } = TALENTS[id];
+  if (parent === undefined) return true;
+  const twin = twinOf(parent);
+  return talents.includes(parent) || (twin !== undefined && talents.includes(twin));
+}
+
+/** A talent learnt excludes its twin (FORKS). */
+function isExcluded(talents: readonly TalentId[], id: TalentId): boolean {
+  const twin = twinOf(id);
+  return twin !== undefined && talents.includes(twin);
+}
+
+/** The twin of a learnt talent is learnt instead: it cannot be learnt beside it. */
+export function isTalentExcluded(state: GameState, id: TalentId): boolean {
+  return isExcluded(state.talents, id);
+}
+
 /** A talent can be learnt once its parent is: the next ring of the tree. */
 export function isTalentReachable(state: GameState, id: TalentId): boolean {
-  const { parent } = TALENTS[id];
-  return !hasTalent(state, id) && (parent === undefined || hasTalent(state, parent));
+  return !hasTalent(state, id) && !isTalentExcluded(state, id) && hasParent(state.talents, id);
 }
 
 export function canLearnTalent(state: GameState, id: TalentId): boolean {
@@ -363,9 +477,32 @@ export function learnTalent(state: GameState, id: TalentId): GameState {
   return { ...state, talents: [...state.talents, id] };
 }
 
-/** The canopy opens once every talent of the tree is learnt, and stays open. */
+/** Player action: learn a fork's other talent instead of the learnt one, once per Cycle. */
+export function swapTalent(state: GameState, id: TalentId): GameState {
+  if (!canSwapTalent(state, id)) return state;
+  const fork = forkOf(id)!;
+  const twin = twinOf(id)!;
+  return {
+    ...state,
+    talents: state.talents.map((learnt) => (learnt === twin ? id : learnt)),
+    talentSwaps: { ...state.talentSwaps, [fork]: state.cycles },
+  };
+}
+
+/** The twin of `id` is learnt and its fork was not swapped in this Cycle yet. */
+export function canSwapTalent(state: GameState, id: TalentId): boolean {
+  const fork = forkOf(id);
+  return fork !== undefined && isTalentExcluded(state, id) && !isForkSwapped(state, fork);
+}
+
+/** The fork was swapped in this Cycle: it waits for the next Cycle of water. */
+export function isForkSwapped(state: GameState, fork: ForkId): boolean {
+  return state.talentSwaps[fork] === state.cycles;
+}
+
+/** The canopy opens once the whole tree is learnt (one talent per fork), and stays open. */
 export function isCanopyOpen(state: { talents: readonly TalentId[] }): boolean {
-  return state.talents.length >= TALENT_LIST.length;
+  return state.talents.length >= TREE_SIZE;
 }
 
 /** Seeds asked for the next level of a canopy talent; null at its last level. */
@@ -421,21 +558,32 @@ export function validCanopyLevels(
 }
 
 /**
- * Keep only talents a save can legitimately hold: known, learnt after their parent, and paid
- * for by the Seeds obtained.
+ * Keep only talents a save can legitimately hold: known, learnt after their parent, not beside
+ * their twin, and paid for by the Seeds obtained.
  */
 export function validTalents(ids: readonly unknown[], seeds: number): TalentId[] {
   const kept: TalentId[] = [];
   let spent = 0;
   for (const id of ids) {
     if (!isTalentId(id) || kept.includes(id)) continue;
-    const { parent, cost } = TALENTS[id];
-    if (parent !== undefined && !kept.includes(parent)) continue;
+    const { cost } = TALENTS[id];
+    if (!hasParent(kept, id) || isExcluded(kept, id)) continue;
     if (spent + cost > seeds) continue;
     kept.push(id);
     spent += cost;
   }
   return kept;
+}
+
+/** Keep only fork swaps a save can hold: the Cycle of each fork's last swap. */
+export function validTalentSwaps(raw: unknown): Partial<Record<ForkId, number>> {
+  const swaps: Partial<Record<ForkId, number>> = {};
+  if (typeof raw !== 'object' || raw === null) return swaps;
+  for (const fork of FORK_IDS) {
+    const cycle = (raw as Record<string, unknown>)[fork];
+    if (Number.isInteger(cycle) && (cycle as number) >= 0) swaps[fork] = cycle as number;
+  }
+  return swaps;
 }
 
 /** Something in the tree can be sown now: a talent, or a level of the canopy. */

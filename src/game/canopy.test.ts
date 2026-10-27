@@ -16,6 +16,8 @@ import {
   raiseCanopy,
   seedsSpent,
   setSowerFactor,
+  FORK_IDS,
+  FORKS,
   TALENT_LIST,
   type CanopyId,
 } from './talents';
@@ -24,7 +26,10 @@ import { withAllIntroduced } from './introductions';
 
 /** A new game whose mechanics are all introduced (§10.8), to test them directly. */
 const openGame = (now: number) => withAllIntroduced(createInitialState(now));
-const ALL_TALENTS = TALENT_LIST.map((t) => t.id);
+/** The whole tree: every talent but the twins of the forks. */
+const ALL_TALENTS = TALENT_LIST.map((t) => t.id).filter(
+  (id) => !FORK_IDS.some((fork) => FORKS[fork][1] === id),
+);
 
 /** A player who learnt the whole tree and has `spare` Seeds left to sow. */
 function fullTree(spare: number, extra: Partial<GameState> = {}): GameState {
