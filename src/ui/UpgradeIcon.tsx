@@ -37,6 +37,8 @@ function badgeFor({ effect }: UpgradeDef): string | undefined {
 
 function pathFor({ effect }: UpgradeDef): string {
   switch (effect.kind) {
+    case 'rule':
+      return effect.generator ? GENERATOR_PATHS[effect.generator] : SYNERGY_PATH;
     case 'generatorMultiplier':
     case 'synergy':
     case 'clickSynergy':
@@ -51,6 +53,8 @@ function pathFor({ effect }: UpgradeDef): string {
 /** What an upgrade's tile is tinted after: the building it boosts, the click, or a synergy. */
 export function upgradeFamily({ effect }: UpgradeDef): GeneratorId | 'click' | 'synergy' {
   switch (effect.kind) {
+    case 'rule':
+      return effect.generator ?? 'synergy';
     case 'generatorMultiplier':
     case 'synergy':
     case 'clickSynergy':

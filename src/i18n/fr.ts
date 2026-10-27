@@ -1389,6 +1389,7 @@ export const fr = {
     sharedKnowledge: u('Savoirs partagés', 'Ce que l’un apprend, le voisin le sait le lendemain.'),
     seedLibrary: u('Grainothèque', 'On emprunte des graines comme des livres.'),
     commons: u('Les communs', 'Ce qui est à tous pousse mieux.'),
+    strongSynergies: u('Synergies renforcées', 'Chaque lien entre voisins tient deux fois plus.'),
   } satisfies Record<UpgradeSynergyId, UpgradeText>,
   clickSynergies: {
     tendedPots: u('Pots choyés', 'Une main attentive vaut tous les engrais.'),

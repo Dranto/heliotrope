@@ -1,5 +1,6 @@
 // Upgrade data (docs/game-design.md §5). One-off purchases; their names and flavour lines live
 // in src/i18n. Adding an upgrade only means adding a row here and its texts.
+import type { Bonus } from './bonuses';
 import { GENERATOR_IDS, GENERATORS, type GeneratorId } from './generators';
 
 /** §5.1: owned thresholds that unlock a ×2 upgrade for a generator, with costs in base costs. */
@@ -60,7 +61,12 @@ export const SYNERGY_IDS = [
 export type SynergyId = (typeof SYNERGY_IDS)[number];
 
 /** §5.3: upgrades that grow with the other upgrades bought. */
-export const UPGRADE_SYNERGY_IDS = ['sharedKnowledge', 'seedLibrary', 'commons'] as const;
+export const UPGRADE_SYNERGY_IDS = [
+  'sharedKnowledge',
+  'seedLibrary',
+  'commons',
+  'strongSynergies',
+] as const;
 export type UpgradeSynergyId = (typeof UPGRADE_SYNERGY_IDS)[number];
 
 /** §5.3: buildings that grow with the click upgrades bought. */
@@ -84,7 +90,12 @@ export type UpgradeEffect =
   /** `generator` gains `bonusPerUnit` (additive) per unit of `source` owned. */
   | { kind: 'synergy'; generator: GeneratorId; source: GeneratorId; bonusPerUnit: number }
   /** Global production gains `bonusPerUpgrade` (additive) per upgrade of `counts` bought. */
-  | { kind: 'upgradeSynergy'; counts: 'all' | 'synergies'; bonusPerUpgrade: number };
+  | { kind: 'upgradeSynergy'; counts: 'all' | 'synergies'; bonusPerUpgrade: number }
+  /**
+   * Changes a rule of the game with a bonus of the shared shape (slimming plan, lot 6), for a
+   * building's tier or for the whole game.
+   */
+  | { kind: 'rule'; generator?: GeneratorId; bonus: Bonus };
 
 export interface UpgradeCondition {
   /** Minimum units owned of each listed generator. */
@@ -125,14 +136,65 @@ function synergyCostFactor(dearer: GeneratorId): number {
   return dearer === 'verticalFarm' ? SYNERGY_COST_FACTOR_FARM : SYNERGY_COST_FACTOR;
 }
 
+/**
+ * Lot 6 of the slimming plan: at 150 and 300 units, a building's upgrade changes a rule instead
+ * of doubling it, tied to what the building is: the pots and the click, the roofs and the garden,
+ * the farms and the Seeds, the mirrors and the Water.
+ */
+export const GENERATOR_RULES: Record<GeneratorId, { 6: Bonus; 10: Bonus }> = {
+  pot: {
+    6: { kind: 'clickPerUnit', generator: 'pot', amount: 2 },
+    10: { kind: 'biodiversityFactor', factor: 1.1 },
+  },
+  balconyPanel: {
+    6: { kind: 'effectDuration', effect: 'bloom', factor: 1.5 },
+    10: { kind: 'clickMultiplier', factor: 2 },
+  },
+  rooftopGarden: {
+    6: { kind: 'gardenGrowth', factor: 1.25 },
+    10: { kind: 'harvestFactor', factor: 2 },
+  },
+  greenhouse: {
+    6: { kind: 'gardenGrowth', factor: 1.25 },
+    10: { kind: 'ripening', seconds: 30 },
+  },
+  verticalFarm: {
+    6: { kind: 'discount', fraction: 0.05 },
+    10: { kind: 'ripening', seconds: 30 },
+  },
+  mirrorPlant: {
+    6: { kind: 'collectorDiscount', fraction: 0.25 },
+    10: { kind: 'water', factor: 1.25 },
+  },
+  urbanCanopy: {
+    6: { kind: 'siteDiscount', fraction: 0.25 },
+    10: { kind: 'biodiversityFactor', factor: 1.1 },
+  },
+  arcology: {
+    6: { kind: 'ripening', seconds: 30 },
+    10: { kind: 'water', factor: 1.5 },
+  },
+};
+
+/** Seconds the rules of every building take off the Seeds' ripening, all together. */
+export const RULES_RIPENING_SECONDS = Object.values(GENERATOR_RULES)
+  .flatMap((rules) => [rules[6], rules[10]])
+  .reduce((sum, bonus) => sum + (bonus.kind === 'ripening' ? bonus.seconds : 0), 0);
+
 function generatorUpgrades(): UpgradeDef[] {
   return GENERATOR_IDS.flatMap((generator) =>
-    GENERATOR_UPGRADE_TIERS.map(({ owned, costFactor }, index) => ({
-      id: `${generator}.${(index + 1) as GeneratorUpgradeTier}` as const,
-      cost: GENERATORS[generator].baseCost * costFactor,
-      condition: { owned: { [generator]: owned } },
-      effect: { kind: 'generatorMultiplier', generator, factor: 2 } as const,
-    })),
+    GENERATOR_UPGRADE_TIERS.map(({ owned, costFactor }, index): UpgradeDef => {
+      const tier = (index + 1) as GeneratorUpgradeTier;
+      const rule = tier === 6 || tier === 10 ? GENERATOR_RULES[generator][tier] : undefined;
+      return {
+        id: `${generator}.${tier}`,
+        cost: GENERATORS[generator].baseCost * costFactor,
+        condition: { owned: { [generator]: owned } },
+        effect: rule
+          ? { kind: 'rule', generator, bonus: rule }
+          : { kind: 'generatorMultiplier', generator, factor: 2 },
+      };
+    }),
   );
 }
 
@@ -237,6 +299,10 @@ const SYNERGIES: UpgradeDef[] = [
   synergy('citizenGrid', 'mirrorPlant', 'balconyPanel', 0.005),
 ];
 
+/** "Synergies renforcées" (lot 6): unlocked by this many building synergies, at this cost. */
+export const STRONG_SYNERGIES_COUNT = 15;
+export const STRONG_SYNERGIES_COST = 1e12;
+
 function upgradeSynergy(
   id: UpgradeSynergyId,
   cost: number,
@@ -251,6 +317,13 @@ const UPGRADE_SYNERGIES: UpgradeDef[] = [
   upgradeSynergy('sharedKnowledge', 50_000, { upgrades: 10 }, 'all', 0.005),
   upgradeSynergy('seedLibrary', 50_000_000, { upgrades: 30 }, 'all', 0.005),
   upgradeSynergy('commons', 500_000_000, { synergies: 6 }, 'synergies', 0.03),
+  // Lot 6: a second rank for the synergies, in the late Seasons when the panel empties.
+  {
+    id: 'strongSynergies',
+    cost: STRONG_SYNERGIES_COST,
+    condition: { synergies: STRONG_SYNERGIES_COUNT },
+    effect: { kind: 'rule', bonus: { kind: 'synergyFactor', factor: 2 } },
+  },
 ];
 
 function clickSynergy(

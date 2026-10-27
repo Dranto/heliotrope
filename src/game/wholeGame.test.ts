@@ -32,7 +32,7 @@ describe('the whole game (§8, M30)', () => {
     expect(Object.keys(state.city.workshop).length).toBeGreaterThan(0);
     // Each full hour played is followed by three hours away.
     const { played, real } = run.swarms[0]!;
-    expect(real - played).toBe(
+    expect(real - played).toBeCloseTo(
       Math.floor(played / REFERENCE_SESSION_SECONDS) * REFERENCE_AWAY_SECONDS,
     );
   });

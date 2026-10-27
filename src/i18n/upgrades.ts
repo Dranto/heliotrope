@@ -2,18 +2,19 @@
 import { formatNumber, formatPercent } from '../game/format';
 import type { GeneratorUpgradeTier, UpgradeDef } from '../game/upgrades';
 import { t, type UpgradeText } from './index';
+import { bonusText } from './restoration';
 
 export function upgradeText(upgrade: UpgradeDef): UpgradeText {
   const { id, effect } = upgrade;
-  if (effect.kind === 'generatorMultiplier') {
+  if (effect.kind === 'generatorMultiplier' || (effect.kind === 'rule' && effect.generator)) {
     const tier = Number(id.split('.')[1]) as GeneratorUpgradeTier;
-    return t.generatorUpgrades[effect.generator][tier - 1]!;
+    return t.generatorUpgrades[effect.generator!][tier - 1]!;
   }
   if (effect.kind === 'synergy') return t.synergies[id as keyof typeof t.synergies];
   if (effect.kind === 'clickSynergy') {
     return t.clickSynergies[id as keyof typeof t.clickSynergies];
   }
-  if (effect.kind === 'upgradeSynergy') {
+  if (effect.kind === 'upgradeSynergy' || effect.kind === 'rule') {
     return t.upgradeSynergies[id as keyof typeof t.upgradeSynergies];
   }
   return t.clickUpgrades[id as keyof typeof t.clickUpgrades];
@@ -43,5 +44,7 @@ export function upgradeEffectText(upgrade: UpgradeDef): string {
       );
     case 'upgradeSynergy':
       return t.upgradeEffect.upgradeSynergy(formatPercent(effect.bonusPerUpgrade), effect.counts);
+    case 'rule':
+      return bonusText(effect.bonus);
   }
 }

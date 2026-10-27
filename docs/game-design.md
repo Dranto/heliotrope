@@ -125,6 +125,21 @@ Pour chaque générateur, une amélioration qui **double** sa production se déb
 
 Soit 8 générateurs × 10 seuils = 80 améliorations, chacune avec un nom et une ligne d'ambiance (ex. « Terreau de compost » pour le Potager, « Miroirs auto-orientables » pour la Centrale).
 
+**Les paliers qui changent une règle (lot 6, §9.17).** À 150 et 300 exemplaires, l'amélioration ne double plus le bâtiment : elle change une règle, liée à ce qu'il est (`GENERATOR_RULES`, `src/game/upgrades.ts`).
+
+| Bâtiment | 150 exemplaires | 300 exemplaires |
+|---|---|---|
+| Héliotrope en pot | le clic rapporte +2 par pot | biodiversité ×1,1 |
+| Panneau de balcon | la Floraison dure ×1,5 | valeur du clic ×2 |
+| Potager sur le toit | le potager pousse ×1,25 plus vite | Récolte du Papillon ×2 |
+| Serre communautaire | le potager pousse ×1,25 plus vite | les Graines mûrissent 30 s plus tôt |
+| Ferme verticale | bâtiments 5 % moins chers | les Graines mûrissent 30 s plus tôt |
+| Centrale à miroirs | collecteurs d'eau 25 % moins chers | l'Eau ×1,25 |
+| Canopée urbaine | sites de la biorégion 25 % moins chers en Eau | biodiversité ×1,1 |
+| Arcologie vivante | les Graines mûrissent 30 s plus tôt | l'Eau ×1,5 |
+
+Le joueur de référence les achète dès que sa réserve les couvre, même si leur gain ne se lit pas dans la Lumière par seconde.
+
 Quand aucune amélioration n'est proposée (par moments après le 1ᵉʳ Cycle, entre deux seuils), le panneau « Améliorer » montre la prochaine en vue : le seuil de bâtiment le plus proche d'être atteint, avec son compte et une barre (« Prochaine : Façades nourricières · Ferme verticale 149 / 150 »). Le panneau garde ainsi un objectif, selon la règle d'or du §2.
 
 > Paliers de fin de partie (2026-10-13) : Antoine a demandé des paliers pour que les mécaniques ne s'estompent pas trop vite. Après le 1ᵉʳ Cycle, le joueur de référence possède 140 à 280 exemplaires de chaque bâtiment au fil d'une Saison : les seuils s'arrêtaient à 200, et le panneau « Améliorer » se vidait pour le reste de la partie. Les seuils de 225, 250 et 300 tombent là où le joueur se trouve. Leur coût suit la progression (×10 puis ×100 par seuil) ; c'est le nombre d'exemplaires qui les retient, pas le prix. Avec les deux paliers de biodiversité ajoutés au §5.4, les Cycles 2 à 4 durent 36, 40 et 55 min (cibles 35, 35 et 45, dans les ±30 %) : le 3ᵉ Cycle finit avec 21 Sources au lieu de 20, si bien que le 4ᵉ, qui en vise ×1,5, demande une Saison de plus. La boucle ne s'emballe pas : la 1ʳᵉ Saison, le 1ᵉʳ Cycle et les villes sœurs ne bougent pas.
@@ -191,6 +206,7 @@ Condition : 10 exemplaires de chacun des deux générateurs, ou 5 quand l'un des
 | Savoirs partagés | 10 améliorations achetées | 50 000 | +0,5 % par amélioration achetée |
 | Grainothèque | 30 améliorations achetées | 50 M | +0,5 % par amélioration achetée |
 | Les communs | 6 synergies entre bâtiments achetées | 500 M | +3 % par synergie entre bâtiments achetée |
+| Synergies renforcées (lot 6) | 15 synergies entre bâtiments achetées | 1 000 Md | toutes les synergies ×2, dans les Saisons tardives où le panneau se vide |
 
 **Avec le clic.** Trois bâtiments grandissent avec les améliorations de clic achetées (§5.2) : soigner la fleur à la main profite aussi au quartier.
 
@@ -1279,6 +1295,8 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Lot 5 : les voies engagent (§5.5).** À chaque forme, la première voie renforce le bâtiment (×1,5, ×1,75 puis ×2 au lieu de ×1,25 à ×1,5) et la seconde le relie au rythme : Graines qui mûrissent jusqu'à 30 s plus tôt, Eau ×1,3 à ×1,5, collecteurs et sites 20 % moins chers, bâtiments moins chers, clic, potager. Une voie qui joue se change une fois par Cycle. Le panneau Bâtir dit l'effet de chaque voie.
 - **Équilibrage (lot 5).** Le joueur de référence prend toujours la première voie : 1ʳᵉ Saison conseillée 53 min (cible 67), 2ᵉ Saison 18 min ; Cycles 2 à 4 en 24, 36 et 45 min ; essaimages à 2 h 55 et 4 h de jeu (cibles 4 h et 5 h). Le premier essaimage bascule plus tôt, comme l'audit l'avait vu (règle de relance ×1,5, lot 9). Des voies ×2 partout faisaient tomber la 1ʳᵉ Saison à 49 min.
 - **Sauvegarde (lot 5).** Version 46 : les voies restent, chaque bâtiment peut changer une fois de plus.
+- **Lot 6 : des paliers qui changent une règle (§5.1, §5.3).** À 150 et 300 exemplaires, l'amélioration d'un bâtiment change une règle au lieu de doubler : clic, Floraison, potager, Papillon, Graines jusqu'à 30 s plus tôt, collecteurs et sites 25 % moins chers, Eau, biodiversité. « Synergies renforcées » double toutes les synergies une fois 15 d'entre elles achetées. Les règles suivent la forme commune des bonus (`rule`).
+- **Équilibrage (lot 6).** Le joueur de référence achète les règles dès que sa réserve les couvre. 1ʳᵉ Saison conseillée 53 min, Cycles 2 à 4 en 24, 36 et 42 min, essaimages à 3 h et 4 h de jeu. Deux doublements de moins par bâtiment ne se voient pas : passé le 1ᵉʳ Cycle, la maturité des Graines fixe la Saison, et les règles qui la raccourcissent compensent.
 
 ## 10. Écrans et interface
 

@@ -26,8 +26,8 @@ const owned = (patch: Partial<GameState['generators']>) => ({
 });
 
 describe('upgrade data', () => {
-  it('has 10 ×2 upgrades per generator, 10 click upgrades and 24 synergies (§5)', () => {
-    expect(UPGRADE_LIST).toHaveLength(8 * 10 + 10 + 18 + 3 + 3);
+  it('has 10 upgrades per generator, 10 click upgrades and 25 synergies (§5)', () => {
+    expect(UPGRADE_LIST).toHaveLength(8 * 10 + 10 + 18 + 4 + 3);
     expect(new Set(UPGRADE_LIST.map((u) => u.id)).size).toBe(UPGRADE_LIST.length);
   });
 

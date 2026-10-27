@@ -1300,6 +1300,10 @@ export const en: Texts = {
     sharedKnowledge: u('Shared knowledge', 'What one learns, the neighbour knows the next day.'),
     seedLibrary: u('Seed lending', 'We borrow seeds like books.'),
     commons: u('The commons', 'What belongs to all grows better.'),
+    strongSynergies: u(
+      'Stronger synergies',
+      'Every bond between neighbours holds twice as strong.',
+    ),
   },
   clickSynergies: {
     tendedPots: u('Tended pots', 'An attentive hand is worth every fertiliser.'),
