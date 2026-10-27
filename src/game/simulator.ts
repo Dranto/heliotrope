@@ -120,6 +120,12 @@ function bestOption(state: GameState, clicksPerSecond: number): Option {
     (id) => state.generators[id] === 0 && canBuyGenerator(state, id),
   );
   if (novelty) return { kind: 'generator', id: novelty };
+  // ...and buys an upgrade that changes a rule (lot 6) once the reserve covers it, though its
+  // gain does not show in the Light per second.
+  const rule = availableUpgrades(state).find(
+    (u) => u.effect.kind === 'rule' && u.cost <= state.resources.light,
+  );
+  if (rule) return { kind: 'upgrade', id: rule.id };
   const current = income(state, clicksPerSecond);
   const options: Option[] = [
     ...GENERATOR_IDS.map((id) => ({ kind: 'generator', id }) as const),

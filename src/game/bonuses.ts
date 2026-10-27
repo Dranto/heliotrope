@@ -18,6 +18,7 @@ import { parcelBonuses, type Future, type ParcelId } from './parcels';
 import { PROJECTS, type ProjectId } from './projects';
 import { varietyBonuses, type VarietyId } from './seedBank';
 import { canopyBonuses, TALENTS, type CanopyState, type TalentId } from './talents';
+import { UPGRADES, type UpgradeId } from './upgrades';
 
 export type Bonus =
   /** Multiplies one generator's production. */
@@ -179,7 +180,16 @@ function collectBonuses(source: BonusSource): Bonus[] {
       : []),
     ...(isGameState(source) ? familyBonuses(source.species) : []),
     ...(isGameState(source) ? milestoneFamilyBonuses(source.achievements) : []),
+    ...(isGameState(source) ? ruleBonuses(source.upgrades) : []),
   ];
+}
+
+/** The rules the upgrades bought change (slimming plan, lot 6). */
+function ruleBonuses(upgrades: readonly UpgradeId[]): Bonus[] {
+  return upgrades.flatMap((id) => {
+    const effect = UPGRADES[id]?.effect;
+    return effect?.kind === 'rule' ? [effect.bonus] : [];
+  });
 }
 
 export function bonusesOf<K extends BonusKind>(

@@ -2,6 +2,7 @@ import { BASIN_SITE_IDS } from './bioregion';
 import { availableSeeds } from './talents';
 import { GENERATOR_IDS } from './generators';
 import { SEED_RIPENING_SECONDS } from './seasons';
+import { RULES_RIPENING_SECONDS } from './upgrades';
 import {
   ADVISED_CYCLE_TARGET,
   PACING_TARGETS,
@@ -101,7 +102,9 @@ describe('later Seasons, after the first Cycle (§7)', () => {
   const { seasons } = simulateSeasonsAfterCycle({ from: cycle.state, count: 5 });
 
   it('lasts at least the ripening time, Season after Season', () => {
-    for (const seconds of seasons) expect(seconds).toBeGreaterThanOrEqual(SEED_RIPENING_SECONDS);
+    // The rules of the buildings (lot 6) shorten the ripening once their tier is reached.
+    const shortest = SEED_RIPENING_SECONDS - RULES_RIPENING_SECONDS;
+    for (const seconds of seasons) expect(seconds).toBeGreaterThanOrEqual(shortest);
   });
 
   it('grows longer once doubling the Seeds asks for more than the ripening time', () => {

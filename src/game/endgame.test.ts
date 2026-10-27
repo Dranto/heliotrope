@@ -1,6 +1,7 @@
 import { isDeltaComplete, ripeningSeconds } from './delta';
 import { CYCLE_TARGETS, simulateCycles, simulateFirstCycle, simulateTwoSeasons } from './simulator';
 import { isCanopyComplete } from './talents';
+import { RULES_RIPENING_SECONDS } from './upgrades';
 
 // The endgame (docs/game-design.md §8, M19): the reference player goes on from the first Cycle of
 // water, opening the delta, widening its arms and sowing the tree, each Cycle played until it
@@ -31,9 +32,11 @@ describe('the Cycles after the first (§8, M19)', () => {
   });
 
   it('keeps every Season at least as long as its Seeds take to ripen', () => {
+    // The rules of the buildings (lot 6) shorten the ripening once their tier is reached.
+    const shortest = ripeningSeconds(run.state) - RULES_RIPENING_SECONDS;
     for (const cycle of run.cycles) {
       for (const seconds of cycle.seasons.slice(0, -1)) {
-        expect(seconds).toBeGreaterThanOrEqual(ripeningSeconds(run.state) - 1);
+        expect(seconds).toBeGreaterThanOrEqual(shortest - 1);
       }
     }
   });
