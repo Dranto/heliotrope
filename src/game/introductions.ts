@@ -17,8 +17,6 @@ export const FEATURE_IDS = [
   'bioregion',
   'cooperatives',
   'weather',
-  'orchard',
-  'greatWorks',
 ] as const;
 export type FeatureId = (typeof FEATURE_IDS)[number];
 

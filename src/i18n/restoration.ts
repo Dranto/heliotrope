@@ -55,8 +55,6 @@ export function bonusText(bonus: Bonus): string {
       return b.perDistrict(formatPercent(bonus.bonus));
     case 'gardenGrowth':
       return b.gardenGrowth(factor(bonus.factor));
-    case 'orchardGrowth':
-      return b.orchardGrowth(factor(bonus.factor));
     case 'pollenFill':
       return b.pollenFill(factor(bonus.factor));
     case 'feeds':
@@ -69,8 +67,6 @@ export function bonusText(bonus: Bonus): string {
       return b.perSpecies(t.generators[bonus.generator].name, formatPercent(bonus.bonus));
     case 'generatorPerParcel':
       return b.generatorPerParcel(t.generators[bonus.generator].name, formatPercent(bonus.bonus));
-    case 'harvestBaskets':
-      return b.harvestBaskets(bonus.units);
     case 'perPath':
       return b.perPath(formatPercent(bonus.bonus));
     case 'perMilestoneFamily':

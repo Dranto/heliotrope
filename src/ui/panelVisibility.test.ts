@@ -11,7 +11,7 @@ describe('isPanelHidden', () => {
     expect(isPanelHidden('restoration', 'phone', 'build')).toBe(true);
     expect(isPanelHidden('restoration', 'phone', 'improve')).toBe(false);
     expect(isPanelHidden('garden', 'phone', 'living')).toBe(false);
-    expect(isPanelHidden('greatWorks', 'phone', 'region')).toBe(false);
+    expect(isPanelHidden('bioregion', 'phone', 'region')).toBe(false);
     expect(isPanelHidden('bioregion', 'phone', 'more')).toBe(true);
   });
 

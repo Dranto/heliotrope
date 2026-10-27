@@ -91,8 +91,6 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.cycles(condition.count);
     case 'deltaLevels':
       return describe.deltaLevels(condition.count);
-    case 'worksBuilt':
-      return describe.worksBuilt(condition.count);
     case 'sisterCities':
       return describe.sisterCities(condition.count);
     case 'paths':
@@ -101,18 +99,12 @@ export function achievementDescription({ id, condition }: AchievementDef): strin
       return describe.flights(condition.count);
     case 'rotations':
       return describe.rotations(condition.count);
-    case 'oldTree':
-      return describe.oldTree;
     case 'weatherSpecies':
       return describe.weatherSpecies;
     case 'families':
       return describe.families(condition.count);
     case 'weather':
       return describe.weather(t.weather.day[condition.weather]);
-    case 'fruitHarvests':
-      return describe.fruitHarvests(condition.count);
-    case 'fruitVarieties':
-      return describe.fruitVarieties(condition.count);
     case 'lockCycles':
       return describe.lockCycles(condition.count);
     case 'cycleChallenges':

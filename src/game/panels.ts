@@ -9,12 +9,9 @@ import {
 } from './bioregion';
 import { unlockedCooperatives } from './cooperatives';
 import { canRestoreDistrict, offeredDistrict } from './districts';
-import { FRUIT_IDS } from './fruits';
 import { isGardenOpen, isRipe } from './garden';
 import { GENERATOR_IDS } from './generators';
 import { pendingTier } from './growth';
-import { areGreatWorksOpen, isStageReady, WORK_IDS } from './greatWorks';
-import { canPlant, isOrchardOpen, treeStage } from './orchard';
 import { availableUpgrades, isGeneratorRevealed } from './production';
 import {
   canCarryOutProject,
@@ -32,9 +29,7 @@ export const PANEL_IDS = [
   'restoration',
   'cooperatives',
   'garden',
-  'orchard',
   'bioregion',
-  'greatWorks',
 ] as const;
 export type PanelId = (typeof PANEL_IDS)[number];
 
@@ -48,9 +43,7 @@ export const PANEL_LAYER: Record<PanelId, LayerId> = {
   restoration: 'city',
   cooperatives: 'city',
   garden: 'living',
-  orchard: 'living',
   bioregion: 'region',
-  greatWorks: 'region',
 };
 
 export function isPanelId(value: unknown): value is PanelId {
@@ -77,12 +70,8 @@ export function isPanelShown(state: GameState, id: PanelId): boolean {
       return unlockedCooperatives(state).length > 0;
     case 'garden':
       return isGardenOpen(state);
-    case 'orchard':
-      return isOrchardOpen(state);
     case 'bioregion':
       return isBioregionOpen(state);
-    case 'greatWorks':
-      return areGreatWorksOpen(state);
   }
 }
 
@@ -130,16 +119,10 @@ export function panelHasAction(state: GameState, id: PanelId): boolean {
       return false;
     case 'garden':
       return state.garden.plots.some((plot) => plot.crop !== null && isRipe(plot));
-    case 'orchard':
-      return FRUIT_IDS.some(
-        (fruit) => treeStage(state.orchard.trees[fruit]) === 'ripe' || canPlant(state, fruit),
-      );
     case 'bioregion':
       return (
         COLLECTOR_IDS.some((collector) => canBuyCollector(state, collector)) ||
         SITE_IDS.some((site) => canRaiseSite(state, site))
       );
-    case 'greatWorks':
-      return WORK_IDS.some((work) => isStageReady(state, work));
   }
 }

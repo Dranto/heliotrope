@@ -13,8 +13,6 @@ import { isParcelId, type ParcelId } from './parcels';
 import { isDistrictId, type DistrictId } from './districts';
 import { isProjectId, type ProjectId } from './projects';
 import { validPlots } from './garden';
-import { validGreatWorks } from './greatWorks';
-import { validOrchard } from './orchard';
 import { validCity } from './cities';
 import { validGrowth } from './growth';
 import { FLIGHT_BUTTERFLY_FACTOR, FLIGHT_MAX_SECONDS, validPollen } from './pollen';
@@ -151,6 +149,9 @@ const migrations: Record<number, Migration> = {
   // v42 (lot 2): the neighbours' requests, their hands and bonds, the greetings and the forecast
   // swap leave. Their fields are dropped below, their Milestones counted as retired.
   41: (raw) => ({ ...raw, version: 42 }),
+  // v43 (lot 3): the great works and their baskets, the orchard, the hives and the honey leave.
+  // Their fields are dropped below, their Milestones counted as retired.
+  42: (raw) => ({ ...raw, version: 43 }),
 };
 
 function isLanguage(value: string): value is Language {
@@ -372,11 +373,8 @@ export function deserialize(json: string, now: number): GameState | null {
     varieties: Array.isArray(garden?.varieties)
       ? [...new Set<VarietyId>(garden.varieties.filter(isVarietyId))]
       : [],
-    baskets: isCount(garden?.baskets) ? garden.baskets : 0,
     rotations: isCount(garden?.rotations) ? garden.rotations : 0,
   };
-  state.greatWorks = validGreatWorks(data.greatWorks);
-  state.orchard = validOrchard(data.orchard);
   state.city = validCity(data.city);
   state.growth = validGrowth(data.growth);
   state.pollen = validPollen(data.pollen);

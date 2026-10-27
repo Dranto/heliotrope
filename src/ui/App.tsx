@@ -63,8 +63,6 @@ import { MilestoneBloom } from './MilestoneBloom';
 import { Options } from './Options';
 import { Restoration } from './Restoration';
 import { Garden } from './Garden';
-import { GreatWorks } from './GreatWorks';
-import { Orchard } from './Orchard';
 import { areCitiesOpen, canSwarm } from '../game/cities';
 import { harvest, harvestAll } from '../game/garden';
 import { Scene } from './Scene';
@@ -98,8 +96,8 @@ const TABS: Tab[] = ['build', 'improve', 'living', 'region', 'more'];
 const TAB_PANELS: Record<Tab, PanelId[]> = {
   build: ['generators', 'cooperatives'],
   improve: ['upgrades', 'restoration'],
-  living: ['garden', 'orchard'],
-  region: ['bioregion', 'greatWorks'],
+  living: ['garden'],
+  region: ['bioregion'],
   more: [],
 };
 const TAB_LAYER: Record<Tab, LayerId> = {
@@ -117,9 +115,7 @@ const PANEL_CLASS: Record<PanelId, string> = {
   restoration: 'restoration',
   cooperatives: 'cooperatives',
   garden: 'garden-panel',
-  orchard: 'orchard-panel',
   bioregion: 'bioregion',
-  greatWorks: 'works-panel',
 };
 
 /**
@@ -333,17 +329,14 @@ export function App() {
     [store, notify],
   );
 
-  // M32: harvest everything ripe in the garden and the orchard, and sow the same crops again.
+  // M32: harvest everything ripe in the garden, and sow the same crops again.
   const onHarvestAll = useCallback(() => {
     const result = harvestAll(store.getState());
     if (!result) return;
     store.dispatch(() => result.state);
-    notify(t.garden.harvested.all(result.crops.length, result.fruits.length));
+    notify(t.garden.harvested.all(result.crops.length));
     for (const { variety } of result.crops) {
       if (variety) notify(t.garden.variety(t.garden.varieties[variety]));
-    }
-    for (const fruit of result.fruits) {
-      if (fruit.variety) notify(t.orchard.found(t.orchard.varieties[fruit.id]));
     }
   }, [store, notify]);
 
@@ -751,8 +744,6 @@ export function App() {
               <Upgrades />
               {awake('restoration') && <Restoration onHighlight={setHighlight} />}
               {awake('garden') && <Garden onHarvest={onHarvest} onHarvestAll={onHarvestAll} />}
-              {awake('orchard') && <Orchard onHarvestAll={onHarvestAll} />}
-              {awake('greatWorks') && <GreatWorks />}
             </div>
             <div className="side-column">
               <Generators />

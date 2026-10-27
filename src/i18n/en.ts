@@ -2,8 +2,6 @@
 import type { LandscapeId, WorkshopId } from '../game/cityData';
 import type { CorridorFamily } from '../game/corridors';
 import type { FamilyId } from '../game/families';
-import type { FruitId } from '../game/fruits';
-import type { TreeStage } from '../game/orchard';
 import type { CropId, VarietyId } from '../game/seedBank';
 import type { CanopyId } from '../game/talents';
 import type { Texts, UpgradeText } from './fr';
@@ -370,12 +368,7 @@ export const en: Texts = {
       floodTide: 'High waters',
       'delta.1': 'First branch',
       'delta.6': 'Open delta',
-      'works.1': 'Cornerstone',
-      'works.4': 'Great works',
-      firstFruit: 'First fruit',
-      oldOrchard: 'Old orchards',
       rotation: 'The soil rests',
-      oldTree: 'Old tree',
       wholeFamily: 'The whole family',
       skyCreatures: 'Creatures of the sky',
       'cities.1': 'Swarming',
@@ -480,10 +473,6 @@ export const en: Texts = {
       deltaLevels: (count: number) =>
         count === 1 ? 'Open a first branch of the delta' : `Open all ${count} levels of the delta`,
       lockCycles: (count: number) => `Let the lock keeper start ${count} Cycles`,
-      worksBuilt: (count: number) =>
-        count === 1 ? 'Complete a great work' : `Complete all ${count} great works`,
-      fruitHarvests: (count: number) =>
-        count === 1 ? 'Pick a first fruit in the orchard' : `Pick fruit ${count} times`,
       sisterCities: (count: number) =>
         count === 1 ? 'Found a sister city' : `Found ${count} sister cities`,
       paths: (count: number) =>
@@ -493,9 +482,7 @@ export const en: Texts = {
       weather: (day: string) => `Live through ${day}`,
       flights: (count: number) =>
         count === 1 ? 'Fill the pollen gauge and send a flight' : `Send ${count} pollen flights`,
-      fruitVarieties: (count: number) => `Find the orchard's ${count} old varieties`,
       rotations: (count: number) => `Harvest ${count} crops sown after a different one`,
-      oldTree: 'Pick a fruit tree until it becomes an old tree',
       families: (count: number) => `Bring ${count} whole families of the Herbier back`,
       weatherSpecies: 'See the five species of the weather come back',
       cycleChallenges: (count: number) =>
@@ -606,15 +593,10 @@ export const en: Texts = {
         `${generator}: +${percent}% per species in the Herbarium`,
       generatorPerParcel: (generator: string, percent: string) =>
         `${generator}: +${percent}% per restored parcel`,
-      harvestBaskets: (units: number) =>
-        units === 1
-          ? 'Each garden harvest gives one more basket'
-          : `Each garden harvest gives ${units} more baskets`,
       perPath: (percent: string) => `+${percent}% production per working path`,
       perMilestoneFamily: (percent: string) =>
         `+${percent}% production per complete family of Milestones`,
       gardenGrowth: (factor: string) => `The garden grows ×${factor} faster`,
-      orchardGrowth: (factor: string) => `The orchard grows ×${factor} faster`,
       pollenFill: (factor: string) => `The pollen gauge fills ×${factor} faster`,
       cuttingsGift: (units: number) =>
         units === 1
@@ -633,35 +615,6 @@ export const en: Texts = {
       fleaMarket: 'The Solar flea market',
       flight: 'The Pollen flight',
     },
-  },
-  greatWorks: {
-    title: 'The great works',
-    hint: 'Each stage is paid with Light, Water and baskets from the garden, the last ones also with honey from the hives. What is given stays given.',
-    baskets: (count: string) => `${count} baskets`,
-    basketsHint: 'Each harvest of the garden fills baskets.',
-    names: {
-      tram: 'The solar tram',
-      river: 'The reopened river',
-      hall: 'The food hall',
-      tower: 'The seed tower',
-    },
-    stages: {
-      tram: ['The rails', 'The flowering catenaries', 'The stations', 'The first tram'],
-      river: ['The broken slab', 'The banks', 'The footbridges', 'The bathing spot'],
-      hall: ['The frame', 'The stalls', 'The common kitchen'],
-      tower: ['The foundations', 'The growing floors', 'The seed bank', 'The belvedere'],
-    },
-    stage: (built: string, count: string) => `${built} of ${count} stages`,
-    next: (stage: string) => `Next stage: ${stage}`,
-    light: 'Light',
-    water: 'Water',
-    basketsLabel: 'Baskets',
-    honeyLabel: 'Honey',
-    species: (have: string, need: string) => `Herbarium species: ${have} of ${need}`,
-    contribute: 'Give',
-    contributeLabel: (work: string) => `Give towards ${work}`,
-    complete: 'Complete',
-    built: 'Built',
   },
   garden: {
     title: 'The courtyard garden',
@@ -717,12 +670,10 @@ export const en: Texts = {
       effect: (seconds: string) =>
         `Climbing beans! Rooftop gardens and greenhouses ×2 for ${seconds}.`,
       pollen: 'The strawberries scent the flower: the pollen gauge fills.',
-      all: (crops: number, fruits: number) =>
-        `All harvested: ${crops} crop${crops === 1 ? '' : 's'} sown again, ${fruits} tree${fruits === 1 ? '' : 's'} picked.`,
+      all: (crops: number) => `All harvested: ${crops} crop${crops === 1 ? '' : 's'} sown again.`,
     },
     harvestAll: 'Harvest all and sow again',
-    harvestAllHint:
-      'Harvests everything ripe in the garden and the orchard, and sows the same crop again.',
+    harvestAllHint: 'Harvests everything ripe in the garden, and sows the same crop again.',
     rotated: 'Rotated: grows ×1.2',
     variety: (name: string) => `New variety: ${name}!`,
   },
@@ -730,7 +681,7 @@ export const en: Texts = {
     open: 'Sister cities',
     title: 'The sister cities',
     close: 'Close the sister cities',
-    hint: 'Swarming founds a sister city elsewhere in the region: the Seasons, the Bioregion and the Cycles start again. The Herbier, the Milestones, the decor, the great works, the garden, the orchard, the delta and the cities already founded stay.',
+    hint: 'Swarming founds a sister city elsewhere in the region: the Seasons, the Bioregion and the Cycles start again. The Herbier, the Milestones, the decor, the garden, the delta and the cities already founded stay.',
     savoirs: (count: string) => `${count} Savoirs`,
     earned: (count: string, percent: string) =>
       `${count} Savoirs earned in all: production +${percent}%`,
@@ -780,48 +731,6 @@ export const en: Texts = {
     deepen: 'Deepen',
     learnt: 'Learnt',
     level: (level: number, max: number) => `Level ${level}/${max}`,
-  },
-  orchard: {
-    title: 'The orchard and the hives',
-    hint: 'A tree is planted once, grows for two days, then bears fruit every eight hours, online and offline. Each picking brings an hour of production and baskets, and sometimes an old variety.',
-    names: {
-      apple: 'Apple tree',
-      pear: 'Pear tree',
-      cherry: 'Cherry tree',
-      plum: 'Plum tree',
-    } satisfies Record<FruitId, string>,
-    varieties: {
-      apple: 'Reinette apple',
-      pear: 'Curé pear',
-      cherry: 'Burlat cherry',
-      plum: 'Greengage',
-    } satisfies Record<FruitId, string>,
-    stages: {
-      none: 'To plant',
-      sapling: 'Sapling',
-      flowering: 'In bloom',
-      fruiting: 'Fruit ripening',
-      ripe: 'Ripe fruit',
-    } satisfies Record<TreeStage, string>,
-    next: (time: string) => `${time} to go`,
-    plant: 'Plant',
-    plantLabel: (name: string) => `Plant: ${name}`,
-    free: 'free',
-    cost: (baskets: string) => `${baskets} baskets`,
-    pick: 'Pick',
-    pickLabel: (name: string) => `Pick: ${name}`,
-    hives: (count: string, max: string) => `Hives: ${count} of ${max}`,
-    hiveHint:
-      'Each hive makes the garden and the orchard grow ×1.2 faster, makes a garden variety likelier and gives a jar of honey every 6 h, for the great works.',
-    setHive: 'Set a hive',
-    honey: (count: string) => `${count} jars of honey`,
-    found: (name: string) => `Old variety found: ${name}!`,
-    spendHoney: 'Send a flight',
-    spendHoneyCost: '1 jar of honey',
-    age: (age: number) => ['', 'Two-year-old tree', 'Five-year-old tree', 'Old tree'][age] ?? '',
-    basketsPerPick: (count: string) => `${count} baskets per pick`,
-    varietiesTitle: 'Old varieties',
-    unknownVariety: (tree: string) => `An old variety of the ${tree.toLowerCase()}`,
   },
   corridors: {
     family: { green: 'green', blue: 'blue' } satisfies Record<CorridorFamily, string>,
@@ -1238,14 +1147,11 @@ export const en: Texts = {
       council: 'The neighbourhood council',
       fountaineers: 'The fountaineers',
       growers: 'The friends of the garden',
-      beekeepers: 'The beekeepers',
     },
     upgrades: 'The upgrades',
     upgradesAndProjects: 'The upgrades and the projects',
     resows: 'Resows the harvested beds of the garden, never harvesting',
-    carriesHoney: 'Carries the honey beyond two jars to the great work in progress',
     sowings: (count: string) => `${count} sowings`,
-    jars: (count: string) => `${count} jars carried`,
     collectors: 'The water collectors',
     buys: (buys: string) => `Buys ${buys}`,
     and: (first: string, second: string) => `${first} and ${second}`,

@@ -14,10 +14,8 @@ import { completeChallenge, generatorLimit } from './challenges';
 import { completeCycleChallenge } from './cycleChallenges';
 import { runLockKeeper } from './cycles';
 import { runCooperatives } from './cooperatives';
-import { buildReadyStages } from './greatWorks';
 import type { GeneratorId } from './generators';
 import { growGarden } from './garden';
-import { growOrchard } from './orchard';
 import { decayPollen, pollinate } from './pollen';
 import { advanceWeather } from './weather';
 import { runBuilders } from './cities';
@@ -58,9 +56,7 @@ function produce(state: GameState, dtSeconds: number): GameState {
  * species now deserved (§9.5).
  */
 export function unlockProgress(state: GameState): GameState {
-  return buildReadyStages(
-    unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(state)))),
-  );
+  return unlockSpecies(completeCycleChallenge(completeChallenge(unlockAchievements(state))));
 }
 
 /**
@@ -73,11 +69,8 @@ export function tick(state: GameState, dtSeconds: number): GameState {
   if (dtSeconds <= 0) return state;
   const watered = advanceWeather(
     decayPollen(
-      growOrchard(
-        growGarden(
-          earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds),
-          dtSeconds,
-        ),
+      growGarden(
+        earnWater(produce(state, dtSeconds), waterPerSecond(state) * dtSeconds),
         dtSeconds,
       ),
       dtSeconds,

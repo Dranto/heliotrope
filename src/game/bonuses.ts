@@ -8,14 +8,12 @@ import { weatherBonuses, type WeatherState } from './weather';
 import type { GameState } from './state';
 import { cityBonuses, type CitySource } from './cityData';
 import { corridorBonuses } from './corridors';
-import { fruitVarietyBonuses, type FruitId } from './fruits';
 import type { EffectKind } from './effects';
 import type { GeneratorId } from './generators';
 import { CHALLENGES, type ChallengeId } from './challenges';
 import { CYCLE_CHALLENGES, type CycleChallengeId } from './cycleChallenges';
 import { hillsidesBonuses, scaleBonus, widenFactor, type WideArmId } from './delta';
 import { DISTRICTS, type DistrictId } from './districts';
-import { greatWorksBonuses, type WorkId } from './greatWorks';
 import { growthBonuses, pathsWorking, type GrowthState } from './growth';
 import { familyBonuses } from './families';
 import { parcelBonuses, type Future, type ParcelId } from './parcels';
@@ -68,8 +66,6 @@ export type Bonus =
   | { kind: 'perDistrict'; bonus: number }
   /** Multiplies how fast the courtyard garden's crops grow (§9.7, §6.6). */
   | { kind: 'gardenGrowth'; factor: number }
-  /** Multiplies how fast the orchard's trees grow and bear (§9.8, §7.6). */
-  | { kind: 'orchardGrowth'; factor: number }
   /** The pollen gauge fills faster (§5.6). */
   | { kind: 'pollenFill'; factor: number }
   /** The neighbours bring `units` more of their building (§9.6). */
@@ -80,8 +76,6 @@ export type Bonus =
   | { kind: 'perSpecies'; generator: GeneratorId; bonus: number }
   /** `generator` gains `bonus` (additive) per parcel restored (§5.5). */
   | { kind: 'generatorPerParcel'; generator: GeneratorId; bonus: number }
-  /** Each harvest of the courtyard garden gives `units` more baskets (§9.9, M34). */
-  | { kind: 'harvestBaskets'; units: number }
   /** Adds `bonus` to global production per path working on the buildings (§9.9, M34). */
   | { kind: 'perPath'; bonus: number }
   /** Adds `bonus` to global production per family of Milestones complete (§9.16, M37). */
@@ -114,10 +108,6 @@ export interface BonusSource {
   sites?: { hillsides: number };
   /** Widenings of the delta's arms, read for the hillsides and the flood arm (M19). */
   delta?: { widths: Readonly<Record<WideArmId, number>> };
-  /** Stages of the great works built (§6.6, M20); absent where none can be. */
-  greatWorks?: { works: Readonly<Record<WorkId, { stage: number }>> };
-  /** Old fruit varieties found in the orchard (§9.8, M22); absent where none can be. */
-  orchard?: { varieties: readonly FruitId[] };
   /** The sister cities (§7.6, M23); absent where none can be. */
   city?: CitySource;
   /** The paths picked as the buildings grow (§5.5, M26); absent where none can be. */
@@ -167,8 +157,6 @@ function collectBonuses(source: BonusSource): Bonus[] {
     cycleChallenges = [],
     sites,
     delta,
-    greatWorks,
-    orchard,
     city,
     growth,
     weather,
@@ -186,9 +174,7 @@ function collectBonuses(source: BonusSource): Bonus[] {
       CYCLE_CHALLENGES[id].bonuses.map((b) => scaleBonus(b, floodScale)),
     ),
     ...(sites ? hillsidesBonuses(sites.hillsides, widenFactor(delta?.widths.hillsArm ?? 0)) : []),
-    ...(greatWorks ? greatWorksBonuses(greatWorks.works) : []),
     ...corridorBonuses({ parcels, futures }),
-    ...(orchard ? fruitVarietyBonuses(orchard.varieties) : []),
     ...(city ? cityBonuses(city) : []),
     ...(growth ? growthBonuses({ generators: source.generators, growth }) : []),
     ...(weather && source.intro
@@ -236,7 +222,6 @@ export function factorOf(
     | 'visitInterval'
     | 'harvestFactor'
     | 'gardenGrowth'
-    | 'orchardGrowth'
     | 'pollenFill',
 ): number {
   return bonusesOf(source, kind).reduce((product, b) => product * b.factor, 1);
@@ -290,7 +275,30 @@ export function offlineCapBonus(source: BonusSource): number {
   return bonusesOf(source, 'offlineCap').reduce((sum, b) => sum + b.seconds, 0);
 }
 
-/** Baskets added to each harvest of the courtyard garden. */
-export function extraHarvestBaskets(source: BonusSource): number {
-  return bonusesOf(source, 'harvestBaskets').reduce((sum, b) => sum + b.units, 0);
+/**
+ * Bonuses of a list of stages folded together for display: same kinds (and same effect) add up,
+ * factors multiply, so a complete work reads as one line per effect.
+ */
+export function foldBonuses(bonuses: readonly Bonus[]): Bonus[] {
+  const folded = new Map<string, Bonus>();
+  for (const bonus of bonuses) {
+    const key = [
+      bonus.kind,
+      'effect' in bonus ? bonus.effect : '',
+      'generator' in bonus ? bonus.generator : '',
+    ].join(':');
+    const prev = folded.get(key);
+    if (!prev) {
+      folded.set(key, bonus);
+      continue;
+    }
+    const merged: Record<string, unknown> = { ...prev };
+    for (const [field, value] of Object.entries(bonus)) {
+      if (typeof value !== 'number') continue;
+      const before = (prev as unknown as Record<string, number>)[field] ?? 0;
+      merged[field] = field === 'factor' ? before * value : before + value;
+    }
+    folded.set(key, merged as unknown as Bonus);
+  }
+  return [...folded.values()];
 }

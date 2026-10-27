@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { growersCrop, isCooperativeUnlocked, runCooperatives } from './cooperatives';
-import { createGreatWorksState, HONEY_RESERVE } from './greatWorks';
 import { withAllIntroduced } from './introductions';
 import { PROJECTS } from './projects';
 import { offeredProjects } from './restoration';
@@ -88,51 +87,12 @@ describe('the friends of the garden (M36)', () => {
   });
 });
 
-describe('the beekeepers (M36)', () => {
-  const works = createGreatWorksState();
-  const stage = { ...works.works.tram, stage: 2 };
-
-  it('come with the second hive and carry the spare honey to the work in progress', () => {
-    const state = late({
-      orchard: { ...late().orchard, hives: 2, honey: HONEY_RESERVE + 5 },
-      greatWorks: { works: { ...works.works, tram: stage } },
-    });
-    expect(isCooperativeUnlocked(state, 'beekeepers')).toBe(true);
-    const run = runCooperatives(state);
-    expect(run.greatWorks.works.tram.paid.honey).toBe(3);
-    expect(run.orchard.honey).toBe(HONEY_RESERVE + 2);
-    expect(run.cooperatives.purchases.beekeepers).toBe(3);
-  });
-
-  it('keep carrying honey with no talent learnt, as after a swarm', () => {
-    const state = late({
-      talents: [],
-      orchard: { ...late().orchard, hives: 2, honey: HONEY_RESERVE + 5 },
-      greatWorks: { works: { ...works.works, tram: stage } },
-    });
-    const run = runCooperatives(state);
-    expect(run.greatWorks.works.tram.paid.honey).toBe(3);
-    expect(run.orchard.honey).toBe(HONEY_RESERVE + 2);
-  });
-
-  it('keep the reserve, and wait for the second hive', () => {
-    const one = late({
-      orchard: { ...late().orchard, hives: 1, honey: 9 },
-      greatWorks: { works: { ...works.works, tram: stage } },
-    });
-    expect(isCooperativeUnlocked(one, 'beekeepers')).toBe(false);
-    expect(runCooperatives(one).orchard.honey).toBe(9);
-    const reserve = { ...one, orchard: { ...one.orchard, hives: 2, honey: HONEY_RESERVE } };
-    expect(runCooperatives(reserve).orchard.honey).toBe(HONEY_RESERVE);
-  });
-});
-
 describe('the save (M36)', () => {
   it('keeps the new canopy talents and cooperatives', () => {
     const state = withCanopy(late({ seeds: 1e6 }), { assembly: 1, growers: 1 });
     const back = deserialize(serialize(state), 0)!;
     expect(back.canopy.levels.assembly).toBe(1);
     expect(back.canopy.levels.growers).toBe(1);
-    expect(back.cooperatives.purchases.beekeepers).toBe(0);
+    expect(back.cooperatives.purchases.growers).toBe(0);
   });
 });

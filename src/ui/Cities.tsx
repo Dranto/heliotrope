@@ -16,7 +16,7 @@ import {
   type LandscapeId,
 } from '../game/cities';
 import { formatNumber, formatPercent } from '../game/format';
-import { foldBonuses } from '../game/greatWorks';
+import { foldBonuses } from '../game/bonuses';
 import { t } from '../i18n';
 import { bonusesText } from '../i18n/restoration';
 import { Dialog } from './Dialog';

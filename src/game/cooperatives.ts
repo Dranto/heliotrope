@@ -2,9 +2,8 @@
 // the Tree of Seasons brings them in. Each one looks after some buildings, the council after the
 // upgrades, the fountaineers (from the Canopy, §7.1) after the water collectors of the
 // Bioregion. M36 adds the small loops: the council carries out the projects once the assembly of
-// the Canopy asks it, the growers resow the courtyard garden (never harvesting, D27) and the
-// beekeepers carry the spare honey to the great works. Pure: `runCooperatives` returns new
-// state, called by every tick.
+// the Canopy asks it and the growers resow the courtyard garden (never harvesting, D27). Pure:
+// `runCooperatives` returns new state, called by every tick.
 import { isIntroduced } from './introductions';
 import {
   buyCollector,
@@ -25,8 +24,6 @@ import {
 import type { GameState } from './state';
 import { CANOPY_LIST, TALENT_LIST } from './talents';
 import { canSow, CROP_IDS, isCropUnlocked, openPlots, sow, type CropId } from './garden';
-import { carryHoney } from './greatWorks';
-import { HIVE_COSTS } from './orchard';
 import { PROJECTS, type ProjectId } from './projects';
 import { carryOutProject, offeredProjects } from './restoration';
 
@@ -38,7 +35,6 @@ export const COOPERATIVE_IDS = [
   'council',
   'fountaineers',
   'growers',
-  'beekeepers',
 ] as const;
 export type CooperativeId = (typeof COOPERATIVE_IDS)[number];
 
@@ -51,7 +47,6 @@ export const COOPERATIVE_GENERATORS: Record<CooperativeId, readonly GeneratorId[
   council: [],
   fountaineers: [],
   growers: [],
-  beekeepers: [],
 };
 
 /** "Garder une réserve": a purchase may then cost at most this share of the Light in reserve. */
@@ -86,11 +81,10 @@ export function isCooperativeId(value: unknown): value is CooperativeId {
 
 /**
  * A cooperative joins once the talent that brings it in is learnt (from the 2nd Season, D3), or
- * its canopy talent sown. The beekeepers come with the second hive of the orchard (M36).
+ * its canopy talent sown.
  */
 export function isCooperativeUnlocked(state: GameState, id: CooperativeId): boolean {
   if (!isIntroduced(state, 'cooperatives')) return false;
-  if (id === 'beekeepers') return state.orchard.hives >= HIVE_COSTS.length;
   return (
     TALENT_LIST.some((t) => t.cooperative === id && state.talents.includes(t.id)) ||
     CANOPY_LIST.some((c) => c.cooperative === id && state.canopy.levels[c.id] > 0)
@@ -272,20 +266,12 @@ function resowGarden(state: GameState): GameState {
   return counted(next, 'growers', sown);
 }
 
-/** The beekeepers (M36) carry the spare honey to the great work in progress. */
-function tendHives(state: GameState): GameState {
-  if (!isCooperativeActive(state, 'beekeepers')) return state;
-  const next = carryHoney(state);
-  return counted(next, 'beekeepers', state.orchard.honey - next.orchard.honey);
-}
-
 /**
  * Let the working cooperatives buy what they can afford now. Their purchases are not the
  * player's: they do not reset the time since the last purchase (hidden Milestone, §9.3).
  */
 export function runCooperatives(state: GameState): GameState {
-  // The beekeepers need no talent (M36): they keep working after a swarm empties the tree.
-  let next = tendHives(resowGarden(state));
+  let next = resowGarden(state);
   if (next.talents.length === 0) return next;
   for (let i = 0; i < MAX_PURCHASES_PER_TICK; i++) {
     const purchase = nextPurchase(next);

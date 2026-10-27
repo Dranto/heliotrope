@@ -5,8 +5,6 @@ import type { ChallengeId } from './challenges';
 import type { CycleChallengeId } from './cycleChallenges';
 import { createDecorState, type DecorState } from './decor';
 import { createDeltaState, type DeltaState } from './delta';
-import { createGreatWorksState, type GreatWorksState } from './greatWorks';
-import { createOrchardState, type OrchardState } from './orchard';
 import { createCityState, type CityState } from './cities';
 import type { DistrictId } from './districts';
 import { createCooperativesState, type CooperativesState } from './cooperatives';
@@ -30,7 +28,7 @@ import type { UpgradeId } from './upgrades';
 import { createVisitState, VISIT_KINDS, type VisitKind, type VisitState } from './visits';
 
 /** Bump when the shape of GameState changes, and add a migration in save.ts. */
-export const STATE_VERSION = 42;
+export const STATE_VERSION = 43;
 
 /** §9.2: the Golden Butterfly flies by every 3 to 8 minutes. */
 export const BUTTERFLY_MIN_INTERVAL = 3 * 60;
@@ -139,10 +137,6 @@ export interface GameState {
   cycleChallenges: CycleChallengeId[];
   /** The courtyard garden's beds, harvests and seed bank (§9.7). Kept forever. */
   garden: GardenState;
-  /** Stages of the great works built and paid so far (§6.6, M20). Kept forever. */
-  greatWorks: GreatWorksState;
-  /** The orchard and the hives (§9.8, M22), kept across Seasons and Cycles. */
-  orchard: OrchardState;
   /** The sister cities (§7.6, M23): the city lived in, the network, the Savoirs. */
   city: CityState;
   /** The paths picked as the buildings grow (§5.5, M26). Kept across Seasons and Cycles. */
@@ -235,8 +229,6 @@ export function createInitialState(now: number): GameState {
     cycleChallenge: null,
     cycleChallenges: [],
     garden: createGardenState(),
-    greatWorks: createGreatWorksState(),
-    orchard: createOrchardState(),
     city: createCityState(),
     growth: createGrowthState(),
     pollen: createPollenState(),

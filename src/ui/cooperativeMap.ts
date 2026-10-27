@@ -69,11 +69,4 @@ export const COOPERATIVE_ROUTES: Record<CooperativeId, CooperativeRoute> = {
     delay: 6,
     park: [WEST + MID + 40, SOUTH + MID - 1, 0],
   },
-  // M36: the north avenue from the east street to the west edge, there and back, with the honey.
-  beekeepers: {
-    path: `M${EAST + MID} ${NORTH + MID + 1} H-12 V${NORTH + MID - 1} H${EAST + MID} Z`,
-    seconds: 48,
-    delay: 18,
-    park: [WEST - 40, NORTH + MID + 1, 180],
-  },
 };

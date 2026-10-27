@@ -10,9 +10,6 @@ import { GENERATOR_IDS, type GeneratorId } from './generators';
 import { clickValue, lightPerSecond } from './production';
 import { lightForSeeds } from './seasons';
 import { deltaLevels, LOCK_MILESTONE_CYCLES } from './delta';
-import { FRUIT_IDS } from './fruits';
-import { TREE_AGE_PICKS, treeAge } from './orchard';
-import { worksBuilt } from './greatWorks';
 import { VARIETY_IDS } from './seedBank';
 import type { GameState } from './state';
 import { canopyLevels, isCanopyComplete } from './talents';
@@ -44,6 +41,11 @@ export const RETIRED_ACHIEVEMENTS: readonly unknown[] = [
   'firstFavour',
   'goodNeighbour',
   'hello',
+  'works.1',
+  'works.4',
+  'firstFruit',
+  'oldOrchard',
+  'oldTree',
 ];
 
 /** Upgrade groups a Milestone can ask to complete within one Season. */
@@ -111,15 +113,8 @@ export type AchievementCondition =
   | { kind: 'deltaLevels'; count: number }
   /** Cycles the lock keeper started (§7.5). */
   | { kind: 'lockCycles'; count: number }
-  /** Great works complete, kept forever (§6.6). */
-  | { kind: 'worksBuilt'; count: number }
-  /** Fruit picked in the orchard, and old varieties found there (§9.8). */
-  | { kind: 'fruitHarvests'; count: number }
-  | { kind: 'fruitVarieties'; count: number }
   /** Harvests of a crop sown after a different one (M32). */
   | { kind: 'rotations'; count: number }
-  /** A fruit tree at its last age (M32). */
-  | { kind: 'oldTree' }
   /** Sister cities founded (§7.6). */
   | { kind: 'sisterCities'; count: number }
   /** Paths working on the buildings that grow (§5.5). */
@@ -188,7 +183,6 @@ const COLLECTOR_STEPS = [10, 50] as const;
 const SITE_STEPS = [1, 10, 25] as const;
 const CYCLE_STEPS = [1, 3] as const;
 const DELTA_STEPS = [1, 6] as const;
-const WORK_STEPS = [1, 4] as const;
 const CITY_STEPS = [1, 3] as const;
 const CYCLE_CHALLENGE_STEPS = [1, 3] as const;
 
@@ -220,11 +214,7 @@ export type AchievementId =
   | `sites.${(typeof SITE_STEPS)[number]}`
   | `cycles.${(typeof CYCLE_STEPS)[number]}`
   | `delta.${(typeof DELTA_STEPS)[number]}`
-  | `works.${(typeof WORK_STEPS)[number]}`
-  | 'firstFruit'
-  | 'oldOrchard'
   | 'rotation'
-  | 'oldTree'
   | `cities.${(typeof CITY_STEPS)[number]}`
   | 'firstPath'
   | 'manyPaths'
@@ -379,12 +369,6 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
     condition: { kind: 'canopyLevels', count } as const,
   })),
   { id: 'crown', family: 'neighbourhood', condition: { kind: 'fullCanopy' } },
-  // The great works (§6.6).
-  ...WORK_STEPS.map((count) => ({
-    id: `works.${count}` as const,
-    family: 'neighbourhood' as const,
-    condition: { kind: 'worksBuilt', count } as const,
-  })),
   // The sister cities (§7.6).
   ...CITY_STEPS.map((count) => ({
     id: `cities.${count}` as const,
@@ -409,15 +393,7 @@ export const ACHIEVEMENT_LIST: readonly AchievementDef[] = [
   { id: 'skyCreatures', family: 'neighbourhood', condition: { kind: 'weatherSpecies' } },
   // The families of the Herbier (M35).
   { id: 'wholeFamily', family: 'neighbourhood', condition: { kind: 'families', count: 2 } },
-  // The orchard (§9.8).
-  { id: 'firstFruit', family: 'neighbourhood', condition: { kind: 'fruitHarvests', count: 1 } },
-  {
-    id: 'oldOrchard',
-    family: 'neighbourhood',
-    condition: { kind: 'fruitVarieties', count: FRUIT_IDS.length },
-  },
-  // The lighter garden and orchard (M32).
-  { id: 'oldTree', family: 'neighbourhood', condition: { kind: 'oldTree' } },
+  // The lighter garden (M32).
   {
     id: 'rotation',
     family: 'neighbourhood',
@@ -655,16 +631,12 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return deltaLevels(state) >= condition.count;
     case 'lockCycles':
       return state.delta.lockCycles >= condition.count;
-    case 'worksBuilt':
-      return worksBuilt(state) >= condition.count;
     case 'sisterCities':
       return state.city.founded.length >= condition.count;
     case 'paths':
       return pathsWorking(state) >= condition.count;
     case 'rotations':
       return state.garden.rotations >= condition.count;
-    case 'oldTree':
-      return FRUIT_IDS.some((id) => treeAge(state.orchard.trees[id]) === TREE_AGE_PICKS.length);
     case 'flights':
       return state.pollen.flights >= condition.count;
     case 'weather':
@@ -673,10 +645,6 @@ function isMet(state: GameState, condition: AchievementCondition): boolean {
       return WEATHER_SPECIES.every((id) => state.species.includes(id));
     case 'families':
       return completeFamilies(state.species).length >= condition.count;
-    case 'fruitHarvests':
-      return state.orchard.harvests >= condition.count;
-    case 'fruitVarieties':
-      return state.orchard.varieties.length >= condition.count;
     case 'cycleChallenges':
       return state.cycleChallenges.length >= condition.count;
     case 'playSeconds':
@@ -775,8 +743,6 @@ function measure(state: GameState, condition: AchievementCondition): [number, nu
       return [deltaLevels(state), condition.count];
     case 'lockCycles':
       return [state.delta.lockCycles, condition.count];
-    case 'worksBuilt':
-      return [worksBuilt(state), condition.count];
     case 'sisterCities':
       return [state.city.founded.length, condition.count];
     case 'paths':
@@ -787,10 +753,6 @@ function measure(state: GameState, condition: AchievementCondition): [number, nu
       return [state.pollen.flights, condition.count];
     case 'families':
       return [completeFamilies(state.species).length, condition.count];
-    case 'fruitHarvests':
-      return [state.orchard.harvests, condition.count];
-    case 'fruitVarieties':
-      return [state.orchard.varieties.length, condition.count];
     case 'cycleChallenges':
       return [state.cycleChallenges.length, condition.count];
     case 'playSeconds':

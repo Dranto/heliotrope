@@ -54,7 +54,6 @@ import { welcomeVisit, type WelcomeResult } from '../game/visits';
 import { ParcelGround, ParcelOffers, ProjectMarks } from './RestorationArt';
 import { isDecorOpen, nextDecor, placeDecor } from '../game/decor';
 import { DecorLayer } from './DecorArt';
-import { GreatWorksLayer } from './GreatWorksArt';
 import { GrowthLayer } from './GrowthArt';
 import { PollenWave } from './PollenWave';
 import { WeatherForecast, WeatherLayer } from './WeatherArt';
@@ -66,13 +65,8 @@ import { GENERATOR_IDS, type GeneratorId } from '../game/generators';
 import { CorridorLayer } from './CorridorArt';
 import { RootsLayer } from './RootsArt';
 import { treeAge } from './tree';
-import { OrchardLayer } from './OrchardArt';
-import { encodeOrchard } from './orchardMap';
-import { isOrchardOpen, pickFruit, type FruitId } from '../game/orchard';
 import { encodeCorridors } from './corridorMap';
 import { corridors as corridorsOf } from '../game/corridors';
-import { encodeStages } from './greatWorksMap';
-import { areGreatWorksOpen } from '../game/greatWorks';
 import { ReturnReplay } from './ReturnReplay';
 import { replaySeconds, returnMarks, returnSkies, returnSweeps } from './returnMap';
 import { encodeDecor } from './decorMap';
@@ -253,13 +247,6 @@ export function Scene({
     )
     .join();
   const reduced = state.settings.reducedMotion || prefersReducedMotion();
-  // The great works (§6.6), encoded so the layer only redraws when a stage is built.
-  const worksOpen = areGreatWorksOpen(state);
-  const works = encodeStages(
-    Object.fromEntries(
-      Object.entries(state.greatWorks.works).map(([id, w]) => [id, w.stage]),
-    ) as Parameters<typeof encodeStages>[0],
-  );
   // The buildings that grow (§5.5), encoded so the layer only redraws when a form or path changes.
   const flights = state.pollen.flights;
   const weather = isWeatherOpen(state) ? state.weather.current : null;
@@ -272,15 +259,8 @@ export function Scene({
     >,
     state.growth.paths,
   );
-  // The orchard (§9.8), encoded so the layer only redraws when a tree or a hive changes.
-  const orchardOpen = isOrchardOpen(state);
   // The landscape of the sister city lived in (§7.6).
   const landscape = state.city.landscape;
-  const orchard = encodeOrchard(state.orchard);
-  const onPick = useCallback(
-    (id: FruitId) => store.dispatch((s) => pickFruit(s, id)?.state ?? s),
-    [store],
-  );
   // The green and blue corridors (§6.7), encoded so the layer only redraws when one changes.
   const corridors = encodeCorridors(corridorsOf(state));
   // The parcels in their second future (§6.5), joined so the ground only redraws on a change.
@@ -350,8 +330,6 @@ export function Scene({
         <DistrictGround districts={districts} />
         <DistrictOffer id={districtOffer} ready={districtReady} onRestore={restoreNeighbour} />
         <CorridorLayer corridors={corridors} />
-        <OrchardLayer orchard={orchard} open={orchardOpen} onPick={onPick} />
-        <GreatWorksLayer stages={works} open={worksOpen} reduced={reduced} />
         <GrowthLayer growth={growth} flying={flying} reduced={reduced} />
         <PollenWave flights={flights} flying={flying} reduced={reduced} />
         <ProjectMarks projects={projects} />
@@ -380,16 +358,11 @@ export function Scene({
       rootAge,
       districts,
       districtOffer,
-      works,
-      worksOpen,
       growth,
       flights,
       flying,
       weather,
       corridors,
-      orchard,
-      orchardOpen,
-      onPick,
       districtReady,
       restoreNeighbour,
       projects,
