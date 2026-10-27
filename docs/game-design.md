@@ -833,7 +833,7 @@ valeurClic          = (1 × multClic + pctClic × productionGlobale/s)
 | 1ʳᵉ Centrale à miroirs | ~21 min |
 | 1ʳᵉ Canopée urbaine | ~37 min |
 | 1ʳᵉ Arcologie vivante | ~57 min |
-| 1ʳᵉ Saison conseillée (10 Graines) | ~1 h 07 |
+| 1ʳᵉ Saison conseillée (10 Graines) | ~55 min (1 h 07 avant l'allègement) |
 
 Depuis l'équilibrage adouci (après le MVP), ces cibles sont environ un tiers plus courtes qu'au MVP (qui visait 4 h pour la 1ʳᵉ Saison), et l'écart entre deux paliers grandit doucement (×3 au début, ×2 au milieu, puis moins) au lieu de laisser un long creux avant les derniers bâtiments. Les synergies (§5.3) raccourcissent ensuite surtout la fin de la 1ʳᵉ Saison : la Saison conseillée passe de ~2 h 40 à ~2 h 15, sans toucher au début de partie. Les améliorations de clic précoces (§5.2) accélèrent ensuite surtout le début : le Potager arrive vers 1 min 30 au lieu de 2 min 40. Avec les parcelles et les projets du jalon 6 (§6.1, §6.2), qui accélèrent la seconde moitié, la Saison conseillée arrive vers 1 h 30 – 1 h 40. Les synergies, les Jalons et l'Herbier l'ont ensuite avancée vers 1 h 12 – 1 h 15, à −28 % de l'ancienne cible de 1 h 40, au bord de la marge : M19 rapproche les trois dernières cibles de ce rythme voulu (Canopée 50 → 45 min, Arcologie 1 h 20 → 1 h 10, Saison conseillée 1 h 40 → 1 h 20), sans changer le jeu. Les bâtiments qui grandissent (M26), le pollen (M27) et les moments qui s'enchaînent (M31) ont ensuite avancé toute la seconde moitié de la Saison : sur six graines de hasard, la Centrale arrivait entre −34 % et −12 % de sa cible, hors de la marge pour une graine. Les quatre dernières cibles suivent donc à nouveau ce rythme (Centrale 26 → 21 min, Canopée 45 → 37 min, Arcologie 1 h 10 → 57 min, Saison conseillée 1 h 20 → 1 h 07), toujours sans changer le jeu.
 
@@ -887,10 +887,10 @@ Le simulateur joue aussi les **Cycles qui suivent le premier** (`simulateCycles`
 
 | Cycle | Cible | Simulé | Saisons | Sources à la fin |
 |---|---|---|---|---|
-| 1ᵉʳ (conseillé) | ~2 h 10 | 2 h 08 | une dizaine | 5 |
-| 2ᵉ | ~30 min | 24 min | 2 de 12 min | 9 |
-| 3ᵉ | ~28 min (35 avant le lot 8) | 22 min | 2 de 11 min | 17 |
-| 4ᵉ | ~32 min (45 avant le lot 8) | 26 min | 3 de 9 min | 28 |
+| 1ᵉʳ (conseillé) | ~1 h 50 (2 h 10 avant le lot 9) | 1 h 46 | une dizaine | 5 |
+| 2ᵉ | ~18 min (30 avant le lot 9) | 16,5 min | 12 min et 5 min | 8 |
+| 3ᵉ | ~18 min (35 avant le lot 8) | 15,6 min | 12 min et 4 min | 12 |
+| 4ᵉ | ~20 min (45 avant le lot 8) | 19 min | 11 min et 8 min | 18 |
 | 5ᵉ | (~1 h) | 1 h 10 | 6, de 10 à 16 min | 57 |
 | 6ᵉ | (~1 h 10) | 1 h 28 | 6, la dernière de 29 min | 90 |
 
@@ -908,8 +908,20 @@ Roadmap P29 : le simulateur joue enfin tout (`src/game/wholeGame.ts`, `simulateW
 
 | Étape | Cible (heures de jeu) | Simulé | Temps réel | Cycles dans la ville |
 |---|---|---|---|---|
-| 1ʳᵉ ville sœur | ~4 h | 4,0 h | 16 h | 4 après le premier |
-| 2ᵉ ville sœur | ~5 h | 5,0 h | 20 h | 2 après le premier |
+| 1ʳᵉ ville sœur | ~3 h (4 h avant le lot 9) | 2,8 h | 8,8 h | 3 Cycles |
+| 2ᵉ ville sœur | ~4 h (5 h avant le lot 9) | 3,9 h | 12,9 h | 2 Cycles |
+
+**La règle de relance (lot 9).** Jusqu'au lot 8, le joueur de référence ne regardait ses Sources qu'à la fin d'une Saison : un Cycle durait deux ou trois Saisons entières, et un petit bonus n'importe où le faisait basculer de l'une à l'autre (1ᵉʳ essaimage à 3 h ou 4 h, Cycles 3 et 4 en 22 et 26 min ou en 26 et 35 min). Depuis le lot 9, il regarde ses Sources chaque minute et lance le Cycle suivant dès qu'elles atteignent ×1,5, comme l'éclusier (§7.5) : la durée d'un Cycle suit l'Eau sans sauter d'une Saison. Les cibles des Cycles et de la partie suivent ce rythme, plus court.
+
+**Le joueur attentif (lot 9).** Un second joueur ne s'absente jamais : il s'occupe du potager toutes les 3 min et accueille chaque visiteur (`attentiveSessions`, `src/game/attentivePlayer.test.ts`).
+
+| Étape | Cible | Simulé |
+|---|---|---|
+| 1ʳᵉ Saison conseillée | ~35 min | 34 min |
+| 1ʳᵉ ville sœur | ~2 h de jeu | 2,1 h |
+| 2ᵉ ville sœur | ~3 h de jeu | 3,2 h |
+
+Le potager et les visites comptent : un joueur attentif essaime une heure plus tôt que le joueur de référence et finit sa 1ʳᵉ Saison en deux tiers du temps.
 
 - **Plus court que sans les boucles.** Sans les absences ni les petites boucles, il fallait 6 Cycles après le premier pour essaimer (M23) ; avec trois heures hors ligne par heure de jeu, les grands chantiers et les alliances, il en faut 4. La ville sœur, qui garde le delta, les Savoirs et le reste, ne prend ensuite qu'une heure de jeu.
 - **La grande floraison n'a pas de cible.** Elle demande l'Herbier complet, donc toutes les Saisons et tous les Cycles à défi, les visites de la ville et la trame bleue, que le joueur de référence ne joue pas. Au 2ᵉ essaimage, il a bâti deux étapes de chaque chantier et ramené 16 espèces sur 28. Écart avec la roadmap, qui proposait une trentaine d'heures pour la floraison : elle reste l'objectif de très long terme, sans test.
@@ -1320,6 +1332,7 @@ Demande d'Antoine du 2026-10-26 : retirer les mécaniques de peu d'effet et diff
 - **Équilibrage (lot 7).** 1ʳᵉ Saison conseillée 53 min ; Cycles 2 à 4 en 22, 26 et 35 min (cibles 30, 35 et 45, entre −28 % et −23 %) ; essaimages à 2 h 53 et 3 h 53 de jeu (cibles 4 h et 5 h). 30 s de maturité par quartier faisaient tomber le 2ᵉ Cycle à 20 min : seuls deux quartiers la raccourcissent. Le lot 9 remesure les cibles.
 - **Lot 8 : l'Arbre s'étend (§7.1).** Une quatrième branche, Le Quartier (5 talents) : clic ×2 de l'ancien Marché du tram, projets 25 % moins chers, bâtiments 10 % moins chers des anciennes Racines profondes, parcelles et quartiers voisins 25 % moins chers, visiteurs 25 % plus fréquents. Trois fourches opposent Boutures et Terre profonde (2 min de maturité), Longue floraison et Prairie sauvage (potager ×1,5), Veilleurs de nuit et Gardiens des sources (Eau ×1,25) ; l'échange se fait une fois par Cycle. La Canopée s'ouvre avec 22 talents. Un Jalon : « Arbre du quartier » (22 talents), **143 Jalons**.
 - **Équilibrage (lot 8).** Le joueur de référence garde le premier talent de chaque fourche et apprend le Quartier après les trois anciennes branches. 1ʳᵉ Saison conseillée 53 min ; Cycles 2 à 4 en 23, 22 et 26 min ; essaimages à 2 h 54 et 3 h 49 de jeu (cibles 4 h et 5 h). L'Arbre complet ouvre la Canopée plus tard dans la partie, et sa Pépinière raccourcit alors les Saisons des Cycles 3 et 4 (9 min au lieu de 11) : selon le moment où les Sources franchissent ×1,5, ces Cycles durent 22 et 26 min ou 26 et 35 min. Les cibles des Cycles 3 et 4 passent de 35 et 45 min à 28 et 32 min pour couvrir les deux, en attendant que le lot 9 corrige la règle de relance ×1,5 et remesure le §8.
+- **Lot 9 : rééquilibrage (§8).** Le simulateur lance le Cycle suivant dès que ses Sources atteignent ×1,5 au lieu d'attendre la fin de la Saison : le rythme ne bascule plus d'une Saison entière au moindre bonus. Nouvelles cibles : 1ʳᵉ Saison conseillée 55 min (mesurée 53), 1ᵉʳ Cycle 1 h 50 (1 h 46), Cycles 2 à 4 en 18, 18 et 20 min (16,5, 15,6 et 19), essaimages à 3 h et 4 h de jeu (2,8 h et 3,9 h). Un joueur attentif, qui soigne le potager toutes les 3 min et accueille chaque visiteur, a ses propres cibles : 1ʳᵉ Saison 35 min, essaimages à 2 h et 3 h. Rien ne change dans le jeu lui-même.
 - **Sauvegarde (lot 8).** Version 47 : aucune fourche n'a encore été échangée ; une sauvegarde qui tiendrait les deux talents d'une fourche garde le premier appris.
 
 ## 10. Écrans et interface
